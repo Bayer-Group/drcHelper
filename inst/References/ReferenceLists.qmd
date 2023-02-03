@@ -1,0 +1,12 @@
+
+
+## Example Dose Response Analysis
+
+- [Example of using DRC](https://rpubs.com/Kat_T/788707)
+
+> Biological activity can be induced by adding some concentration of compound. One of the core tenants of pharmacology is that this relationship between [Compound], or agonist, and response, follows a semi-log sigmoidal curve described by the Hill equation. This means at first, biological response to the dose (DR) is slow. Then as more compound is added, it becomes roughly linear. FInally, the response is fully saturated and plateaus around some value.
+
+- [the analysis of data from live cell imaging cell proliferation experiments](https://f1000research.com/articles/5-962)
+
+> The software is potentially useful to any research group studying the impact of small molecule inhibitors on cell proliferation using the IncuCyte ZOOM.
+Keywords

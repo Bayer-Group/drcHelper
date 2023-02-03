@@ -1,0 +1,89 @@
+---
+title: "Examples_drc"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(drc)
+```
+
+- From the help page of `drc::ED`
+
+> There are several options for calculating confidence intervals through the argument interval. The option "delta" results in asymptotical Wald-type confidence intervals (using the delta method and the normal or t-distribution depending on the type of response). The option "fls" produces (possibly skewed) confidence intervals through back-transformation from the logarithm scale (only meaningful in case the parameter in the model is log(ED50) as for the llogistic2) models. The option "tfls" is for transforming back and forth from log scale (experimental). The option "inv" results in confidence intervals obtained through inverse regression.
+
+```{r}
+## Model with ED50 as a parameter
+finney71.m1 <- drm(affected/total ~ dose, weights = total,
+data = finney71, fct = LL.2(), type = "binomial")
+
+summary(finney71.m1)
+plot(finney71.m1, broken = TRUE, bp = 0.1, lwd = 2)
+
+ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="relative")
+## ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="absolute")
+## ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "upper")
+
+ED(finney71.m1, c(10, 20, 50), interval = "inv", reference = "control",type="relative")
+```
+
+
+```{r}
+## Fitting 4-parameter log-logistic model
+ryegrass.m1 <- drm(ryegrass, fct = LL.4())
+
+## Calculating EC/ED values
+## Also displaying 95% confidence intervals
+ED(ryegrass.m1, c(10, 50, 90), interval = "delta")
+plot(ryegrass.m1,broken = TRUE)
+plot(ryegrass.m1, broken = TRUE, type="confidence", add=TRUE)
+```
+
+
+```{r}
+## Fitting the Brain-Cousens model
+lettuce.m1 <- drm(weight ~ conc, 
+data = lettuce, fct = BC.4())
+plot(lettuce.m1,confidence.level = 0.95)
+### Calculating ED[-10]
+
+# This does not work
+#ED(lettuce.m1, -10)  
+
+## Now it does work
+ED(lettuce.m1, c(-10,-20), bound = FALSE)  # works
+
+### Using a different break point. 
+par(mfrow = c(2, 2))
+plot(lettuce.m1, main = "bp = default")  # using the default
+plot(lettuce.m1, bp = 1e-4, main = "bp = 1e-4")
+plot(lettuce.m1, bp = 1e-6, main = "bp = 1e-6")
+plot(lettuce.m1, bp = 1e-8, main = "bp = 1e-8")
+par(mfrow = c(1,1))
+
+```
+
+
+```{r}
+## Fitting model to be plotted below
+spinach.m1 <- drm(SLOPE~DOSE, CURVE, data = spinach, fct = LL.4())
+
+## Plot with no colours
+plot(spinach.m1, main = "Different line types (default)")
+
+## Plot with default colours
+plot(spinach.m1, col = TRUE, main = "Default colours")
+
+## Plot with specified colours
+plot(spinach.m1, col = c(2,6,3,23,56), main = "User-specified colours")
+
+## Plot of curves 1 and 2 only
+plot(spinach.m1, level = c(1,2), main = "User-specified curves")
+
+```

@@ -1,0 +1,14 @@
+pandoc: 2.17.1.1
+pkgdown: 2.0.6
+pkgdown_sha: ~
+articles:
+  Introduction: Introduction.html
+  Tutorial_drc_Helpers: Tutorial_drc_Helpers.html
+  EFSA-Criteria: EFSA-Criteria.html
+  Examples_MCP: Examples_MCP.html
+  Examples_drc: Examples_drc.html
+  Examples_oecd201: Examples_oecd201.html
+  MQJT: MQJT.html
+  Ordinal-Data: Ordinal-Data.html
+last_built: 2022-11-04T13:40Z
+

@@ -1,0 +1,5 @@
+^drcHelper\.Rproj$
+^\.Rproj\.user$
+^vignettes/articles$
+^data-raw$
+^README\.Rmd$

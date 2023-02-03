@@ -1,0 +1,130 @@
+---
+title: "An example: RSCABS for Histopath Data"
+---
+
+## An example of performing the Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices.
+
+
+RSCABS: designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT. 
+
+Steps in the testing procedure:
+
+1.The Cochran-Armitage (CA) trend test was used to test a set of organisms for an increase in the presences (score > 0) or absence (score = 0) of an effect with an increase in the dose concentration of the treatments. 
+2. The Rao-Scott (RS) adjustment controls for the similarity in each experiment unit / apparatus (*e.g.*, fish tank) by calculating an adjustment to the CA test statistic from correlation of organisms within each apparatuses. 
+3. The by slices (BS) part allows for testing at each severity score (*e.g.*, from 1 to 5) instead of just presences or absence. By slices works by splitting the severity scores associated with an endpoint into **two** groups based on the severity score being tested.  The RSCA test statistic is calculated based on these two groups.
+4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left. 
+
+
+### Notes on RSCABS
+
+1. Select responses maximum value should be > 0 and smaller than 20??
+2. for each to be tested response/endpoints, *convert2score*
+3. for each to be tested response/endpoints, *prepDataRSCABS*, prepare the data into matrix/table format, treatment as column, replicate as row
+4. for each to be tested response/endpoints, *stepKRSCABS*.
+
+```
+$Gon_Asynch_Dev
+           Effect Treatment R.Score Statistic     P.Value Signif
+1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
+2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
+5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+```
+
+5. combine the results into a big matrix.
+
+```{r}
+library(drcHelper)
+# Prepare data
+library(DependenciesGraphs)
+dep <- funDependencies("package:drcHelper","runRSCABS")
+
+# visualization
+plot(dep)
+
+library(tidyverse)
+```
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+```
+
+```{r}
+data("exampleHistData")
+exampleHistData <- exampleHistData %>% as_tibble %>% mutate(across(where(is.integer),as.numeric)) %>% as.data.frame(.)
+#Take the subset corresponding to F0-females of 16 weeks of age
+
+subIndex<-which(exampleHistData$Generation=='F2' &
+                  exampleHistData$Genotypic_Sex=='Female' &
+                  exampleHistData$Age=='16_wk' )
+exampleHistData.Sub<-exampleHistData[subIndex, ]
+#Run RSCABS	
+exampleResults<-runRSCABS(exampleHistData.Sub,'Treatment',
+                          'Replicate',test.type='RS')
+```
+
+```{r}
+exampleResults %>% knitr::kable(.,digits=3)
+```
+
+
+```{r}
+ggplot(exampleHistData.Sub,aes(x=Treatment,fill=factor(Gon_Asynch_Dev)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Data: Gon_Asynch_Dev",subtitle = "subset: F2 generation, 15 week age and female")
+# xlab<-'Group'
+# ylab<-'Total Fish'
+# main<-'Example Graph for \n Example Data and Gon_Asynch_Dev'
+# col<-c('purple1','red3')
+# Metric="Total"
+# Lowest ="Include"
+# # PlotParms<-list()
+# # PlotParms$xlab<-'Group'
+# # PlotParms$ylab<-'Total Fish'
+# # PlotParms$main<-'Example Graph for \n Example Data and Gon_Asynch_Dev'
+# # PlotParms$Colors<-c('purple1','red3')
+# plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Asynch_Dev",
+# 	Treatment="Treatment", Metric="Total", Lowest = "Include",
+# 	#PlotParms =PlotParms,
+# 	Format = NULL, File = NULL,
+# 	xlab=xlab,main=main,ylab=ylab,col=col)
+# ####################
+# col <- c("purple","green","black")
+# plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Incr_Oocyte_Atresia",
+# 	Treatment="Treatment", Metric="Total", Lowest = "Include",
+# 	#PlotParms =PlotParms, 
+# 	Format = NULL, File = NULL,
+# 	xlab=xlab,main=main,ylab=ylab,col=col)
+cids <-which(apply(exampleHistData.Sub[,-(1:5)],2,max)>0)
+responses <- names(cids)
+
+
+
+ggplot(exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint"),aes(x=Treatment,fill=factor(Response)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint)
+
+
+library(scales)
+dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint") %>% group_by(Endpoint,Treatment,Response) %>% summarise(counts=n())%>% group_by(Endpoint,Treatment) %>% mutate(total=sum(counts))
+
+ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
+```
+
+## References
+
+- Agresti, A. (2002) Categorical Data Analysis, Second Edition. Hoboken, New Jersey: John Wiley & Sons, Inc.
+- Harrell, F. E, (2001) Regression Modeling Strategies. New York: Springer-Verlag.
+- http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/
+## Multi-quantile JT
+
+From: John Green, personal communication.
+
+

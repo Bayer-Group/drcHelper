@@ -1,0 +1,12 @@
+name: medrc_shiny
+title: medrc_shiny
+username: zhenglei_gao
+account: zhenglei_gao
+server: rsconnect.cs.sats.cloud
+hostUrl: https://rsconnect.cs.sats.cloud/__api__
+appId: 309
+bundleId: 1458
+url: https://rsconnect.cs.sats.cloud/content/309/
+when: 1666279603.87434
+asMultiple: FALSE
+asStatic: FALSE

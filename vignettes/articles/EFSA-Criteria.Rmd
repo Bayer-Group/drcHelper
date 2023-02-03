@@ -1,0 +1,67 @@
+---
+title: "EFSA Criteria"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+
+## Model Comparison Criteria
+
+Apart from generic model comparison criteria, EFSA has proposed to use the following two criteria 
+
+**Normalized Width**
+
+|NW   |    Rating|
+|:----|:---------|
+|<0.2 | Excellent|
+|<0.5 | Good     |
+|<1   | Fair     |
+|<2   | Poor     |
+|$>2$ | Bad      |
+
+**Overlapping of EC10, 20 and 50**
+
+
+|Overlapping  Conditions                  |Certainty of the Protection Level |
+|:----------------------------------------|:---------------------------------|
+|EC$_{10}$ < EC$_{20,low}$                | High                             |
+|EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
+|EC$_{10}$ > EC$_{50,low}$                | Fair                             |
+
+
+
+
+## BMD Guidance 2012 Criteria
+
+## BMD Guidance 2022 Criteria
+
+## US EPA BMDS Criteria
+
+
+
+
+
+
+
+
+| Possible Guidelines                                                                                                       |
+|:--------------------------------------------------------------------------------------------------------------------------|
+| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 2004                                                         |
+| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 1984                                                         |
+| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 1981                                                         |
+| OCSPP 850.1010 Aquatic Invertebrate Acute Toxicity Test, Freshwater Daphnids - 2016                                       |
+| OPPTS 850.1010 Aquatic Invertebrate Acute Toxicity Test, Freshwater Daphnids - 1996                                       |
+| EPA OPP 72-2 (Aquatic Invertebrate Acute Toxicity Test)                                                                   |
+| ISO 6341 (Water quality - Determination of the Inhibition of the Mobility of Daphnia magna Straus (Cladocera, Crustacea)) |
+| EU Method C.2 (Acute Toxicity for Daphnia)                                                                                |
+| Japanese MAFF notification No.12-Nousan-8147 - 2000                                                                       |
+| Japanese MAFF notification No. 30-Shouan-6278 - 2019                                                                      |

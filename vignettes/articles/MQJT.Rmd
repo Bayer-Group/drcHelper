@@ -1,0 +1,56 @@
+---
+title: "MQJT"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## The MQJT
+
+The step-down Jonckheere-Terpstra test applied to replicate medians was conventionally used for statistical analysis of amphibian developmental stage. Some questions have been raised whether an analysis focused on the median developmental stage in each rep is sufficiently sensitive to detect statistically effects on developmental stage that are biologically important. Thus John and Tim proposed a modification on standard step-down Jonckheere-Terpstra test procedure which examines multiple quantiles (i.e. shifts in Q20, Q30, Q40, Q50, . . . , Q80) simultaneously. 
+
+The assumption behind MQJT is that a shift in the entire distribution would be expected if there is a "true" effect on the population. An effect on a small portion of the more sensitive population was not considered as biologically relevant if the majority in that replicate were not affected. On the other hand, even if the replicate median were similar across all test concentrations / doses, if most other quantiles are different, showing and effect of the test item, then a significant effect should be identified by the test.  
+
+Assuming a common distribution in all test concentrations (a standard assumption in
+almost all statistical analyses), the difference between the nth quantile, Qn, and the
+median, Q50, is constant across concentrations. Thus, the shifts in Q20, Q30, Q40, Q50, .
+. ., Q80, all measure the effect of test concentrations on a segment of the frequency
+distribution of stages.
+
+Excerpt from John's "Supplementary Approach to Statistical Analysis of Developmental Stage in
+Amphibians"  
+The proposed method proceeds as follows:
+1. Determine the 20th percentile of the stage distribution within each rep at each test
+concentration.
+
+2. Perform a Jonkheere-Terpstra trend test on these 20th percentiles across all
+concentrations. Record the P-value for the trend test.
+
+3. Repeat steps 1 and 2 for the 30th through 80th percentile.
+
+4. Determine the median of the P-values that were obtained in steps 1-3. This
+median P-value is the probability that a trend in distribution shifts across
+concentrations is due to chance. If this median p-value is 0.05 or greater, testing
+stops and the NOEC exceeds the highest tested concentration. Otherwise, proceed
+to step (5).
+
+5. Drop the data from the highest test concentration, and repeat steps 1-4, so that a
+new median P-value is calculated for the reduced data set. If this median p-value
+is 0.05 or greater, testing stops and the NOEC is the highest tested concentration
+used in this analysis. Otherwise, proceed to step (6).
+
+6. Drop the data from the highest concentration used in the current analysis, and
+repeat steps 1-4, so that a new median P-value is calculated for the reduced data
+set.
+
+7. Continue dropping treatment groups until the new median P-value is no longer
+statistically significant. The highest concentration at which this occurs is the noobserved-
+effect-concentration (NOEC).
