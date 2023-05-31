@@ -2,6 +2,17 @@
 title: "An example: RSCABS for Histopath Data"
 ---
 
+
+## Background
+
+Allen Olmstead
+Ecotoxicologist
+
+For the public consultation period on the EU **prothioconazole endocrine assessment**, one of the studies of focus in the FSTRA (fish short term reproduction assay). In particular there was a question concerning the histopathology results (female oocyte atresia, specifically) and whether they were statistically significant. In our report, there is no formal statistical analysis of the data. I was asked about the availability of approaches for this based on my past postdoctoral experience at the EPA lab that developed many of the endocrine assays. For histopath endpoints, the EPA used a Rao-Scott Cochran-Armitage Trend Test By Slices (RSCABS, described in attached paper). 
+
+Using this RSCABS procedure, I looked at the female oocyte atresia data in R. The attached Excel file has the data and the other attached pdf has my notes on this analysis. However, validation is needed if we are to proceed with this approach in any external purpose. 
+
+
 ## An example of performing the Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices.
 
 

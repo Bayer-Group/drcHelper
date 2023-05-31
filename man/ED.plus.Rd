@@ -4,7 +4,7 @@
 \alias{ED.plus}
 \title{Calculating ED following the regulatrory ED definition.}
 \usage{
-\method{ED}{plus}(
+ED.plus(
   object,
   respLev,
   maxEff = TRUE,

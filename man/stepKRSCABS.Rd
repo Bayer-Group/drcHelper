@@ -2,7 +2,7 @@
 % Please edit documentation in R/RSCABS.R
 \name{stepKRSCABS}
 \alias{stepKRSCABS}
-\title{Steps through the severity score for a given effect}
+\title{plotRSCABS}
 \usage{
 stepKRSCABS(Effect, Data.Prep, Treatment, Replicate, test.type)
 }
@@ -25,6 +25,9 @@ Results.Effect
 }
 }
 \description{
+Steps through the severity score for a given effect
+}
+\details{
 An internal function for stepping through each severity score of an endpoint.
 }
 \author{
