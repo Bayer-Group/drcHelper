@@ -114,7 +114,7 @@ list(interm_values = interm_values, Z = Z)
 data("dat_ptz")
 #summarize data
 select(dat_ptz, tmt, tank, S0, S1, S2, S3) %>%
-kable()
+knitr::kable()
 # create control only data set
 cdat <- filter(dat_ptz, tmt %in% c("C", "SC"))
 # Slice S1
