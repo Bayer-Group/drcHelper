@@ -7,7 +7,11 @@
 getEndpoint(pvals, doses = c("Control", "B", "C", "D"), procedure = "stepDown")
 }
 \arguments{
-\item{procedure}{}
+\item{pvals}{pvals from a tests}
+
+\item{doses}{corresponding doses}
+
+\item{procedure}{procedure to obtain NOEC}
 }
 \description{
 getEndpoint according to a series of p-values

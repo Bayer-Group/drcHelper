@@ -1,9 +1,9 @@
 #' Summary Williams Test results.
 #'
-#' @param object
+#' @param object William test result object
 #' @param ...
 #'
-#' @return
+#' @return William test results
 #' @export
 #'
 #' @examples
@@ -68,7 +68,7 @@ summaryZG <-function (object, ...)
 
 #' get from william res accept/reject
 #'
-#' @param william
+#' @param william william test results
 #'
 #' @return
 #' @export
@@ -84,9 +84,9 @@ getwilliamRes <- function(william){
 
 #' getEndpoint according to a series of p-values
 #'
-#' @param pvals
-#' @param doses
-#' @param procedure
+#' @param pvals pvals from a tests
+#' @param doses corresponding doses
+#' @param procedure procedure to obtain NOEC
 #'
 #' @return
 #' @export

@@ -2,7 +2,7 @@
 % Please edit documentation in R/drc_Helper.R
 \name{mselect.plus}
 \alias{mselect.plus}
-\title{Title}
+\title{added functionality for mselect}
 \usage{
 mselect.plus(
   object = NULL,
@@ -25,5 +25,5 @@ mselect.plus(
 mselect.plus
 }
 \description{
-Title
+added functionality for mselect
 }

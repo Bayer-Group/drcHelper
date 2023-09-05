@@ -7,7 +7,7 @@
 getwilliamRes(william)
 }
 \arguments{
-\item{william}{}
+\item{william}{william test results}
 }
 \description{
 get from william res accept/reject

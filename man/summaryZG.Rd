@@ -7,7 +7,12 @@
 summaryZG(object, ...)
 }
 \arguments{
+\item{object}{William test result object}
+
 \item{...}{}
+}
+\value{
+William test results
 }
 \description{
 Summary Williams Test results.
