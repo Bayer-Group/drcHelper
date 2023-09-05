@@ -199,7 +199,17 @@ ED.plus <- function(object,respLev,maxEff=TRUE,trend="Increase",range="Percentag
   return(res)
 
 }
-#' Title
+
+
+
+#' @rdname ED.ZG
+#' @details
+#' Due to old ECxHelper development where ED.plus is defined as ED.ZG
+#' @seealso [ED.plus()] for the public version of usage
+#' @export
+ED.ZG <- ED.plus
+
+#' added functionality for mselect
 #'
 #' @param object
 #' @param fctList
@@ -298,6 +308,15 @@ mselect.plus <- function (object=NULL, fctList = NULL, nested = FALSE, sorted = 
   class(res) <- "drcComp"
   return(res)
 }
+
+
+#' @rdname mselect.ZG
+#' @details
+#' Due to old ECxHelper development where mselect.plus is defined as mselect.ZG
+#'
+#' @export
+mselect.ZG <- mselect.plus
+
 print.drcComp <- function(x,..){
   x=x[c("Comparison","EFSA")]
   NextMethod()

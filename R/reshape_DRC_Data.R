@@ -12,7 +12,6 @@ treatment2dose <- function(x){
   dose
 }
 
-## Example Data set: collembola_juveniles <- collembola_run1%>% filter(Endpoint=="Juveniles")%>% dplyr::select(-Endpoint)
 
 #' Reshape the wide data to long data
 #'
