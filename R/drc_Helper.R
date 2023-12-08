@@ -465,7 +465,7 @@ calcSteepnessOverlap <- function(mod=NULL,obj=NULL,trend="Decrease",CI="inv",...
   # |EC$_{10}$ > EC$_{50,low}$                | Fair                             |
   res <- rep(NA,2)
   if(!is.null(mod) & !inherits(mod,"try-error")){
-    if(class(mod)=="drc") obj <- ED.plus(mod,c(10,20,50),trend=trend, CI=CI...)
+    if(class(mod)=="drc") obj <- ED.plus(mod,c(10,20,50),trend=trend, CI=CI,...)
     obj <- as.data.frame(obj)
     steep <- obj$Estimate[1]/obj$Estimate[3] # the Ratio between EC 10 and EC 50
     if(!is.na(steep)){
