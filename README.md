@@ -159,7 +159,14 @@ knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
 plot.modList(modList,scale="logx")
 ```
 
+<div class="figure">
+
 <img src="man/figures/README-unnamed-chunk-8-1.png" alt="Yield Model Fits" width="100%" />
+<p class="caption">
+Yield Model Fits
+</p>
+
+</div>
 
 ``` r
 plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
@@ -195,6 +202,7 @@ knitr::kable(resED,caption = "Total Shoot Length Growth Yield at 14 day",digits 
 Total Shoot Length Growth Yield at 14 day
 
 ``` r
+
 mod <-modList[[1]]
 edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
 pander::pander(as.data.frame(edres))
@@ -217,3 +225,8 @@ pander::pander(coef(modsum))
 | **b:(Intercept)** |  -1.794  |   0.2203   | -8.144  | 1.696e-08 |
 | **d:(Intercept)** |  53.85   |   0.9535   |  56.48  | 3.42e-28  |
 | **e:(Intercept)** |  0.1925  |  0.01447   |  13.3   | 7.664e-13 |
+
+## ToDo
+
+- [ ] Develop all NOEC functions
+- [ ] Prepare the templates.

@@ -101,9 +101,9 @@ addECxCI <- function(p=NULL,object,EDres=NULL,trend="Decrease",endpoint="ErC", r
 ED.plus <- function(object,respLev,maxEff=TRUE,trend="Increase",range="Percentage",CI=c("delta","inv","bmd-inv"),...){
   ## Note that this might not be suitable for models with fixed c or d parameters, where
   CI <- match.arg(CI)
-  if(grepl("log(ED50) as parameter",object$fct$text,fixed = TRUE)) CI <-"delta"
+
   if(!inherits(object,"try-error")){
-    if(CI=="delta" | CI=="inv"){
+    if(CI=="delta"){
       type <- object$type
       coefs <- coef(object)
       num <- length(coefs)
@@ -448,53 +448,57 @@ plot.edList <- function(edList,fctNames,...){
 ## Steepness and overlap
 #' Title
 #'
-#' @param mod
-#' @param obj
-#' @param trend
-#' @param ...
+#' @param mod fitted object from drm model fitting
+#' @param obj Calculated ED 10, 20, 50 object if available. mod should set to be NULL in this case
+#' @param trend "Decrease" or "Increase"
+#' @param ... other parameters that wil be passed into ED.plus
 #'
 #' @return
 #' @export
 #'
 #' @examples
-calcSteepnessOverlap <- function(mod=NULL,obj=NULL,trend="Decrease",...){
+calcSteepnessOverlap <- function(mod=NULL,obj=NULL,trend="Decrease",CI="inv",...){
   # |Overlapping  Conditions                  |Certainty of the Protection Level |
   # |-----------------------------------------|----------------------------------|
   # |EC$_{10}$ < EC$_{20,low}$                | High                             |
   # |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
   # |EC$_{10}$ > EC$_{50,low}$                | Fair                             |
-  if(!is.null(mod)){
-    if(class(mod)=="drc") obj <- ED.plus(mod,c(10,20,50),trend=trend,...)
-  }
   res <- rep(NA,2)
-  obj <- as.data.frame(obj)
-  steep <- obj$Estimate[1]/obj$Estimate[3] # the Ratio between EC 10 and EC 50
-  if(!is.na(steep)){
-    if(steep <0.33) res[2] <- "Shallow" else{
-      if(steep <0.66) res[2] <- "Medium" else res[2] <- "Steep"
-    }
-  }else steep <- "Not Defined"
-  if(nrow(obj)!=3){
-    print("Without EC50, not able to calculate Steepness")
-  }else{
-
-
-    if(!is.na(obj$Lower[2]) & !is.na(obj$Estimate[1])){
-      if(obj$Estimate[1] < obj$Lower[2]){
-        res[1] <- "High"
-      }else{
-        if(!is.na(obj$Lower[3])){
-          if(obj$Estimate[1] < obj$Lower[3])res[1] <- "Medium" else res[1] <-"Fair"
-        }else{
-          res[1] <- "Not Low"
-        }
+  if(!is.null(mod) & !inherits(mod,"try-error")){
+    if(class(mod)=="drc") obj <- ED.plus(mod,c(10,20,50),trend=trend, CI=CI...)
+    obj <- as.data.frame(obj)
+    steep <- obj$Estimate[1]/obj$Estimate[3] # the Ratio between EC 10 and EC 50
+    if(!is.na(steep)){
+      if(steep <0.33) res[2] <- "Shallow" else{
+        if(steep <0.66) res[2] <- "Medium" else res[2] <- "Steep"
       }
+    }else steep <- "Not Defined"
+    if(nrow(obj)!=3){
+      print("Without EC50, not able to calculate Steepness")
     }else{
-      res[1] <- "Not Defined"
-    }
 
+
+      if(!is.na(obj$Lower[2]) & !is.na(obj$Estimate[1])){
+        if(obj$Estimate[1] < obj$Lower[2]){
+          res[1] <- "High"
+        }else{
+          if(!is.na(obj$Lower[3])){
+            if(obj$Estimate[1] < obj$Lower[3]) res[1] <- "Medium" else res[1] <-"Fair"
+          }else{
+            res[1] <- "Not Low"
+          }
+        }
+      }else{
+        res[1] <- "Not Defined"
+      }
+
+    }
+    return(res)
+  }else{
+    return(res)
   }
-  res
+
+
 }
 
 #' Select ECx estimation from Models with mselect.plus and EFSA SO criteria

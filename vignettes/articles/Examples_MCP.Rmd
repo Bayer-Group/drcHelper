@@ -9,6 +9,14 @@ knitr::opts_chunk$set(
 )
 ```
 
+Note that to install "PMCMRplus" properly, you need probably install libmpfr-dev first for Linux OS. 
+
+```
+sudo apt-get install libmpfr-dev
+```
+
+
+
 ```{r setup}
 library(drcHelper)
 library(PMCMRplus)

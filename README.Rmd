@@ -114,3 +114,13 @@ pander::pander(coef(modsum))
 ```
 
 
+## ToDo
+
+- [ ] Develop all NOEC functions
+- [ ] Prepare the templates. 
+- [ ] Update the documentation
+
+## Contribution Notes
+
+- Please create a pull request when 
+
