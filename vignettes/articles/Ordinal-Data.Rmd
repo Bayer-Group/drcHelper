@@ -134,6 +134,7 @@ ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total)
 - Agresti, A. (2002) Categorical Data Analysis, Second Edition. Hoboken, New Jersey: John Wiley & Sons, Inc.
 - Harrell, F. E, (2001) Regression Modeling Strategies. New York: Springer-Verlag.
 - http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/
+
 ## Multi-quantile JT
 
 From: John Green, personal communication.

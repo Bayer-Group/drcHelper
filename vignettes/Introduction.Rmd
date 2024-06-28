@@ -19,3 +19,5 @@ This package inlcudes the helping functions for dose-response analysis that are 
 ```{r setup}
 library(drcHelper)
 ```
+
+

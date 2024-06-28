@@ -4,10 +4,22 @@
 \alias{calcSteepnessOverlap}
 \title{Title}
 \usage{
-calcSteepnessOverlap(mod = NULL, obj = NULL, trend = "Decrease", ...)
+calcSteepnessOverlap(
+  mod = NULL,
+  obj = NULL,
+  trend = "Decrease",
+  CI = "inv",
+  ...
+)
 }
 \arguments{
-\item{...}{}
+\item{mod}{fitted object from drm model fitting}
+
+\item{obj}{Calculated ED 10, 20, 50 object if available. mod should set to be NULL in this case}
+
+\item{trend}{"Decrease" or "Increase"}
+
+\item{...}{other parameters that wil be passed into ED.plus}
 }
 \description{
 Title

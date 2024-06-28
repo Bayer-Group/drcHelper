@@ -1,0 +1,23 @@
+---
+title: "Quantal Data"
+---
+
+## Tarone's Test
+
+```{r}
+mymatrix1 <- matrix(c(4,5,5,103),nrow=2,byrow=TRUE)
+colnames(mymatrix1) <- c("Disease","Control")
+rownames(mymatrix1) <- c("Exposure","Unexposed")
+mymatrix2 <- matrix(c(10,3,5,43),nrow=2,byrow=TRUE)
+colnames(mymatrix2) <- c("Disease","Control")
+rownames(mymatrix2) <- c("Exposure","Unexposed")
+mylist <- list(mymatrix1,mymatrix2)
+calcTaronesTest(mylist)
+```
+
+## Trend Test
+
+```{r}
+
+```
+
