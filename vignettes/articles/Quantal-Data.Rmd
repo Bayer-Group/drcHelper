@@ -2,6 +2,11 @@
 title: "Quantal Data"
 ---
 
+```{r}
+library(drcHelper)
+```
+
+
 ## Tarone's Test
 
 ```{r}

@@ -14,10 +14,26 @@ knitr::opts_chunk$set(
 )
 ```
 
-This package inlcudes the helping functions for dose-response analysis that are generic and might be useful outside our own organization. 
+This package includes a collection of helping functions for dose-response analysis that are generic and might be useful outside our own organization.
+
+In the vignettes/articles folder, there are lots of examples for doing various type of dose-response analysis. 
+
 
 ```{r setup}
 library(drcHelper)
 ```
+
+
+
+
+## Other useful packages 
+
+### ecotoxicology package
+
+You might want to use the SpearmanKarber function instead of tsk::tsk function.  
+
+- https://cran.r-project.org/web/packages/ecotoxicology/index.html
+
+Implementation of the EPA's Ecological Exposure Research Division (EERD) tools (discontinued in 1999) for Probit and Trimmed Spearman-Karber Analysis. Probit and Spearman-Karber methods from Finney's book "Probit analysis a statistical treatment of the sigmoid response curve" with options for most accurate results or identical results to the book. Probit and all the tables from Finney's book (code-generated, not copied) with the generating functions included. Control correction: Abbott, Schneider-Orelli, Henderson-Tilton, Sun-Shepard. Toxicity scales: Horsfall-Barratt, Archer, Gauhl-Stover, Fullerton-Olsen, etc.
 
 

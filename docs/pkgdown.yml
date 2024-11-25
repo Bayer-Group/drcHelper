@@ -1,14 +1,21 @@
-pandoc: 2.17.1.1
-pkgdown: 2.0.6
+pandoc: 2.19.2
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   Introduction: Introduction.html
   Tutorial_drc_Helpers: Tutorial_drc_Helpers.html
+  Count_Data: Count_Data.html
   EFSA-Criteria: EFSA-Criteria.html
+  Example_RSCABS_PTZ: Example_RSCABS_PTZ.html
+  Examples using NLS: Examples using NLS.html
   Examples_MCP: Examples_MCP.html
   Examples_drc: Examples_drc.html
   Examples_oecd201: Examples_oecd201.html
+  Examples_using_drda: Examples_using_drda.html
+  Fitting-a-biphasic-dose-reponse-model: Fitting-a-biphasic-dose-reponse-model.html
   MQJT: MQJT.html
   Ordinal-Data: Ordinal-Data.html
-last_built: 2022-11-04T13:40Z
+  Quantal-Data: Quantal-Data.html
+  TSK_method: TSK_method.html
+last_built: 2024-11-25T23:34Z
 

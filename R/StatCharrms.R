@@ -1,10 +1,10 @@
 #' Williams Test from the StatCharrms Package
 #'
-#' @param df
-#' @param resp
-#' @param trt
-#' @param direction
-#' @param SeIn
+#' @param df The data frame
+#' @param resp The name of the response as a string
+#' @param trt The name of the response as a string
+#' @param direction Is the direction of the test 'decreasing' or 'increasing'
+#' @param SeIn the standard error, default is program selected. WilliamsTest can take in a different value in the case of repeated measures
 #'
 #' @return
 #' @export

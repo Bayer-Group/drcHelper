@@ -1,0 +1,11 @@
+## What to do when Hessian is a problem
+
+This file is to reproduce the code from this webpage
+
+- https://biostatsr.blogspot.com/2017/05/standard-error-from-hessian-matrix-when.html
+
+
+## References
+
+- Gill J. and G. King 2004. What to do when your Hessian is not invertible: Alternatives to model respecification in nonlinear estimation. Sociological Methods & Research 33: 54-87.
+- Rebonato and Jackel, “The most general methodology for creating a valid correlation matrix for risk management and option pricing purposes”, Journal of Risk, Vol 2, No 2, 2000.

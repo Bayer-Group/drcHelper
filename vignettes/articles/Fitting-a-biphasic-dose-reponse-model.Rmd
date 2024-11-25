@@ -1,0 +1,186 @@
+---
+title: "Fitting a biphasic dose-reponse model"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This article is to reproduce the biphasic dose responses demonstrated in the [Stackoverflow post](https://stackoverflow.com/questions/72472432/how-to-fit-a-biphasic-dose-response-curve-using-r) and in the [supplementing material](https://pmc.ncbi.nlm.nih.gov/articles/instance/4660423/bin/srep17200-s1.pdf)
+
+```{r setup}
+library(drcHelper)
+library(drc)
+```
+## Stackoverflow
+
+```{r}
+dat <- structure(list(Concn = c(1e-05, 4e-06, 1.5e-06, 7.5e-07, 2.5e-07, 
+1e-07, 3.75e-08, 1.63e-08, 6.25e-09, 2.5e-09, 1.06e-09, 4.06e-10, 
+1.56e-10, 6.25e-11, 2.66e-11, 1.09e-11), CompoundX = c(0.309967, 
+0.239756, 0.924346, 1.409483, 2.128796, 2.407227, 2.300768, 1.826203, 
+0.978104, 0.483403, 0.235191, 0.115721, 0.06902, 0.031384, 0.023007, 
+0.003956), CompoundX.2 = c(0.28848, 0.386004, 0.924336, 1.310479, 
+2.007222, 2.371517, 2.203162, 1.654133, 1.06907, 0.473238, 0.251971, 
+0.114867, 0.053681, 0.054416, 0.028945, 0.020866)), class = "data.frame", row.names = c(NA, 
+-16L))
+
+m0<-drm(CompoundX~log(Concn), data = dat, fct = gaussian())
+summary(m0)
+
+
+plot(m0, type = "all", col= "black", log = "")
+
+
+```
+## Defining 
+
+```{r}
+data(metaldata)
+#Make a subset with the Zn data
+Zn <- metaldata[metaldata$metal=="Zn",]
+Zn
+#Fitting biphasic dose-response profiles
+#gaussian function
+Zn.gau <- drm(IR~conc, data=Zn, fct=gaussian(), na.action=na.omit)
+summary(Zn.gau)
+#Model checking 
+plot(fitted(Zn.gau), residuals(Zn.gau), ylim = c(-20, 20))
+
+# Gaussian function with Box-Cox transform
+Zn.gau2 <- drm(IR~conc, data=Zn, fct=gaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(Zn.gau2)
+#Model checking 
+plot(fitted(Zn.gau2), residuals(Zn.gau2), ylim = c(-0.4, 0.4))
+
+#lgaussian function
+Zn.lgau <- drm(IR~conc, data=Zn, fct=lgaussian(), na.action=na.omit)
+summary(Zn.lgau)
+#Model checking 
+plot(fitted(Zn.lgau), residuals(Zn.lgau), ylim = c(-20, 20))
+
+# lgaussian function with Box-Cox transform
+Zn.lgau2 <- drm(IR~conc, data=Zn, fct=lgaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(Zn.lgau2)
+#Model checking 
+plot(fitted(Zn.lgau2), residuals(Zn.lgau2), ylim = c(-0.4, 0.4))
+
+#plot the models fitted
+plot(Zn.gau, type = "obs", col= "black", log = "")
+plot(Zn.gau, type = "none", add = TRUE, col = "red") 
+plot(Zn.gau2, type = "none", add = TRUE, col = "yellow")
+plot(Zn.lgau, type = "none", add = TRUE, col = "blue")
+plot(Zn.lgau2, type = "none", add = TRUE, col = "green")
+
+#Effective doses (EDp) calculation
+ED(Zn.lgau2, 50, interval = "delta")
+ED(Zn.lgau2, -50, interval = "delta", bound = FALSE)
+ED(Zn.lgau2, 99.9,interval = "delta")
+
+#Make a subset with the Cd data
+Cd <- metaldata[metaldata$metal=="Cd",]
+Cd
+#Fitting biphasic dose-response profiles
+#gaussian function
+Cd.gau <- drm(IR~conc, data=Cd, fct=gaussian(), na.action=na.omit)
+summary(Cd.gau)
+#Model checking 
+plot(fitted(Cd.gau), residuals(Cd.gau), ylim = c(-10, 10))
+
+#Gaussian function with Box-Cox transform
+Cd.gau2 <- drm(IR~conc, data=Cd, fct=gaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(Cd.gau2)
+#Model checking 
+plot(fitted(Cd.gau2), residuals(Cd.gau2), ylim = c(-0.2, 0.2))
+
+#lgaussian function
+Cd.lgau <- drm(IR~conc, data=Cd, fct=lgaussian(), na.action=na.omit)
+summary(Cd.lgau)
+#Model checking 
+plot(fitted(Cd.lgau), residuals(Cd.lgau), ylim = c(-6, 6), xlim = c(0, 50)) 
+
+#lgaussian function with Box-Cox transform
+Cd.lgau2 <- drm(IR~conc, data=Cd, fct=lgaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(Cd.lgau2)
+#Model checking 
+plot(fitted(Cd.lgau2), residuals(Cd.lgau2), ylim = c(-0.3, 0.3))
+
+#plot the models fitted
+plot(Cd.gau, type = "obs", col= "black", log = "", ylim = c(0, 60))
+plot(Cd.gau, type = "none", add = TRUE, col = "red") 
+plot(Cd.gau2, type = "none", add = TRUE, col = "yellow")
+plot(Cd.lgau, type = "none", add = TRUE, col = "blue")
+plot(Cd.lgau2, type = "none", add = TRUE, col = "green")
+
+#Effective doses (D(p)) calculation
+ED(Cd.lgau2, -50, interval = "delta", bound = FALSE)
+ED(Cd.lgau2, 99.9,interval = "delta")
+ED(Cd.lgau2, 50,interval = "delta")
+
+# Make a subset with the ZnCd data
+ZnCd <- metaldata[metaldata$metal=="ZnCd",]
+ZnCd
+
+#gaussian function
+ZnCd.gau <- drm(IR~conc, data=ZnCd, fct=gaussian(), na.action=na.omit)
+summary(ZnCd.gau)
+#Model checking
+plot(fitted(ZnCd.gau), residuals(ZnCd.gau))
+
+#Gaussian function with Box-Cox transform
+ZnCd.gau2 <- drm(IR~conc, data=ZnCd, fct=gaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(ZnCd.gau2)
+#Model checking
+plot(fitted(ZnCd.gau2), residuals(ZnCd.gau2), ylim = c(-0.15, 0.15))
+
+#lgaussian function
+ZnCd.lgau <- drm(IR~conc, data=ZnCd, fct=lgaussian(), na.action=na.omit)
+summary(ZnCd.lgau)
+#Model checking
+plot(fitted(ZnCd.lgau), residuals(ZnCd.lgau), ylim = c(-2, 2))
+
+#lgaussian function with Box-Cox transform
+ZnCd.lgau2 <- drm(IR~conc, data=ZnCd, fct=lgaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
+summary(ZnCd.lgau2)
+#Model checking
+plot(fitted(ZnCd.lgau2), residuals(ZnCd.lgau2), ylim = c(-0.06, 0.06))
+
+#plot the models fitted
+plot(ZnCd.gau, type = "obs", col= "black", ylim = c(0, 300))
+plot(ZnCd.gau, type = "none", add = TRUE, col = "red")
+plot(ZnCd.gau2, type = "none", add = TRUE, col = "yellow")
+plot(ZnCd.lgau, type = "none", add = TRUE, col = "blue")
+plot(ZnCd.lgau2, type = "none", add = TRUE, col = "green")
+
+#Effective doses (D(p)) calculation
+ED(ZnCd.lgau2, -50, interval = "delta", bound = FALSE)
+ED(ZnCd.lgau2, 99.9,interval = "delta")
+ED(ZnCd.lgau2, 50,interval = "delta")
+```
+
+
+```{r eval=FALSE}
+# Additivity predictions and departures from additivity
+indicesFct(0.355,list(ZnCd.lgau2, Zn.lgau2, Cd.lgau2), c(-0.2, -0.5, -1, -2, -5, -10, -20, -30, -40, -50, -60, -70, -80, -90, -99, 99, 80, 70, 60, 50, 40, 30, 20, 10, 5, 2, 1, 0.5, 0.2))
+```
+
+
+```{r eval=FALSE}
+#plot CIx
+plotFACI(0.355,list(ZnCd.lgau2, Zn.lgau2, Cd.lgau2), "x", ylim = c(-0.2, 2.2), faValues = c(-10, -20, -30, -40, -50, -60, -70, -80, -90, -99, 99, 90, 80, 70, 60, 50, 40, 30, 20, 10), showPoints = TRUE)
+title("Combination index for x axis")
+
+#plot CIy
+plotFACI(0.355,list(ZnCd.lgau2, Zn.lgau2, Cd.lgau2), "y", ylim = c(-0.2, 2.2), faValues = c(-10, -20, -30, -40, -50, -60, -70, -80, -90, -99, 99, 90, 80, 70, 60, 50, 40, 30, 20, 10), showPoints = TRUE)
+title("Combination index for y axis")
+
+```
+
+
+## References
+
+1. Martin-Betancor K, Ritz C, Fernández-Piñas F, Leganés F, Rodea-Palomares I. Defining an additivity framework for mixture research in inducible whole-cell biosensors. Sci Rep. 2015 Nov 26;5:17200. doi: 10.1038/srep17200. PMID: 26606975; PMCID: PMC4660423.
+2. https://stackoverflow.com/questions/72472432/how-to-fit-a-biphasic-dose-response-curve-using-r

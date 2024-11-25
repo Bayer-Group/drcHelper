@@ -49,11 +49,6 @@ $Gon_Asynch_Dev
 ```{r}
 library(drcHelper)
 # Prepare data
-library(DependenciesGraphs)
-dep <- funDependencies("package:drcHelper","runRSCABS")
-
-# visualization
-plot(dep)
 
 library(tidyverse)
 ```
@@ -128,6 +123,19 @@ dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_
 
 ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
 ```
+
+## Dependencies
+
+```{r}
+library(DependenciesGraphs)
+dep <- funDependencies("package:drcHelper","runRSCABS")
+
+# visualization
+plot(dep)
+
+```
+
+
 
 ## References
 

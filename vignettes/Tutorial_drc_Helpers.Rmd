@@ -1,5 +1,5 @@
 ---
-title: "Example Usage for drcHelper"
+title: "Example Usage of drcHelper"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Tutorial_drc_Helpers}
@@ -20,20 +20,9 @@ library(drc)
 
 ```
 
+In this vignettes we illustrate how to use drcHelper to produce tables and graphs that will be included in a dose-response analysis report. 
 
-```{r}
-library(DependenciesGraphs)
-dep <- funDependencies("package:drcHelper","ED.plus")
-plot(dep)
-dep <- funDependencies("package:drcHelper","mselect.ED")
-plot(dep)
 
-#dep <- funDependencies("package:drcHelper","mselect.plus")
-#plot(dep)
-
-dep <- envirDependencies('package:drcHelper')
-plot(dep)
-```
 
 ## Fitting multiple models and rank them.
 
@@ -52,3 +41,19 @@ plot(dep)
 
 
 ## Outputting 
+
+
+## Dependencies
+```{r}
+library(DependenciesGraphs)
+dep <- funDependencies("package:drcHelper","ED.plus")
+plot(dep)
+dep <- funDependencies("package:drcHelper","mselect.ED")
+plot(dep)
+
+#dep <- funDependencies("package:drcHelper","mselect.plus")
+#plot(dep)
+
+dep <- envirDependencies('package:drcHelper')
+plot(dep)
+```

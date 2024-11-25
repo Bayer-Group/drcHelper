@@ -4,7 +4,16 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/Count_Data.html</loc>
+  </url>
+  <url>
     <loc>/articles/EFSA-Criteria.html</loc>
+  </url>
+  <url>
+    <loc>/articles/Example_RSCABS_PTZ.html</loc>
+  </url>
+  <url>
+    <loc>/articles/Examples using NLS.html</loc>
   </url>
   <url>
     <loc>/articles/Examples_MCP.html</loc>
@@ -16,6 +25,12 @@
     <loc>/articles/Examples_oecd201.html</loc>
   </url>
   <url>
+    <loc>/articles/Examples_using_drda.html</loc>
+  </url>
+  <url>
+    <loc>/articles/Fitting-a-biphasic-dose-reponse-model.html</loc>
+  </url>
+  <url>
     <loc>/articles/Introduction.html</loc>
   </url>
   <url>
@@ -23,6 +38,12 @@
   </url>
   <url>
     <loc>/articles/Ordinal-Data.html</loc>
+  </url>
+  <url>
+    <loc>/articles/Quantal-Data.html</loc>
+  </url>
+  <url>
+    <loc>/articles/TSK_method.html</loc>
   </url>
   <url>
     <loc>/articles/Tutorial_drc_Helpers.html</loc>
@@ -43,6 +64,12 @@
     <loc>/reference/ED.plus.html</loc>
   </url>
   <url>
+    <loc>/reference/RSCABK.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Tarone.test.html</loc>
+  </url>
+  <url>
     <loc>/reference/addECxCI.html</loc>
   </url>
   <url>
@@ -52,6 +79,12 @@
     <loc>/reference/calcSteepnessOverlap.html</loc>
   </url>
   <url>
+    <loc>/reference/calcTaronesTest.html</loc>
+  </url>
+  <url>
+    <loc>/reference/calpha.test.html</loc>
+  </url>
+  <url>
     <loc>/reference/contEndpoint.html</loc>
   </url>
   <url>
@@ -59,6 +92,9 @@
   </url>
   <url>
     <loc>/reference/getEndpoint.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getModelName.html</loc>
   </url>
   <url>
     <loc>/reference/getwilliamRes.html</loc>
@@ -88,12 +124,33 @@
     <loc>/reference/plot.modList.html</loc>
   </url>
   <url>
-    <loc>/reference/plotRSCABS.html</loc>
+    <loc>/reference/prepDataRSCABS.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reshape_drcData.html</loc>
   </url>
   <url>
     <loc>/reference/runRSCABS.html</loc>
   </url>
   <url>
+    <loc>/reference/simplifyTreatment.html</loc>
+  </url>
+  <url>
+    <loc>/reference/stepDownRSCABS.html</loc>
+  </url>
+  <url>
+    <loc>/reference/stepKRSCABS.html</loc>
+  </url>
+  <url>
     <loc>/reference/summaryZG.html</loc>
+  </url>
+  <url>
+    <loc>/reference/treatment2dose.html</loc>
+  </url>
+  <url>
+    <loc>/reference/wide2long.html</loc>
+  </url>
+  <url>
+    <loc>/reference/williamsTest_JG.html</loc>
   </url>
 </urlset>

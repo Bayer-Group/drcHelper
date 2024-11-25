@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of drcHelper is to ...
+The goal of drcHelper is to assit the routine dose-response analysis with a collection of helper functions or standalong functions that are generic and might be useful outside our own organization.
 
 ## Installation
 
@@ -122,5 +122,5 @@ pander::pander(coef(modsum))
 
 ## Contribution Notes
 
-- Please create a pull request when 
+- Please create a pull request to contribute to the development of packages. 
 

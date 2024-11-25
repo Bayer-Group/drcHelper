@@ -35,10 +35,19 @@
       <a href="../articles/Introduction.html">Introduction</a>
     </li>
     <li>
-      <a href="../articles/Tutorial_drc_Helpers.html">Example Usage for drcHelper</a>
+      <a href="../articles/Tutorial_drc_Helpers.html">Example Usage of drcHelper</a>
+    </li>
+    <li>
+      <a href="../articles/Count_Data.html">Count Data</a>
     </li>
     <li>
       <a href="../articles/EFSA-Criteria.html">EFSA Criteria</a>
+    </li>
+    <li>
+      <a href="../articles/Example_RSCABS_PTZ.html">PTZ</a>
+    </li>
+    <li>
+      <a href="../articles/Examples%20using%20NLS.html">Using nls to fit arbitrary dose-response models</a>
     </li>
     <li>
       <a href="../articles/Examples_MCP.html">Examples of NOEC Derivation by MCP</a>
@@ -50,10 +59,22 @@
       <a href="../articles/Examples_oecd201.html">Examples_oecd201</a>
     </li>
     <li>
+      <a href="../articles/Examples_using_drda.html">Examples using drda</a>
+    </li>
+    <li>
+      <a href="../articles/Fitting-a-biphasic-dose-reponse-model.html">Fitting a biphasic dose-reponse model</a>
+    </li>
+    <li>
       <a href="../articles/MQJT.html">MQJT</a>
     </li>
     <li>
-      <a href="../articles/Ordinal-Data.html">Ordinal Data</a>
+      <a href="../articles/Ordinal-Data.html">An example: RSCABS for Histopath Data</a>
+    </li>
+    <li>
+      <a href="../articles/Quantal-Data.html">Quantal Data</a>
+    </li>
+    <li>
+      <a href="../articles/TSK_method.html"> Spearman-Karber method</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
@@ -81,6 +102,14 @@
         </td>
         <td><p>Calculating ED following the regulatrory ED definition.</p></td>
       </tr><tr><td>
+          <p><code><a href="RSCABK.html">RSCABK()</a></code> </p>
+        </td>
+        <td><p>Runs the kth slice of RSCABS</p></td>
+      </tr><tr><td>
+          <p><code><a href="Tarone.test.html">Tarone.test()</a></code> </p>
+        </td>
+        <td><p>Tarone's Z Test</p></td>
+      </tr><tr><td>
           <p><code><a href="addECxCI.html">addECxCI()</a></code> </p>
         </td>
         <td><p>adding ECx estimation and interval to the model output plot</p></td>
@@ -93,6 +122,14 @@
         </td>
         <td><p>Title</p></td>
       </tr><tr><td>
+          <p><code><a href="calcTaronesTest.html">calcTaronesTest()</a></code> </p>
+        </td>
+        <td><p>Tarones test for Stratified OR (taken from https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R)</p></td>
+      </tr><tr><td>
+          <p><code><a href="calpha.test.html">calpha.test()</a></code> </p>
+        </td>
+        <td><p>C(alpha) test from the epiphy package.</p></td>
+      </tr><tr><td>
           <p><code><a href="contEndpoint.html">contEndpoint()</a></code> </p>
         </td>
         <td><p>get Endpoint for continuous data</p></td>
@@ -104,6 +141,10 @@
           <p><code><a href="getEndpoint.html">getEndpoint()</a></code> </p>
         </td>
         <td><p>getEndpoint according to a series of p-values</p></td>
+      </tr><tr><td>
+          <p><code><a href="getModelName.html">getModelName()</a></code> </p>
+        </td>
+        <td><p>Get Model Name</p></td>
       </tr><tr><td>
           <p><code><a href="getwilliamRes.html">getwilliamRes()</a></code> </p>
         </td>
@@ -127,7 +168,7 @@
       </tr><tr><td>
           <p><code><a href="mselect.plus.html">mselect.plus()</a></code> </p>
         </td>
-        <td><p>Title</p></td>
+        <td><p>added functionality for mselect</p></td>
       </tr><tr><td>
           <p><code><a href="plot.edList.html">plot(<i>&lt;edList&gt;</i>)</a></code> </p>
         </td>
@@ -137,17 +178,45 @@
         </td>
         <td><p>Plot a list of models together.</p></td>
       </tr><tr><td>
-          <p><code><a href="plotRSCABS.html">plotRSCABS()</a></code> </p>
+          <p><code><a href="prepDataRSCABS.html">prepDataRSCABS()</a></code> </p>
         </td>
-        <td><p>plotRSCABS</p></td>
+        <td><p>Prepares data for an RSCABS analysis</p></td>
+      </tr><tr><td>
+          <p><code><a href="reshape_drcData.html">reshape_drcData()</a></code> </p>
+        </td>
+        <td><p>Reshape the wide data to long data</p></td>
       </tr><tr><td>
           <p><code><a href="runRSCABS.html">runRSCABS()</a></code> </p>
         </td>
         <td><p>Run RSCABS test</p></td>
       </tr><tr><td>
+          <p><code><a href="simplifyTreatment.html">simplifyTreatment()</a></code> </p>
+        </td>
+        <td><p>Resolve the excel datasheet number issue like 12.300000000000001 or 8.3579999999999</p></td>
+      </tr><tr><td>
+          <p><code><a href="stepDownRSCABS.html">stepDownRSCABS()</a></code> </p>
+        </td>
+        <td><p>Performs the step down aspect of RSCABS</p></td>
+      </tr><tr><td>
+          <p><code><a href="stepKRSCABS.html">stepKRSCABS()</a></code> </p>
+        </td>
+        <td><p>plotRSCABS</p></td>
+      </tr><tr><td>
           <p><code><a href="summaryZG.html">summaryZG()</a></code> </p>
         </td>
         <td><p>Summary Williams Test results.</p></td>
+      </tr><tr><td>
+          <p><code><a href="treatment2dose.html">treatment2dose()</a></code> </p>
+        </td>
+        <td><p>Change Treatment groups to numerical dose</p></td>
+      </tr><tr><td>
+          <p><code><a href="wide2long.html">wide2long()</a></code> </p>
+        </td>
+        <td><p>change from wide format to long format</p></td>
+      </tr><tr><td>
+          <p><code><a href="williamsTest_JG.html">williamsTest_JG()</a></code> </p>
+        </td>
+        <td><p>Williams Test from the StatCharrms Package</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -161,7 +230,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

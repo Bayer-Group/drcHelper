@@ -53,10 +53,19 @@
       <a href="articles/Introduction.html">Introduction</a>
     </li>
     <li>
-      <a href="articles/Tutorial_drc_Helpers.html">Example Usage for drcHelper</a>
+      <a href="articles/Tutorial_drc_Helpers.html">Example Usage of drcHelper</a>
+    </li>
+    <li>
+      <a href="articles/Count_Data.html">Count Data</a>
     </li>
     <li>
       <a href="articles/EFSA-Criteria.html">EFSA Criteria</a>
+    </li>
+    <li>
+      <a href="articles/Example_RSCABS_PTZ.html">PTZ</a>
+    </li>
+    <li>
+      <a href="articles/Examples%20using%20NLS.html">Using nls to fit arbitrary dose-response models</a>
     </li>
     <li>
       <a href="articles/Examples_MCP.html">Examples of NOEC Derivation by MCP</a>
@@ -68,10 +77,22 @@
       <a href="articles/Examples_oecd201.html">Examples_oecd201</a>
     </li>
     <li>
+      <a href="articles/Examples_using_drda.html">Examples using drda</a>
+    </li>
+    <li>
+      <a href="articles/Fitting-a-biphasic-dose-reponse-model.html">Fitting a biphasic dose-reponse model</a>
+    </li>
+    <li>
       <a href="articles/MQJT.html">MQJT</a>
     </li>
     <li>
-      <a href="articles/Ordinal-Data.html">Ordinal Data</a>
+      <a href="articles/Ordinal-Data.html">An example: RSCABS for Histopath Data</a>
+    </li>
+    <li>
+      <a href="articles/Quantal-Data.html">Quantal Data</a>
+    </li>
+    <li>
+      <a href="articles/TSK_method.html"> Spearman-Karber method</a>
     </li>
   </ul>
 </li>
@@ -113,7 +134,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">drcHelper</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org" class="external-link">purrr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">sum1</span> <span class="op">&lt;-</span> <span class="va">oecd201</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Time</span>,<span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>Yield_mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Yield</span><span class="op">)</span>,Yield_sd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">Yield</span><span class="op">)</span>,GrowthRate_mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">GrowthRate</span><span class="op">)</span>,GrowthRate_sd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">GrowthRate</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sum0</span> <span class="op">&lt;-</span> <span class="va">sum1</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">==</span><span class="st">"Control"</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>Yield0<span class="op">=</span><span class="va">Yield_mean</span>,GrowthRate0<span class="op">=</span><span class="va">GrowthRate_mean</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Time</span>,<span class="va">Yield0</span>,<span class="va">GrowthRate0</span><span class="op">)</span><span class="op">)</span></span>
@@ -714,7 +735,11 @@ Table:
 <p>14 day TSL Yield, Model Comparison</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span>,scale<span class="op">=</span><span class="st">"logx"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" alt="Yield Model Fits" width="100%"></p>
+<div class="figure">
+<img src="reference/figures/README-unnamed-chunk-8-1.png" alt="Yield Model Fits" width="100%"><p class="caption">
+Yield Model Fits
+</p>
+</div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">]</span>,scale<span class="op">=</span><span class="st">"logx"</span>,npts<span class="op">=</span><span class="fl">40</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
@@ -765,7 +790,8 @@ Table:
 </table>
 <p>Total Shoot Length Growth Yield at 14 day</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">mod</span> <span class="op">&lt;-</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">edres</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ED.plus.html">ED.plus</a></span><span class="op">(</span><span class="va">mod</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="st">"Decrease"</span><span class="op">)</span></span>
 <span><span class="fu">pander</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pander/man/pander.html" class="external-link">pander</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">edres</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -843,6 +869,16 @@ Table:
 </tbody>
 </table>
 </div>
+<div class="section level2">
+<h2 id="todo">ToDo<a class="anchor" aria-label="anchor" href="#todo"></a>
+</h2>
+<ul class="task-list">
+<li>
+<input type="checkbox" disabled>Develop all NOEC functions</li>
+<li>
+<input type="checkbox" disabled>Prepare the templates.</li>
+</ul>
+</div>
 </div>
   </div>
 
@@ -883,7 +919,7 @@ Table:
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

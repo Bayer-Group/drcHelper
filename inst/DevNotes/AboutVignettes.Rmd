@@ -1,0 +1,21 @@
+
+## Reuse code snippets
+
+https://www.garrickadenbuie.com/blog/dry-vignette-and-readme/
+
+
+
+
+## vetr
+When you write functions that operate on S3 or unclassed objects you can either trust that your inputs will be structured as expected, or tediously check that they are.
+
+vetr takes the tedium out of structure verification so that you can trust, but verify. It lets you express structural requirements declaratively with templates, and it auto-generates human-friendly error messages as needed.
+
+https://github.com/brodieG/vetr
+
+## Building the site pages
+
+```{r}
+pkgdown::build_site_github_pages()
+```
+

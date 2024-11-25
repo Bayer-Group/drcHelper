@@ -53,10 +53,19 @@
       <a href="../articles/Introduction.html">Introduction</a>
     </li>
     <li>
-      <a href="../articles/Tutorial_drc_Helpers.html">Example Usage for drcHelper</a>
+      <a href="../articles/Tutorial_drc_Helpers.html">Example Usage of drcHelper</a>
+    </li>
+    <li>
+      <a href="../articles/Count_Data.html">Count Data</a>
     </li>
     <li>
       <a href="../articles/EFSA-Criteria.html">EFSA Criteria</a>
+    </li>
+    <li>
+      <a href="../articles/Example_RSCABS_PTZ.html">PTZ</a>
+    </li>
+    <li>
+      <a href="../articles/Examples%20using%20NLS.html">Using nls to fit arbitrary dose-response models</a>
     </li>
     <li>
       <a href="../articles/Examples_MCP.html">Examples of NOEC Derivation by MCP</a>
@@ -68,10 +77,22 @@
       <a href="../articles/Examples_oecd201.html">Examples_oecd201</a>
     </li>
     <li>
+      <a href="../articles/Examples_using_drda.html">Examples using drda</a>
+    </li>
+    <li>
+      <a href="../articles/Fitting-a-biphasic-dose-reponse-model.html">Fitting a biphasic dose-reponse model</a>
+    </li>
+    <li>
       <a href="../articles/MQJT.html">MQJT</a>
     </li>
     <li>
-      <a href="../articles/Ordinal-Data.html">Ordinal Data</a>
+      <a href="../articles/Ordinal-Data.html">An example: RSCABS for Histopath Data</a>
+    </li>
+    <li>
+      <a href="../articles/Quantal-Data.html">Quantal Data</a>
+    </li>
+    <li>
+      <a href="../articles/TSK_method.html"> Spearman-Karber method</a>
     </li>
   </ul>
 </li>
@@ -100,7 +121,19 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">drcHelper</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">drcHelper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: drc</span></span>
+<span><span class="co">#&gt; Loading required package: MASS</span></span>
+<span><span class="co">#&gt; Loading required package: drcData</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 'drc' has been loaded.</span></span>
+<span><span class="co">#&gt; Please cite R and 'drc' if used for a publication,</span></span>
+<span><span class="co">#&gt; for references type 'citation()' and 'citation('drc')'.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'drc'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="model-comparison-criteria">Model Comparison Criteria<a class="anchor" aria-label="anchor" href="#model-comparison-criteria"></a>
 </h2>
@@ -114,19 +147,19 @@ use the following two criteria</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">&lt;0.2</td>
+<td align="left"><span class="math inline">\(&lt;0.2\)</span></td>
 <td align="left">Excellent</td>
 </tr>
 <tr class="even">
-<td align="left">&lt;0.5</td>
+<td align="left"><span class="math inline">\(&lt;0.5\)</span></td>
 <td align="left">Good</td>
 </tr>
 <tr class="odd">
-<td align="left">&lt;1</td>
+<td align="left"><span class="math inline">\(&lt;1\)</span></td>
 <td align="left">Fair</td>
 </tr>
 <tr class="even">
-<td align="left">&lt;2</td>
+<td align="left"><span class="math inline">\(&lt;2\)</span></td>
 <td align="left">Poor</td>
 </tr>
 <tr class="odd">
@@ -246,7 +279,7 @@ Crustacea))</td>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

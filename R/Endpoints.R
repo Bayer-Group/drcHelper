@@ -1,7 +1,7 @@
 #' Summary Williams Test results.
 #'
 #' @param object William test result object
-#' @param ...
+#' @param ... additional parameters to be passed into the function, placeholder
 #'
 #' @return William test results
 #' @export
@@ -82,7 +82,7 @@ getwilliamRes <- function(william){
 
 
 
-#' getEndpoint according to a series of p-values
+#' Obtain Endpoint (NOEC) according to a series of p-values
 #'
 #' @param pvals pvals from a tests
 #' @param doses corresponding doses
@@ -129,7 +129,7 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
 
 
 
-#' get Endpoint for continuous data
+#' get Endpoint for continuous data according to results of a series of tests
 #'
 #' @param paov
 #' @param pks

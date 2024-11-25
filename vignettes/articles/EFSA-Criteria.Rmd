@@ -22,10 +22,10 @@ Apart from generic model comparison criteria, EFSA has proposed to use the follo
 
 |NW   |    Rating|
 |:----|:---------|
-|<0.2 | Excellent|
-|<0.5 | Good     |
-|<1   | Fair     |
-|<2   | Poor     |
+|$<0.2$ | Excellent|
+|$<0.5$ | Good     |
+|$<1$   | Fair     |
+|$<2$   | Poor     |
 |$>2$ | Bad      |
 
 **Overlapping of EC10, 20 and 50**

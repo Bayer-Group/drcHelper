@@ -201,6 +201,27 @@ ED.plus <- function(object,respLev,maxEff=TRUE,trend="Increase",range="Percentag
 }
 
 
+#' Get Model Name
+#'
+#' @param fname
+#'
+#' @return the model name
+#' @export
+#'
+#' @examples
+#' getModelName("LL.2")
+#'
+getModelName <- function(fname = NULL){
+  if(grep("EXD",fname)){
+    noParm <- stringr::str_split(fname,fixed("."))[[1]][2]
+    ModelName <- paste0(noParm,"-parameter exponential decay model")
+  }else{
+    ModelName <- getMeanFunctions(fname=resComp$Model[1])
+    ModelName <- paste0(ModelName[[1]]$noParm,"-parameter ",ModelName[[1]]$text)
+  }
+  return(ModelName)
+
+}
 
 #' @rdname ED.ZG
 #' @details
