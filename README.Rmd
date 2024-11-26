@@ -90,7 +90,7 @@ plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
 p <-plot.modList(modList[c(1)],scale="logx",npts=80)+theme(legend.position = "none")+ggtitle("14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit")
 addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
                      textAjust.x=0.01,textAjust.y=1,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 1,xmin=0.012)+ylab("Total Shoot Length [cm]") + xlab("Concentration [µg a.s./L]")
-ggsave("TSL_14d_Yield.png")
+## ggsave("TSL_14d_Yield.png")
 ```
 
 ```{r}
