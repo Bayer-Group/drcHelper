@@ -10,7 +10,7 @@ simplifyTreatment(trt)
 \item{trt}{a treatment vector, either factor or character}
 }
 \value{
-a simplified vector
+a simplified vector, either a factor or a character vector, depending on x
 }
 \description{
 Resolve the excel datasheet number issue like 12.300000000000001 or 8.3579999999999

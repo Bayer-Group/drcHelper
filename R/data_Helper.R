@@ -2,7 +2,7 @@
 #'
 #' @param trt a treatment vector, either factor or character
 #'
-#' @return a simplified vector
+#' @return a simplified vector, either a factor or a character vector, depending on x
 #' @export
 #'
 #' @examples
@@ -28,12 +28,20 @@ simplifyTreatment <- function(trt){
 
 #' change from wide format to long format
 #'
-#' @param widedat
-#' @param cnames
+#' @param widedat data in wide format
+#' @param cnames whether to use the 1st row as the column names, 
+#' 1 means 1st row need to be converted to headers
+#' @param whether the 1st column is the Replicates column
 #'
-#' @return
-#'
-#' @examples
+#' @return a dataframe in long format
+#' @examples  
+#' # Create a sample wide dataset
+#'  widedat <- data.frame(
+#'    Replicates = c("Rep1", "Rep2", "Rep3"),
+#'    Treatment1 = c(1.1, 2.2, 3.3),
+#'    Treatment2 = c(4.4, 5.5, 6.6)
+#'  )
+#' drcHelper:::wide2long(widedat,cnames=FALSE)
 wide2long <- function(widedat,cnames=1,repnames=1){
   if(cnames==1) {
     widedat1 <- widedat[-1,]

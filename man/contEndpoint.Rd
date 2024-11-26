@@ -2,7 +2,7 @@
 % Please edit documentation in R/Endpoints.R
 \name{contEndpoint}
 \alias{contEndpoint}
-\title{get Endpoint for continuous data}
+\title{get Endpoint for continuous data according to results of a series of tests}
 \usage{
 contEndpoint(
   paov,
@@ -22,5 +22,5 @@ contEndpoint(
 \item{doses}{}
 }
 \description{
-get Endpoint for continuous data
+get Endpoint for continuous data according to results of a series of tests
 }
