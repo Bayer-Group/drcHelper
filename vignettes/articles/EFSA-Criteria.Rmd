@@ -35,7 +35,7 @@ Apart from generic model comparison criteria, EFSA has proposed to use the follo
 |:----------------------------------------|:---------------------------------|
 |EC$_{10}$ < EC$_{20,low}$                | High                             |
 |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
-|EC$_{10}$ > EC$_{50,low}$                | Fair                             |
+|EC$_{10}$ > EC$_{50,low}$                | Low                              |
 
 
 

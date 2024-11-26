@@ -483,7 +483,7 @@ calcSteepnessOverlap <- function(mod=NULL,obj=NULL,trend="Decrease",CI="inv",...
   # |-----------------------------------------|----------------------------------|
   # |EC$_{10}$ < EC$_{20,low}$                | High                             |
   # |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
-  # |EC$_{10}$ > EC$_{50,low}$                | Fair                             |
+  # |EC$_{10}$ > EC$_{50,low}$                | Low                             |
   res <- rep(NA,2)
   if(!is.null(mod) & !inherits(mod,"try-error")){
     if(class(mod)=="drc") obj <- ED.plus(mod,c(10,20,50),trend=trend, CI=CI,...)
@@ -504,9 +504,9 @@ calcSteepnessOverlap <- function(mod=NULL,obj=NULL,trend="Decrease",CI="inv",...
           res[1] <- "High"
         }else{
           if(!is.na(obj$Lower[3])){
-            if(obj$Estimate[1] < obj$Lower[3]) res[1] <- "Medium" else res[1] <-"Fair"
-          }else{
-            res[1] <- "Not Low"
+            if(obj$Estimate[1] < obj$Lower[3]) res[1] <- "Medium" else res[1] <-"Low"
+          }else{ ## cannot compare due to missing EC 50 lower limits.
+            res[1] <- "Not Low (missing LCI of EC50)"
           }
         }
       }else{

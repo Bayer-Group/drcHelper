@@ -1,0 +1,17 @@
+
+
+- Build ReadMe GitHub page
+
+```{r}
+devtools::build_readme()
+```
+
+- Build documentation site
+
+```{r}
+pkgdown::build_site_github_pages(clean=FALSE)
+```
+
+- 
+
+

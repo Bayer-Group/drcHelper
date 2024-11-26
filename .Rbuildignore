@@ -3,3 +3,8 @@
 ^vignettes/articles$
 ^data-raw$
 ^README\.Rmd$
+^inst/apps$
+^inst/Archive$
+^inst/DevNotes$
+^inst/References$
+^inst/RStats$
