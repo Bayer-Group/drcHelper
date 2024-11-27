@@ -21,3 +21,4 @@ Depends:
     drc,
     R (>= 2.10)
 LazyData: true
+URL: https://effective-adventure-2klnejq.pages.github.io/
