@@ -1,5 +1,5 @@
 ---
-title: "Example Usage of drcHelper"
+title: "drcHelper"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Tutorial_drc_Helpers}
