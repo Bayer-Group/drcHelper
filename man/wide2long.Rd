@@ -21,12 +21,11 @@ a dataframe in long format
 change from wide format to long format
 }
 \examples{
- 
 # Create a sample wide dataset
- widedat <- data.frame(
-   Replicates = c("Rep1", "Rep2", "Rep3"),
-   Treatment1 = c(1.1, 2.2, 3.3),
-   Treatment2 = c(4.4, 5.5, 6.6)
- )
-wide2long(widedat,cnames=FALSE)
+widedat <- data.frame(
+  Replicates = c("Rep1", "Rep2", "Rep3"),
+  Treatment1 = c(1.1, 2.2, 3.3),
+  Treatment2 = c(4.4, 5.5, 6.6)
+)
+drcHelper:::wide2long(widedat, cnames = FALSE)
 }

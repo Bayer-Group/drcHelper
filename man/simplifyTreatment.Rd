@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_Helper.R
 \name{simplifyTreatment}
 \alias{simplifyTreatment}
-\title{Resolve the excel datasheet number issue like 12.300000000000001 or 8.3579999999999}
+\title{Resolve the excel datasheet number issues}
 \usage{
 simplifyTreatment(trt)
 }
@@ -10,18 +10,28 @@ simplifyTreatment(trt)
 \item{trt}{a treatment vector, either factor or character}
 }
 \value{
-a simplified vector, either a factor or a character vector, depending on x
+a simplified vector, either a factor or a character vector,
+depending on x
 }
 \description{
-Resolve the excel datasheet number issue like 12.300000000000001 or 8.3579999999999
+The \code{simplifyTreatment} function is designed to handle and simplify
+a treatment vector, which can be either a factor or a character vector.
+The primary goal of this function is to resolve issues with numeric
+precision that often arise in Excel datasheets, such as numbers
+being represented with excessive decimal places, like 12.300000000000001
+or 8.3579999999999
 }
 \examples{
-x <- structure(c(1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L,
-3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L, 6L, 1L, 1L, 1L,
-1L, 1L, 1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L,
-5L, 5L, 5L, 6L, 6L, 6L, 6L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L,
-2L, 3L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L,
-6L), levels = c("Control", "1", "3.51", "12.300000000000001",
-             "42.9", "150"), class = "factor")
+x <- structure(c(
+  1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L,
+  3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L, 6L, 1L, 1L, 1L,
+  1L, 1L, 1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L,
+  5L, 5L, 5L, 6L, 6L, 6L, 6L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L,
+  2L, 3L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L,
+  6L
+), levels = c(
+  "Control", "1", "3.51", "12.300000000000001",
+  "42.9", "150"
+), class = "factor")
 simplifyTreatment(x)
 }
