@@ -1,0 +1,45 @@
+---
+title: "Normality Check"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+Normality checks are often conducted by Shaprio-Wilks test or by QQ plots. However, we need to understand both approaches have limitations. 
+
+There are people with opinions that many populaer normality tests, including Shapiro-Wilks and Anderson-Darling tests should never be used. However, it is still useful to use these tests to quantify or identify non-normality, especially with moderate sample size.  
+
+
+## Limitations
+
+For example, mixture of normals (almost-normal in terms of Q-Q plots) cannot be detected easily with small sample size (smaller than 1000) (taken from this post^[https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless]).   
+```{r}
+x <- replicate(
+  100,
+  {
+    c(
+      shapiro.test(rnorm(10) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(100) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(1000) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(5000) + c(1, 0, 2, 0, 1))$p.value
+    )
+  }
+)
+rownames(x) <- c("n10", "n100", "n1000", "n5000")
+apply(x, 1, function(y) {
+  sum(y < 0.05)
+})
+```
+
+
+## References
+
+Micceri, T. (1989). The unicorn, the normal curve, and other improbable creatures. Psychological Bulletin, 105(1), 156-166.
