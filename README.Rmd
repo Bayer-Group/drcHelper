@@ -122,5 +122,9 @@ pander::pander(coef(modsum))
 
 ## Contribution Notes
 
-- Please create a pull request to contribute to the development of packages. 
+- Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the `gh pr create` command. 
 
+```
+gh pr create --title "Title of the pull request" --body "Description of the pull request"
+gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+```
