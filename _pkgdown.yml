@@ -1,16 +1,72 @@
 url: https://effective-adventure-2klnejq.pages.github.io/
 template:
+  math-rendering: mathjax
   bootstrap: 5
-
+  params:
+    bootswatch: flatly
+search:
+  exclude: news/index.html
+repo:
+  url:
+    home: https://github.com/pharmaverse/admiral/
+    source: https://github.com/pharmaverse/admiral/blob/main/
+    issue: https://github.com/pharmaverse/admiral/issues/
+    user: https://github.com/
+news:
+  cran_dates: yes
 development:
   mode: auto
+  version_label: default
+authors:
+  before: We define *authors* as those who are actively maintaining the code base,
+    and *contributors* as those who made a significant contribution in the past. For
+    all acknowledgements, see the eponymous section in the [Home Page](https://pharmaverse.github.io/admiral/).
+  footer:
+    roles:
+    - aut
+    - ctb
+    - cre
+    - fnd
+    text: Developed by
+  sidebar:
+    roles: aut
+reference:
+- title: Helper functions for drc package
+- title: Superseded
+  desc: "Superseded functions have been replaced with better functions. However, we\nwill
+    not be removing these functions from `{drcHelper}`.  \n"
+  contents: has_keyword("deprecated")
+navbar:
+  structure:
+    left:
+    - getstarted
+    - reference
+    - articles
+    - news
+    - tutorials
+    right:
+    - search
+    - newissue
+    - github
+  components:
+    getstarted:
+      text: Get Started
+      menu:
+      - text: Get Started
+        href: articles/drcHelper.html
+      - text: Introduction
+        href: articles/Introduction.html
+    reference:
+      text: Reference
+      href: reference/
+    tutorials:
+      text: User Guides
+      href: tutorials
+    articles:
+      text: Articles
+      href: articles
+    newissue:
+      icon: fa-bug
+      href: https://github.com/bayer-int/drcHelper/issues/new?template=Blank+issue
+      aria-label: New Issue
 
-articles:
-
-
-news:
-  releases:
-  - text: "Version 2.2.1"
-    href: https://www.tidyverse.org/articles/2019/09/devtools-2-2-1/
-  - text: "Version 2.0.0"
-    href: https://www.tidyverse.org/articles/2018/10/devtools-2-0-0/
