@@ -30,12 +30,7 @@ authors:
     text: Developed by
   sidebar:
     roles: aut
-reference:
-- title: Helper functions for drc package
-- title: Superseded
-  desc: "Superseded functions have been replaced with better functions. However, we\nwill
-    not be removing these functions from `{drcHelper}`.  \n"
-  contents: has_keyword("deprecated")
+
 navbar:
   structure:
     left:
