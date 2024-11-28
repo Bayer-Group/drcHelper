@@ -19,7 +19,7 @@ a treatment vector, which can be either a factor or a character vector.
 The primary goal of this function is to resolve issues with numeric
 precision that often arise in Excel datasheets, such as numbers
 being represented with excessive decimal places, like 12.300000000000001
-or 8.3579999999999
+or 8.3579999999999.
 }
 \examples{
 x <- structure(c(
