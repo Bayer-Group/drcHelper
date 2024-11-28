@@ -130,6 +130,7 @@ gh pr create --title "Title of the pull request" --body "Description of the pull
 gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
 ```
 To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository.
+
 ```r
 knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
 ```
