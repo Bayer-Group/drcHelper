@@ -20,21 +20,27 @@ library(drc)
 
 ```{r}
 ## Model with ED50 as a parameter
-finney71.m1 <- drm(affected/total ~ dose, weights = total,
+finney71.m1 <- drm(affected / total ~ dose, weights = total,
 data = finney71, fct = LL.2(), type = "binomial")
 
 summary(finney71.m1)
 plot(finney71.m1, broken = TRUE, bp = 0.1, lwd = 2)
 
 ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="relative")
-## ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="absolute")
-## ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "upper")
+ED(finney71.m1, c(0.10, 0.20, 0.50), interval = "delta", reference = "control",type="absolute")
+##  Referecen could be the upper limit or the control. In this case I am not sure what has been calcuated. 
+ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "upper")
 
-ED(finney71.m1, c(10, 20, 50), interval = "inv", reference = "control",type="relative")
+ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="relative")
+
+bmd::bmd(finney71.m1, c(0.1),backgType="modelBased",def="excess",interval="inv")
+
+## Note that in ED.plus, instead of using interval = "delta", we specifify CI = "delta", to distinguish the option to calculate CI
+drcHelper::ED.plus(finney71.m1,c(10,20,50),CI="inv")
 ```
 
 
-```{r}
+```{r warning=FALSE}
 ## Fitting 4-parameter log-logistic model
 ryegrass.m1 <- drm(ryegrass, fct = LL.4())
 
