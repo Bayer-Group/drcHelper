@@ -25,21 +25,24 @@ tsk <- function(...) UseMethod("tsk")
 #' @S3method
 #' @export
 tsk.numeric <-
-    function(x, n, r, control = 0, trim = 0, conf.level = 0.95,
-             use.log.doses = TRUE, ...) {
-        input <- data.frame(x = x, n = n, r = r)
-        tsk(input, control, trim, conf.level, use.log.doses, ...)
-    }
+  function(x, n, r, control = 0, trim = 0, conf.level = 0.95,
+           use.log.doses = TRUE, ...) {
+    input <- data.frame(x = x, n = n, r = r)
+    tsk(input, control, trim, conf.level, use.log.doses, ...)
+  }
 
 #' TSK Analysis for Data Frame Input
 #'
 #' This function performs TSK analysis for data frame input.
 #'
-#' @param input A data frame containing the columns `x` (doses), `n` (total counts), and `r` (response counts).
+#' @param input A data frame containing the columns `x` (doses),
+#'  `n` (total counts), and `r` (response counts).
 #' @param control A numeric value indicating the control dose (default is 0).
 #' @param trim A numeric value indicating the trim level (default is 0).
-#' @param conf.level A numeric value indicating the confidence level (default is 0.95).
-#' @param use.log.doses A logical value indicating whether to use log-transformed doses (default is TRUE).
+#' @param conf.level A numeric value indicating the confidence level
+#' (default is 0.95).
+#' @param use.log.doses A logical value indicating whether to use
+#' log-transformed doses (default is TRUE).
 #' @param ... Additional arguments passed to the function.
 #' @return The result of the TSK analysis.
 
@@ -89,7 +92,7 @@ tsk.data.frame <-
         ### smoothing-a-sequence-without-using-a-loop-in-r
         needs.smooth <- is.unsorted(data.smoothed$p)
         if (needs.smooth) {
-            data.smoothed$p <- gpava(
+            data.smoothed$p <- isotone::gpava(
                 z = data.smoothed$x,
                 y = data.smoothed$p,
                 weights = data.smoothed$n
