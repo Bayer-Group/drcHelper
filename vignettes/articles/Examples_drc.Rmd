@@ -36,7 +36,7 @@ ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="r
 bmd::bmd(finney71.m1, c(0.1),backgType="modelBased",def="excess",interval="inv")
 
 ## Note that in ED.plus, instead of using interval = "delta", we specifify CI = "delta", to distinguish the option to calculate CI
-drcHelper::ED.plus(finney71.m1,c(10,20,50),CI="inv")
+drcHelper::ED.plus(finney71.m1, c(10, 20, 50), CI = "inv")
 ```
 
 
@@ -52,7 +52,7 @@ plot(ryegrass.m1, broken = TRUE, type="confidence", add=TRUE)
 ```
 
 
-```{r}
+```{r fig.keep=TRUE}
 ## Fitting the Brain-Cousens model
 lettuce.m1 <- drm(weight ~ conc, 
 data = lettuce, fct = BC.4())
@@ -78,7 +78,7 @@ par(mfrow = c(1,1))
 
 ```{r}
 ## Fitting model to be plotted below
-spinach.m1 <- drm(SLOPE~DOSE, CURVE, data = spinach, fct = LL.4())
+spinach.m1 <- drm(SLOPE ~ DOSE, CURVE, data = spinach, fct = LL.4())
 
 ## Plot with no colours
 plot(spinach.m1, main = "Different line types (default)")
