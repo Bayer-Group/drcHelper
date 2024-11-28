@@ -18,5 +18,5 @@ log(x+a)
 Helper function for scaling x-axis
 }
 \examples{
-logxp(0,1)
+logxp(0, 1)
 }

@@ -20,7 +20,8 @@
 )
 }
 \arguments{
-\item{...}{user input when the use does not want to use the data provided in the modList}
+\item{...}{user input when the use does not want to use the
+data provided in the modList}
 }
 \description{
 Plot a list of models together.
