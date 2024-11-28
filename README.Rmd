@@ -133,4 +133,5 @@ To use the pkgdown github workflow, some of the vignettes need to be pre-knit be
 
 ```r
 knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
+knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
 ```
