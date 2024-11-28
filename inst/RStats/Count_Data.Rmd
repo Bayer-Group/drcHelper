@@ -10,4 +10,5 @@ author:
     affiliation: Bayer AG
     affiliation_url: https://bayer.com
     orcid_id: 0000-0002-4042-310X
+output: distill::distill_article
 ---

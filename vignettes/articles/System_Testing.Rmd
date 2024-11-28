@@ -3,14 +3,13 @@ title: "System Testing"
 description: | 
   Testing approaches and description of test cases
 date: December 4, 2024
-author:
-  - first_name: "Zhenglei"
-    last_name: "Gao"
-    url: https://github.com/Zhenglei-BCS
-    affiliation: Bayer AG
-    affiliation_url: https://bayer.com
-    orcid_id: 0000-0002-4042-310X
-output: distill::distill_article
+author: "Zhenglei Gao"
+output:
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+pkgdown:
+  as_is: true
+  set_null_theme: false
 ---
 
 
