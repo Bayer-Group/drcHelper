@@ -60,6 +60,11 @@ navbar:
     articles:
       text: Articles
       href: articles
+      menu:
+      - text: Get Started
+        href: articles/drcHelper.html
+      - text: Introduction
+        href: articles/Introduction.html
     newissue:
       icon: fa-bug
       href: https://github.com/bayer-int/drcHelper/issues/new?template=Blank+issue
