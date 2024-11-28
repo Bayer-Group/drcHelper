@@ -7,17 +7,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
-```{r setup}
+
+
+``` r
 library(drcHelper)
 library(drc)
-
 ```
 
 In this vignettes we illustrate how to use drcHelper to produce tables and graphs that will be included in a dose-response analysis report. 
@@ -27,33 +22,44 @@ In this vignettes we illustrate how to use drcHelper to produce tables and graph
 ## Fitting multiple models and rank them.
 
 
-```{r}
 
-```
 
 
 
 ## Adding ECx and ECx CI's to the plots
 
-```{r}
 
-```
 
 
 ## Outputting 
 
 
 ## Dependencies
-```{r}
+
+``` r
+
 library(DependenciesGraphs)
+#> Loading required package: visNetwork
+#> Warning: package 'visNetwork' was built under R version 4.4.2
+#> Loading required package: shinydashboard
+#> Warning: package 'shinydashboard' was built under R version 4.4.2
+#> 
+#> Attaching package: 'shinydashboard'
+#> The following object is masked from 'package:graphics':
+#> 
+#>     box
+#> Loading required package: XML
 dep <- funDependencies("package:drcHelper","ED.plus")
 plot(dep)
+#> Error in loadNamespace(name): there is no package called 'webshot'
 dep <- funDependencies("package:drcHelper","mselect.ED")
 plot(dep)
+#> Error in loadNamespace(name): there is no package called 'webshot'
 
 #dep <- funDependencies("package:drcHelper","mselect.plus")
 #plot(dep)
 
 dep <- envirDependencies('package:drcHelper')
 plot(dep)
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```

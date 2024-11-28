@@ -2,13 +2,15 @@
 % Please edit documentation in R/drc_Helper.R
 \name{mselect.ED}
 \alias{mselect.ED}
-\title{Select ECx estimation from Models with mselect.plus and EFSA SO criteria}
+\title{ECx calculation together with normalized width proposed by EFSA SO.}
 \usage{
 mselect.ED(modList, respLev = c(10, 20, 50), trend = "Decrease", ...)
 }
 \arguments{
+\item{modList}{list of models}
+
 \item{...}{}
 }
 \description{
-Select ECx estimation from Models with mselect.plus and EFSA SO criteria
+ECx calculation together with normalized width proposed by EFSA SO.
 }

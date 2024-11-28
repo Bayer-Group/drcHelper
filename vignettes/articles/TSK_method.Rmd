@@ -62,7 +62,7 @@ The original goal of this R package was to replicate the results of a DOS progra
 ## devtools::install_github(repo="brsr/tsk")
 
 
-library(tsk)
+## library(tsk)
 tsk( c(1, 10, 100, 1000), 20, c(0, 3, 17, 20) )
 
 data(hamilton)

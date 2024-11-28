@@ -35,12 +35,13 @@ devtools::install_github("bayer-int/drcHelper")
 
 ## Data Overview
 
-```{r}
+```{r message=FALSE,warning=FALSE}
 library(drcHelper)
 library(drc)
 library(dplyr)
 library(purrr)
 library(ggplot2)
+theme_set(theme_bw())
 sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
 sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
 # sum0
@@ -127,4 +128,8 @@ pander::pander(coef(modsum))
 ```
 gh pr create --title "Title of the pull request" --body "Description of the pull request"
 gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+```
+To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository.
+```r
+knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
 ```

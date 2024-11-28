@@ -7,7 +7,11 @@
 \method{plot}{edList}(edList, fctNames, ...)
 }
 \arguments{
-\item{...}{}
+\item{edList}{ECx lists from fitted set of models}
+
+\item{fctNames}{fct function names}
+
+\item{...}{additional parameters}
 }
 \description{
 Plot the ECx estimation and confidence intervals from the list of models.
