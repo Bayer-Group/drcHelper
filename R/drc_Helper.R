@@ -367,14 +367,19 @@ print.drcComp <- function(x, ...) {
 
 #' Plot a list of models together.
 #'
-#' @param modList
-#' @param respLev
-#' @param data
-#' @param xmin
-#' @param xmax
-#' @param scale
-#' @param npts
-#' @param ... user input when the use does not want to use the
+#' @param modList list of drc models.
+#' @param respLev to be calculated ECx levels, for example, c(10,20,50).
+#' @param data data used to fit the set of models
+#' @param xmin minimum value of xaxis, should be greater than 0 to
+#'  fit the log scale.
+#' @param xmax maximum value of xaxis, can be missing.
+#' @param scale could be "logx", "logy", "logxy", "orig".
+#' @param npts number of points used for plotting the prediction
+#'  confidence bands
+#' @param plot_respLev logical, whether to add the estimated ECx with CIs
+#' @param xbreaks breaks in x-axis labeling
+#' @param ... addition parameters to be passed into plotting functions or
+#' user input when the use does not want to use the
 #' data provided in the modList
 #'
 #' @return
@@ -434,12 +439,17 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
     return(newdata)
   })
   predData$Model <- factor(predData$Model, levels = unique(predData$Model))
-
+  require(ggplot2)
   p <- ggplot(ex1, aes_(x = ~conc0, y = as.name(responseName))) +
-    geom_ribbon(data = predData, aes_(x = as.name(doseName), y = ~p, ymin = ~pmin, ymax = ~pmax, col = ~Model, fill = ~Model), alpha = 0.2) +
+    geom_ribbon(data = predData, aes_(x = as.name(doseName),
+                                      y = ~p, ymin = ~pmin,
+                                      ymax = ~pmax, col = ~Model,
+                                      fill = ~Model),
+                alpha = 0.2) +
     xlab(doseName) +
     ylab(responseName) +
-    geom_line(data = predData, aes_(x = as.name(doseName), y = ~p, col = ~Model)) +
+    geom_line(data = predData, aes_(x = as.name(doseName), y = ~p, 
+                                    col = ~Model)) +
     geom_point()
 
   if (!is.null(respLev) & plot_respLev) {
@@ -455,9 +465,9 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
 
 #' Plot the ECx estimation and confidence intervals from the list of models.
 #'
-#' @param edList
-#' @param fctNames
-#' @param ...
+#' @param edList ECx lists from fitted set of models
+#' @param fctNames fct function names
+#' @param ... additional parameters
 #'
 #' @return
 #' @export plot.edList
@@ -502,23 +512,24 @@ plot.edList <- function(edList, fctNames, ...) {
   return(plotED)
 }
 ## Steepness and overlap
-#' Title
+#' Steepness and overlap calcuation
 #'
 #' @param mod fitted object from drm model fitting
-#' @param obj Calculated ED 10, 20, 50 object if available. mod should set to be NULL in this case
+#' @param obj Calculated ED 10, 20, 50 object if available.
+#' mod should set to be NULL in this case
 #' @param trend "Decrease" or "Increase"
 #' @param ... other parameters that wil be passed into ED.plus
 #'
-#' @return
+#' @return a table with certainty of potection level and steepness of the models
 #' @export
 #'
 #' @examples
-calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI = "inv", ...) {
-  # |Overlapping  Conditions                  |Certainty of the Protection Level |
-  # |-----------------------------------------|----------------------------------|
-  # |EC$_{10}$ < EC$_{20,low}$                | High                             |
-  # |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
-  # |EC$_{10}$ > EC$_{50,low}$                | Low                             |
+calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI = "inv", ...) { # nolint: line_length_linter.
+  # |Overlapping  Conditions                  |Certainty of the Protection Level | # nolint
+  # |-----------------------------------------|----------------------------------| # nolint
+  # |EC$_{10}$ < EC$_{20,low}$                | High                             | # nolint
+  # |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           | # nolint
+  # |EC$_{10}$ > EC$_{50,low}$                | Low                             | # nolint
   res <- rep(NA, 2)
   if (!is.null(mod) & !inherits(mod, "try-error")) {
     if (class(mod) == "drc") obj <- ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...)
@@ -556,9 +567,9 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
   }
 }
 
-#' Select ECx estimation from Models with mselect.plus and EFSA SO criteria
+#' ECx calculation together with normalized width proposed by EFSA SO. 
 #'
-#' @param modList
+#' @param modList list of models
 #' @param respLev
 #' @param trend
 #' @param ...
@@ -567,9 +578,15 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
 #' @export mselect.ED
 #'
 #' @examples
-mselect.ED <- function(modList, respLev = c(10, 20, 50), trend = "Decrease", ...) {
-  edList <- lapply(modList, function(obj) ED.plus(obj, respLev, trend = trend, ...))
-  ## map2(modList,edList,function(x,y){predict(x,newdata=data.frame(Concentration=y[,1]))}) ## Check if Prediction Make sense
+mselect.ED <- function(modList, respLev = c(10, 20, 50),
+                       trend = "Decrease", ...) {
+  edList <- lapply(modList, function(obj) {
+                                           ED.plus(obj,
+                                                   respLev,
+                                                   trend = trend, ...) })
+  ## map2(modList,edList,function(x,y){
+  ## predict(x,newdata=data.frame(Concentration=y[,1]))})
+  ## Check if Prediction Make sense
 
   NW <- lapply(edList, calcNW)
   edRes <- map2(edList, NW, cbind)
@@ -602,7 +619,7 @@ calcNW <- function(x, ED = "ZG") {
   x <- as.data.frame(x) ## x is the ED object from ED function.
   out <- as.data.frame((x$Upper - x$Lower) / x$Estimate)
   if (ED == "ZG") newRowNames <- rownames(x)
-  if (ED == "drc") newRowNames <- paste0("EC_", do.call(c, lapply(strsplit(row.names(x), ":"), function(y) y[3])))
+  if (ED == "drc") newRowNames <- paste0("EC_", do.call(c, lapply(strsplit(row.names(x), ":"), function(y) y[3]))) # nolint: line_length_linter.
   out <- cbind(out, NA)
   out[, 2] <- ECx_rating(out[, 1])
   row.names(out) <- newRowNames
@@ -620,7 +637,7 @@ calcNW <- function(x, ED = "ZG") {
 #' @examples
 ECx_rating <- function(x) {
   ## normalised width (NW) of CI
-  ## NW   |  Rating
+  ## NW   |  Rating # nolint: commented_code_linter.
   ## ----------------
   ## <0.2 | Excellent
   ## <0.5 | Good
@@ -630,7 +647,7 @@ ECx_rating <- function(x) {
   outRating <- NULL
   for (i in x) {
     if (is.nan(i) || is.na(i)) {
-      outRating <- c(outRating, "not defined")
+      outRating <- c(outRating, "Not defined")
     } else {
       if (i < 0.2) {
         outRating <- c(outRating, "Excellent")
@@ -643,7 +660,7 @@ ECx_rating <- function(x) {
       } else if (i > 2) {
         outRating <- c(outRating, "Bad")
       } else {
-        outRating <- c(outRating, "not defined")
+        outRating <- c(outRating, "Not defined")
       }
     }
   }
@@ -671,9 +688,9 @@ drcCompare <- function(modRes = NULL, modList = NULL, trend = "Decrease",
   } else {
     if (is.null(modList)) stop("Need the model output list from previous step!")
   }
-  # A significance test is provided for the comparison of the dose-response model considered and the simple linear regression model with slope 0 (a horizontal regression line corresponding to no dose effect)
-  # The likelihood ratio test statistic and the corresponding degrees of freedom and p-value are reported.
-  a <- plyr::ldply(modList, function(obj) if (inherits(obj, "try-error")) c(`Chi-square test` = NA, Df = NA, `p-value` = NA) else noEffect(obj))
+  # A significance test is provided for the comparison of the dose-response model considered and the simple linear regression model with slope 0 (a horizontal regression line corresponding to no dose effect) # nolint: line_length_linter.
+  # The likelihood ratio test statistic and the corresponding degrees of freedom and p-value are reported. # nolint: line_length_linter.
+  a <- plyr::ldply(modList, function(obj) if (inherits(obj, "try-error")) c(`Chi-square test` = NA, Df = NA, `p-value` = NA) else noEffect(obj)) # nolint: line_length_linter.
   Overlap <- plyr::ldply(modList, calcSteepnessOverlap, CI = CI)
   names(Overlap) <- c(".id", "Certainty_Protection", "Steepness")
   CompRes <- cbind(comparison, Overlap[, -1])
