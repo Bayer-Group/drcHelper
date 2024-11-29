@@ -1,3 +1,17 @@
+#' This is hamilton data
+#' 
+#' Example dose-response data given in Hamilton (1977).
+#' Note that, as per Hamilton (1978), the confidence intervals
+#' given in Hamilton (1977) for these data sets are incorrect.
+#' @format A list containing ten data frames: dr1a, dr1b, dr1c,
+#' dr1d, dr1e, dr4a, dr4b, dr4c, dr4d, dr4e,
+#' @docType data
+#' @source Hamilton, 1977.
+#' @references \url{data_blah.com}
+#' @keywords data
+"hamilton"
+
+
 #' Trimmed Spearman-Karber Method by brsr
 #'
 #' @param ... inputs

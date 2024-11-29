@@ -170,4 +170,7 @@ for (i in 1:length(expected)){
 
 ## References
 
-https://www.cureffi.org/2015/09/20/the-math-behind-spearman-karber-analysis/
+- https://www.cureffi.org/2015/09/20/the-math-behind-spearman-karber-analysis/
+- Hamilton, M. A.; Russo, R. C.; Thurston, R. V. Trimmed Spearman-Karber Method for Estimating Median Lethal Concentrations in Toxicity Bioassays. Enviro. Sci. Tech. 1977, 11 (7), 714-719. http://dx.doi.org/10.1021/es60130a004
+
+- Ibid, 1978, 12 (4), 417. http://dx.doi.org/10.1021/es60140a017
