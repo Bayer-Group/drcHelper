@@ -8,9 +8,9 @@ search:
   exclude: news/index.html
 repo:
   url:
-    home: https://github.com/pharmaverse/admiral/
-    source: https://github.com/pharmaverse/admiral/blob/main/
-    issue: https://github.com/pharmaverse/admiral/issues/
+    home: https://github.com/bayer-int/drcHelper
+    source: https://github.com/bayer-int/drcHelper/blob/main/
+    issue: https://github.com/bayer-int/drcHelper/issues/
     user: https://github.com/
 news:
   cran_dates: yes
@@ -36,9 +36,10 @@ navbar:
     left:
     - getstarted
     - reference
-    - articles
-    - news
     - tutorials
+    - articles
+    - validation
+    - news
     right:
     - search
     - newissue
