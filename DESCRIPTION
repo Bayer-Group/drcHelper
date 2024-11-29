@@ -1,17 +1,15 @@
 Package: drcHelper
-Title: What the Package Does (One Line, Title Case)
+Title: Collection and verification of helper functions for dose-response analysis
 Version: 0.0.1
 Authors@R: 
     person("Zhenglei", "Gao", , "zhenglei.gao@bayer.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4042-310X"))
-Description: Helper functions for drc package.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Helper functions for drc package and other dose-response analysis functions.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: 
-    drcBAG,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
@@ -21,3 +19,9 @@ Depends:
     drc,
     R (>= 2.10)
 LazyData: true
+URL: https://effective-adventure-2klnejq.pages.github.io/
+Imports: 
+    bmd,
+    isotone,
+    PMCMRplus
+Remotes: DoseResponse/bmd

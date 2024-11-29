@@ -9,7 +9,7 @@ summaryZG(object, ...)
 \arguments{
 \item{object}{William test result object}
 
-\item{...}{}
+\item{...}{additional parameters to be passed into the function, placeholder}
 }
 \value{
 William test results

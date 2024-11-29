@@ -1,0 +1,65 @@
+---
+title: "A Note on Statistical Power"
+description: | 
+  Collection of Notes on MM
+date: December 4, 2024
+author:
+  - first_name: "Zhenglei"
+    last_name: "Gao"
+    url: https://github.com/Zhenglei-BCS
+    affiliation: Bayer AG
+    affiliation_url: https://bayer.com
+    orcid_id: 0000-0002-4042-310X
+---
+
+## Nonparametric Tests
+
+```{r}
+library(SimEngine)
+ ### NULL HYPOTHESIS: Theta=0 ###
+
+   n_x=200                                 # Sample size under Null Hypothesis
+   mu_x=0                                  # Sample mean under Null Hypothesis
+   sigma_x=3                               # Sample deviation under Null Hypotesis
+
+ ### ALTERNATIVE HYPOTHESIS: Theta>0 ###
+
+   tmu_y=100                               # Number of means under Alternative Hypothesis
+   mu_y=seq(-2, 2, length=tmu_y)           # Means under Alternative Hypothesis
+   sigma_y=3                               # Deviation under Alternative Hypothesis
+
+
+prob_rechazo_wilcoxon=NULL                 # Power of Wilcoxon Test
+prob_rechazo_stest=NULL                    # Power of Sign Test
+
+tsim=1000                                  # Simulation size
+
+for (j in 1: tmu_y)
+     {
+        valorP_stest=NULL                  # P value Sign Test
+        valorP_wilcoxon=NULL               # P value Wilcoxon Test
+
+    for (i in 1:tsim)
+          {
+           x=rnorm(n_x, mu_x, sigma_x)
+           stest=SIGN.test(x, y=NULL, alternative = "less", md = 0, conf.level = 0.95)
+           valorP_stest[i]=stest$p.value
+           wtest=wilcox.test(x, y=NULL, alternative = "less", mu = 0, conf.level = 0.95)
+           valorP_wilcoxon[i]=wtest$p.value
+           }
+       prob_rechazo_stest[j]=sum(ifelse(valorP_stest<0.05,1,0))/tsim
+       prob_rechazo_wilcoxon[j]=sum(ifelse(valorP_wilcoxon<0.05,1,0))/tsim
+        }
+
+cbind(prob_rechazo_stest, prob_rechazo_wilcoxon)
+
+plot (mu_y,prob_rechazo_stest, type="l", col=2, main="Power",ylab="",xlab="")
+lines(mu_y,prob_rechazo_wilcoxon, type="l", col=4)
+```
+
+
+
+## References
+
+- The Abuse of Power: https://www.tandfonline.com/doi/abs/10.1198/000313001300339897#preview
+- SIMR: power analysis for GLMM https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12504

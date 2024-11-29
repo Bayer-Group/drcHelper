@@ -7,7 +7,15 @@
 williamsTest_JG(df, resp, trt, direction = "decreasing", SeIn = NULL)
 }
 \arguments{
-\item{SeIn}{}
+\item{df}{The data frame}
+
+\item{resp}{The name of the response as a string}
+
+\item{trt}{The name of the response as a string}
+
+\item{direction}{Is the direction of the test 'decreasing' or 'increasing'}
+
+\item{SeIn}{the standard error, default is program selected. WilliamsTest can take in a different value in the case of repeated measures}
 }
 \description{
 Williams Test from the StatCharrms Package

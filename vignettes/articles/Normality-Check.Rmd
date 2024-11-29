@@ -1,0 +1,134 @@
+---
+title: "Normality Check"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warnings = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+Normality checks are often conducted by Shaprio-Wilks test or by QQ plots. However, we need to understand both approaches have limitations. 
+
+There are people with opinions that many populaer normality tests, including Shapiro-Wilk's and Anderson-Darling tests should never be used. However, it is still useful to use these tests to quantify or identify non-normality, especially with moderate sample size.  
+
+## Standard Practices
+
+In the context of statistical analysis, conducting a normality assessment is a preliminary step outlined in the decision flowchart established by the OECD 54 and various testing guidelines. The Shapiro-Wilk test is a robust option for this purpose, particularly when dealing with relatively small sample sizes.
+
+It is important to note that there are several methodologies available for evaluating normality. One approach involves assessing whether the data within each treatment group or test concentration group adheres to a normal distribution. Alternatively, one can examine the normality of residuals following an ANOVA or linear regression analysis. The first approach assumes that the data within each treatment group is normally distributed, without imposing the constraints of homogeneity of variance. Conversely, the second approach posits that the residuals are drawn from a single normal distribution, thereby providing a different perspective on the data's adherence to normality.
+
+```{r}
+## It is possible to use options(digits = 7) to control the number
+## of digits in print outs. However, it is not necessary to do so.
+vgl_0 <- c(0.131517109035102, 0.117455425985384, 0.130835155683102,
+           0.12226548296818, 0.127485057136569, 0.128828137633933)
+vgl_1 <- c(0.122888192029009, 0.126866725094641, 0.128467082586674,
+           0.116653888503673)
+vgl_2 <- c(0.0906079518188219, 0.102060998252763, 0.107240263636048,
+           0.0998663441976353)
+vgl_3 <- c(0.0584507373938537, 0.066439126181113, 0.0806046608441279,
+           0.0828404794158172)
+vgl_4 <- c(0.0462632004630849, 0.0461876546375037, 0.0512317665813575,
+           0.0416533060961155)
+vgl_5 <- c(0.0267638178172436, 0.0314508456741666, 0.0237960318948956,
+           0.0295133681572911)
+vgl_6 <- c(0.0273565894468647, 0.0324226779638651, 0.0289617934362975,
+            0.0305317153447814)
+
+x0 <- vgl_0 - mean(vgl_0)
+x1 <- vgl_1 - mean(vgl_1)
+x2 <- vgl_2 - mean(vgl_2)
+x3 <- vgl_3 - mean(vgl_3)
+x4 <- vgl_4 - mean(vgl_4)
+x5 <- vgl_5 - mean(vgl_5)
+x6 <- vgl_6 - mean(vgl_6)
+
+res <- shapiro.test(c(x0, x1, x2, x3, x4, x5, x6))
+res
+```
+
+<u> Check for normality </u> 
+
+Significance level is $\alpha$ = 0.05. The p-value is the conditional probability of obtaining test results as extreme as the observed one given the null hypothesis H0 (normal distribution) being true. When p is smaller than the pre-determined significance level $\alpha$, the null hypothesis is rejected. 
+
+Result Shapiro-Wilk's test:
+```{r echo=FALSE}
+knitr::kable(broom::tidy(res), digits = 2)
+pander::pander(broom::tidy(res), digits = 2)
+```
+
+
+```{r echo=FALSE,fig.cap="Residuals from ANOVA are presented in a QQ-plot."}
+y=c(0.131517109035102,0.117455425985384,0.130835155683102,0.12226548296818,0.127485057136569,0.128828137633933,
+0.122888192029009,0.126866725094641,0.128467082586674,0.116653888503673,
+0.0906079518188219,0.102060998252763,0.107240263636048,0.0998663441976353,
+0.0584507373938537,0.066439126181113,0.0806046608441279,0.0828404794158172,
+0.0462632004630849,0.0461876546375037,0.0512317665813575,0.0416533060961155,
+0.0267638178172436,0.0314508456741666,0.0237960318948956,0.0295133681572911,
+0.0273565894468647,0.0324226779638651,0.0289617934362975,0.0305317153447814)
+Rate = c(0,0,0,0,0,0,
+0.0448,0.0448,0.0448,0.0448,
+0.132,0.132,0.132,0.132,
+0.390,0.390,0.390,0.390,
+1.15,1.15,1.15,1.15,
+3.39,3.39,3.39,3.39,
+10.0,10.0,10.0,10.0)
+Response  = data.frame(Rate, y)
+options(digits=16)
+
+## Scatterplot
+res <- matrix(nrow=dim(Response)[1], ncol=1)
+VGL <- matrix(nrow=dim(Response)[1], ncol=1)
+j = 1
+Rate0 = Rate[1]
+for(i in 1:dim(Response)[1]) {
+    control <- Response[Response$Rate == Rate[i],]    
+    y0<- mean(control$y)
+    res[i] = y[i]-y0
+    if(Rate[i]!=Rate0){
+        j=j+1
+        Rate0 = Rate[i]
+    }
+    VGL[i] =j
+}
+Response = data.frame(Rate, y,res,VGL)
+
+qqnorm(Response$res, pch = 1, frame = FALSE)
+qqline(Response$res, col = "steelblue", lwd = 2)
+
+knitr::kable(broom::tidy(res), digits = 2)
+pander::pander(broom::tidy(res), digits = 2)
+```
+## Limitations
+
+For example, mixture of normals (almost-normal in terms of Q-Q plots) cannot be detected easily with small sample size (smaller than 1000) (taken from this post^[https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless]).   
+```{r}
+x <- replicate(
+  100,
+  {
+    c(
+      shapiro.test(rnorm(10) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(100) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(1000) + c(1, 0, 2, 0, 1))$p.value, # $
+      shapiro.test(rnorm(5000) + c(1, 0, 2, 0, 1))$p.value
+    )
+  }
+)
+rownames(x) <- c("n10", "n100", "n1000", "n5000")
+apply(x, 1, function(y) {
+  sum(y < 0.05)
+})
+```
+
+
+## References
+
+Micceri, T. (1989). The unicorn, the normal curve, and other improbable creatures. Psychological Bulletin, 105(1), 156-166.

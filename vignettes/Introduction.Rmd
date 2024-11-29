@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 This package includes a collection of helping functions for dose-response analysis that are generic and might be useful outside our own organization.
 
-In the vignettes/articles folder, there are lots of examples for doing various type of dose-response analysis. 
+There are lots of examples for doing various type of dose-response analysis. Pros and cons for different methods are illustrated. Verification or validation of certain functions from certain packages are also included. 
 
 
 ```{r setup}
@@ -28,9 +28,11 @@ library(drcHelper)
 
 ## Other useful packages 
 
+There are several packages I find useful for the statistical analysis of (eco)toxicological data.
+
 ### ecotoxicology package
 
-You might want to use the SpearmanKarber function instead of tsk::tsk function.  
+ 
 
 - https://cran.r-project.org/web/packages/ecotoxicology/index.html
 

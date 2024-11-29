@@ -126,9 +126,9 @@ ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total)
 
 ## Dependencies
 
-```{r}
+```{r eval=FALSE}
 library(DependenciesGraphs)
-dep <- funDependencies("package:drcHelper","runRSCABS")
+dep <- funDependencies("package:drcHelper", "runRSCABS")
 
 # visualization
 plot(dep)

@@ -15,11 +15,13 @@ mselect.plus(
   doseCol = "dose",
   data = NULL,
   type = "continuous",
-  EFSA = NULL
+  additionalReliability = c("EFSA")
 )
 }
 \arguments{
-\item{EFSA}{}
+\item{type}{}
+
+\item{additionalReliability}{additional reliability need to be calculated}
 }
 \value{
 mselect.plus

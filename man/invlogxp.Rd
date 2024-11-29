@@ -18,5 +18,5 @@ inverse log of x and a
 inverse transformation of logxp
 }
 \examples{
-invlogxp(3,1)
+invlogxp(3, 1)
 }

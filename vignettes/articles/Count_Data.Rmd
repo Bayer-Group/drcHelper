@@ -3,12 +3,5 @@ title: "Count Data"
 description: | 
   Methods for dose-response with count data
 date: December 4, 2024
-author:
-  - first_name: "Zhenglei"
-    last_name: "Gao"
-    url: https://github.com/Zhenglei-BCS
-    affiliation: Bayer AG
-    affiliation_url: https://bayer.com
-    orcid_id: 0000-0002-4042-310X
-output: distill::distill_article
+author: "Zhenglei Gao"
 ---

@@ -2,7 +2,7 @@
 % Please edit documentation in R/drc_Helper.R
 \name{calcSteepnessOverlap}
 \alias{calcSteepnessOverlap}
-\title{Title}
+\title{Steepness and overlap calcuation}
 \usage{
 calcSteepnessOverlap(
   mod = NULL,
@@ -15,12 +15,16 @@ calcSteepnessOverlap(
 \arguments{
 \item{mod}{fitted object from drm model fitting}
 
-\item{obj}{Calculated ED 10, 20, 50 object if available. mod should set to be NULL in this case}
+\item{obj}{Calculated ED 10, 20, 50 object if available.
+mod should set to be NULL in this case}
 
 \item{trend}{"Decrease" or "Increase"}
 
 \item{...}{other parameters that wil be passed into ED.plus}
 }
+\value{
+a table with certainty of potection level and steepness of the models
+}
 \description{
-Title
+Steepness and overlap calcuation
 }

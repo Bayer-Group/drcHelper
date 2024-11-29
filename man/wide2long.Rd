@@ -7,8 +7,25 @@
 wide2long(widedat, cnames = 1, repnames = 1)
 }
 \arguments{
-\item{cnames}{}
+\item{widedat}{data in wide format}
+
+\item{cnames}{whether to use the 1st row as the column names,
+1 means 1st row need to be converted to headers}
+
+\item{whether}{the 1st column is the Replicates column}
+}
+\value{
+a dataframe in long format
 }
 \description{
 change from wide format to long format
+}
+\examples{
+# Create a sample wide dataset
+widedat <- data.frame(
+  Replicates = c("Rep1", "Rep2", "Rep3"),
+  Treatment1 = c(1.1, 2.2, 3.3),
+  Treatment2 = c(4.4, 5.5, 6.6)
+)
+drcHelper:::wide2long(widedat, cnames = FALSE)
 }

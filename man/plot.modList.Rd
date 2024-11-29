@@ -20,7 +20,29 @@
 )
 }
 \arguments{
-\item{...}{user input when the use does not want to use the data provided in the modList}
+\item{modList}{list of drc models.}
+
+\item{respLev}{to be calculated ECx levels, for example, c(10,20,50).}
+
+\item{data}{data used to fit the set of models}
+
+\item{xmin}{minimum value of xaxis, should be greater than 0 to
+fit the log scale.}
+
+\item{xmax}{maximum value of xaxis, can be missing.}
+
+\item{scale}{could be "logx", "logy", "logxy", "orig".}
+
+\item{npts}{number of points used for plotting the prediction
+confidence bands}
+
+\item{plot_respLev}{logical, whether to add the estimated ECx with CIs}
+
+\item{xbreaks}{breaks in x-axis labeling}
+
+\item{...}{addition parameters to be passed into plotting functions or
+user input when the use does not want to use the
+data provided in the modList}
 }
 \description{
 Plot a list of models together.

@@ -8,3 +8,8 @@
 ^inst/DevNotes$
 ^inst/References$
 ^inst/RStats$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^LICENSE\.md$

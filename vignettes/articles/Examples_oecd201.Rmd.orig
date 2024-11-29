@@ -1,0 +1,102 @@
+---
+title: "Examples_oecd201"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+library(drc)
+#options(kableExtra.auto_format = FALSE)
+```
+
+
+# Evaluation of Dataset oecd201
+
+```{r}
+data("oecd201")
+```
+
+## Data Overview
+
+```{r}
+sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
+sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
+# sum0
+sumtab <- left_join(sum1%>%filter(Time>0),sum0) %>% mutate(Yield_Inhibition=(Yield0-Yield_mean)/Yield0*100,GrowthRate_Inhibition=(GrowthRate0-GrowthRate_mean)/GrowthRate0*100) %>% dplyr::select(c(Time,Treatment,Yield_mean,Yield_sd,Yield_Inhibition,GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))
+```
+
+
+```{r}
+sumtab%>%dplyr::select(c(Yield_mean,Yield_sd,Yield_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Yield Summary at Time 72h<strong><center>",escape = FALSE)%>% kableExtra::kable_styling(bootstrap_options = "striped")##%>%kableExtra::kable_classic_2()
+```
+
+
+```{r}
+sumtab%>%dplyr::select(c(GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Growth Rate Summary at Time 72h<strong><center>",escape = FALSE)##%>%kableExtra::kable_classic()
+```
+
+## Model Fitting and Comparison For Yield
+
+```{r}
+datTn<- subset(oecd201,Time==72)
+
+mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
+fctList <- list(LL2.3(),W2.3(),W1.3(),EXD.3(),EXD.2(),LN.3(),W2.4(),LL.4(),LL2.4())
+plot(mod,type="all")
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend=datTn$Trend_Yield[1])
+plot.edList(edResTab)
+resComp <- drcCompare(modRes = res,trend="Decrease")
+```
+
+```{r}
+knitr::kable(edResTab,caption = "14 day TSL Yield",digits = 3)
+```
+
+```{r}
+knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
+```
+
+```{r fig.cap="Yield Model Fits"}
+plot.modList(modList,scale="logx")
+
+```
+
+```{r}
+plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
+p <-plot.modList(modList[c(1)],scale="logx",npts=80)+theme(legend.position = "none")+ggtitle("14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit")
+addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+                     textAjust.x=0.01,textAjust.y=1,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 1,xmin=0.012)+ylab("Total Shoot Length [cm]") + xlab("Concentration [µg a.s./L]")
+ggsave("TSL_14d_Yield.png")
+```
+
+```{r}
+resED <- t(edResTab[1:3, c(2,4,5,6)])
+colnames(resED) <- paste("EC", c(10,20,50))
+knitr::kable(resED,caption = "Total Shoot Length Growth Yield at 14 day",digits = 3)
+```
+
+```{r}
+
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
+pander::pander(as.data.frame(edres))
+
+```
+
+
+```{r}
+modsum <- summary(mod)
+pander::pander(coef(modsum))
+```
+

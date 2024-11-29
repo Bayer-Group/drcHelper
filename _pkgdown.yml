@@ -1,0 +1,72 @@
+url: https://effective-adventure-2klnejq.pages.github.io/
+template:
+  math-rendering: mathjax
+  bootstrap: 5
+  params:
+    bootswatch: flatly
+search:
+  exclude: news/index.html
+repo:
+  url:
+    home: https://github.com/pharmaverse/admiral/
+    source: https://github.com/pharmaverse/admiral/blob/main/
+    issue: https://github.com/pharmaverse/admiral/issues/
+    user: https://github.com/
+news:
+  cran_dates: yes
+development:
+  mode: auto
+  version_label: default
+authors:
+  before: We define *authors* as those who are actively maintaining the code base,
+    and *contributors* as those who made a significant contribution in the past. For
+    all acknowledgements, see the eponymous section in the [Home Page](https://pharmaverse.github.io/admiral/).
+  footer:
+    roles:
+    - aut
+    - ctb
+    - cre
+    - fnd
+    text: Developed by
+  sidebar:
+    roles: aut
+
+navbar:
+  structure:
+    left:
+    - getstarted
+    - reference
+    - articles
+    - news
+    - tutorials
+    right:
+    - search
+    - newissue
+    - github
+  components:
+    getstarted:
+      text: Get Started
+      menu:
+      - text: Get Started
+        href: articles/drcHelper.html
+      - text: Introduction
+        href: articles/Introduction.html
+    reference:
+      text: Reference
+      href: reference/
+    tutorials:
+      text: User Guides
+      href: tutorials
+    articles:
+      text: Articles
+      href: articles
+      menu:
+      - text: Get Started
+        href: articles/drcHelper.html
+      - text: Introduction
+        href: articles/Introduction.html
+    newissue:
+      icon: fa-bug
+      href: https://github.com/bayer-int/drcHelper/issues/new?template=Blank+issue
+      aria-label: New Issue
+

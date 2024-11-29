@@ -2,7 +2,7 @@
 % Please edit documentation in R/Endpoints.R
 \name{getEndpoint}
 \alias{getEndpoint}
-\title{getEndpoint according to a series of p-values}
+\title{Obtain Endpoint (NOEC) according to a series of p-values}
 \usage{
 getEndpoint(pvals, doses = c("Control", "B", "C", "D"), procedure = "stepDown")
 }
@@ -14,5 +14,5 @@ getEndpoint(pvals, doses = c("Control", "B", "C", "D"), procedure = "stepDown")
 \item{procedure}{procedure to obtain NOEC}
 }
 \description{
-getEndpoint according to a series of p-values
+Obtain Endpoint (NOEC) according to a series of p-values
 }
