@@ -56,15 +56,39 @@ navbar:
       href: reference/
     tutorials:
       text: User Guides
-      href: tutorials
+      menu:
+      - text: Example Helper Functions
+        href: articles/Examples_drc.html
+      - text: EFSA Criteria and Other Reliability Criteria
+        href: articles/EFSA-Criteria.html
+      - text: RSCABS
+        href: articles/Example_RSCABS.html
+      - text: NLS
+        href: articles/Examples using NLS.html
+      - text: drda
+        href: articles/Examples_using_drda.html
+      - text: OECD 201
+        href: articles/Examples_oecd201.html
     articles:
       text: Articles
-      href: articles
       menu:
-      - text: Get Started
-        href: articles/drcHelper.html
-      - text: Introduction
-        href: articles/Introduction.html
+      - text: TSK method
+        href: articles/TSK_method.html
+      - text: MQJT
+        href: articles/MQJT.html
+      - text: Quantal Data
+        href: articles/Quantal-Data.html
+      - text: Ordinal Data
+        href: articles/Ordianl-Data.html 
+      - text: Fitting A biphasic dose response model
+        href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
+      - text: Count Data
+        href: articles/Count_Data.html  
+    validation:
+      text: Validation
+      menu:
+      - text: System Testing
+        href: articles/System_Testing.html     
     newissue:
       icon: fa-bug
       href: https://github.com/bayer-int/drcHelper/issues/new?template=Blank+issue
