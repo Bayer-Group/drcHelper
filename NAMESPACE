@@ -3,6 +3,7 @@
 S3method(calpha.test,fisher)
 S3method(print,drcComp)
 S3method(print,tskresult)
+S3method(tsk,data.frame)
 S3method(tsk,numeric)
 export(ECx_rating)
 export(ED.ZG)

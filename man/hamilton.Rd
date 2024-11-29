@@ -20,6 +20,9 @@ Note that, as per Hamilton (1978), the confidence intervals
 given in Hamilton (1977) for these data sets are incorrect.
 }
 \references{
-\url{data_blah.com}
+\url{https://github.com/brsr/tsk}
+}
+\author{
+B R S Recht
 }
 \keyword{data}
