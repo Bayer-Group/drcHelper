@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(drcHelper)
 library(drc)
+library(plyr)
 ```
 
 - From the help page of `drc::ED`
