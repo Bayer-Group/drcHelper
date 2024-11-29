@@ -60,7 +60,7 @@ tsk.numeric <-
 #' log-transformed doses (default is TRUE).
 #' @param ... Additional arguments passed to the function.
 #' @return The result of the TSK analysis.
-
+#' @export
 #' @S3method
 #' @importFrom isotone gpava
 tsk.data.frame <-
