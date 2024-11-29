@@ -15,6 +15,7 @@ author:
 ## Nonparametric Tests
 
 ```{r}
+library(SimEngine)
  ### NULL HYPOTHESIS: Theta=0 ###
 
    n_x=200                                 # Sample size under Null Hypothesis

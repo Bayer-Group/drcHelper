@@ -61,14 +61,14 @@ The original goal of this R package was to replicate the results of a DOS progra
 ## install.packages("isotone")
 ## devtools::install_github(repo="brsr/tsk")
 
-
+library(drcHelper)
 ## library(tsk)
-tsk( c(1, 10, 100, 1000), 20, c(0, 3, 17, 20) )
+tsk(c(1, 10, 100, 1000), 20, c(0, 3, 17, 20))
 
 data(hamilton)
 
-p <- 2*pnorm(2)-1
-tolerance = 0.006
+p <- 2 * pnorm(2) - 1
+tolerance <- 0.006
 
 dr1a <- rbind(
   mid =  c(43.89, 44.16, 44.16, 44.16),
