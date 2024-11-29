@@ -1,47 +1,33 @@
 ---
-output: github_document
+title: "Examples_oecd201"
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%",
-  warning = F,
-  message = F
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
-# drcHelper
-
-<!-- badges: start -->
-<!-- badges: end -->
-
-The goal of drcHelper is to assit the routine dose-response analysis with a collection of helper functions or standalong functions that are generic and might be useful outside our own organization.
-
-## Installation
-
-You can install the development version of drcHelper from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("bayer-int/drcHelper")
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+library(drc)
+#options(kableExtra.auto_format = FALSE)
 ```
 
-## Example
+
+# Evaluation of Dataset oecd201
+
+```{r}
+data("oecd201")
+```
 
 ## Data Overview
 
-```{r message=FALSE,warning=FALSE}
-library(drcHelper)
-library(drc)
-library(dplyr)
-library(purrr)
-library(ggplot2)
-theme_set(theme_bw())
+```{r}
 sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
 sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
 # sum0
@@ -50,7 +36,7 @@ sumtab <- left_join(sum1%>%filter(Time>0),sum0) %>% mutate(Yield_Inhibition=(Yie
 
 
 ```{r}
-sumtab%>%dplyr::select(c(Yield_mean,Yield_sd,Yield_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Yield Summary at Time 72h<strong><center>",escape = FALSE)##%>% kableExtra::kable_styling(bootstrap_options = "striped")##%>%kableExtra::kable_classic_2()
+sumtab%>%dplyr::select(c(Yield_mean,Yield_sd,Yield_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Yield Summary at Time 72h<strong><center>",escape = FALSE)%>% kableExtra::kable_styling(bootstrap_options = "striped")##%>%kableExtra::kable_classic_2()
 ```
 
 
@@ -91,7 +77,7 @@ plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
 p <-plot.modList(modList[c(1)],scale="logx",npts=80)+theme(legend.position = "none")+ggtitle("14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit")
 addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
                      textAjust.x=0.01,textAjust.y=1,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 1,xmin=0.012)+ylab("Total Shoot Length [cm]") + xlab("Concentration [µg a.s./L]")
-## ggsave("TSL_14d_Yield.png")
+ggsave("TSL_14d_Yield.png")
 ```
 
 ```{r}
@@ -114,27 +100,3 @@ modsum <- summary(mod)
 pander::pander(coef(modsum))
 ```
 
-
-## ToDo
-
-- [ ] Develop all NOEC functions
-- [ ] Prepare the templates. 
-- [ ] Update the documentation
-
-## Contribution Notes
-
-- Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the `gh pr create` command. 
-
-```
-gh pr create --title "Title of the pull request" --body "Description of the pull request"
-gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
-```
-To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository.
-
-```r
-knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
-knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
-knitr::knit("vignettes/articles/Examples using NLS.Rmd.orig", output = "vignettes/articles/Examples using NLS.Rmd")
-knitr::knit("vignettes/articles/Examples_drc.Rmd.orig", output = "vignettes/articles/Examples_drc.Rmd")
-knitr::knit("vignettes/articles/Examples_oecd201.Rmd.orig", output = "vignettes/articles/Examples_oecd201.Rmd")
-```
