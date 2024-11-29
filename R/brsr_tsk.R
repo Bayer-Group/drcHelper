@@ -3,11 +3,12 @@
 #' Example dose-response data given in Hamilton (1977).
 #' Note that, as per Hamilton (1978), the confidence intervals
 #' given in Hamilton (1977) for these data sets are incorrect.
+#' @author B R S Recht
 #' @format A list containing ten data frames: dr1a, dr1b, dr1c,
 #' dr1d, dr1e, dr4a, dr4b, dr4c, dr4d, dr4e,
 #' @docType data
 #' @source Hamilton, 1977.
-#' @references \url{data_blah.com}
+#' @references \url{https://github.com/brsr/tsk}
 #' @keywords data
 "hamilton"
 
