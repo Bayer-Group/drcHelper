@@ -37,7 +37,7 @@ tsk <- function(...) UseMethod("tsk")
 #' log-transformed doses (default is TRUE).
 #' @param ... Additional arguments passed to the function.
 #' @return The result of the TSK analysis.
-#' @method
+#' @method tsk numeric
 #' @export
 tsk.numeric <-
   function(x, n, r, control = 0, trim = 0, conf.level = 0.95,
@@ -61,7 +61,7 @@ tsk.numeric <-
 #' @param ... Additional arguments passed to the function.
 #' @return The result of the TSK analysis.
 #' @export
-#' @method
+#' @method tsk data.frame
 #' @importFrom isotone gpava
 tsk.data.frame <-
     function(input, control = 0, trim = 0, conf.level = 0.95,
@@ -285,7 +285,7 @@ tsk.data.frame <-
         class(rval) <- "tskresult"
         return(rval)
     }
-#' @method
+#' @method print tskresult
 #' @export
 print.tskresult <- function(x, ...) {
     cat("\n")

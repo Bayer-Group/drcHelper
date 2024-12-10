@@ -21,8 +21,6 @@
 #'
 #' @return
 #' @export
-#'
-#' @examples
 #' @references Green, John W. and Springer, Timothy A. and Saulnier, Amy N. and Swintek, Joe,
 #' (2014) Statistical analysis of histopathological endpoints. Environmental Toxicology and Chemistry, 33(5), 1108-1116
 #' @author Joe Swintek
@@ -61,7 +59,7 @@ runRSCABS <- function(Data,Treatment,Replicate='',Effects='',test.type='RS'){
 
   #Default for effect every column name that is not a Treatment, Replicate, and has a 0 < K.max < 20
   #turn off warnings
-  options(warn=-1)
+  options(warn = -1)
 
   if (Effects ==''){
     Effects<-colnames(Data)

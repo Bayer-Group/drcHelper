@@ -35,20 +35,20 @@ Steps in the testing procedure:
 ## EDA
 
 ```{r}
-dat_ptz
-ptz <- dat_ptz%>%dplyr::select(c(tmt,tank,S0,S1,S2,S3))%>%pivot_longer(cols=c(S0,S1,S2,S2,S3),names_to = "Score",values_to = "count")
+dat_bcs1
+bcs1 <- dat_bcs1%>%dplyr::select(c(tmt,tank,S0,S1,S2,S3))%>%pivot_longer(cols=c(S0,S1,S2,S2,S3),names_to = "Score",values_to = "count")
 theme_set(theme_bw())
-ggplot(ptz,aes(x=tmt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
+ggplot(bcs1,aes(x=tmt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 
-ptz <- ptz%>%mutate(trt=tmt)
-ptz$trt[ptz$trt=="SC" | ptz$trt=="C"] <- "PC" 
-ggplot(ptz,aes(x=trt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
+bcs1 <- bcs1%>%mutate(trt=tmt)
+bcs1$trt[bcs1$trt=="SC" | bcs1$trt=="C"] <- "PC" 
+ggplot(bcs1,aes(x=trt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 
 
-ggplot(ptz%>%group_by(tmt)%>%mutate(total=sum(count),freq=count/total),aes(x=tmt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
-ggplot(ptz%>%group_by(trt)%>%mutate(total=sum(count),freq=count/total),aes(x=trt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
+ggplot(bcs1%>%group_by(tmt)%>%mutate(total=sum(count),freq=count/total),aes(x=tmt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
+ggplot(bcs1%>%group_by(trt)%>%mutate(total=sum(count),freq=count/total),aes(x=trt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 
-slice2 <- dat_ptz%>%mutate(S2_3=total-S0_1)%>% dplyr::select(c(tmt,tank,S0_1,S2_3))%>%pivot_longer(cols=c(S0_1,S2_3),names_to = "Score",values_to = "count")
+slice2 <- dat_bcs1%>%mutate(S2_3=total-S0_1)%>% dplyr::select(c(tmt,tank,S0_1,S2_3))%>%pivot_longer(cols=c(S0_1,S2_3),names_to = "Score",values_to = "count")
 
 
 
@@ -111,12 +111,12 @@ list(interm_values = interm_values, Z = Z)
 
 
 ```{r}
-data("dat_ptz")
+data("dat_bcs1")
 #summarize data
-select(dat_ptz, tmt, tank, S0, S1, S2, S3) %>%
+select(dat_bcs1, tmt, tank, S0, S1, S2, S3) %>%
 knitr::kable()
 # create control only data set
-cdat <- filter(dat_ptz, tmt %in% c("C", "SC"))
+cdat <- filter(dat_bcs1, tmt %in% c("C", "SC"))
 # Slice S1
 ctrl_s1_p <- run_RSCA(cdat$tmt, cdat$tank, cdat$S0, cdat$total)$Z %>%
 abs() %>%
@@ -141,7 +141,7 @@ pnorm() %>%
 `*`(2) %>%
 round(3)
 # combine control treatments
-dat <- mutate(dat_ptz, tmt = ifelse(tmt == "SC", "C", tmt))
+dat <- mutate(dat_bcs1, tmt = ifelse(tmt == "SC", "C", tmt))
 # summary data frame
 dat_sum <- group_by(dat, tmt) %>%
 summarize(across(S0:total, ~ sum(.)))
@@ -149,8 +149,8 @@ summarize(across(S0:total, ~ sum(.)))
 s1_p <- run_RSCA(dat$tmt, dat$tank, dat$total-dat$S0, dat$total)$Z %>%
 pnorm() %>%
 round(3)
-dat1<- dat_ptz%>%filter(tmt!="SC")
-dat2 <-  dat_ptz%>%filter(tmt!="C")
+dat1<- dat_bcs1%>%filter(tmt!="SC")
+dat2 <-  dat_bcs1%>%filter(tmt!="C")
 s1c_p <- run_RSCA(dat1$tmt, dat1$tank, dat1$S0, dat1$total)$Z %>%
 pnorm() %>%
 round(3)
@@ -222,13 +222,13 @@ genIndividual <- function(Score,count){
   }else return(NULL)
 }
 
-ptz1 <- ptz %>% mutate(individual=map2(Score,count,genIndividual)) %>% unnest(c(individual))
-ptz1 <- as.data.frame(ptz1)
-ptz2 <- ptz1[,c("trt","tank","Score1")]
-ptz2$trt <- factor(ptz2$trt)
-ptz2$Score1 <- as.numeric(ptz2$Score1)
-ptz2$S2 <- ptz2$Score1+5
-runRSCABS(ptz2,'trt','tank',test.type='RS')
+bcs11 <- bcs1 %>% mutate(individual=map2(Score,count,genIndividual)) %>% unnest(c(individual))
+bcs11 <- as.data.frame(bcs11)
+bcs12 <- bcs11[,c("trt","tank","Score1")]
+bcs12$trt <- factor(bcs12$trt)
+bcs12$Score1 <- as.numeric(bcs12$Score1)
+bcs12$S2 <- bcs12$Score1+5
+runRSCABS(bcs12,'trt','tank',test.type='RS')
 ```
 
 
@@ -240,10 +240,10 @@ runRSCABS(ptz2,'trt','tank',test.type='RS')
 
 ```{r eval=FALSE}
 library(nparcomp)
-res1<-nparcomp(Score1 ~ trt, data=ptz2, asy.method = "mult.t",
+res1<-nparcomp(Score1 ~ trt, data=bcs12, asy.method = "mult.t",
 type = "Dunnett", info = FALSE,plot.simci = TRUE)
 summary(res1) # Reveal the adjusted p-values
-res1<-nparcomp(Score1 ~ trt, data=ptz2, asy.method = "mult.t",
+res1<-nparcomp(Score1 ~ trt, data=bcs12, asy.method = "mult.t",
 type = "Williams",alternative = "greater",info = FALSE)
 summary(res1) # Reveal the adjusted p-values
 
@@ -280,10 +280,10 @@ plot.nparcomp.zg(res1) # Plot simultaneous confidence limits
 ```{r eval=F}
 library(ordinal)
 
-ptz3 <- ptz2
-ptz3$trt <- factor(ptz3$trt)
-ptz3$Score1 <- factor(ptz2$Score1)
-modCLM <- clm(Score1 ~ trt, data=ptz3)
+bcs13 <- bcs12
+bcs13$trt <- factor(bcs13$trt)
+bcs13$Score1 <- factor(bcs12$Score1)
+modCLM <- clm(Score1 ~ trt, data=bcs13)
 
 propCI <-exp(confint(modCLM, level=1-0.05/2)) # Bonferroni odds ratio CI
 ```
@@ -305,17 +305,17 @@ library("coin")
 library("multcomp")
 Co1 <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Dunnett")))
-ptz2 <- ptz2%>% mutate(EP1=ifelse(Score1>0,1,0),EP2=ifelse(Score1>1,1,0),EP3=ifelse(Score1>2,1,0))
-Codu <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
+bcs12 <- bcs12%>% mutate(EP1=ifelse(Score1>0,1,0),EP2=ifelse(Score1>1,1,0),EP3=ifelse(Score1>2,1,0))
+Codu <-independence_test(EP1 +EP2+EP3~ trt, data = bcs12, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="greater")
-Codu <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
+Codu <-independence_test(EP1 +EP2+EP3~ trt, data = bcs12, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="less")
 pvalCODU <-pvalue(Codu, method="single-step")
 pvalCODU
 
 CoW <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Williams")))
-Cowi <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
+Cowi <-independence_test(EP1 +EP2+EP3~ trt, data = bcs12, teststat = "maximum",
 distribution = "approximate", xtrafo=CoW, alternative="greater")
 pvalCOWI <-pvalue(Cowi, method="single-step")
 pvalCOWI
@@ -372,7 +372,7 @@ library("multcomp")
 green$treat<-as.factor(green$Dose)
 Co1 <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Dunnett")))
-gCodu <-independence_test(S12 +S23~ treat, data = green, teststat = "maximum",
+gCodu <-independence_test(S12 + S23 ~ treat, data = green, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="greater")
 pvalGCODU <-pvalue(gCodu, method="single-step")
 ```
