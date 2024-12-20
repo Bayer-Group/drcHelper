@@ -1,0 +1,16 @@
+
+
+Test cases and expected results are stored in the data folder and ...
+
+The data included in the test cases are either real data excluding the compound or chemical information 
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
