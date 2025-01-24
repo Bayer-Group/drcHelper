@@ -1,0 +1,21 @@
+---
+title: "NOEC Calculation"
+description: | 
+  General ethods for NOEC calculations for dose-response studies
+date: December 4, 2024
+author: "Sarah Baumert, Zhenglei Gao"
+---
+
+
+
+## Dunnet Tests
+
+Dunnett's test is a multiple comparison test for determining significant differences between the mean values of several test groups and a control with normally distributed errors with homogeneous variance. Dunnett's test is robust to slight violations of the normality and variance homogeneity assumptions.
+
+There are several packages providing function for the calculation of the Dunnett’s test. The function "DunnettTest` from the library `DescTools` is calculating correct results for the "two.sided" direction. The function `dunnettTest` from the library `PMCMRplus` can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of `DunnettTest` from the library “DescTools`. The function 
+
+
+
+
+
+DUNNETT C. W. (1955): A multiple comparison procedure for comparing several treatments with a control, Journal of the American Statistical Association, 50, pp. 1096-1121.

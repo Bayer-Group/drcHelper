@@ -16,8 +16,9 @@ Note that access security and scalability are taken care of by the V-COP environ
 
 ## Structure of Testing
 
-### Unit Testing
+### Unit Testing for this Helper Package
 
+### Unit Testing for Other R functions involved in the Analysis
 
 
 ### System Testing

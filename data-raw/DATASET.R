@@ -36,3 +36,25 @@ usethis::use_data(dat_bcs1, overwrite = TRUE)
 test_cases_res <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_gesamt_20240911.xlsx", sheet="test cases")
 test_cases_data <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_gesamt_20240911.xlsx",sheet="EFX statistics")
 ## FSDS <-
+
+
+
+DixonQ <- read.table(textConnection("n	Q_critical
+3	0.941
+4	0.765
+5	0.642
+6	0.56
+7	0.507
+8	0.554
+9	0.512
+10	0.477
+11	0.576
+12	0.546
+13	0.521
+14	0.546
+15	0.525
+16	0.507
+"),header =TRUE)
+
+usethis::use_data(DixonQ)
+
