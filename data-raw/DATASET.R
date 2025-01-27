@@ -33,9 +33,10 @@ usethis::use_data(dat_bcs1, overwrite = TRUE)
 
 ## Test Cases for V-COP / Validated run environment
 
-test_cases_res <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_gesamt_20240911.xlsx", sheet="test cases")
-test_cases_data <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_gesamt_20240911.xlsx",sheet="EFX statistics")
-## FSDS <-
+test_cases_res <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_redact.xlsx", sheet="test cases")
+test_cases_data <- readxl::read_excel("data-raw/R-V-Cop_test_cases_level_2_redact.xlsx",sheet="EFX statistics")
+usethis::use_data(test_cases_data, overwrite = TRUE)
+usethis::use_data(test_cases_res, overwrite = TRUE)
 
 
 

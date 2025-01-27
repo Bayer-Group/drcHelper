@@ -27,11 +27,11 @@ Test cases and expected results are stored in the excel file "R-V-Cop_test_cases
 
 The data included in the test cases are either real data excluding the compound or chemical information or synthetic data generated to cover a special case. Most of the data are repeatedly used in the verification or validation of different tools for the statistical analyses of (eco)toxicology data. 
 
-[@Box1976]
+Here we validated or verified a set of functions, it is not to say other functions in other packages are wrong or inaccurate, they are just not to be used in the defined GLP settings. 
 
 
 ```{r setup0, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, results = "asis")
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, results = "asis",eval=FALSE)
 library(dplyr)
 
 SummariseResults <- function(res) {
@@ -52,6 +52,18 @@ WriteCategoryResults <- function(category, tests, ...) {
 path0 <- here::here()
 devtools::load_all(paste0(path0))
 ```
+
+## Testing R avaliable functions
+
+In this set of testing, the functions are available in other CRAN or GitHub packages and are tested against expected outputs from the development support document. The results were checked first manually and the snapshots were then saved into the `_snaps` subfolder. The subsequent test runs are then checked against those validated sanpshots. 
+
+There are often multiple functions available in R for perfoming the same calculation or analysis. In some cases we tested a few functions in one testing context. 
+
+For example, to perform a Wiliams' test, the function `williamsTest_JG` from this **drcHelper** package, which is extracted from the **statCharrms** as the library is not available from R CRAN. 
+
+The function `DunnettTest` from the library `DescTools` is calculating correct results for the `two.sided` direction. The function `dunnettTest` from the library **PMCMRplus** can be used to calculate the test options `less` (smaller), `greater` and `two.sided`. The results for the `two.sided` option differ in some cases from the results of `DunnettTest` from the library `DescTools`. The function `glht` from the library **multcomp** can be used to perform Dunnett's test with two.sided, less or greater as the alternative hypothesis, which resulted in the same results as the function `DunnettTest` from the library **DescTools**. 
+
+
 
 ```{r GenerateResults,results='hide',message=FALSE,warning=FALSE,fig.keep='none',include=FALSE}
 
@@ -129,6 +141,7 @@ testResultsRaw_list <- lapply(file_lists,function(x)testthat::test_file(paste0(p
 
 ```
 
+All models are wrong, but some are useful" is a common aphorism  [@Box1976].
 
 # References
 
