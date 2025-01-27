@@ -20,7 +20,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of drcHelper is to assist the routine dose-response analysis with a collection of helper functions or standalone functions that are generic and might be useful outside our own organization.
+The goal of drcHelper is to assist with routine dose-response analysis by providing a collection of helper functions and standalone functions that are generic and may be useful beyond our organization.
+
+As part of the GLP stat pilot project, this package serves as a cornerstone for the second use case, EFX Statistics. It will streamline GLP statistical analyses for various dose-response studies and test assays within our registration data package. This ensures that the analyses remain current, state-of-the-art, and flexible enough to adapt to new regulatory requirements while complying with GLP standards.
+
+The package also includes test cases and examples to help the regulatory statistical community understand the reasons behind different outcomes. For instance, point estimations and p-values may vary depending on the parties involved, the functions used, or the packages selected. It aims to promote a harmonized understanding of methodologies and provide a foundation for standardized practices in the regulatory statistics field for plant protection product registration. Additionally, it is hoped that this project will contribute to the ongoing OECD 54 revision process.
 
 ## Installation
 
@@ -117,9 +121,9 @@ pander::pander(coef(modsum))
 
 ## ToDo
 
-- [ ] Develop all NOEC functions
-- [ ] Prepare the templates. 
-- [ ] Update the documentation
+- [ ] Develop all test cases for NOEC functions
+- [ ] Prepare the templates and standard outputs for all . 
+- [ ] Update the documentation. 
 
 ## Contribution Notes
 

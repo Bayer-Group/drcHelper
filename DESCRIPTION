@@ -22,6 +22,8 @@ LazyData: true
 URL: https://effective-adventure-2klnejq.pages.github.io/
 Imports: 
     bmd,
+    DescTools,
     isotone,
+    multcomp,
     PMCMRplus
 Remotes: DoseResponse/bmd
