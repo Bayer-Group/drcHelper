@@ -2,6 +2,20 @@
 
 ## metal data
 
+## Note the algae SAS dataset has been moved to the internal data package drcBAG.
+## The script is kept as an example to read in SAS datasets.
+# install.packages("foreign")
+#
+# # Load the foreign package
+# library(foreign)
+# library(haven)
+# # Read the SAS dataset
+# algae1 <- read.ssd("~/Projects/drcHelper/data-raw/algae.sas7bdat")
+# algae1 <- read_sas("~/Projects/drcHelper/data-raw/algae.sas7bdat")
+#
+# # View the first few rows of the dataset
+# head(algae1)
+
 metaldata<-read.csv(file="~/Projects/drcHelper/data-raw/metaldata.csv")
 usethis::use_data(metaldata, overwrite = TRUE)
 

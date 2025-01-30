@@ -1,3 +1,8 @@
+## Note this script is adapted from the archived version of StatCharrms developed by Joe Swintek [aut, cre],
+## Kevin Flynn[ctb] and Jon Haselman [ctb]. StatCharrms_0.90.1.tar.gz	2017-05-08 15:23	964K(https://cran.r-project.org/src/contrib/Archive/StatCharrms/StatCharrms_0.90.1.tar.gz)
+## Original package licence is License: CC0, which means no copyrights reserved. However,
+## the authors and the archive link are kept in this file so the source can be traced back.
+
 #' Testing Monotonicity
 #'
 #' @param Data Data frame

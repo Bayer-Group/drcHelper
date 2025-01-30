@@ -1,6 +1,7 @@
 ## Note this script is adapted from the archived version of RSCABS developed by Joe Swintek [aut, cre],
 ## Kevin Flynn[ctb].	RSCABS_0.9.5.tar.gz	2020-05-01 08:50	(https://cran.r-project.org/src/contrib/Archive/RSCABS/)
-
+## Original package licence is License: CC0, which means no copyrights reserved. However,
+## the author and the archive link are kept in this file so the source can be traced back.
 
 
 
