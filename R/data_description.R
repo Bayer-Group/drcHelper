@@ -15,14 +15,14 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @format data rame with corrected and uncorrected emergence, survival, reduction.
+#' @format NTP example data with corrected and uncorrected emergence, survival, reduction.
 "NTP_example"
 
 #' Expected processed data from the NTP_example
 #'
 #' @docType data
 #' @keywords datasets
-#' @format data rame with corrected and uncorrected emergence, survival, reduction.
+#' @format NTP example rate data
 "NTP_example_rate"
 
 
@@ -32,3 +32,11 @@ NULL
 #' @references DIXON, W. J. (1950) Analysis of extreme values. Ann. Math. Stat. 21, 488–506.
 #' DEAN, R. B., DIXON, W. J. (1951) Simplified statistics for small numbers of observation. Anal. Chem. 23, 636–638.
 "DixonQ"
+
+
+#' Fake data from collembola juveniles
+#'
+#' @docType data
+#' @keywords datasets
+#' @format collembola_juveniles in wide format
+"collembola_juveniles"

@@ -16,5 +16,5 @@ long format of the dat
 Reshape the wide data to long data
 }
 \examples{
- reshape_drcData(collembola_juveniles)
+ reshape_drcData(collembola_juveniles) ## note collembola_juveniles is fake data.
 }

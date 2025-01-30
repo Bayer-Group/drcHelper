@@ -1,5 +1,8 @@
+## Integrated from tsk single function package with licence GPL3 (GNU General Public License v3.0)
+
+
 #' This is hamilton data
-#' 
+#'
 #' Example dose-response data given in Hamilton (1977).
 #' Note that, as per Hamilton (1978), the confidence intervals
 #' given in Hamilton (1977) for these data sets are incorrect.

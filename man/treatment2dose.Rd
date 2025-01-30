@@ -15,3 +15,6 @@ numeric vector of dose
 \description{
 Change Treatment groups to numerical dose
 }
+\examples{
+treatment2dose(c("Control","0.1","1","10"))
+}
