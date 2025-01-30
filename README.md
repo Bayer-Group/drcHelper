@@ -34,7 +34,7 @@ You can install the development version of drcHelper from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("bayer-int/drcHelper")
+devtools::install_github("Bayer-Group/drcHelper")
 ```
 
 ## Example
