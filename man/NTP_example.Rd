@@ -5,7 +5,7 @@
 \alias{NTP_example}
 \title{NTP_example data}
 \format{
-data rame with corrected and uncorrected emergence, survival, reduction.
+NTP example data with corrected and uncorrected emergence, survival, reduction.
 }
 \usage{
 NTP_example

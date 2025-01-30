@@ -5,7 +5,7 @@
 \alias{NTP_example_rate}
 \title{Expected processed data from the NTP_example}
 \format{
-data rame with corrected and uncorrected emergence, survival, reduction.
+NTP example rate data
 }
 \usage{
 NTP_example_rate
