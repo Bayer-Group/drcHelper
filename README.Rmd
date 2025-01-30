@@ -26,6 +26,8 @@ As part of the GLP stat pilot project, this package serves as a cornerstone for 
 
 The package also includes test cases and examples to help the regulatory statistical community understand the reasons behind different outcomes. For instance, point estimations and p-values may vary depending on the parties involved, the functions used, or the packages selected. It aims to promote a harmonized understanding of methodologies and provide a foundation for standardized practices in the regulatory statistics field for plant protection product registration. Additionally, it is hoped that this project will contribute to the ongoing OECD 54 revision process.
 
+Some of the functions are adapted from archived packages or single functions of a bigger package so that the loaded namespace is not too big for small calculations. Some of the functions are included for testing and validation purposes. All third-party code with a different license are specified in the relevant source files with the license name and the relevant copyright texts.
+
 ## Installation
 
 You can install the development version of drcHelper from [GitHub](https://github.com/) with:
