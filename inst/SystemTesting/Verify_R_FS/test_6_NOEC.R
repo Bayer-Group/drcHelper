@@ -99,8 +99,7 @@ test_that("Tests to derive NOECs",{
     y0<-c(0.120915680098082,0.136752501891969,0.145668808436602,0.131844763607024,0.149892124046466,0.133572261866272)
     y1<-c(0.131517109035102,0.117455425985384,0.130835155683102,0.12226548296818,0.127485057136569,0.128828137633933)
 
-    t.test(y1,y0, var.equal=TRUE, paired=FALSE, alternative="less")
-
+    res <- t.test(y1,y0, var.equal=TRUE, paired=FALSE, alternative="less")
     t.test(y1,y0, var.equal=TRUE, paired=FALSE, alternative="greater")
     t.test(y1,y0, var.equal=TRUE, paired=FALSE, alternative="two.sided")
   })

@@ -6,9 +6,26 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of drcHelper is to assit the routine dose-response analysis
-with a collection of helper functions or standalong functions that are
-generic and might be useful outside our own organization.
+The goal of drcHelper is to assist with routine dose-response analysis
+by providing a collection of helper functions and standalone functions
+that are generic and may be useful beyond our organization.
+
+As part of the GLP stat pilot project, this package serves as a
+cornerstone for the second use case, EFX Statistics. It will streamline
+GLP statistical analyses for various dose-response studies and test
+assays within our registration data package. This ensures that the
+analyses remain current, state-of-the-art, and flexible enough to adapt
+to new regulatory requirements while complying with GLP standards.
+
+The package also includes test cases and examples to help the regulatory
+statistical community understand the reasons behind different outcomes.
+For instance, point estimations and p-values may vary depending on the
+parties involved, the functions used, or the packages selected. It aims
+to promote a harmonized understanding of methodologies and provide a
+foundation for standardized practices in the regulatory statistics field
+for plant protection product registration. Additionally, it is hoped
+that this project will contribute to the ongoing OECD 54 revision
+process.
 
 ## Installation
 
@@ -30,6 +47,7 @@ library(drc)
 library(dplyr)
 library(purrr)
 library(ggplot2)
+theme_set(theme_bw())
 sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
 sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
 # sum0
@@ -108,61 +126,28 @@ plot.edList(edResTab)
 resComp <- drcCompare(modRes = res,trend="Decrease")
 ```
 
+Note that by default settings, the fitted models did not converge except
+for the LL.3 model.
+
 ``` r
-knitr::kable(edResTab,caption = "14 day TSL Yield",digits = 3)
+knitr::kable(edResTab[1:3,],caption = "14 day TSL Yield",digits = 3)
 ```
 
-| .id   | Estimate | Std. Error | Lower | Upper |    NW | Rating      | EC    |
-|:------|---------:|-----------:|------:|------:|------:|:------------|:------|
-| LL.3  |    0.120 |      0.020 | 0.078 | 0.162 | 0.700 | Fair        | EC 10 |
-| LL.3  |    0.158 |      0.019 | 0.118 | 0.197 | 0.504 | Fair        | EC 20 |
-| LL.3  |    0.251 |      0.013 | 0.225 | 0.277 | 0.206 | Good        | EC 50 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | not defined | EC 10 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | not defined | EC 20 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | not defined | EC 50 |
+| .id  | Estimate | Std. Error | Lower | Upper |    NW | Rating | EC    |
+|:-----|---------:|-----------:|------:|------:|------:|:-------|:------|
+| LL.3 |    0.120 |      0.020 | 0.078 | 0.162 | 0.700 | Fair   | EC 10 |
+| LL.3 |    0.158 |      0.019 | 0.118 | 0.197 | 0.504 | Fair   | EC 20 |
+| LL.3 |    0.251 |      0.013 | 0.225 | 0.277 | 0.206 | Good   | EC 50 |
 
 14 day TSL Yield
 
 ``` r
-knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
+knitr::kable(resComp[1,],caption = "14 day TSL Yield, Model Comparison",digits = 3)
 ```
 
-|       |  logLik |      IC | Lack of fit | Res var | Certainty_Protection | Steepness | No Effect p-val |
-|:------|--------:|--------:|------------:|--------:|:---------------------|:----------|----------------:|
-| LL.3  | -67.245 | 142.489 |       0.117 |   7.994 | Medium               | Medium    |               0 |
-| LL2.3 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W2.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W1.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| EXD.3 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| EXD.2 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LN.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W2.4  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LL.4  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LL2.4 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
+|      |  logLik |      IC | Lack of fit | Res var | Certainty_Protection | Steepness | No Effect p-val |
+|:-----|--------:|--------:|------------:|--------:|:---------------------|:----------|----------------:|
+| LL.3 | -67.245 | 142.489 |       0.117 |   7.994 | Medium               | Medium    |               0 |
 
 14 day TSL Yield, Model Comparison
 
@@ -194,7 +179,7 @@ addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", resp
 <img src="man/figures/README-unnamed-chunk-9-2.png" width="100%" />
 
 ``` r
-ggsave("TSL_14d_Yield.png")
+## ggsave("TSL_14d_Yield.png")
 ```
 
 ``` r
@@ -239,11 +224,28 @@ pander::pander(coef(modsum))
 
 ## ToDo
 
-- [ ] Develop all NOEC functions
-- [ ] Prepare the templates.
-- [ ] Update the documentation
+- [ ] Develop all test cases for NOEC functions
+- [ ] Prepare the templates and standard outputs for all .
+- [ ] Update the documentation.
 
 ## Contribution Notes
 
 - Please create a pull request to contribute to the development of
-  packages.
+  packages. Note that source branch is the branch you are currently
+  working on when you run the `gh pr create` command.
+
+<!-- -->
+
+    gh pr create --title "Title of the pull request" --body "Description of the pull request"
+    gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+
+To use the pkgdown github workflow, some of the vignettes need to be
+pre-knit before pushing to the remote github repository.
+
+``` r
+knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
+knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
+knitr::knit("vignettes/articles/Examples using NLS.Rmd.orig", output = "vignettes/articles/Examples using NLS.Rmd")
+knitr::knit("vignettes/articles/Examples_drc.Rmd.orig", output = "vignettes/articles/Examples_drc.Rmd")
+knitr::knit("vignettes/articles/Examples_oecd201.Rmd.orig", output = "vignettes/articles/Examples_oecd201.Rmd")
+```

@@ -64,7 +64,7 @@ sumtab%>%dplyr::select(c(GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))%>
 
 ## Model Fitting and Comparison For Yield
 
-```{r}
+```{r warning=FALSE,message=FALSE}
 datTn<- subset(oecd201,Time==72)
 
 mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
@@ -76,13 +76,14 @@ edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend=datTn$Trend
 plot.edList(edResTab)
 resComp <- drcCompare(modRes = res,trend="Decrease")
 ```
+Note that by default settings, the fitted models did not converge except for the LL.3 model. 
 
 ```{r}
-knitr::kable(edResTab,caption = "14 day TSL Yield",digits = 3)
+knitr::kable(edResTab[1:3,],caption = "14 day TSL Yield",digits = 3)
 ```
 
 ```{r}
-knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
+knitr::kable(resComp[1,],caption = "14 day TSL Yield, Model Comparison",digits = 3)
 ```
 
 ```{r fig.cap="Yield Model Fits"}
