@@ -126,61 +126,28 @@ plot.edList(edResTab)
 resComp <- drcCompare(modRes = res,trend="Decrease")
 ```
 
+Note that by default settings, the fitted models did not converge except
+for the LL.3 model.
+
 ``` r
-knitr::kable(edResTab,caption = "14 day TSL Yield",digits = 3)
+knitr::kable(edResTab[1:3,],caption = "14 day TSL Yield",digits = 3)
 ```
 
-| .id   | Estimate | Std. Error | Lower | Upper |    NW | Rating      | EC    |
-|:------|---------:|-----------:|------:|------:|------:|:------------|:------|
-| LL.3  |    0.120 |      0.020 | 0.078 | 0.162 | 0.700 | Fair        | EC 10 |
-| LL.3  |    0.158 |      0.019 | 0.118 | 0.197 | 0.504 | Fair        | EC 20 |
-| LL.3  |    0.251 |      0.013 | 0.225 | 0.277 | 0.206 | Good        | EC 50 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| LL2.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| W2.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| W1.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| EXD.3 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| EXD.2 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| LN.3  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| W2.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| LL.4  |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 10 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 20 |
-| LL2.4 |       NA |         NA |    NA |    NA |    NA | Not defined | EC 50 |
+| .id  | Estimate | Std. Error | Lower | Upper |    NW | Rating | EC    |
+|:-----|---------:|-----------:|------:|------:|------:|:-------|:------|
+| LL.3 |    0.120 |      0.020 | 0.078 | 0.162 | 0.700 | Fair   | EC 10 |
+| LL.3 |    0.158 |      0.019 | 0.118 | 0.197 | 0.504 | Fair   | EC 20 |
+| LL.3 |    0.251 |      0.013 | 0.225 | 0.277 | 0.206 | Good   | EC 50 |
 
 14 day TSL Yield
 
 ``` r
-knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
+knitr::kable(resComp[1,],caption = "14 day TSL Yield, Model Comparison",digits = 3)
 ```
 
-|       |  logLik |      IC | Lack of fit | Res var | Certainty_Protection | Steepness | No Effect p-val |
-|:------|--------:|--------:|------------:|--------:|:---------------------|:----------|----------------:|
-| LL.3  | -67.245 | 142.489 |       0.117 |   7.994 | Medium               | Medium    |               0 |
-| LL2.3 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W2.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W1.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| EXD.3 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| EXD.2 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LN.3  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| W2.4  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LL.4  |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
-| LL2.4 |      NA |      NA |          NA |      NA | NA                   | NA        |              NA |
+|      |  logLik |      IC | Lack of fit | Res var | Certainty_Protection | Steepness | No Effect p-val |
+|:-----|--------:|--------:|------------:|--------:|:---------------------|:----------|----------------:|
+| LL.3 | -67.245 | 142.489 |       0.117 |   7.994 | Medium               | Medium    |               0 |
 
 14 day TSL Yield, Model Comparison
 
