@@ -1,0 +1,643 @@
+---
+title: "Examples_oecd201"
+---
+
+
+
+
+```r
+library(drcHelper)
+library(tidyverse)
+library(drc)
+#options(kableExtra.auto_format = FALSE)
+```
+
+
+# Evaluation of Dataset oecd201
+
+
+```r
+data("oecd201")
+```
+
+## Data Overview
+
+
+```r
+sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
+sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
+#> Error in rename(., Yield0 = Yield_mean, GrowthRate0 = GrowthRate_mean): unused arguments (Yield0 = Yield_mean, GrowthRate0 = GrowthRate_mean)
+# sum0
+sumtab <- left_join(sum1%>%filter(Time>0),sum0) %>% mutate(Yield_Inhibition=(Yield0-Yield_mean)/Yield0*100,GrowthRate_Inhibition=(GrowthRate0-GrowthRate_mean)/GrowthRate0*100) %>% dplyr::select(c(Time,Treatment,Yield_mean,Yield_sd,Yield_Inhibition,GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))
+#> Error in `filter()`:
+#> ℹ In argument: `Time > 0`.
+#> Caused by error:
+#> ! object 'Time' not found
+```
+
+
+
+```r
+sumtab%>%dplyr::select(c(Yield_mean,Yield_sd,Yield_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Yield Summary at Time 72h<strong><center>",escape = FALSE)%>% kableExtra::kable_styling(bootstrap_options = "striped")##%>%kableExtra::kable_classic_2()
+#> Error in dplyr::select(., c(Yield_mean, Yield_sd, Yield_Inhibition)): object 'sumtab' not found
+```
+
+
+
+```r
+sumtab%>%dplyr::select(c(GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Growth Rate Summary at Time 72h<strong><center>",escape = FALSE)##%>%kableExtra::kable_classic()
+#> Error in dplyr::select(., c(GrowthRate_mean, GrowthRate_sd, GrowthRate_Inhibition)): object 'sumtab' not found
+```
+
+## Model Fitting and Comparison For Yield
+
+
+```r
+datTn<- subset(oecd201,Time==72)
+
+mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
+fctList <- list(LL2.3(),W2.3(),W1.3(),EXD.3(),EXD.2(),LN.3(),W2.4(),LL.4(),LL2.4())
+plot(mod,type="all")
+```
+
+![plot of chunk unnamed-chunk-6](./vignettes/figure/unnamed-chunk-6-1.png)
+
+```r
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend=datTn$Trend_Yield[1])
+plot.edList(edResTab)
+```
+
+![plot of chunk unnamed-chunk-6](./vignettes/figure/unnamed-chunk-6-2.png)
+
+```r
+resComp <- drcCompare(modRes = res,trend="Decrease")
+```
+
+
+```r
+knitr::kable(edResTab,caption = "14 day TSL Yield",digits = 3)
+```
+
+<table>
+<caption>14 day TSL Yield</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .id </th>
+   <th style="text-align:right;"> Estimate </th>
+   <th style="text-align:right;"> Std. Error </th>
+   <th style="text-align:right;"> Lower </th>
+   <th style="text-align:right;"> Upper </th>
+   <th style="text-align:right;"> NW </th>
+   <th style="text-align:left;"> Rating </th>
+   <th style="text-align:left;"> EC </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> W2.3 </td>
+   <td style="text-align:right;"> 0.121 </td>
+   <td style="text-align:right;"> 0.015 </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:right;"> 0.152 </td>
+   <td style="text-align:right;"> 0.509 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.3 </td>
+   <td style="text-align:right;"> 0.148 </td>
+   <td style="text-align:right;"> 0.015 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 0.179 </td>
+   <td style="text-align:right;"> 0.419 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.3 </td>
+   <td style="text-align:right;"> 0.236 </td>
+   <td style="text-align:right;"> 0.014 </td>
+   <td style="text-align:right;"> 0.207 </td>
+   <td style="text-align:right;"> 0.265 </td>
+   <td style="text-align:right;"> 0.243 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.3 </td>
+   <td style="text-align:right;"> 0.120 </td>
+   <td style="text-align:right;"> 0.020 </td>
+   <td style="text-align:right;"> 0.078 </td>
+   <td style="text-align:right;"> 0.162 </td>
+   <td style="text-align:right;"> 0.700 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.3 </td>
+   <td style="text-align:right;"> 0.158 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 0.118 </td>
+   <td style="text-align:right;"> 0.197 </td>
+   <td style="text-align:right;"> 0.504 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.3 </td>
+   <td style="text-align:right;"> 0.251 </td>
+   <td style="text-align:right;"> 0.013 </td>
+   <td style="text-align:right;"> 0.225 </td>
+   <td style="text-align:right;"> 0.277 </td>
+   <td style="text-align:right;"> 0.206 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.3 </td>
+   <td style="text-align:right;"> 0.120 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.085 </td>
+   <td style="text-align:right;"> 0.170 </td>
+   <td style="text-align:right;"> 0.714 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.3 </td>
+   <td style="text-align:right;"> 0.158 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.123 </td>
+   <td style="text-align:right;"> 0.203 </td>
+   <td style="text-align:right;"> 0.509 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.3 </td>
+   <td style="text-align:right;"> 0.251 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.226 </td>
+   <td style="text-align:right;"> 0.278 </td>
+   <td style="text-align:right;"> 0.207 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.4 </td>
+   <td style="text-align:right;"> 0.122 </td>
+   <td style="text-align:right;"> 0.016 </td>
+   <td style="text-align:right;"> 0.088 </td>
+   <td style="text-align:right;"> 0.156 </td>
+   <td style="text-align:right;"> 0.556 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.4 </td>
+   <td style="text-align:right;"> 0.148 </td>
+   <td style="text-align:right;"> 0.016 </td>
+   <td style="text-align:right;"> 0.115 </td>
+   <td style="text-align:right;"> 0.182 </td>
+   <td style="text-align:right;"> 0.451 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.4 </td>
+   <td style="text-align:right;"> 0.236 </td>
+   <td style="text-align:right;"> 0.015 </td>
+   <td style="text-align:right;"> 0.206 </td>
+   <td style="text-align:right;"> 0.267 </td>
+   <td style="text-align:right;"> 0.259 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.4 </td>
+   <td style="text-align:right;"> 0.126 </td>
+   <td style="text-align:right;"> 0.023 </td>
+   <td style="text-align:right;"> 0.078 </td>
+   <td style="text-align:right;"> 0.173 </td>
+   <td style="text-align:right;"> 0.759 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.4 </td>
+   <td style="text-align:right;"> 0.162 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.118 </td>
+   <td style="text-align:right;"> 0.207 </td>
+   <td style="text-align:right;"> 0.546 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.4 </td>
+   <td style="text-align:right;"> 0.252 </td>
+   <td style="text-align:right;"> 0.013 </td>
+   <td style="text-align:right;"> 0.225 </td>
+   <td style="text-align:right;"> 0.280 </td>
+   <td style="text-align:right;"> 0.218 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.4 </td>
+   <td style="text-align:right;"> 0.126 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.086 </td>
+   <td style="text-align:right;"> 0.184 </td>
+   <td style="text-align:right;"> 0.777 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.4 </td>
+   <td style="text-align:right;"> 0.162 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.124 </td>
+   <td style="text-align:right;"> 0.213 </td>
+   <td style="text-align:right;"> 0.552 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.4 </td>
+   <td style="text-align:right;"> 0.252 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.226 </td>
+   <td style="text-align:right;"> 0.281 </td>
+   <td style="text-align:right;"> 0.219 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LN.3 </td>
+   <td style="text-align:right;"> 0.120 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 0.082 </td>
+   <td style="text-align:right;"> 0.158 </td>
+   <td style="text-align:right;"> 0.639 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LN.3 </td>
+   <td style="text-align:right;"> 0.154 </td>
+   <td style="text-align:right;"> 0.018 </td>
+   <td style="text-align:right;"> 0.118 </td>
+   <td style="text-align:right;"> 0.191 </td>
+   <td style="text-align:right;"> 0.474 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LN.3 </td>
+   <td style="text-align:right;"> 0.249 </td>
+   <td style="text-align:right;"> 0.012 </td>
+   <td style="text-align:right;"> 0.223 </td>
+   <td style="text-align:right;"> 0.274 </td>
+   <td style="text-align:right;"> 0.203 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W1.3 </td>
+   <td style="text-align:right;"> 0.135 </td>
+   <td style="text-align:right;"> 0.032 </td>
+   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:right;"> 0.201 </td>
+   <td style="text-align:right;"> 0.987 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W1.3 </td>
+   <td style="text-align:right;"> 0.176 </td>
+   <td style="text-align:right;"> 0.029 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 0.235 </td>
+   <td style="text-align:right;"> 0.671 </td>
+   <td style="text-align:left;"> Fair </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W1.3 </td>
+   <td style="text-align:right;"> 0.264 </td>
+   <td style="text-align:right;"> 0.013 </td>
+   <td style="text-align:right;"> 0.237 </td>
+   <td style="text-align:right;"> 0.292 </td>
+   <td style="text-align:right;"> 0.210 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.2 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:right;"> 0.028 </td>
+   <td style="text-align:right;"> 0.041 </td>
+   <td style="text-align:right;"> 0.378 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.2 </td>
+   <td style="text-align:right;"> 0.074 </td>
+   <td style="text-align:right;"> 0.007 </td>
+   <td style="text-align:right;"> 0.060 </td>
+   <td style="text-align:right;"> 0.087 </td>
+   <td style="text-align:right;"> 0.378 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.2 </td>
+   <td style="text-align:right;"> 0.229 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.185 </td>
+   <td style="text-align:right;"> 0.272 </td>
+   <td style="text-align:right;"> 0.378 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.3 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 0.004 </td>
+   <td style="text-align:right;"> 0.027 </td>
+   <td style="text-align:right;"> 0.042 </td>
+   <td style="text-align:right;"> 0.435 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.3 </td>
+   <td style="text-align:right;"> 0.074 </td>
+   <td style="text-align:right;"> 0.008 </td>
+   <td style="text-align:right;"> 0.058 </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:right;"> 0.435 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 20 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.3 </td>
+   <td style="text-align:right;"> 0.229 </td>
+   <td style="text-align:right;"> 0.024 </td>
+   <td style="text-align:right;"> 0.179 </td>
+   <td style="text-align:right;"> 0.278 </td>
+   <td style="text-align:right;"> 0.435 </td>
+   <td style="text-align:left;"> Good </td>
+   <td style="text-align:left;"> EC 50 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
+```r
+knitr::kable(resComp,caption = "14 day TSL Yield, Model Comparison",digits = 3)
+```
+
+<table>
+<caption>14 day TSL Yield, Model Comparison</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> logLik </th>
+   <th style="text-align:right;"> IC </th>
+   <th style="text-align:right;"> Lack of fit </th>
+   <th style="text-align:right;"> Res var </th>
+   <th style="text-align:left;"> Certainty_Protection </th>
+   <th style="text-align:left;"> Steepness </th>
+   <th style="text-align:right;"> No Effect p-val </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> W2.3 </td>
+   <td style="text-align:right;"> -66.46 </td>
+   <td style="text-align:right;"> 140.9 </td>
+   <td style="text-align:right;"> 0.188 </td>
+   <td style="text-align:right;"> 7.556 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.3 </td>
+   <td style="text-align:right;"> -67.25 </td>
+   <td style="text-align:right;"> 142.5 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 7.994 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.3 </td>
+   <td style="text-align:right;"> -67.25 </td>
+   <td style="text-align:right;"> 142.5 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 7.994 </td>
+   <td style="text-align:left;"> High </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W2.4 </td>
+   <td style="text-align:right;"> -66.43 </td>
+   <td style="text-align:right;"> 142.9 </td>
+   <td style="text-align:right;"> 0.113 </td>
+   <td style="text-align:right;"> 7.858 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL.4 </td>
+   <td style="text-align:right;"> -66.58 </td>
+   <td style="text-align:right;"> 143.2 </td>
+   <td style="text-align:right;"> 0.102 </td>
+   <td style="text-align:right;"> 7.943 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LL2.4 </td>
+   <td style="text-align:right;"> -66.58 </td>
+   <td style="text-align:right;"> 143.2 </td>
+   <td style="text-align:right;"> 0.102 </td>
+   <td style="text-align:right;"> 7.943 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LN.3 </td>
+   <td style="text-align:right;"> -67.75 </td>
+   <td style="text-align:right;"> 143.5 </td>
+   <td style="text-align:right;"> 0.086 </td>
+   <td style="text-align:right;"> 8.284 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> W1.3 </td>
+   <td style="text-align:right;"> -68.09 </td>
+   <td style="text-align:right;"> 144.2 </td>
+   <td style="text-align:right;"> 0.069 </td>
+   <td style="text-align:right;"> 8.489 </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:left;"> Medium </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.2 </td>
+   <td style="text-align:right;"> -80.60 </td>
+   <td style="text-align:right;"> 167.2 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 19.958 </td>
+   <td style="text-align:left;"> High </td>
+   <td style="text-align:left;"> Shallow </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> EXD.3 </td>
+   <td style="text-align:right;"> -80.60 </td>
+   <td style="text-align:right;"> 169.2 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 20.756 </td>
+   <td style="text-align:left;"> High </td>
+   <td style="text-align:left;"> Shallow </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
+```r
+plot.modList(modList,scale="logx")
+```
+
+![Yield Model Fits](./vignettes/figure/unnamed-chunk-9-1.png)
+
+
+```r
+plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
+```
+
+![plot of chunk unnamed-chunk-10](./vignettes/figure/unnamed-chunk-10-1.png)
+
+```r
+p <-plot.modList(modList[c(1)],scale="logx",npts=80)+theme(legend.position = "none")+ggtitle("14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit")
+addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+                     textAjust.x=0.01,textAjust.y=1,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 1,xmin=0.012)+ylab("Total Shoot Length [cm]") + xlab("Concentration [µg a.s./L]")
+```
+
+![plot of chunk unnamed-chunk-10](./vignettes/figure/unnamed-chunk-10-2.png)
+
+```r
+ggsave("TSL_14d_Yield.png")
+```
+
+
+```r
+resED <- t(edResTab[1:3, c(2,4,5,6)])
+colnames(resED) <- paste("EC", c(10,20,50))
+knitr::kable(resED,caption = "Total Shoot Length Growth Yield at 14 day",digits = 3)
+```
+
+<table>
+<caption>Total Shoot Length Growth Yield at 14 day</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> EC 10 </th>
+   <th style="text-align:right;"> EC 20 </th>
+   <th style="text-align:right;"> EC 50 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Estimate </td>
+   <td style="text-align:right;"> 0.121 </td>
+   <td style="text-align:right;"> 0.148 </td>
+   <td style="text-align:right;"> 0.236 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Lower </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 0.207 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Upper </td>
+   <td style="text-align:right;"> 0.152 </td>
+   <td style="text-align:right;"> 0.179 </td>
+   <td style="text-align:right;"> 0.265 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NW </td>
+   <td style="text-align:right;"> 0.509 </td>
+   <td style="text-align:right;"> 0.419 </td>
+   <td style="text-align:right;"> 0.243 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
+```r
+
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
+pander::pander(as.data.frame(edres))
+```
+
+
+------------------------------------------------------
+  &nbsp;     Estimate   Std. Error    Lower    Upper  
+----------- ---------- ------------ --------- --------
+ **EC 5**     0.1044     0.01464     0.0743    0.1346 
+
+ **EC 10**    0.1209     0.01494     0.09017   0.1517 
+
+ **EC 20**    0.1477     0.01501     0.1167    0.1786 
+
+ **EC 50**    0.2361     0.01395     0.2074    0.2649 
+------------------------------------------------------
+
+
+
+
+
+```r
+modsum <- summary(mod)
+pander::pander(coef(modsum))
+```
+
+
+-----------------------------------------------------------------
+      &nbsp;         Estimate   Std. Error   t-value    p-value  
+------------------- ---------- ------------ --------- -----------
+ **b:(Intercept)**    -1.794      0.2203     -8.144    1.696e-08 
+
+ **d:(Intercept)**    53.85       0.9535      56.48    3.42e-28  
+
+ **e:(Intercept)**    0.1925     0.01447      13.3     7.664e-13 
+-----------------------------------------------------------------
+
+
+
