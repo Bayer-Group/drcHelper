@@ -1,5 +1,5 @@
 ---
-title: "Examples_drc"
+title: "Examples of using drc and drcHelper"
 ---
 
 ```{r, include = FALSE}
@@ -30,7 +30,7 @@ plot(finney71.m1, broken = TRUE, bp = 0.1, lwd = 2)
 
 ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="relative")
 ED(finney71.m1, c(0.10, 0.20, 0.50), interval = "delta", reference = "control",type="absolute")
-##  Referecen could be the upper limit or the control. In this case I am not sure what has been calcuated. 
+##  Referecen could be the upper limit or the control. In this case I am not sure what has been calcuated.
 ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "upper")
 
 ED(finney71.m1, c(10, 20, 50), interval = "delta", reference = "control",type="relative")
@@ -56,18 +56,18 @@ plot(ryegrass.m1, broken = TRUE, type="confidence", add=TRUE)
 
 ```{r fig.keep=TRUE}
 ## Fitting the Brain-Cousens model
-lettuce.m1 <- drm(weight ~ conc, 
+lettuce.m1 <- drm(weight ~ conc,
 data = lettuce, fct = BC.4())
 plot(lettuce.m1,confidence.level = 0.95)
 ### Calculating ED[-10]
 
 # This does not work
-#ED(lettuce.m1, -10)  
+#ED(lettuce.m1, -10)
 
 ## Now it does work
 ED(lettuce.m1, c(-10,-20), bound = FALSE)  # works
 
-### Using a different break point. 
+### Using a different break point.
 par(mfrow = c(2, 2))
 plot(lettuce.m1, main = "bp = default")  # using the default
 plot(lettuce.m1, bp = 1e-4, main = "bp = 1e-4")

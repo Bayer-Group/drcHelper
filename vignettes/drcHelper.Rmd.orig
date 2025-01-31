@@ -2,7 +2,7 @@
 title: "drcHelper"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{drcHelpers}
+  %\VignetteIndexEntry{drcHelper}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,7 +20,7 @@ library(drc)
 
 ```
 
-In this vignettes we illustrate how to use drcHelper to produce tables and graphs that will be included in a dose-response analysis report. 
+In this vignettes we illustrate how to use drcHelper to produce tables and graphs that will be included in a dose-response analysis report.
 
 
 
@@ -40,11 +40,11 @@ In this vignettes we illustrate how to use drcHelper to produce tables and graph
 ```
 
 
-## Outputting 
+## Outputting
 
 
 ## Dependencies
-```{r}
+```{r eval=F}
 
 library(DependenciesGraphs)
 dep <- funDependencies("package:drcHelper","ED.plus")

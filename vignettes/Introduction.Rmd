@@ -38,4 +38,6 @@ There are several packages I find useful for the statistical analysis of (eco)to
 
 Implementation of the EPA's Ecological Exposure Research Division (EERD) tools (discontinued in 1999) for Probit and Trimmed Spearman-Karber Analysis. Probit and Spearman-Karber methods from Finney's book "Probit analysis a statistical treatment of the sigmoid response curve" with options for most accurate results or identical results to the book. Probit and all the tables from Finney's book (code-generated, not copied) with the generating functions included. Control correction: Abbott, Schneider-Orelli, Henderson-Tilton, Sun-Shepard. Toxicity scales: Horsfall-Barratt, Archer, Gauhl-Stover, Fullerton-Olsen, etc.
 
+### NSEC package
+
 
