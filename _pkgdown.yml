@@ -8,9 +8,9 @@ search:
   exclude: news/index.html
 repo:
   url:
-    home: https://github.com/bayer-int/drcHelper
-    source: https://github.com/bayer-int/drcHelper/blob/main/
-    issue: https://github.com/bayer-int/drcHelper/issues/
+    home: https://github.com/BayerGroup/drcHelper
+    source: https://github.com/BayerGroup/drcHelper/blob/main/
+    issue: https://github.com/BayerGroup/drcHelper/issues/
     user: https://github.com/
 news:
   cran_dates: yes
@@ -20,7 +20,7 @@ development:
 authors:
   before: We define *authors* as those who are actively maintaining the code base,
     and *contributors* as those who made a significant contribution in the past. For
-    all acknowledgements, see the eponymous section in the [Home Page](https://pharmaverse.github.io/admiral/).
+    all acknowledgements, see the section in the [Home Page](https://effective-adventure-2klnejq.pages.github.io/).
   footer:
     roles:
     - aut
@@ -48,15 +48,15 @@ navbar:
     getstarted:
       text: Get Started
       menu:
-      - text: Get Started
-        href: articles/drcHelper.html
       - text: Introduction
         href: articles/Introduction.html
+      - text: Get Started
+        href: articles/drcHelper.html
     reference:
       text: Reference
       href: reference/
     tutorials:
-      text: User Guides
+      text: Examples
       menu:
       - text: Example Helper Functions
         href: articles/Examples_drc.html
@@ -80,18 +80,18 @@ navbar:
       - text: Quantal Data
         href: articles/Quantal-Data.html
       - text: Ordinal Data
-        href: articles/Ordianl-Data.html 
+        href: articles/Ordianl-Data.html
       - text: Fitting A biphasic dose response model
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
       - text: Count Data
-        href: articles/Count_Data.html  
+        href: articles/Count_Data.html
     validation:
       text: Validation
       menu:
       - text: System Testing
-        href: articles/System_Testing.html     
+        href: articles/System_Testing.html
     newissue:
       icon: fa-bug
-      href: https://github.com/bayer-int/drcHelper/issues/new?template=Blank+issue
+      href: https://github.com/BayerGroup/drcHelper/issues/new?template=Blank+issue
       aria-label: New Issue
 

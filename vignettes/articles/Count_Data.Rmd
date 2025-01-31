@@ -1,7 +1,16 @@
 ---
-title: "Count Data"
+title: "Count Data in General"
 description: | 
   Methods for dose-response with count data
 date: December 4, 2024
 author: "Zhenglei Gao"
 ---
+
+
+## Poisson, Quasi-Poisson, Negative-Binomial
+
+## References
+- [Quasi-Poisson vs. negative binomial regression: how should we model overdispersed count data?](https://www.semanticscholar.org/paper/Quasi-Poisson-vs.-negative-binomial-regression%3A-how-Hoef-Boveng/01d13ec2187a90742ebcf288437e3d0a1ca28dd8)
+- [Revisiting the analysis pipeline for overdispersed Poisson and binomial data](https://pmc.ncbi.nlm.nih.gov/articles/PMC10184615/)
+- [Check for over-dispersion](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#testing-for-overdispersioncomputing-overdispersion-factor)
+- [Stackoverflow post on overdispersion in Poisson](https://stats.stackexchange.com/questions/201903/how-to-deal-with-overdispersion-in-poisson-regression-quasi-likelihood-negativ/332250#332250)

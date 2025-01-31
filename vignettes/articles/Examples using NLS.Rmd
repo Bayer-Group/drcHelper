@@ -7,14 +7,12 @@ title: "Using nls to fit arbitrary dose-response models"
 This article demonstrates how to use nls function to fit a dose-response model, taken from ggprism package.
 
 
-``` r
+```r
 library(drcHelper)
 # for the graph
 library(ggplot2)
 library(ggprism)
-#> Error in library(ggprism): there is no package called 'ggprism'
 library(ggnewscale)
-#> Error in library(ggnewscale): there is no package called 'ggnewscale'
 
 # just for manipulating the data.frame
 library(dplyr)
@@ -26,14 +24,13 @@ library(tidyr)
 
 
 
-``` r
+```r
 library(ggprism)
-#> Error in library(ggprism): there is no package called 'ggprism'
 ```
 ## Example Dataset
 
 
-``` r
+```r
 # construct the data.frame, log10 transform the agonist concentration
 # convert the data.frame to long format, then remove any rows with NA
 df <- data.frame(
@@ -67,7 +64,7 @@ head(df)
 ```
 
 
-``` r
+```r
 dose_resp <- y ~ min + ((max - min) / (1 + exp(hill_coefficient * (ec50 - x))))
 
 ggplot(df, aes(x = log.agonist, y = response)) + 
@@ -104,8 +101,9 @@ ggplot(df, aes(x = log.agonist, y = response)) +
         legend.position.inside = c(0.05, 0.95),
         legend.justification = c(0.05, 0.95)) + 
   labs(x = "[Agonist], M")
-#> Error in loadNamespace(x): there is no package called 'ggnewscale'
 ```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
 
 ## References

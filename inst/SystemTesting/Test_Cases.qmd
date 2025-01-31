@@ -19,11 +19,9 @@ bibliography: references.bib
 
 ## Definition of Test Cases
 
-In addition to these test cases, we are also verifying if the selected R functions for a particular purpose. The functions, data, and expected results are listed in 
+In addition to unit testing for important functions, we are also verifying if the selected R functions for a particular purpose. The functions, data, and expected results are listed in the `inst/SystemTesting/Verify_R_FS`. Expe
 
-
-
-Test cases and expected results are stored in the excel file "R-V-Cop_test_cases_level_2_gesamt_20240911.xlsx" in the raw-data folder. The compound or study related information are redacted and it will not affect the numerical evaluation or verification. 
+Test cases and expected results are stored in the excel file "R-V-Cop_test_cases_level_2_redact.xlsx" in the raw-data folder. The compound or study related information are redacted and it will not affect the numerical evaluation or verification. 
 
 The data included in the test cases are either real data excluding the compound or chemical information or synthetic data generated to cover a special case. Most of the data are repeatedly used in the verification or validation of different tools for the statistical analyses of (eco)toxicology data. 
 

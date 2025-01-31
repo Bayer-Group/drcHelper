@@ -25,101 +25,133 @@ Steps in the testing procedure:
 ## EDA
 
 
-``` r
+```r
 dat_ptz
 ```
 
 ```
-## # A tibble: 20 × 9
-##    tmt   tank     S0    S1    S3    S2  S0_1  S0_2 total
-##    <chr> <chr> <int> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-##  1 C     5A        2     1     1     0     3     3     4
-##  2 C     5B        3     1     0     0     4     4     4
-##  3 C     5C        3     0     0     0     3     3     3
-##  4 C     5D        2     0     1     0     2     2     3
-##  5 SC    4A        1     3     0     0     4     4     4
-##  6 SC    4B        1     1     2     0     2     2     4
-##  7 SC    4C        1     3     0     0     4     4     4
-##  8 SC    4D        3     0     1     0     3     3     4
-##  9 T1    3A        4     0     0     0     4     4     4
-## 10 T1    3B        2     2     0     0     4     4     4
-## 11 T1    3C        4     0     0     0     4     4     4
-## 12 T1    3D        3     0     1     0     3     3     4
-## 13 T2    2A        3     0     0     1     3     4     4
-## 14 T2    2B        2     0     1     1     2     3     4
-## 15 T2    2C        1     2     0     0     3     3     3
-## 16 T2    2D        3     0     1     0     3     3     4
-## 17 T3    1A        1     1     2     0     2     2     4
-## 18 T3    1B        4     0     0     0     4     4     4
-## 19 T3    1C        2     1     1     0     3     3     4
-## 20 T3    1D        1     0     3     0     1     1     4
+## Error in eval(expr, envir, enclos): object 'dat_ptz' not found
 ```
 
-``` r
+```r
 ptz <- dat_ptz%>%dplyr::select(c(tmt,tank,S0,S1,S2,S3))%>%pivot_longer(cols=c(S0,S1,S2,S2,S3),names_to = "Score",values_to = "count")
+```
+
+```
+## Error in dplyr::select(., c(tmt, tank, S0, S1, S2, S3)): object 'dat_ptz' not found
+```
+
+```r
 theme_set(theme_bw())
 ggplot(ptz,aes(x=tmt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)
+```
+## Error in ggplot(ptz, aes(x = tmt, y = count, color = Score, fill = Score)): object 'ptz' not found
+```
 
-``` r
+```r
 ptz <- ptz%>%mutate(trt=tmt)
+```
+
+```
+## Error in is.data.frame(.data): object 'ptz' not found
+```
+
+```r
 ptz$trt[ptz$trt=="SC" | ptz$trt=="C"] <- "PC" 
+```
+
+```
+## Error in ptz$trt[ptz$trt == "SC" | ptz$trt == "C"] <- "PC": object 'ptz' not found
+```
+
+```r
 ggplot(ptz,aes(x=trt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-2.png)
+```
+## Error in ggplot(ptz, aes(x = trt, y = count, color = Score, fill = Score)): object 'ptz' not found
+```
 
-``` r
+```r
 ggplot(ptz%>%group_by(tmt)%>%mutate(total=sum(count),freq=count/total),aes(x=tmt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-3.png)
+```
+## Error in group_by(., tmt): object 'ptz' not found
+```
 
-``` r
+```r
 ggplot(ptz%>%group_by(trt)%>%mutate(total=sum(count),freq=count/total),aes(x=trt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-4.png)
+```
+## Error in group_by(., trt): object 'ptz' not found
+```
 
-``` r
+```r
 slice2 <- dat_ptz%>%mutate(S2_3=total-S0_1)%>% dplyr::select(c(tmt,tank,S0_1,S2_3))%>%pivot_longer(cols=c(S0_1,S2_3),names_to = "Score",values_to = "count")
+```
 
+```
+## Error in is.data.frame(.data): object 'dat_ptz' not found
+```
 
-
+```r
 slice2 <- slice2%>%mutate(trt=tmt)
-slice2$trt[slice2$trt=="SC" | slice2$trt=="C"] <- "PC" 
+```
 
+```
+## Error in is.data.frame(.data): object 'slice2' not found
+```
+
+```r
+slice2$trt[slice2$trt=="SC" | slice2$trt=="C"] <- "PC" 
+```
+
+```
+## Error in slice2$trt[slice2$trt == "SC" | slice2$trt == "C"] <- "PC": object 'slice2' not found
+```
+
+```r
 ggplot(slice2,aes(x=tmt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-5.png)
+```
+## Error in ggplot(slice2, aes(x = tmt, y = count, color = Score, fill = Score)): object 'slice2' not found
+```
 
-``` r
+```r
 ggplot(slice2,aes(x=trt,y=count,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-6.png)
+```
+## Error in ggplot(slice2, aes(x = trt, y = count, color = Score, fill = Score)): object 'slice2' not found
+```
 
-``` r
+```r
 ggplot(slice2%>%group_by(tmt)%>%mutate(total=sum(count),freq=count/total),aes(x=tmt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-7.png)
+```
+## Error in group_by(., tmt): object 'slice2' not found
+```
 
-``` r
+```r
 ggplot(slice2%>%group_by(trt)%>%mutate(total=sum(count),freq=count/total),aes(x=trt,y=freq,color=Score,fill=Score))+geom_bar(stat = "identity",position = "stack")+scale_fill_viridis_d()
 ```
 
-![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-8.png)
+```
+## Error in group_by(., trt): object 'slice2' not found
+```
 
 
 
 ## R script
 
 
-``` r
+```r
 # fucntion to generate the Rao Scott adjusted values
 get_RS_adj_val <- function(group, replicate, affected, total) {
 # create data frame from input vectors
@@ -162,41 +194,34 @@ list(interm_values = interm_values, Z = Z)
 
 
 
-``` r
+```r
 data("dat_ptz")
+```
+
+```
+## Warning in data("dat_ptz"): data set 'dat_ptz' not found
+```
+
+```r
 #summarize data
 select(dat_ptz, tmt, tank, S0, S1, S2, S3) %>%
 knitr::kable()
 ```
 
+```
+## Error in select(dat_ptz, tmt, tank, S0, S1, S2, S3): object 'dat_ptz' not found
+```
 
-
-|tmt |tank | S0| S1| S2| S3|
-|:---|:----|--:|--:|--:|--:|
-|C   |5A   |  2|  1|  0|  1|
-|C   |5B   |  3|  1|  0|  0|
-|C   |5C   |  3|  0|  0|  0|
-|C   |5D   |  2|  0|  0|  1|
-|SC  |4A   |  1|  3|  0|  0|
-|SC  |4B   |  1|  1|  0|  2|
-|SC  |4C   |  1|  3|  0|  0|
-|SC  |4D   |  3|  0|  0|  1|
-|T1  |3A   |  4|  0|  0|  0|
-|T1  |3B   |  2|  2|  0|  0|
-|T1  |3C   |  4|  0|  0|  0|
-|T1  |3D   |  3|  0|  0|  1|
-|T2  |2A   |  3|  0|  1|  0|
-|T2  |2B   |  2|  0|  1|  1|
-|T2  |2C   |  1|  2|  0|  0|
-|T2  |2D   |  3|  0|  0|  1|
-|T3  |1A   |  1|  1|  0|  2|
-|T3  |1B   |  4|  0|  0|  0|
-|T3  |1C   |  2|  1|  0|  1|
-|T3  |1D   |  1|  0|  0|  3|
-
-``` r
+```r
 # create control only data set
 cdat <- filter(dat_ptz, tmt %in% c("C", "SC"))
+```
+
+```
+## Error in filter(dat_ptz, tmt %in% c("C", "SC")): object 'dat_ptz' not found
+```
+
+```r
 # Slice S1
 ctrl_s1_p <- run_RSCA(cdat$tmt, cdat$tank, cdat$S0, cdat$total)$Z %>%
 abs() %>%
@@ -204,6 +229,13 @@ pnorm() %>%
 `-`(1, .) %>%
 `*`(2) %>%
 round(3)
+```
+
+```
+## Error in eval_tidy(xs[[j]], mask): object 'cdat' not found
+```
+
+```r
 # slice S2
 ctrl_s2_p <- run_RSCA(cdat$tmt, cdat$tank, cdat$S0_1, cdat$total)$Z %>%
 abs() %>%
@@ -211,8 +243,13 @@ pnorm() %>%
 `-`(1, .) %>%
 `*`(2) %>%
 round(3)
+```
 
+```
+## Error in eval_tidy(xs[[j]], mask): object 'cdat' not found
+```
 
+```r
 # slice S3
 ctrl_s3_p <- run_RSCA(cdat$tmt, cdat$tank, cdat$S0_2, cdat$total)$Z %>%
 abs() %>%
@@ -220,39 +257,95 @@ pnorm() %>%
 `-`(1, .) %>%
 `*`(2) %>%
 round(3)
+```
+
+```
+## Error in eval_tidy(xs[[j]], mask): object 'cdat' not found
+```
+
+```r
 # combine control treatments
 dat <- mutate(dat_ptz, tmt = ifelse(tmt == "SC", "C", tmt))
+```
+
+```
+## Error in is.data.frame(.data): object 'dat_ptz' not found
+```
+
+```r
 # summary data frame
 dat_sum <- group_by(dat, tmt) %>%
 summarize(across(S0:total, ~ sum(.)))
+```
+
+```
+## Error in group_by(dat, tmt): object 'dat' not found
+```
+
+```r
 # Slice S1
 s1_p <- run_RSCA(dat$tmt, dat$tank, dat$total-dat$S0, dat$total)$Z %>%
 pnorm() %>%
 round(3)
+```
+
+```
+## Error in eval_tidy(xs[[j]], mask): object 'dat' not found
+```
+
+```r
 dat1<- dat_ptz%>%filter(tmt!="SC")
+```
+
+```
+## Error in filter(., tmt != "SC"): object 'dat_ptz' not found
+```
+
+```r
 dat2 <-  dat_ptz%>%filter(tmt!="C")
+```
+
+```
+## Error in filter(., tmt != "C"): object 'dat_ptz' not found
+```
+
+```r
 s1c_p <- run_RSCA(dat1$tmt, dat1$tank, dat1$S0, dat1$total)$Z %>%
 pnorm() %>%
 round(3)
+```
+
+```
+## Error in eval_tidy(xs[[j]], mask): object 'dat1' not found
+```
+
+```r
 s1c_p
 ```
 
 ```
-## [1] 0.11
+## Error in eval(expr, envir, enclos): object 's1c_p' not found
 ```
 
-``` r
+```r
 s1sc_p <- run_RSCA(dat2$tmt, dat2$tank, dat2$S0, dat2$total)$Z %>%
 pnorm() %>%
 round(3)
+```
+
+```
+## Error in eval_tidy(xs[[j]], mask): object 'dat2' not found
+```
+
+```r
 s1sc_p
 ```
 
 ```
-## [1] 0.74
+## Error in eval(expr, envir, enclos): object 's1sc_p' not found
 ```
 
-``` r
+```r
 # table for slice 1
 mutate(dat_sum, `S1-S3` = total - S0,
 Percent = round(`S1-S3`/total*100, 0)) %>%
@@ -260,37 +353,38 @@ dplyr::select(tmt, S0, `S1-S3`, Percent) %>%
 kable()
 ```
 
+```
+## Error in is.data.frame(.data): object 'dat_sum' not found
+```
 
-
-|tmt | S0| S1-S3| Percent|
-|:---|--:|-----:|-------:|
-|C   | 16|    14|      47|
-|T1  | 13|     3|      19|
-|T2  |  9|     6|      40|
-|T3  |  8|     8|      50|
-
-``` r
+```r
 # slice S2
 s2_p <- run_RSCA(dat$tmt, dat$tank, dat$S0_1, dat$total)$Z %>%
 pnorm() %>%
 round(3)
+```
 
+```
+## Error in eval_tidy(xs[[j]], mask): object 'dat' not found
+```
+
+```r
 run_RSCA(dat1$tmt, dat1$tank, dat1$S0_1, dat1$total)$Z %>% pnorm() 
 ```
 
 ```
-## [1] 0.04713206
+## Error in eval_tidy(xs[[j]], mask): object 'dat1' not found
 ```
 
-``` r
+```r
 run_RSCA(dat2$tmt, dat2$tank, dat2$S0_1, dat2$total)$Z %>% pnorm() 
 ```
 
 ```
-## [1] 0.07900702
+## Error in eval_tidy(xs[[j]], mask): object 'dat2' not found
 ```
 
-``` r
+```r
 # table for slice 2
 mutate(dat_sum, `S0-S1` = S0 + S1, `S2-S3` = S2 + S3,
 Percent = round(`S2-S3`/total*100, 0)) %>%
@@ -298,37 +392,38 @@ select(tmt, `S0-S1`, `S2-S3`, Percent) %>%
 kable()
 ```
 
+```
+## Error in is.data.frame(.data): object 'dat_sum' not found
+```
 
-
-|tmt | S0-S1| S2-S3| Percent|
-|:---|-----:|-----:|-------:|
-|C   |    25|     5|      17|
-|T1  |    15|     1|       6|
-|T2  |    11|     4|      27|
-|T3  |    10|     6|      38|
-
-``` r
+```r
 # slice S3
 s3_p <- run_RSCA(dat$tmt, dat$tank, dat$S0_2, dat$total)$Z %>%
 pnorm() %>%
 round(3)
+```
 
+```
+## Error in eval_tidy(xs[[j]], mask): object 'dat' not found
+```
+
+```r
 run_RSCA(dat1$tmt, dat1$tank, dat1$S0_2, dat1$total)$Z %>% pnorm() 
 ```
 
 ```
-## [1] 0.08706086
+## Error in eval_tidy(xs[[j]], mask): object 'dat1' not found
 ```
 
-``` r
+```r
 run_RSCA(dat2$tmt, dat2$tank, dat2$S0_2, dat2$total)$Z %>% pnorm() 
 ```
 
 ```
-## [1] 0.1304879
+## Error in eval_tidy(xs[[j]], mask): object 'dat2' not found
 ```
 
-``` r
+```r
 # table for slice 3
 mutate(dat_sum, `S0-S2` = S0 + S1 + S2,
 Percent = round(S3/total*100, 0)) %>%
@@ -336,39 +431,34 @@ select(tmt, `S0-S2`, S3, Percent) %>%
 kable()
 ```
 
-
-
-|tmt | S0-S2| S3| Percent|
-|:---|-----:|--:|-------:|
-|C   |    25|  5|      17|
-|T1  |    15|  1|       6|
-|T2  |    13|  2|      13|
-|T3  |    10|  6|      38|
+```
+## Error in is.data.frame(.data): object 'dat_sum' not found
+```
 
 
 
-``` r
+```r
 s1_p
 ```
 
 ```
-## [1] 0.484
+## Error in eval(expr, envir, enclos): object 's1_p' not found
 ```
 
-``` r
+```r
 s2_p
 ```
 
 ```
-## [1] 0.072
+## Error in eval(expr, envir, enclos): object 's2_p' not found
 ```
 
-``` r
+```r
 s3_p
 ```
 
 ```
-## [1] 0.161
+## Error in eval(expr, envir, enclos): object 's3_p' not found
 ```
 
 ## Check with runRSCABS
@@ -385,7 +475,7 @@ s3_p
 
 
 
-``` r
+```r
 genIndividual <- function(Score,count){
   if(count>0){
     return(data.frame(Score1=rep(gsub("S","",Score),count)))
@@ -393,28 +483,58 @@ genIndividual <- function(Score,count){
 }
 
 ptz1 <- ptz %>% mutate(individual=map2(Score,count,genIndividual)) %>% unnest(c(individual))
+```
+
+```
+## Error in is.data.frame(.data): object 'ptz' not found
+```
+
+```r
 ptz1 <- as.data.frame(ptz1)
+```
+
+```
+## Error in as.data.frame(ptz1): object 'ptz1' not found
+```
+
+```r
 ptz2 <- ptz1[,c("trt","tank","Score1")]
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'ptz1' not found
+```
+
+```r
 ptz2$trt <- factor(ptz2$trt)
+```
+
+```
+## Error in factor(ptz2$trt): object 'ptz2' not found
+```
+
+```r
 ptz2$Score1 <- as.numeric(ptz2$Score1)
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'ptz2' not found
+```
+
+```r
 ptz2$S2 <- ptz2$Score1+5
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'ptz2' not found
+```
+
+```r
 runRSCABS(ptz2,'trt','tank',test.type='RS')
 ```
 
 ```
-##     Effect Treatment R.Score   Statistic    P.Value Signif
-## 1  Score11         4       1 -0.03982353 0.48411691      .
-## 2  Score11         4       1 -0.03982353 0.48411691      .
-## 3  Score12         4       2  1.45886196 0.07230155      .
-## 4  Score12         4       2  1.45886196 0.07230155      .
-## 5  Score13         4       3  0.99006850 0.16107032      .
-## 6  Score13         4       3  0.99006850 0.16107032      .
-## 7      S26         4       6 -0.03982353 0.48411691      .
-## 8      S26         4       6 -0.03982353 0.48411691      .
-## 9      S27         4       7  1.45886196 0.07230155      .
-## 10     S27         4       7  1.45886196 0.07230155      .
-## 11     S28         4       8  0.99006850 0.16107032      .
-## 12     S28         4       8  0.99006850 0.16107032      .
+## Error in is.factor(x): object 'ptz2' not found
 ```
 
 
@@ -425,7 +545,7 @@ runRSCABS(ptz2,'trt','tank',test.type='RS')
 ### 1. A nonparametric approach based on relative effect size
 
 
-``` r
+```r
 library(nparcomp)
 res1<-nparcomp(Score1 ~ trt, data=ptz2, asy.method = "mult.t",
 type = "Dunnett", info = FALSE,plot.simci = TRUE)
@@ -465,7 +585,7 @@ plot.nparcomp.zg(res1) # Plot simultaneous confidence limits
 ### 4. Cumulative link model
 
 
-``` r
+```r
 library(ordinal)
 
 ptz3 <- ptz2
@@ -489,79 +609,45 @@ in the control.
 
 
 
-``` r
+```r
 library("coin")
-```
-
-```
-## Error in library("coin"): there is no package called 'coin'
-```
-
-``` r
 library("multcomp")
-```
-
-```
-## Warning: package 'multcomp' was built under R version 4.4.2
-```
-
-```
-## Loading required package: mvtnorm
-```
-
-```
-## Loading required package: survival
-```
-
-```
-## Loading required package: TH.data
-```
-
-```
-## Warning: package 'TH.data' was built under R version 4.4.2
-```
-
-```
-## 
-## Attaching package: 'TH.data'
-```
-
-```
-## The following object is masked from 'package:MASS':
-## 
-##     geyser
-```
-
-``` r
 Co1 <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Dunnett")))
 ptz2 <- ptz2%>% mutate(EP1=ifelse(Score1>0,1,0),EP2=ifelse(Score1>1,1,0),EP3=ifelse(Score1>2,1,0))
+```
+
+```
+## Error in is.data.frame(.data): object 'ptz2' not found
+```
+
+```r
 Codu <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="greater")
 ```
 
 ```
-## Error in independence_test(EP1 + EP2 + EP3 ~ trt, data = ptz2, teststat = "maximum", : could not find function "independence_test"
+## Error in terms.formula(formula, data = data): object 'ptz2' not found
 ```
 
-``` r
+```r
 Codu <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="less")
 ```
 
 ```
-## Error in independence_test(EP1 + EP2 + EP3 ~ trt, data = ptz2, teststat = "maximum", : could not find function "independence_test"
+## Error in terms.formula(formula, data = data): object 'ptz2' not found
 ```
 
-``` r
+```r
 pvalCODU <-pvalue(Codu, method="single-step")
 ```
 
 ```
-## Error in pvalue(Codu, method = "single-step"): could not find function "pvalue"
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'object' in selecting a method for function 'pvalue': object 'Codu' not found
 ```
 
-``` r
+```r
 pvalCODU
 ```
 
@@ -569,7 +655,7 @@ pvalCODU
 ## Error in eval(expr, envir, enclos): object 'pvalCODU' not found
 ```
 
-``` r
+```r
 CoW <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Williams")))
 Cowi <-independence_test(EP1 +EP2+EP3~ trt, data = ptz2, teststat = "maximum",
@@ -577,18 +663,18 @@ distribution = "approximate", xtrafo=CoW, alternative="greater")
 ```
 
 ```
-## Error in independence_test(EP1 + EP2 + EP3 ~ trt, data = ptz2, teststat = "maximum", : could not find function "independence_test"
+## Error in terms.formula(formula, data = data): object 'ptz2' not found
 ```
 
-``` r
+```r
 pvalCOWI <-pvalue(Cowi, method="single-step")
 ```
 
 ```
-## Error in pvalue(Cowi, method = "single-step"): could not find function "pvalue"
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'object' in selecting a method for function 'pvalue': object 'Cowi' not found
 ```
 
-``` r
+```r
 pvalCOWI
 ```
 
@@ -598,7 +684,7 @@ pvalCOWI
 
 
 
-``` r
+```r
 data(exampleHistData)
 subIndex<-which(exampleHistData$Generation=="F1" &
 exampleHistData$Genotypic_Sex=="Male" &
@@ -624,7 +710,7 @@ pvalCODU
 
 
 
-``` r
+```r
 CoW <- function(data) trafo(data, factor_trafo = function(x)
 model.matrix(~x - 1) %*% t(contrMat(table(x), "Williams")))
 Cowi <-independence_test(EP1 +EP2+EP3~ treat, data = Lhh, teststat = "maximum",
@@ -636,7 +722,7 @@ pvalCOWI
 Monotone increasing trends exist for any category, whereas the strongest for 1, (2,3,5).
 
 
-``` r
+```r
 Adu <-independence_test(Gon+EP1 +EP2+EP3~ treat, data = Lhh, teststat = "maximum",
 distribution = "approximate", xtrafo=Co1, alternative="greater")
 pvalADU <-pvalue(Adu, method="single-step")
@@ -645,7 +731,7 @@ pvalADU
 
 
 
-``` r
+```r
 library("coin")
 library("multcomp")
 green$treat<-as.factor(green$Dose)
