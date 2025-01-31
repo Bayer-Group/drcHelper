@@ -11,6 +11,7 @@
 #' @param referencerow Unexposed row
 #'
 #' @return string with results
+#' @export
 #'
 #' @aliases Tarones
 #' @examples
