@@ -1,0 +1,25 @@
+pandoc: 3.1.11
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  articles/Advanced_Fitting-a-biphasic-dose-reponse-model: Advanced_Fitting-a-biphasic-dose-reponse-model.html
+  articles/Count_Data: Count_Data.html
+  drcHelper: drcHelper.html
+  articles/EFSA-Criteria: EFSA-Criteria.html
+  articles/Examples using NLS: Examples using NLS.html
+  articles/Examples_drc: Examples_drc.html
+  articles/Examples_MCP: Examples_MCP.html
+  articles/Examples_oecd201: Examples_oecd201.html
+  articles/Examples_using_drda: Examples_using_drda.html
+  Introduction: Introduction.html
+  articles/MQJT: MQJT.html
+  articles/NOEC_Methods: NOEC_Methods.html
+  articles/Normality-Check: Normality-Check.html
+  articles/Ordinal-Data: Ordinal-Data.html
+  articles/Quantal-Data: Quantal-Data.html
+  articles/System_Testing: System_Testing.html
+  articles/TSK_method: TSK_method.html
+last_built: 2025-02-05T11:44Z
+urls:
+  reference: https://effective-adventure-2klnejq.pages.github.io/reference
+  article: https://effective-adventure-2klnejq.pages.github.io/articles
