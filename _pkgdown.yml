@@ -1,4 +1,4 @@
-url: https://effective-adventure-2klnejq.pages.github.io/
+url: https://bayer-group.github.io/drcHelper/index.html
 template:
   math-rendering: mathjax
   bootstrap: 5
@@ -8,9 +8,9 @@ search:
   exclude: news/index.html
 repo:
   url:
-    home: https://github.com/BayerGroup/drcHelper
-    source: https://github.com/BayerGroup/drcHelper/blob/main/
-    issue: https://github.com/BayerGroup/drcHelper/issues/
+    home: https://github.com/Bayer-Group/drcHelper
+    source: https://github.com/Bayer-Group/drcHelper/blob/main/
+    issue: https://github.com/Bayer-Group/drcHelper/issues/
     user: https://github.com/
 news:
   cran_dates: yes
@@ -50,7 +50,7 @@ navbar:
       menu:
       - text: Introduction
         href: articles/Introduction.html
-      - text: Get Started
+      - text: Package Dependencies
         href: articles/drcHelper.html
     reference:
       text: Reference
@@ -64,15 +64,15 @@ navbar:
         href: articles/EFSA-Criteria.html
       - text: RSCABS
         href: articles/Example_RSCABS.html
-      - text: NLS
-        href: articles/Examples using NLS.html
-      - text: drda
-        href: articles/Examples_using_drda.html
       - text: OECD 201
         href: articles/Examples_oecd201.html
     articles:
       text: Articles
       menu:
+      - text: NLS
+        href: articles/Examples using NLS.html
+      - text: drda
+        href: articles/Examples_using_drda.html
       - text: TSK method
         href: articles/TSK_method.html
       - text: MQJT
@@ -80,7 +80,7 @@ navbar:
       - text: Quantal Data
         href: articles/Quantal-Data.html
       - text: Ordinal Data
-        href: articles/Ordianl-Data.html
+        href: articles/Ordinal-Data.html
       - text: Fitting A biphasic dose response model
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
       - text: Count Data
@@ -92,6 +92,6 @@ navbar:
         href: articles/System_Testing.html
     newissue:
       icon: fa-bug
-      href: https://github.com/BayerGroup/drcHelper/issues/new?template=Blank+issue
+      href: https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue
       aria-label: New Issue
 
