@@ -33,7 +33,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
-    <li><a class="dropdown-item" href="../articles/drcHelper.html">Get Started</a></li>
+    <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
@@ -43,18 +43,18 @@
 <li><a class="dropdown-item" href="../articles/Examples_drc.html">Example Helper Functions</a></li>
     <li><a class="dropdown-item" href="../articles/EFSA-Criteria.html">EFSA Criteria and Other Reliability Criteria</a></li>
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
-    <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
-    <li><a class="dropdown-item" href="../articles/Examples_using_drda.html">drda</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">OECD 201</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/TSK_method.html">TSK method</a></li>
+<li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
+    <li><a class="dropdown-item" href="../articles/Examples_using_drda.html">drda</a></li>
+    <li><a class="dropdown-item" href="../articles/TSK_method.html">TSK method</a></li>
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Quantal-Data.html">Quantal Data</a></li>
-    <li><a class="dropdown-item" href="../articles/Ordianl-Data.html">Ordinal Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Ordinal-Data.html">Ordinal Data</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
   </ul>
@@ -70,8 +70,8 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/BayerGroup/drcHelper/issues/new?template=Blank+issue" aria-label="New Issue"><span class="fa fa-bug"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/BayerGroup/drcHelper" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue" aria-label="New Issue"><span class="fa fa-bug"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Bayer-Group/drcHelper" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -88,7 +88,7 @@
       <h1>Using nls to fit arbitrary dose-response models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/BayerGroup/drcHelper/blob/main/vignettes/articles/Examples%20using%20NLS.Rmd" class="external-link"><code>vignettes/articles/Examples using NLS.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/Examples%20using%20NLS.Rmd" class="external-link"><code>vignettes/articles/Examples using NLS.Rmd</code></a></small>
       <div class="d-none name"><code>Examples using NLS.Rmd</code></div>
     </div>
 
@@ -97,7 +97,7 @@
 <p>This article demonstrates how to use nls function to fit a
 dose-response model, taken from ggprism package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/">drcHelper</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: drc</span></span>
 <span><span class="co">#&gt; Loading required package: MASS</span></span>
 <span><span class="co">#&gt; </span></span>
