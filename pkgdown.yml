@@ -6,6 +6,7 @@ articles:
   articles/Count_Data: Count_Data.html
   drcHelper: drcHelper.html
   articles/EFSA-Criteria: EFSA-Criteria.html
+  Example_Analysis_Workflow: Example_Analysis_Workflow.html
   articles/Examples using NLS: Examples using NLS.html
   articles/Examples_drc: Examples_drc.html
   articles/Examples_MCP: Examples_MCP.html
@@ -19,7 +20,7 @@ articles:
   articles/Quantal-Data: Quantal-Data.html
   articles/System_Testing: System_Testing.html
   articles/TSK_method: TSK_method.html
-last_built: 2025-02-06T09:07Z
+last_built: 2025-02-14T09:20Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

@@ -4,6 +4,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Count_Data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/EFSA-Criteria.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Example_Analysis_Workflow.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples using NLS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_MCP.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_drc.html</loc></url>
@@ -36,8 +37,10 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/calpha.test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/collembola_juveniles.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/contEndpoint.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/dose.p.glmmPQL.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcCompare.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcHelper-package.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/getEC50.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/getEndpoint.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/getModelName.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/getwilliamRes.html</loc></url>
@@ -54,6 +57,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.modList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prepDataRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.drcComp.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pvi_example.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/reshape_drcData.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/runRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/simplifyTreatment.html</loc></url>
