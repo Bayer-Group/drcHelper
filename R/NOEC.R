@@ -1,6 +1,9 @@
 ## Function to calculate NOECs using multiple methods and broomed together
 
 
+
+## Unit Testing in # FILE: tests/testthat/test_quantal_categorical.R
+
 #' Tarone's Z Test
 #'
 #' Tests the goodness of fit of the binomial distribution.

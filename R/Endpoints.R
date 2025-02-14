@@ -1,3 +1,71 @@
+## PMCMRplus package helpers
+## testthat/test_williamsSummary.R
+
+#' Calculate Means Using the Pool Adjacent Violators Algorithm (PAVA)
+#'
+#' This function computes adjusted means and standard errors for groups defined by a factor variable
+#' using the Pool Adjacent Violators Algorithm (PAVA).
+#'
+#' @param x A numeric vector of observations.
+#' @param g A factor variable that defines the groups for which to calculate means.
+#' @param alternative A character string specifying the alternative hypothesis.
+#'                    Options are "greater" (default) or "less".
+#'
+#' @return A data frame containing the following columns:
+#' \item{pavaMean}{The adjusted means for each group.}
+#' \item{SE.diff}{The standard errors of the differences.}
+#'
+#' @export
+#'
+#' @examples
+#' # Example usage:
+#' x <- c(1, 2, 3, 4, 5, 6)
+#' g <- factor(c("A", "A", "B", "B", "C", "C"))
+#' result <- pavaMean(x, g)
+#' print(result)
+#' x <- c(106, 114, 116, 127, 145,
+#'        110, 125, 143, 148, 151,
+#'        136, 139, 149, 160, 174)
+#' g <- gl(3,5)
+#' levels(g) <- c("0", "I", "II")
+#' pavaMean(x,g)
+pavaMean <- function(x,g,alternative = "greater"){
+  alternative <- match.arg(alternative, choices = c("greater", "less"))
+  xold <- x
+  if (alternative == "less") {
+    x <- -x
+  }
+  xi <- tapply(x, g, mean, na.rm = T)
+  ni <- tapply(x, g, length)
+  k <- nlevels(g)
+  kk <- k - 1
+  if (kk > 10)
+    stop("Critical t-values are only available for up to 10 dose levels.")
+  N <- sum(ni)
+  df <- N - k
+  s2i <- tapply(x, g, var)
+  s2in <- 1/df * sum(s2i * (ni - 1))
+  xiiso <- .Fortran("pava", y = as.double(xi), w = as.double(ni),
+                    kt = integer(k), n = as.integer(k))$y
+  mui <- rep(NA, k)
+  for (i in 1:k) {
+    v <- k
+    tmp <- rep(NA, length(1:i))
+    for (u in 1:i) {
+      j <- u
+      tmp01 <- sapply(i:k, function(v) sum(ni[j:v] * xiiso[j:v])/sum(ni[j:v]))
+      tmp[u] <- min(tmp01)
+    }
+    mui[i] <- max(tmp, na.rm = TRUE)
+  }
+  sei <- sapply(1:k, function(i) {
+    sqrt((s2in/ni[i] + s2in/ni[1]))
+  })
+  res <- data.frame(`pavaMean` = mui, SE.diff = sei)
+  # res$Will <- res$pavaMean-res$pavaMean[1]
+  # res$Will[1] <- NA
+  return(res)
+}
 #' Summary Williams Test results.
 #'
 #' @param object William test result object
@@ -6,8 +74,17 @@
 #' @return William test results
 #' @export
 #'
-#' @examples
-summaryZG <-function (object, ...)
+#' @examples ## Example from Sachs (1997, p. 402)
+#' x <- c(106, 114, 116, 127, 145,
+#'        110, 125, 143, 148, 151,
+#'        136, 139, 149, 160, 174)
+#' g <- gl(3,5)
+#' levels(g) <- c("0", "I", "II")
+#'
+#' ## Williams Test
+#' res <- williamsTest(x ~ g)
+#' summaryZG(res) ## return a data frame instead of a list.
+summaryZG <-function (object, verbose=F,...)
 {
   critVal <- as.numeric(object$crit.value)
   stat <- as.numeric(object$statistic)
@@ -38,11 +115,14 @@ summaryZG <-function (object, ...)
     dec <- dec[ok]
   }
   dist <- paste0(dist, "-value")
-  cat("\n\t", object$method, "\n\n")
-  cat("data: ", object$data.name, "\n")
-  if (!is.null(object$alternative)) {
-    cat("alternative hypothesis: ", object$alternative, "\n")
+  if(verbose){
+    cat("\n\t", object$method, "\n\n")
+    cat("data: ", object$data.name, "\n")
+    if (!is.null(object$alternative)) {
+      cat("alternative hypothesis: ", object$alternative, "\n")
+    }
   }
+
   paramName <- names(object$parameter)
   if (length(paramName) == 2) {
     suppressWarnings(expr = xdf <- data.frame(STATISTIC = round(stat,
@@ -60,7 +140,7 @@ summaryZG <-function (object, ...)
   }
   rownames(xdf) <- H0
   return(xdf)
-  invisible(object)
+  ##invisible(object)
 }
 
 
@@ -69,14 +149,26 @@ summaryZG <-function (object, ...)
 #' get from william res accept/reject
 #'
 #' @param william william test results
+#' @param n number of hypotheses to be tested. description
 #'
 #' @return
 #' @export
 #'
-#' @examples
-getwilliamRes <- function(william){
+#' @examples ## Example from Sachs (1997, p. 402)
+#' x <- c(106, 114, 116, 127, 145,
+#'        110, 125, 143, 148, 151,
+#'        136, 139, 149, 160, 174)
+#' g <- gl(3,5)
+#' levels(g) <- c("0", "I", "II")
+#'
+#' ## Williams Test
+#' res <- williamsTest(x ~ g)
+#' getwilliamRes(res)
+getwilliamRes <- function(william,n=NULL){
   if(class(william)=="try-error"){
-    return(rep(NA,3))
+    if(is.null(n)) stop("when the test does not return a valid results, you need to specify
+                        the number of hypotheses. ")
+    return(rep(NA,n=n))
   }else(return(as.character(summaryZG(william)$decision)))
 }
 
@@ -92,6 +184,9 @@ getwilliamRes <- function(william){
 #' @export
 #'
 #' @examples
+#' pvals <- c(0.01, 0.03, 0.07, 0.08)
+#' doses <- c("Control", "B", "C", "D")
+#' getEndpoint(pvals, doses)
 getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown"){
   nd <-length(doses)
   if(all(is.na(pvals))) {
@@ -99,7 +194,7 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
   }
   np <- length(pvals)
   if(np < (nd-1)){
-    pvals <- c(pvals,rep(0,nd-1-np))
+    pvals <- c(pvals,rep(0,nd-1-np)) ## Asumming missing the high doses
   }
   sig <- pvals<0.05
 
@@ -108,11 +203,14 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
   if(procedure=="stepDown")
   {
     for(i in (nd-1):1){
-      if(!sig[i]){ NOEC <- doses[i+1]
-
-      return(NOEC)}
+      if(!sig[i]){
+        NOEC <- doses[i+1]
+        return(NOEC)
+      }
     }
     if(sig[1]) return(NOEC)
+
+
 
   }else{
     for(i in 1:(nd-1)){
@@ -184,4 +282,7 @@ contEndpoint <- function(paov,pks,pnormal,phomogeneity,monotonicity,william,dunn
   return(NOEC)
 }
 
+## find / -type f -exec grep -H 'text-to-find-here' {} \;
+## grep -rnw '/path/to/somewhere/' -e 'contEndpoint'
 
+## find . -name "*.Rmd" | xargs -d '\n' grep -i "contEndpoint"

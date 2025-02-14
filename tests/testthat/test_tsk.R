@@ -1,5 +1,5 @@
 
-test_that("logxp function scales the x-axis correctly",{
+test_that("tsk can calculate ",{
 
 
   p <- 2 * pnorm(2) - 1

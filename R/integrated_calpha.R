@@ -34,8 +34,11 @@
 #'
 #' @examples
 #' # For incidence data:
-#' my_incidence <- incidence(tobacco_viruses)
-#' my_fisher <- agg_index(my_incidence, method = "fisher")
+#' # my_incidence <- epiphy::incidence(epiphy::tobacco_viruses)
+#' # my_fisher <- epiphy::agg_index(my_incidence, method = "fisher")
+#' my_fisher <- structure(list(index = 3.14396182555326,
+#' name = "Fisher's index of dispersion", flavor = "incidence", N = 75L, n = 40L),
+#' class = c("fisher", "agg_index"))
 #' calpha.test(my_fisher)
 #'
 #' @seealso \code{\link{chisq.test}}, \code{\link{z.test}}
@@ -59,6 +62,11 @@ calpha.test <- function(x, ...) UseMethod("calpha.test")
 calpha.test.fisher <- function(x, ...) {
   call  <- match.call() # TODO: Not yet used.
   dname <- deparse(substitute(x))
+  # Ensure x has the required components
+  if (!all(c("N", "n", "index") %in% names(x))) {
+    stop("Input object must contain 'N', 'n', and 'index'.", call. = FALSE)
+  }
+
   N     <- x[["N"]]
   switch (x[["flavor"]],
           "count" = {

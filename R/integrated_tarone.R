@@ -2,6 +2,7 @@
 ## COPYRIGHT HOLDER: ClinStats authors
 ## MIT licence
 #------------------------------------------------------------------------------#
+## Unit Testing in # FILE: tests/testthat/test_quantal_categorical.R
 
 #' Tarones test for Stratified OR (integrated from https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R)
 #'
@@ -10,8 +11,9 @@
 #' @param mylist A list of matrix Stratified by a Variable
 #' @param referencerow Unexposed row
 #'
-#' @return string with results
+#' @return string with a list of p-values
 #' @export
+#' @details modified the output to return p-values, need metafor package to run
 #'
 #' @aliases Tarones
 #' @examples
@@ -68,7 +70,10 @@ calcTaronesTest <- function(mylist, referencerow = 2) {
   }
   # calculate Tarone's test of homogeneity, using the rma.mh function from the
   # "metafor" package
+  # Meta-Analysis via the Mantel-Haenszel Method
   tarone <- metafor::rma.mh(ptrt, htrt, pctrl, hctrl, ntrt, nctrl)
   pvalue <- tarone$TAp
   print(paste("Pvalue for Tarone's test =", pvalue))
+  return(list(pval=pvalue,tarone=tarone))
+
 }

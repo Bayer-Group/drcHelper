@@ -18,15 +18,6 @@
 #'
 #' @examples
 williamsTest_JG<-function(df,resp,trt,direction='decreasing',SeIn=NULL){
-  #' @export
-  #df: The data frame
-  #Each row is an observation
-  #resp: The name of the response as a string
-  #trt: The name of the response as a string
-  #The lowest value must be the control
-  #direction:  Is the direction of the test 'decreasing' or 'increasing'
-  #SeIn: the standard error, default is program selected however
-  #WilliamsTest can take in a different value in the case of repeated measures
 
 
   #Adjust for test direction synonyms
@@ -36,13 +27,8 @@ williamsTest_JG<-function(df,resp,trt,direction='decreasing',SeIn=NULL){
     direction<-'DECREASING'
   }
 
-  if (direction == 'INCREASING'){
-    direction<-'INCREASING'
-  }
-
-  if (is.element(direction,c('DECREASING','INCREASING'))==FALSE){
-    message("Please enter either 'decreasing' or 'increasing' for the direction.\n Function ending.")
-    return()
+  if (!direction %in% c('DECREASING', 'INCREASING')) {
+    stop("Please enter either 'decreasing' or 'increasing' for the direction.")
   }
 
   #Load look up table
@@ -83,8 +69,7 @@ williamsTest_JG<-function(df,resp,trt,direction='decreasing',SeIn=NULL){
   N.tilde<-N
   DF=sum(N)-length(N)
   if (DF < 5){
-    message('Error: Williams test is not appropriate when DF < 5. \n Function ending.')
-    return()
+    stop('Error: Williams test is not appropriate when DF < 5. \n Function ending.')
   }
 
   #Loop of y.tilde

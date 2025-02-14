@@ -40,3 +40,11 @@ NULL
 #' @keywords datasets
 #' @format collembola_juveniles in wide format
 "collembola_juveniles"
+
+
+#' Fake data as an example of PVI data
+#'
+#' @docType data
+#' @keywords datasets
+#' @format collembola_juveniles in wide format
+"pvi_example"

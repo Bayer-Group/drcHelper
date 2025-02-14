@@ -1,13 +1,28 @@
 ## res <- testthat::test_file("inst/SystemTesting/Verify_R_FS/test_6_NOEC.R",reporter =  testthat::ListReporter)
 
-test_that("Tests to derive NOECs",{
-  test_that("Fisher's Test",{
+res%>%
+  as_tibble() %>%
+  rename(Test = test) %>%
+  group_by(file, context, Test) %>%
+  ##tidyr::separate_wider_delim(Test, names = c("Context1", "Test1"), delim = ":")%>%
+  summarise(NumTests = first(nb),
+            Passed   = sum(passed),
+            Failed   = sum(failed),
+            Warnings = sum(warning),
+            Errors   = sum(as.numeric(error)),
+            Skipped  = sum(as.numeric(skipped)),
+            .groups = "drop") %>%
+  tidyr::separate_wider_delim(Test, names = c("Context", "Test"), delim = ":")%>%
+  dplyr::select(-context)
+
+describe("Tests to derive NOECs",{
+  it("Fisher's Test",{
 
   })
 
 
 
-  test_that("Dunn's-Test with Kruskal-Wallis pretest",{
+  it("Dunn's-Test with Kruskal-Wallis pretest",{
 
     Rate=c(0,0,0,0,0,0,
            0.0448,0.0448,0.0448,0.0448,
@@ -48,11 +63,11 @@ test_that("Tests to derive NOECs",{
   })
 
 
-  test_that("Rank sum Test",{
+  it("Rank sum Test",{
 
   })
 
-  test_that("FS  :Student's t-test",{
+  it("Student's t-test",{
     y0<-c(0.120915680098082,0.136752501891969,0.145668808436602,0.131844763607024,0.149892124046466,0.133572261866272)
     y1<-c(0.131517109035102,0.117455425985384,0.130835155683102,0.12226548296818,0.127485057136569,0.128828137633933)
 
@@ -67,7 +82,7 @@ test_that("Tests to derive NOECs",{
     expect_equal(res$p.value, 0.07085, tolerance = 1e-4)
   })
 
-  test_that("FS  :Welch's t-test",{
+  it("Welch's t-test",{
     y0<-c(0.131517109035102,0.117455425985384,0.130835155683102,0.12226548296818,0.127485057136569,0.128828137633933)
     y1<-c(0.122888192029009,0.126866725094641,0.128467082586674,0.116653888503673)
     y2<-c(0.0906079518188219,0.102060998252763,0.107240263636048,0.0998663441976353)
@@ -86,18 +101,18 @@ test_that("Tests to derive NOECs",{
 
 
   })
-  test_that("Wilcoxon Test",{
+  it("Wilcoxon Test",{
 
   })
 
 
 
-  test_that("Welch's t-test",{
+  it("Welch's t-test",{
 
   })
 
 
-  test_that("William's Test",{
+  it("William's Test",{
     Rate = c(0,0,0,0,0,0,
              0.0448,0.0448,0.0448,0.0448,
              0.132,0.132,0.132,0.132,
@@ -126,7 +141,7 @@ test_that("Tests to derive NOECs",{
   })
 
 
-  test_that("Dunnett Test",{
+  it("Dunnett Test",{
 
     Rate = c(0,0,0,0,0,0,
              0.0448,0.0448,0.0448,0.0448,
@@ -145,6 +160,7 @@ test_that("Tests to derive NOECs",{
     Response = data.frame(Rate, y)
 
     library("DescTools")
+    set.seed(100) ## if not setting random seed, snapshot won't work as the mvt would change.
     expect_snapshot(DunnettTest(y ~ Rate, data = Response))
     expect_snapshot(PMCMRplus::dunnettTest(y ~ Rate,alternative="less"))
     expect_snapshot(PMCMRplus::dunnettTest(y ~ Rate,alternative="greater"))
@@ -159,7 +175,7 @@ test_that("Tests to derive NOECs",{
     expect_snapshot(glht(mod1,linfct = mcp(Dose="Dunnett"),alternative="less"))
   })
 
-  test_that("Two Sample t-test",{
+  it("Two Sample t-test",{
     y0<-c(0.120915680098082,0.136752501891969,0.145668808436602,0.131844763607024,0.149892124046466,0.133572261866272)
     y1<-c(0.131517109035102,0.117455425985384,0.130835155683102,0.12226548296818,0.127485057136569,0.128828137633933)
 
@@ -168,7 +184,7 @@ test_that("Tests to derive NOECs",{
     t.test(y1,y0, var.equal=TRUE, paired=FALSE, alternative="two.sided")
   })
 
-  test_that("Jonckheere Terpstra Test",{
+  it("Jonckheere Terpstra Test",{
     ## DescTools::JonckheereTerpstraTest()
 
 

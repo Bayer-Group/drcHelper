@@ -1,3 +1,6 @@
+## # FILE: tests/testthat/test_data_Helper.R
+
+
 #' Resolve the excel datasheet number issues
 #'
 #' The `simplifyTreatment` function is designed to handle and simplify
@@ -9,7 +12,7 @@
 #'
 #' @param trt a treatment vector, either factor or character
 #'
-#' @return a simplified vector, either a factor or a character vector, 
+#' @return a simplified vector, either a factor or a character vector,
 #' depending on x
 #' @export
 #'

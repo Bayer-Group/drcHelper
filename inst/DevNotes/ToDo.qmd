@@ -1,0 +1,13 @@
+TODO
+==================
+- [ ] fitting multiple assays in one run
+- [ ] group and hover not working for settings
+- [ ] hide more advance settings in separate tab?
+- [ ] build / fix report template
+- [ ] add inputs for fixed model parameters
+
+## Reminders
+
+- [ ] AWS update to the new version
+Existing domains using version 2023.03.3-547.pro5 can upgrade to 2024.04.2+764.pro1
+https://docs.aws.amazon.com/sagemaker/latest/dg/rstudio-version-upgrade.html#:~:text=Create%20a%20new%20domain%20from%20the%20AWS%20CLI,an%20existing%20domain%20to%20use%20the%202024.04.2%2B764.pro1%20version.

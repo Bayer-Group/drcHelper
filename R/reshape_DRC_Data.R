@@ -1,3 +1,7 @@
+## unit testing in test_helper_functions.R ###
+
+
+
 #' Change Treatment groups to numerical dose
 #'
 #' @param x treatment groups with numbers and "Control"
