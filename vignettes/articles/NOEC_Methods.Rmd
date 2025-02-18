@@ -31,6 +31,7 @@ shapiro.test(residuals(fit))
 bartlett.test(x ~ g - 1)
 anova(fit)
 ## works with object of class aov
+library(PMCMRplus)
 summary(tamhaneDunnettTest(fit, alternative = "greater"))
 ## summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="single-step"))
 ## p.adjust “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”, “none”
