@@ -18,8 +18,9 @@ using Penalized Quasi-Likelihood (PQL)."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
@@ -96,10 +97,22 @@ using Penalized Quasi-Likelihood (PQL).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Assuming `glmm_model` is a fitted glmmPQL model</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">glmm_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span><span class="va">yt</span> <span class="op">~</span> <span class="va">dose</span>,random<span class="op">=</span> <span class="op">~</span><span class="fl">1</span> <span class="op">|</span> <span class="va">Obs</span>,family<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">quasibinomial</a></span><span class="op">(</span>link<span class="op">=</span><span class="st">"logit"</span><span class="op">)</span>,data<span class="op">=</span><span class="va">pvi_example</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 6</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 7</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 8</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 9</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration 10</span>
 <span class="r-in"><span><span class="va">dose_result</span> <span class="op">&lt;-</span> <span class="fu">dose.p.glmmPQL</span><span class="op">(</span><span class="va">glmm_model</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'glmm_model' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dose_result</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'dose_result' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              Dose       SE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> p = 0.5: 21.22061 1.455262</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

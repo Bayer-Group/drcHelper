@@ -18,6 +18,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Quantal-Data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/System_Testing.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/TSK_method.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Trend-Testing.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/drcHelper.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/index.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/authors.html</loc></url>
@@ -31,12 +32,14 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/RSCABK.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/Tarone.test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/addECxCI.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/backCalcSE.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/calcNW.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/calcSteepnessOverlap.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/calcTaronesTest.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/calpha.test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/collembola_juveniles.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/contEndpoint.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/convert2Score.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/dose.p.glmmPQL.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcCompare.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcHelper-package.html</loc></url>
@@ -53,6 +56,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/mselect.ZG.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/mselect.plus.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/oecd201.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pavaMean.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.edList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.modList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prepDataRSCABS.html</loc></url>

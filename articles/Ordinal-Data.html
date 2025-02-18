@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>An example: RSCABS for Histopath Data • drcHelper</title>
+<title>Example Ordinal Data Analysis • drcHelper</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="An example: RSCABS for Histopath Data">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Example Ordinal Data Analysis">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -30,9 +30,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
@@ -85,7 +86,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>An example: RSCABS for Histopath Data</h1>
+      <h1>Example Ordinal Data Analysis</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/Ordinal-Data.Rmd" class="external-link"><code>vignettes/articles/Ordinal-Data.Rmd</code></a></small>
@@ -97,13 +98,928 @@
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
+<p>There is no routine procedures in regulatory frameworks for ordinal
+data analysis yet. For histopathological data, it is recommended to use
+RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to
+derive NOEALs. An alternative is MQJT.</p>
+<p>Plant visual injury data has been evaluated qualitatively and it is
+possible to analyze them quantitatively</p>
 </div>
 <div class="section level2">
-<h2 id="an-example-of-performing-the-rao-scott-adjusted-cochran-armitage-trend-test-by-slices-">An example of performing the Rao-Scott Adjusted Cochran-Armitage
-Trend Test by Slices.<a class="anchor" aria-label="anchor" href="#an-example-of-performing-the-rao-scott-adjusted-cochran-armitage-trend-test-by-slices-"></a>
+<h2 id="ordinal-data-in-general">Ordinal Data in General<a class="anchor" aria-label="anchor" href="#ordinal-data-in-general"></a>
 </h2>
-<p>RSCABS: designed to analyze histopathological results from standard
-toxicology experiments, for example the MEOGRT.</p>
+<p>From a statistical point view, ordinal data is a type of categorical
+data where the order matters, but the exact differences or distances
+between the categories are not defined. For example, survey responses
+like “satisfied,” “neutral,” and “dissatisfied”, ranking like 1st, 2nd,
+3rd, levels of education like high school, bachelor, master. Market
+research, psychology, health studies, and social sciences often use
+ordinal data.</p>
+<p>Since ordinal data doesn’t assume equal intervals, non-parametric
+methods are often used. Medians rather than means are often the basis of
+comparisons. Chi-Square test can be used to determine if there is a
+significant association between two categorical variables. Spearman’s
+Rank Correlation and Kendall’s tau are correlation measures that can
+assess the strength and direction of association between two ranked
+variables.</p>
+<p>Ordinal Regression is a somewhat complex method that can predict
+outcomes based on ordinal data. It helps understand how different
+factors influence rankings and the transition between the ordered
+categories.</p>
+<ul>
+<li>Proportional Odds Model: Coefficient (slopes) remains constant
+across all categories.</li>
+<li>Continuation Ratio Model: Model cumulative odds ratios.</li>
+<li>Adjacent Categories Model: useful when neighboring categories
+influence each other.</li>
+</ul>
+<p>Due to the limited information and potentially unequal intervals, it
+requires a clear understanding of its subtleties and complexities, and
+careful attentions when implementing regression modelling.</p>
+<p>In the ecotoxicology area, histopathology assessment and visual
+injury data are ranked categorical data.</p>
+</div>
+<div class="section level2">
+<h2 id="regression-approaches">Regression Approaches<a class="anchor" aria-label="anchor" href="#regression-approaches"></a>
+</h2>
+<p>Ordinal regression can be conducted using MASS::polr function or the
+function provided in GLMcat, which is an R package that encompasses lots
+of models specified in a similar way: (ratio, cdf, design: parallel or
+complete).</p>
+<p>When transforming the ordinal variable into percentages or
+proportions, it is also possible to model them as continuous data or
+using logitic regression with quasibinomial assumptions. The two
+approaches produce similar results when the data is behaving truly like
+a dose-response with overe-dispersed binomial distributions.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/textconnections.html" class="external-link">textConnection</a></span><span class="op">(</span><span class="st">"Obs    rep dose    yt  y0 </span></span>
+<span><span class="st">1   1   2   0.02021 0</span></span>
+<span><span class="st">2   2   2   0.02491 0</span></span>
+<span><span class="st">3   3   2   0.00760 0</span></span>
+<span><span class="st">4   5   2   0.04466 0</span></span>
+<span><span class="st">5   6   2   0.00037 0</span></span>
+<span><span class="st">6   8   2   0.05386 0</span></span>
+<span><span class="st">7   9   2   0.07205 0</span></span>
+<span><span class="st">8   10  2   0.01125 0</span></span>
+<span><span class="st">9   1   4   0.02011 0</span></span>
+<span><span class="st">10  7   4   0.09058 0</span></span>
+<span><span class="st">11  8   4   0.06255 0</span></span>
+<span><span class="st">12  10  8   0.09431 0</span></span>
+<span><span class="st">13  4   2   0.14060 A</span></span>
+<span><span class="st">14  7   2   0.22223 A</span></span>
+<span><span class="st">15  2   4   0.20943 A</span></span>
+<span><span class="st">16  3   4   0.20959 A</span></span>
+<span><span class="st">17  4   4   0.17305 A</span></span>
+<span><span class="st">18  9   4   0.11405 A</span></span>
+<span><span class="st">19  10  4   0.17668 A</span></span>
+<span><span class="st">20  1   8   0.12756 A</span></span>
+<span><span class="st">21  6   8   0.11478 A</span></span>
+<span><span class="st">22  6   32  0.20602 A</span></span>
+<span><span class="st">23  5   4   0.26650 B</span></span>
+<span><span class="st">24  6   4   0.27344 B</span></span>
+<span><span class="st">25  3   8   0.27021 B</span></span>
+<span><span class="st">26  5   8   0.30662 B</span></span>
+<span><span class="st">27  8   8   0.29319 B</span></span>
+<span><span class="st">28  9   8   0.37300 B</span></span>
+<span><span class="st">29  6   16  0.36224 B</span></span>
+<span><span class="st">30  9   16  0.31316 B</span></span>
+<span><span class="st">31  2   8   0.55845 C</span></span>
+<span><span class="st">32  4   8   0.44811 C</span></span>
+<span><span class="st">33  3   16  0.42677 C</span></span>
+<span><span class="st">34  3   32  0.52315 C</span></span>
+<span><span class="st">35  7   8   0.67080 D</span></span>
+<span><span class="st">36  2   16  0.71776 D</span></span>
+<span><span class="st">37  4   16  0.73038 D</span></span>
+<span><span class="st">38  5   16  0.64232 D</span></span>
+<span><span class="st">39  7   16  0.68720 D</span></span>
+<span><span class="st">40  8   16  0.61088 D</span></span>
+<span><span class="st">41  5   32  0.72342 D</span></span>
+<span><span class="st">42  8   32  0.63594 D</span></span>
+<span><span class="st">43  1   16  0.77171 E</span></span>
+<span><span class="st">44  10  16  0.74087 E</span></span>
+<span><span class="st">45  2   32  0.79477 E</span></span>
+<span><span class="st">46  4   32  0.88546 E</span></span>
+<span><span class="st">47  7   32  0.78002 E</span></span>
+<span><span class="st">48  9   32  0.81456 E</span></span>
+<span><span class="st">49  10  32  0.89465 E</span></span>
+<span><span class="st">50  1   32  0.96129 F</span></span>
+<span><span class="st">51  1   64  0.96127 F</span></span>
+<span><span class="st">52  2   64  0.91687 F</span></span>
+<span><span class="st">53  3   64  0.97204 F</span></span>
+<span><span class="st">54  4   64  0.99268 F</span></span>
+<span><span class="st">55  5   64  0.98935 F</span></span>
+<span><span class="st">56  6   64  0.96263 F</span></span>
+<span><span class="st">57  7   64  0.95435 F</span></span>
+<span><span class="st">58  8   64  0.92081 F</span></span>
+<span><span class="st">59  9   64  0.91776 F</span></span>
+<span><span class="st">60  10  64  0.99104 F"</span><span class="op">)</span>,header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>yy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html" class="external-link">mapvalues</a></span><span class="op">(</span><span class="va">y0</span>,from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="fl">30</span>,<span class="fl">50</span>,<span class="fl">70</span>,<span class="fl">90</span>,<span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>yy2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html" class="external-link">mapvalues</a></span><span class="op">(</span><span class="va">y0</span>,from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>,<span class="fl">0.18</span>,<span class="fl">0.34</span>,<span class="fl">0.50</span>,<span class="fl">0.66</span>,<span class="fl">0.82</span>,<span class="fl">0.95</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/ftable.html" class="external-link">ftable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">y0</span> <span class="op">+</span> <span class="va">dose</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span><span class="op">)</span> <span class="co">##%&gt;% gt::gt() ## as.data.frame(.) %&gt;% knitr::kable(.,digits = 3)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt;    dose  2  4  8 16 32 64</span></span>
+<span><span class="co">#&gt; y0                       </span></span>
+<span><span class="co">#&gt; 0        8  3  1  0  0  0</span></span>
+<span><span class="co">#&gt; A        2  5  2  0  1  0</span></span>
+<span><span class="co">#&gt; B        0  2  4  2  0  0</span></span>
+<span><span class="co">#&gt; C        0  0  2  1  1  0</span></span>
+<span><span class="co">#&gt; D        0  0  1  5  2  0</span></span>
+<span><span class="co">#&gt; E        0  0  0  2  5  0</span></span>
+<span><span class="co">#&gt; F        0  0  0  0  1 10</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span></span>
+<span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">y0</th>
+<th align="right">n</th>
+<th align="right">meany</th>
+<th align="right">meanyy2</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">12</td>
+<td align="right">0.042</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">10</td>
+<td align="right">0.169</td>
+<td align="right">0.18</td>
+</tr>
+<tr class="odd">
+<td align="left">B</td>
+<td align="right">8</td>
+<td align="right">0.307</td>
+<td align="right">0.34</td>
+</tr>
+<tr class="even">
+<td align="left">C</td>
+<td align="right">4</td>
+<td align="right">0.489</td>
+<td align="right">0.50</td>
+</tr>
+<tr class="odd">
+<td align="left">D</td>
+<td align="right">8</td>
+<td align="right">0.677</td>
+<td align="right">0.66</td>
+</tr>
+<tr class="even">
+<td align="left">E</td>
+<td align="right">7</td>
+<td align="right">0.812</td>
+<td align="right">0.82</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">11</td>
+<td align="right">0.958</td>
+<td align="right">0.95</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">dose</th>
+<th align="right">n</th>
+<th align="right">meany</th>
+<th align="right">meanyy</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">0.060</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">0.160</td>
+<td align="right">0.11</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">10</td>
+<td align="right">0.326</td>
+<td align="right">0.31</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="right">10</td>
+<td align="right">0.600</td>
+<td align="right">0.64</td>
+</tr>
+<tr class="odd">
+<td align="right">32</td>
+<td align="right">10</td>
+<td align="right">0.722</td>
+<td align="right">0.75</td>
+</tr>
+<tr class="even">
+<td align="right">64</td>
+<td align="right">10</td>
+<td align="right">0.958</td>
+<td align="right">1.00</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dattab_new</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dose</span>, y<span class="op">=</span><span class="va">yt</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"glm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family<span class="op">=</span><span class="st">"quasibinomial"</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y ~ log(x)"</span>,</span>
+<span>                       se <span class="op">=</span><span class="cn">TRUE</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## fit ordered logit model and store results 'm'</span></span>
+<span><span class="va">dattab_new</span> <span class="op">$</span><span class="va">y0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">polr</a></span><span class="op">(</span><span class="va">y0</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dattab_new</span>, Hess<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; MASS::polr(formula = y0 ~ log(dose), data = dattab_new, Hess = TRUE)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;           Value Std. Error t value</span></span>
+<span><span class="co">#&gt; log(dose) 3.465     0.4876   7.106</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Intercepts:</span></span>
+<span><span class="co">#&gt;     Value   Std. Error t value</span></span>
+<span><span class="co">#&gt; 0|A  4.0061  0.8091     4.9513</span></span>
+<span><span class="co">#&gt; A|B  6.3415  1.0283     6.1669</span></span>
+<span><span class="co">#&gt; B|C  8.1921  1.2395     6.6092</span></span>
+<span><span class="co">#&gt; C|D  9.1287  1.3489     6.7677</span></span>
+<span><span class="co">#&gt; D|E 10.9709  1.5691     6.9917</span></span>
+<span><span class="co">#&gt; E|F 12.9482  1.8234     7.1011</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual Deviance: 128.7906 </span></span>
+<span><span class="co">#&gt; AIC: 142.7906</span></span>
+<span><span class="va">ctable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## At ER50, the cumulative probability probability of the response being in a higher category is close to 1.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">ctable</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">ctable</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">12.18</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; log(dose)       0|A       A|B       B|C       C|D       D|E       E|F </span></span>
+<span><span class="co">#&gt; 0.9908438 0.9975973 0.9998653 0.9999875 0.9999963 0.9999997 1.0000000</span></span>
+<span><span class="co">## calculate and store p values</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">ctable</span><span class="op">[</span>, <span class="st">"t value"</span><span class="op">]</span><span class="op">)</span>, lower.tail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">*</span> <span class="fl">2</span></span>
+<span></span>
+<span><span class="co">## combined table</span></span>
+<span><span class="op">(</span><span class="va">ctable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">ctable</span>, <span class="st">"p value"</span> <span class="op">=</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               Value Std. Error  t value      p value</span></span>
+<span><span class="co">#&gt; log(dose)  3.465155  0.4876298 7.106117 1.193530e-12</span></span>
+<span><span class="co">#&gt; 0|A        4.006148  0.8091031 4.951344 7.370254e-07</span></span>
+<span><span class="co">#&gt; A|B        6.341529  1.0283150 6.166913 6.963590e-10</span></span>
+<span><span class="co">#&gt; B|C        8.192141  1.2395138 6.609156 3.865169e-11</span></span>
+<span><span class="co">#&gt; C|D        9.128696  1.3488680 6.767672 1.308710e-11</span></span>
+<span><span class="co">#&gt; D|E       10.970866  1.5691374 6.991654 2.716642e-12</span></span>
+<span><span class="co">#&gt; E|F       12.948174  1.8234117 7.101070 1.237950e-12</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span> <span class="co">## profiled CI</span></span>
+<span><span class="co">#&gt;    2.5 %   97.5 % </span></span>
+<span><span class="co">#&gt; 2.582836 4.504378</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">ci</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                       2.5 %   97.5 %</span></span>
+<span><span class="co">#&gt; log(dose) 31.98141 13.23462 90.41212</span></span>
+<span><span class="co">## OR and CI</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>OR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>, <span class="va">ci</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              OR       ci</span></span>
+<span><span class="co">#&gt; 2.5 %  31.98141 13.23462</span></span>
+<span><span class="co">#&gt; 97.5 % 31.98141 90.41212</span></span>
+<span></span>
+<span><span class="va">newdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>logdose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">phat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">m</span>, <span class="va">newdat</span>, type<span class="op">=</span><span class="st">"p"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              0            A           B           C          D            E</span></span>
+<span><span class="co">#&gt; 1 8.326166e-01 0.1483000019 0.016035611 0.001850927 0.00100702 0.0001635762</span></span>
+<span><span class="co">#&gt; 2 3.105443e-01 0.5126011687 0.144195119 0.019598385 0.01096824 0.0018025754</span></span>
+<span><span class="co">#&gt; 3 3.918687e-02 0.2573055374 0.431914336 0.144078094 0.10487831 0.0194406374</span></span>
+<span><span class="co">#&gt; 4 3.342916e-04 0.0031093320 0.018073161 0.031603441 0.20832988 0.4574198047</span></span>
+<span><span class="co">#&gt; 5 3.679470e-03 0.0330795765 0.158639125 0.187148646 0.41376767 0.1694853156</span></span>
+<span><span class="co">#&gt; 6 3.027903e-05 0.0002825179 0.001674417 0.003066947 0.02600507 0.1569497884</span></span>
+<span><span class="co">#&gt;              F</span></span>
+<span><span class="co">#&gt; 1 2.628958e-05</span></span>
+<span><span class="co">#&gt; 2 2.902582e-04</span></span>
+<span><span class="co">#&gt; 3 3.196213e-03</span></span>
+<span><span class="co">#&gt; 4 2.811301e-01</span></span>
+<span><span class="co">#&gt; 5 3.420020e-02</span></span>
+<span><span class="co">#&gt; 6 8.119910e-01</span></span>
+<span></span>
+<span><span class="va">phat</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">0</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+<th align="right">E</th>
+<th align="right">F</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.833</td>
+<td align="right">0.148</td>
+<td align="right">0.016</td>
+<td align="right">0.002</td>
+<td align="right">0.001</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="right">0.311</td>
+<td align="right">0.513</td>
+<td align="right">0.144</td>
+<td align="right">0.020</td>
+<td align="right">0.011</td>
+<td align="right">0.002</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="right">0.039</td>
+<td align="right">0.257</td>
+<td align="right">0.432</td>
+<td align="right">0.144</td>
+<td align="right">0.105</td>
+<td align="right">0.019</td>
+<td align="right">0.003</td>
+</tr>
+<tr class="even">
+<td align="right">0.000</td>
+<td align="right">0.003</td>
+<td align="right">0.018</td>
+<td align="right">0.032</td>
+<td align="right">0.208</td>
+<td align="right">0.457</td>
+<td align="right">0.281</td>
+</tr>
+<tr class="odd">
+<td align="right">0.004</td>
+<td align="right">0.033</td>
+<td align="right">0.159</td>
+<td align="right">0.187</td>
+<td align="right">0.414</td>
+<td align="right">0.169</td>
+<td align="right">0.034</td>
+</tr>
+<tr class="even">
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.002</td>
+<td align="right">0.003</td>
+<td align="right">0.026</td>
+<td align="right">0.157</td>
+<td align="right">0.812</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ylleonv/GLMcat" class="external-link">GLMcat</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>logdose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mod_ref_log_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GLMcat/man/glmcat.html" class="external-link">glmcat</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">y0</span> <span class="op">~</span> <span class="va">logdose</span>, ratio <span class="op">=</span> <span class="st">"reference"</span>, cdf <span class="op">=</span> <span class="st">"logistic"</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span>,ref<span class="op">=</span><span class="st">"0"</span>,parallel <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in glmcat(formula = y0 ~ logdose, ratio = "reference", cdf =</span></span>
+<span><span class="co">#&gt; "logistic", : The response variable is defined as an ordered variable. Recall</span></span>
+<span><span class="co">#&gt; that the the reference ratio is appropiate for nominal responses, while for</span></span>
+<span><span class="co">#&gt; ordinal responses the ratios to use are cumulative, sequential or adjacent.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod_ref_log_c</span><span class="op">)</span></span>
+<span><span class="co">#&gt; y0 ~ logdose</span></span>
+<span><span class="co">#&gt;                 ratio      cdf nobs niter    logLik</span></span>
+<span><span class="co">#&gt; Model info: reference logistic   60    15 -61.33542</span></span>
+<span><span class="co">#&gt;                 Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) A     -2.907      1.309  -2.221 0.026323 *  </span></span>
+<span><span class="co">#&gt; (Intercept) B     -5.398      1.835  -2.942 0.003260 ** </span></span>
+<span><span class="co">#&gt; (Intercept) C     -9.347      3.019  -3.096 0.001958 ** </span></span>
+<span><span class="co">#&gt; (Intercept) D    -10.923      3.065  -3.564 0.000366 ***</span></span>
+<span><span class="co">#&gt; (Intercept) E    -17.421      4.838  -3.600 0.000318 ***</span></span>
+<span><span class="co">#&gt; (Intercept) F   -118.572 109742.356  -0.001 0.999138    </span></span>
+<span><span class="co">#&gt; logdose A          2.179      0.993   2.194 0.028225 *  </span></span>
+<span><span class="co">#&gt; logdose B          3.415      1.177   2.901 0.003725 ** </span></span>
+<span><span class="co">#&gt; logdose C          4.803      1.504   3.194 0.001404 ** </span></span>
+<span><span class="co">#&gt; logdose D          5.633      1.499   3.758 0.000172 ***</span></span>
+<span><span class="co">#&gt; logdose E          7.692      1.895   4.058 4.94e-05 ***</span></span>
+<span><span class="co">#&gt; logdose F         36.404  31664.951   0.001 0.999083    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="op">(</span><span class="va">phat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">mod_ref_log_c</span>, <span class="va">newdat</span>, type<span class="op">=</span><span class="st">"prob"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 A            B            C            D            E</span></span>
+<span><span class="co">#&gt; [1,] 1.904456e-01 3.716346e-02 1.873707e-03 6.891895e-04 4.324730e-06</span></span>
+<span><span class="co">#&gt; [2,] 4.075170e-01 1.873256e-01 2.472185e-02 1.616443e-02 4.225492e-04</span></span>
+<span><span class="co">#&gt; [3,] 3.188563e-01 3.452649e-01 1.192710e-01 1.386298e-01 1.509628e-02</span></span>
+<span><span class="co">#&gt; [4,] 5.226961e-03 3.140645e-02 7.433584e-02 2.730262e-01 5.159543e-01</span></span>
+<span><span class="co">#&gt; [5,] 7.795418e-02 1.988396e-01 1.797976e-01 3.714905e-01 1.685225e-01</span></span>
+<span><span class="co">#&gt; [6,] 2.602312e-12 3.683282e-11 2.281986e-10 1.489914e-09 1.172910e-08</span></span>
+<span><span class="co">#&gt;                 F            0</span></span>
+<span><span class="co">#&gt; [1,] 2.238527e-41 7.698238e-01</span></span>
+<span><span class="co">#&gt; [2,] 9.621150e-31 3.638486e-01</span></span>
+<span><span class="co">#&gt; [3,] 1.512050e-20 6.288173e-02</span></span>
+<span><span class="co">#&gt; [4,] 1.000000e-01 5.029071e-05</span></span>
+<span><span class="co">#&gt; [5,] 7.425066e-11 3.395654e-03</span></span>
+<span><span class="co">#&gt; [6,] 1.000000e+00 5.662137e-15</span></span>
+<span><span class="va">phat</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+<th align="right">E</th>
+<th align="right">F</th>
+<th align="right">0</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.190</td>
+<td align="right">0.037</td>
+<td align="right">0.002</td>
+<td align="right">0.001</td>
+<td align="right">0.000</td>
+<td align="right">0.0</td>
+<td align="right">0.770</td>
+</tr>
+<tr class="even">
+<td align="right">0.408</td>
+<td align="right">0.187</td>
+<td align="right">0.025</td>
+<td align="right">0.016</td>
+<td align="right">0.000</td>
+<td align="right">0.0</td>
+<td align="right">0.364</td>
+</tr>
+<tr class="odd">
+<td align="right">0.319</td>
+<td align="right">0.345</td>
+<td align="right">0.119</td>
+<td align="right">0.139</td>
+<td align="right">0.015</td>
+<td align="right">0.0</td>
+<td align="right">0.063</td>
+</tr>
+<tr class="even">
+<td align="right">0.005</td>
+<td align="right">0.031</td>
+<td align="right">0.074</td>
+<td align="right">0.273</td>
+<td align="right">0.516</td>
+<td align="right">0.1</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="right">0.078</td>
+<td align="right">0.199</td>
+<td align="right">0.180</td>
+<td align="right">0.371</td>
+<td align="right">0.169</td>
+<td align="right">0.0</td>
+<td align="right">0.003</td>
+</tr>
+<tr class="even">
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">1.0</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co">## (phat &lt;- predict(object = mod_ref_log_c, newdat, type="linear.predictor"))</span></span>
+<span></span>
+<span><span class="va">mod_cum_logis</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GLMcat/man/glmcat.html" class="external-link">glmcat</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">y0</span> <span class="op">~</span> <span class="va">logdose</span>, ratio <span class="op">=</span> <span class="st">"cumulative"</span>, cdf <span class="op">=</span> <span class="st">"logistic"</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span>,parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod_cum_logis</span><span class="op">)</span></span>
+<span><span class="co">#&gt; y0 ~ logdose</span></span>
+<span><span class="co">#&gt;                  ratio      cdf nobs niter   logLik</span></span>
+<span><span class="co">#&gt; Model info: cumulative logistic   60     9 -64.3953</span></span>
+<span><span class="co">#&gt;               Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept) 0   4.0061     0.8142   4.920 8.64e-07 ***</span></span>
+<span><span class="co">#&gt; (Intercept) A   6.3415     1.0419   6.086 1.16e-09 ***</span></span>
+<span><span class="co">#&gt; (Intercept) B   8.1920     1.2583   6.510 7.50e-11 ***</span></span>
+<span><span class="co">#&gt; (Intercept) C   9.1286     1.3693   6.666 2.62e-11 ***</span></span>
+<span><span class="co">#&gt; (Intercept) D  10.9707     1.6005   6.854 7.16e-12 ***</span></span>
+<span><span class="co">#&gt; (Intercept) E  12.9479     1.8194   7.117 1.11e-12 ***</span></span>
+<span><span class="co">#&gt; logdose        -3.4651     0.4912  -7.054 1.74e-12 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">phat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">mod_cum_logis</span>, <span class="va">newdat</span>, type<span class="op">=</span><span class="st">"prob"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 0            A           B           C           D           E</span></span>
+<span><span class="co">#&gt; [1,] 8.326186e-01 0.1482975531 0.016035767 0.001851046 0.001007102 0.000163596</span></span>
+<span><span class="co">#&gt; [2,] 3.105557e-01 0.5125923926 0.144191357 0.019598856 0.010968693 0.001802725</span></span>
+<span><span class="co">#&gt; [3,] 3.919032e-02 0.2573138937 0.431903119 0.144076171 0.104878455 0.019441472</span></span>
+<span><span class="co">#&gt; [4,] 3.343480e-04 0.0031097342 0.018074387 0.031605029 0.208331116 0.457408504</span></span>
+<span><span class="co">#&gt; [5,] 3.679947e-03 0.0330824671 0.158642283 0.187148395 0.413758936 0.169485389</span></span>
+<span><span class="co">#&gt; [6,] 3.028531e-05 0.0002825654 0.001674598 0.003067232 0.026006412 0.156948672</span></span>
+<span><span class="co">#&gt;                 F</span></span>
+<span><span class="co">#&gt; [1,] 2.629451e-05</span></span>
+<span><span class="co">#&gt; [2,] 2.903015e-04</span></span>
+<span><span class="co">#&gt; [3,] 3.196565e-03</span></span>
+<span><span class="co">#&gt; [4,] 2.811369e-01</span></span>
+<span><span class="co">#&gt; [5,] 3.420258e-02</span></span>
+<span><span class="co">#&gt; [6,] 8.119902e-01</span></span>
+<span><span class="va">phat</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">0</th>
+<th align="right">A</th>
+<th align="right">B</th>
+<th align="right">C</th>
+<th align="right">D</th>
+<th align="right">E</th>
+<th align="right">F</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.833</td>
+<td align="right">0.148</td>
+<td align="right">0.016</td>
+<td align="right">0.002</td>
+<td align="right">0.001</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="right">0.311</td>
+<td align="right">0.513</td>
+<td align="right">0.144</td>
+<td align="right">0.020</td>
+<td align="right">0.011</td>
+<td align="right">0.002</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="right">0.039</td>
+<td align="right">0.257</td>
+<td align="right">0.432</td>
+<td align="right">0.144</td>
+<td align="right">0.105</td>
+<td align="right">0.019</td>
+<td align="right">0.003</td>
+</tr>
+<tr class="even">
+<td align="right">0.000</td>
+<td align="right">0.003</td>
+<td align="right">0.018</td>
+<td align="right">0.032</td>
+<td align="right">0.208</td>
+<td align="right">0.457</td>
+<td align="right">0.281</td>
+</tr>
+<tr class="odd">
+<td align="right">0.004</td>
+<td align="right">0.033</td>
+<td align="right">0.159</td>
+<td align="right">0.187</td>
+<td align="right">0.414</td>
+<td align="right">0.169</td>
+<td align="right">0.034</td>
+</tr>
+<tr class="even">
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.002</td>
+<td align="right">0.003</td>
+<td align="right">0.026</td>
+<td align="right">0.157</td>
+<td align="right">0.812</td>
+</tr>
+</tbody>
+</table>
+<div class="section level3">
+<h3 id="other-understanding-of-the-dataset">Other understanding of the dataset<a class="anchor" aria-label="anchor" href="#other-understanding-of-the-dataset"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit0</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">polr</a></span><span class="op">(</span><span class="va">y0</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>                      data <span class="op">=</span> <span class="va">dattab_new</span>,</span>
+<span>                      Hess<span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">fit0</span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; MASS::polr(formula = y0 ~ 1, data = dattab_new, Hess = T)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; No coefficients</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Intercepts:</span></span>
+<span><span class="co">#&gt;           0|A           A|B           B|C           C|D           D|E </span></span>
+<span><span class="co">#&gt; -1.386294e+00 -5.465462e-01 -1.793225e-06  2.682586e-01  8.472940e-01 </span></span>
+<span><span class="co">#&gt;           E|F </span></span>
+<span><span class="co">#&gt;  1.493920e+00 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual Deviance: 228.003 </span></span>
+<span><span class="co">#&gt; AIC: 240.003</span></span>
+<span><span class="co">#source("https://github.com/rwnahhas/RMPH_Resources/raw/main/Functions_rmph.R")</span></span>
+<span><span class="va">ilogit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">ilogit</span><span class="op">(</span><span class="va">fit0</span><span class="op">$</span><span class="va">zeta</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       0|A       A|B       B|C       C|D       D|E       E|F </span></span>
+<span><span class="co">#&gt; 0.2000001 0.3666661 0.4999996 0.5666653 0.6999992 0.8166659</span></span>
+<span></span>
+<span></span>
+<span><span class="va">sf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Y&gt;=1'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="st">'Y&gt;=2'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="st">'Y&gt;=3'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="st">'Y&gt;=4'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="st">'Y&gt;=5'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dattab_new</span>, <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, fun<span class="op">=</span><span class="va">sf</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  Length   Class    Mode </span></span>
+<span><span class="co">#&gt;       3 formula    call</span></span>
+<span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 2) ~ log(dose), family = "binomial", </span></span>
+<span><span class="co">#&gt;     data = dattab_new)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
+<span><span class="co">#&gt;      -3.305        2.874  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       60.05 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 29.19     AIC: 33.19</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 3) ~ log(dose), family = "binomial", </span></span>
+<span><span class="co">#&gt;     data = dattab_new)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
+<span><span class="co">#&gt;      -5.089        2.726  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       78.86 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 33.83     AIC: 37.83</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 4) ~ log(dose), family = "binomial", </span></span>
+<span><span class="co">#&gt;     data = dattab_new)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
+<span><span class="co">#&gt;      -7.440        3.067  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       83.18 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 30.69     AIC: 34.69</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="log-logistic-with-quasi-binomial">log-logistic with quasi-binomial<a class="anchor" aria-label="anchor" href="#log-logistic-with-quasi-binomial"></a>
+</h3>
+<ul>
+<li>TRUE ER50=12.18.</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>,data <span class="op">=</span> <span class="va">dattab_new</span>,family <span class="op">=</span> <span class="va">quasibinomial</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; glm(formula = yy2 ~ log(dose), family = quasibinomial, data = dattab_new)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  -3.5064     0.3132  -11.19 4.02e-16 ***</span></span>
+<span><span class="co">#&gt; log(dose)     1.3832     0.1171   11.81  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for quasibinomial family taken to be 0.1163524)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 31.8277  on 59  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance:  6.3595  on 58  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 5</span></span>
+<span><span class="va">ER50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">ER50</span></span>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;      12.617</span></span>
+<span><span class="fu"><a href="../reference/getEC50.html">getEC50</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     EC50    lower    upper       se</span></span>
+<span><span class="co">#&gt; 1 12.617 10.77038 14.78023 1.023657</span></span>
+<span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>,newdata <span class="op">=</span> <span class="va">dattab_new</span>,type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
+<span><span class="va">dattab_new</span><span class="op">$</span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">pred</span></span>
+<span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">)</span>,meanEst<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">y0</th>
+<th align="right">n</th>
+<th align="right">meany</th>
+<th align="right">meanyy2</th>
+<th align="right">meanEst</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">12</td>
+<td align="right">0.042</td>
+<td align="right">0.05</td>
+<td align="right">0.120</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">10</td>
+<td align="right">0.169</td>
+<td align="right">0.18</td>
+<td align="right">0.247</td>
+</tr>
+<tr class="odd">
+<td align="left">B</td>
+<td align="right">8</td>
+<td align="right">0.307</td>
+<td align="right">0.34</td>
+<td align="right">0.361</td>
+</tr>
+<tr class="even">
+<td align="left">C</td>
+<td align="right">4</td>
+<td align="right">0.489</td>
+<td align="right">0.50</td>
+<td align="right">0.515</td>
+</tr>
+<tr class="odd">
+<td align="left">D</td>
+<td align="right">8</td>
+<td align="right">0.677</td>
+<td align="right">0.66</td>
+<td align="right">0.603</td>
+</tr>
+<tr class="even">
+<td align="left">E</td>
+<td align="right">7</td>
+<td align="right">0.812</td>
+<td align="right">0.82</td>
+<td align="right">0.726</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">11</td>
+<td align="right">0.958</td>
+<td align="right">0.95</td>
+<td align="right">0.893</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co">## Consider Replicate effect</span></span>
+<span><span class="va">modr</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>,random<span class="op">=</span><span class="op">~</span><span class="fl">1</span><span class="op">|</span><span class="va">rep</span>,family<span class="op">=</span><span class="st">"quasibinomial"</span>,data<span class="op">=</span><span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="va">ER50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">modr</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">modr</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">modr</span><span class="op">$</span><span class="va">coefficients</span><span class="op">$</span><span class="va">fixed</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">/</span> <span class="va">modr</span><span class="op">$</span><span class="va">coefficients</span><span class="op">$</span><span class="va">fixed</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;    12.61695</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">modr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed-effects model fit by maximum likelihood</span></span>
+<span><span class="co">#&gt;   Data: dattab_new </span></span>
+<span><span class="co">#&gt;   AIC BIC logLik</span></span>
+<span><span class="co">#&gt;    NA  NA     NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Formula: ~1 | rep</span></span>
+<span><span class="co">#&gt;         (Intercept)  Residual</span></span>
+<span><span class="co">#&gt; StdDev:   0.2256918 0.3155037</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Variance function:</span></span>
+<span><span class="co">#&gt;  Structure: fixed weights</span></span>
+<span><span class="co">#&gt;  Formula: ~invwt </span></span>
+<span><span class="co">#&gt; Fixed effects:  yy2 ~ log(dose) </span></span>
+<span><span class="co">#&gt;                 Value Std.Error DF   t-value p-value</span></span>
+<span><span class="co">#&gt; (Intercept) -3.517527 0.3039553 49 -11.57251       0</span></span>
+<span><span class="co">#&gt; log(dose)    1.387562 0.1103306 49  12.57640       0</span></span>
+<span><span class="co">#&gt;  Correlation: </span></span>
+<span><span class="co">#&gt;           (Intr)</span></span>
+<span><span class="co">#&gt; log(dose) -0.907</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Standardized Within-Group Residuals:</span></span>
+<span><span class="co">#&gt;        Min         Q1        Med         Q3        Max </span></span>
+<span><span class="co">#&gt; -3.9592347 -0.3047297  0.1382668  0.4944066  1.9353183 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Observations: 60</span></span>
+<span><span class="co">#&gt; Number of Groups: 10</span></span>
+<span><span class="fu"><a href="../reference/getEC50.html">getEC50</a></span><span class="op">(</span><span class="va">modr</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              EC50    lower    upper       se</span></span>
+<span><span class="co">#&gt; p = 0.5: 12.61695 10.56476 15.06777 1.149772</span></span>
+<span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">modr</span>,newdata <span class="op">=</span> <span class="va">dattab_new</span>,type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
+<span><span class="va">dattab_new</span><span class="op">$</span><span class="va">predr</span> <span class="op">&lt;-</span> <span class="va">pred</span></span>
+<span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">)</span>,meanEst<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>,meanEstR<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">predr</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">y0</th>
+<th align="right">n</th>
+<th align="right">meany</th>
+<th align="right">meanyy2</th>
+<th align="right">meanEst</th>
+<th align="right">meanEstR</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">12</td>
+<td align="right">0.042</td>
+<td align="right">0.05</td>
+<td align="right">0.120</td>
+<td align="right">0.120</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">10</td>
+<td align="right">0.169</td>
+<td align="right">0.18</td>
+<td align="right">0.247</td>
+<td align="right">0.240</td>
+</tr>
+<tr class="odd">
+<td align="left">B</td>
+<td align="right">8</td>
+<td align="right">0.307</td>
+<td align="right">0.34</td>
+<td align="right">0.361</td>
+<td align="right">0.342</td>
+</tr>
+<tr class="even">
+<td align="left">C</td>
+<td align="right">4</td>
+<td align="right">0.489</td>
+<td align="right">0.50</td>
+<td align="right">0.515</td>
+<td align="right">0.517</td>
+</tr>
+<tr class="odd">
+<td align="left">D</td>
+<td align="right">8</td>
+<td align="right">0.677</td>
+<td align="right">0.66</td>
+<td align="right">0.603</td>
+<td align="right">0.620</td>
+</tr>
+<tr class="even">
+<td align="left">E</td>
+<td align="right">7</td>
+<td align="right">0.812</td>
+<td align="right">0.82</td>
+<td align="right">0.726</td>
+<td align="right">0.736</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">11</td>
+<td align="right">0.958</td>
+<td align="right">0.95</td>
+<td align="right">0.893</td>
+<td align="right">0.894</td>
+</tr>
+</tbody>
+</table>
+<p>Note that glmer and glmmPQL (based on lme from the nlme pacakge)
+differs in terms of parameter estimation algorithm and nlme is not
+optimized for dealing with crossed random effects, which are associated
+with a sparse design matrix. See more in the book from Pinheiro &amp;
+Bates.[^1]</p>
+</div>
+<div class="section level3">
+<h3 id="drm-ordinal">DRM Ordinal<a class="anchor" aria-label="anchor" href="#drm-ordinal"></a>
+</h3>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bmd</span><span class="op">)</span></span>
+<span><span class="va">dat_ord</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span>,<span class="va">dose</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">y0</span>,values_from <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span><span class="va">dat_ord</span> <span class="op">&lt;-</span> <span class="va">dat_ord</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">`0`</span>,<span class="va">`A`</span>,<span class="va">`B`</span>,<span class="va">`C`</span>,<span class="va">`D`</span>,<span class="va">`E`</span>,<span class="va">`F`</span><span class="op">)</span>,<span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,<span class="fl">0</span>,<span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>total<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">`0`</span>,<span class="va">`A`</span>,<span class="va">`B`</span>,<span class="va">`C`</span>,<span class="va">`D`</span>,<span class="va">`E`</span>,<span class="va">`F`</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mod_ord</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/bmd/man/drmOrdinal.html" class="external-link">drmOrdinal</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span><span class="op">)</span>,  weights<span class="op">=</span><span class="st">"total"</span>,dose <span class="op">=</span> <span class="st">"dose"</span>, data <span class="op">=</span> <span class="va">dat_ord</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_ord</span><span class="op">)</span> <span class="co"># uses ggplot</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/bmd/man/bmdOrdinal.html" class="external-link">bmdOrdinal</a></span><span class="op">(</span><span class="va">mod_ord</span>, bmr <span class="op">=</span> <span class="fl">0.5</span>, backgType <span class="op">=</span> <span class="st">"modelBased"</span>, def <span class="op">=</span> <span class="st">"excess"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   BMD      BMDL</span></span>
+<span><span class="co">#&gt; A+B+C+D+E+F  3.158208  2.298134</span></span>
+<span><span class="co">#&gt; B+C+D+E+F    6.467922  4.757317</span></span>
+<span><span class="co">#&gt; C+D+E+F     11.313719  8.507258</span></span>
+<span><span class="co">#&gt; D+E+F       14.947346 11.193140</span></span>
+<span><span class="co">#&gt; E+F         26.084222 20.202286</span></span>
+<span><span class="co">#&gt; F           35.967446 -1.757891</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="rscabs">RSCABS<a class="anchor" aria-label="anchor" href="#rscabs"></a>
+</h2>
+<p>Here we give an example of performing the Rao-Scott Adjusted
+Cochran-Armitage Trend Test by Slices. RSCABS is designed to analyze
+histopathological results from standard toxicology experiments, for
+example the MEOGRT.</p>
 <p>Steps in the testing procedure:</p>
 <p>1.The Cochran-Armitage (CA) trend test was used to test a set of
 organisms for an increase in the presences (score &gt; 0) or absence
@@ -120,63 +1036,15 @@ The RSCA test statistic is calculated based on these two groups. 4.
 Carry out a step-down procedure by excluding the highest treatment level
 in the analysis and recalculate the RSCA test statistic until the test
 stats is not significant or there is only control group left.</p>
-<div class="section level3">
-<h3 id="notes-on-rscabs">Notes on RSCABS<a class="anchor" aria-label="anchor" href="#notes-on-rscabs"></a>
-</h3>
-<ol style="list-style-type: decimal">
-<li>Select responses maximum value should be &gt; 0 and smaller than
-20??</li>
-<li>for each to be tested response/endpoints,
-<em>convert2score</em>
-</li>
-<li>for each to be tested response/endpoints, <em>prepDataRSCABS</em>,
-prepare the data into matrix/table format, treatment as column,
-replicate as row</li>
-<li>for each to be tested response/endpoints, <em>stepKRSCABS</em>.</li>
-</ol>
-<pre><code>$Gon_Asynch_Dev
-           Effect Treatment R.Score Statistic     P.Value Signif
-1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
-2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
-5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .</code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li>combine the results into a big matrix.</li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: drc</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: MASS</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## 'drc' has been loaded.</span></span></code></pre>
-<pre><code><span><span class="co">## Please cite R and 'drc' if used for a publication,</span></span></code></pre>
-<pre><code><span><span class="co">## for references type 'citation()' and 'citation('drc')'.</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Attaching package: 'drc'</span></span></code></pre>
-<pre><code><span><span class="co">## The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     gaussian, getInitial</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Prepare data</span></span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
+<span><span class="co"># Prepare data</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.5.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.4</span></span></code></pre>
-<pre><code><span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
-<span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
-<span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">select()</span> masks <span style="color: #0000BB;">MASS</span>::select()</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Use the conflicted package (<span style="color: #0000BB; font-style: italic;">&lt;http://conflicted.r-lib.org/&gt;</span>) to force all conflicts to become errors</span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exampleHistData"</span><span class="op">)</span></span>
 <span><span class="va">exampleHistData</span> <span class="op">&lt;-</span> <span class="va">exampleHistData</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">as_tibble</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.integer</span><span class="op">)</span>,<span class="va">as.numeric</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span></span>
 <span><span class="co">#Take the subset corresponding to F0-females of 16 weeks of age</span></span>
@@ -188,7 +1056,7 @@ replicate as row</li>
 <span><span class="co">#Run RSCABS </span></span>
 <span><span class="va">exampleResults</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/runRSCABS.html">runRSCABS</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span>,<span class="st">'Treatment'</span>,</span>
 <span>                          <span class="st">'Replicate'</span>,test.type<span class="op">=</span><span class="st">'RS'</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exampleResults</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
@@ -217,22 +1085,6 @@ replicate as row</li>
 <td align="left">.</td>
 </tr>
 <tr class="even">
-<td align="left">Gon_Incr_Oocyte_Atresia1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">1.330</td>
-<td align="right">0.092</td>
-<td align="left">.</td>
-</tr>
-<tr class="odd">
-<td align="left">Gon_Incr_Oocyte_Atresia2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
 <td align="left">Gon_Incr_Oocyte_Atresia2</td>
 <td align="right">5</td>
 <td align="right">2</td>
@@ -244,22 +1096,6 @@ replicate as row</li>
 <td align="left">Gon_Incr_Oocyte_Atresia3</td>
 <td align="right">5</td>
 <td align="right">3</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
-<td align="left">Gon_Incr_Oocyte_Atresia3</td>
-<td align="right">5</td>
-<td align="right">3</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
-</tr>
-<tr class="odd">
-<td align="left">Gon_Incr_Oocyte_Atresia4</td>
-<td align="right">5</td>
-<td align="right">4</td>
 <td align="right">1.231</td>
 <td align="right">0.109</td>
 <td align="left">.</td>
@@ -281,14 +1117,6 @@ replicate as row</li>
 <td align="left">.</td>
 </tr>
 <tr class="even">
-<td align="left">Gon_Proteinaceous_fluid1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">-1.410</td>
-<td align="right">0.079</td>
-<td align="left">.</td>
-</tr>
-<tr class="odd">
 <td align="left">Gon_Asynch_Dev1</td>
 <td align="right">5</td>
 <td align="right">1</td>
@@ -296,7 +1124,7 @@ replicate as row</li>
 <td align="right">0.004</td>
 <td align="left">**</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Gon_Asynch_Dev2</td>
 <td align="right">5</td>
 <td align="right">2</td>
@@ -304,14 +1132,6 @@ replicate as row</li>
 <td align="right">0.004</td>
 <td align="left">**</td>
 </tr>
-<tr class="odd">
-<td align="left">Kid_Tub_Mineralization1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">0.358</td>
-<td align="right">0.360</td>
-<td align="left">.</td>
-</tr>
 <tr class="even">
 <td align="left">Kid_Tub_Mineralization1</td>
 <td align="right">5</td>
@@ -324,22 +1144,6 @@ replicate as row</li>
 <td align="left">Kid_Tub_Mineralization2</td>
 <td align="right">5</td>
 <td align="right">2</td>
-<td align="right">-0.070</td>
-<td align="right">0.472</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
-<td align="left">Kid_Tub_Mineralization2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">-0.070</td>
-<td align="right">0.472</td>
-<td align="left">.</td>
-</tr>
-<tr class="odd">
-<td align="left">Kid_Tub_Dilation1</td>
-<td align="right">5</td>
-<td align="right">1</td>
 <td align="right">-0.070</td>
 <td align="right">0.472</td>
 <td align="left">.</td>
@@ -358,22 +1162,6 @@ replicate as row</li>
 <td align="right">2</td>
 <td align="right">-0.049</td>
 <td align="right">0.480</td>
-<td align="left">.</td>
-</tr>
-<tr class="even">
-<td align="left">Kid_Tub_Dilation2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">-0.049</td>
-<td align="right">0.480</td>
-<td align="left">.</td>
-</tr>
-<tr class="odd">
-<td align="left">Kid_Tub_Regeneration1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">-1.375</td>
-<td align="right">0.085</td>
 <td align="left">.</td>
 </tr>
 <tr class="even">
@@ -386,69 +1174,68 @@ replicate as row</li>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Gon_Asynch_Dev</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Data: Gon_Asynch_Dev"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># xlab&lt;-'Group'</span></span>
-<span><span class="co"># ylab&lt;-'Total Fish'</span></span>
-<span><span class="co"># main&lt;-'Example Graph for \n Example Data and Gon_Asynch_Dev'</span></span>
-<span><span class="co"># col&lt;-c('purple1','red3')</span></span>
-<span><span class="co"># Metric="Total"</span></span>
-<span><span class="co"># Lowest ="Include"</span></span>
-<span><span class="co"># # PlotParms&lt;-list()</span></span>
-<span><span class="co"># # PlotParms$xlab&lt;-'Group'</span></span>
-<span><span class="co"># # PlotParms$ylab&lt;-'Total Fish'</span></span>
-<span><span class="co"># # PlotParms$main&lt;-'Example Graph for \n Example Data and Gon_Asynch_Dev'</span></span>
-<span><span class="co"># # PlotParms$Colors&lt;-c('purple1','red3')</span></span>
-<span><span class="co"># plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Asynch_Dev",</span></span>
-<span><span class="co">#   Treatment="Treatment", Metric="Total", Lowest = "Include",</span></span>
-<span><span class="co">#   #PlotParms =PlotParms,</span></span>
-<span><span class="co">#   Format = NULL, File = NULL,</span></span>
-<span><span class="co">#   xlab=xlab,main=main,ylab=ylab,col=col)</span></span>
-<span><span class="co"># ####################</span></span>
-<span><span class="co"># col &lt;- c("purple","green","black")</span></span>
-<span><span class="co"># plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Incr_Oocyte_Atresia",</span></span>
-<span><span class="co">#   Treatment="Treatment", Metric="Total", Lowest = "Include",</span></span>
-<span><span class="co">#   #PlotParms =PlotParms, </span></span>
-<span><span class="co">#   Format = NULL, File = NULL,</span></span>
-<span><span class="co">#   xlab=xlab,main=main,ylab=ylab,col=col)</span></span>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">cids</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">]</span>,<span class="fl">2</span>,<span class="va">max</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cids</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">+</span><span class="va">cids</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,values_to <span class="op">=</span> <span class="st">"Response"</span>,names_to <span class="op">=</span> <span class="st">"Endpoint"</span><span class="op">)</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Histopath Data"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Endpoint</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-2.png" width="700"></p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'scales'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:purrr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     discard</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:readr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     col_factor</span></span>
 <span><span class="va">dat1</span> <span class="op">&lt;-</span> <span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">+</span><span class="va">cids</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,values_to <span class="op">=</span> <span class="st">"Response"</span>,names_to <span class="op">=</span> <span class="st">"Endpoint"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Endpoint</span>,<span class="va">Treatment</span>,<span class="va">Response</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>counts<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Endpoint</span>,<span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>total<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'Endpoint', 'Treatment'. You can override</span></span>
-<span><span class="co">#&gt; using the `.groups` argument.</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dat1</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">counts</span><span class="op">/</span><span class="va">total</span><span class="op">)</span>,stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Histopath Data"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Endpoint</span>,drop <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="va">percent</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
-</div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-3.png" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+<h2 id="multi-quantile-jt">Multi-quantile JT<a class="anchor" aria-label="anchor" href="#multi-quantile-jt"></a>
 </h2>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p>From: John Green, personal communication.</p>
+</div>
+<div class="section level2">
+<h2 id="function-notes">Function Notes<a class="anchor" aria-label="anchor" href="#function-notes"></a>
+</h2>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DependenciesGraphs</span><span class="op">)</span></span>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">funDependencies</span><span class="op">(</span><span class="st">"package:drcHelper"</span>, <span class="st">"runRSCABS"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># visualization</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="notes-on-rscabs-functions">Notes on RSCABS functions<a class="anchor" aria-label="anchor" href="#notes-on-rscabs-functions"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>Select responses maximum value should be &gt; 0 and smaller than
+20??</li>
+<li>for each to be tested response/endpoints,
+<em>convert2score</em>
+</li>
+<li>for each to be tested response/endpoints, <em>prepDataRSCABS</em>,
+prepare the data into matrix/table format, treatment as column,
+replicate as row</li>
+<li>for each to be tested response/endpoints, <em>stepKRSCABS</em>.</li>
+</ol>
+<p>The results look like below:</p>
+<pre><code>$Gon_Asynch_Dev
+           Effect Treatment R.Score Statistic     P.Value Signif
+1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
+2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
+5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>combine the results into a big matrix.</li>
+</ol>
+</div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -460,11 +1247,6 @@ Hoboken, New Jersey: John Wiley &amp; Sons, Inc.</li>
 Springer-Verlag.</li>
 <li><a href="http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/" class="external-link uri">http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/</a></li>
 </ul>
-</div>
-<div class="section level2">
-<h2 id="multi-quantile-jt">Multi-quantile JT<a class="anchor" aria-label="anchor" href="#multi-quantile-jt"></a>
-</h2>
-<p>From: John Green, personal communication.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

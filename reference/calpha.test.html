@@ -18,8 +18,9 @@ alternative of the beta-binomial distribution."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
@@ -120,10 +121,11 @@ Biometrika, 66(3): 585-590.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># For incidence data:</span></span></span>
-<span class="r-in"><span><span class="va">my_incidence</span> <span class="op">&lt;-</span> <span class="fu">incidence</span><span class="op">(</span><span class="va">tobacco_viruses</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in incidence(tobacco_viruses):</span> could not find function "incidence"</span>
-<span class="r-in"><span><span class="va">my_fisher</span> <span class="op">&lt;-</span> <span class="fu">agg_index</span><span class="op">(</span><span class="va">my_incidence</span>, method <span class="op">=</span> <span class="st">"fisher"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in agg_index(my_incidence, method = "fisher"):</span> could not find function "agg_index"</span>
+<span class="r-in"><span><span class="co"># my_incidence &lt;- epiphy::incidence(epiphy::tobacco_viruses)</span></span></span>
+<span class="r-in"><span><span class="co"># my_fisher &lt;- epiphy::agg_index(my_incidence, method = "fisher")</span></span></span>
+<span class="r-in"><span><span class="va">my_fisher</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/structure.html" class="external-link">structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>index <span class="op">=</span> <span class="fl">3.14396182555326</span>,</span></span>
+<span class="r-in"><span>name <span class="op">=</span> <span class="st">"Fisher's index of dispersion"</span>, flavor <span class="op">=</span> <span class="st">"incidence"</span>, N <span class="op">=</span> <span class="fl">75L</span>, n <span class="op">=</span> <span class="fl">40L</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fisher"</span>, <span class="st">"agg_index"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">calpha.test</span><span class="op">(</span><span class="va">my_fisher</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in calpha.test(my_fisher):</span> could not find function "calpha.test"</span>
 <span class="r-in"><span></span></span>

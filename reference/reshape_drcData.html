@@ -16,8 +16,9 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
@@ -85,7 +86,19 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="fu">reshape_drcData</span><span class="op">(</span><span class="va">collembola_juveniles</span><span class="op">)</span> <span class="co">## note collembola_juveniles is fake data.</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dat %&gt;% pivot_longer(-Replicates, names_to = "Treatment", values_to = "Response") %&gt;%     mutate(Dose = treatment2dose(Treatment)) %&gt;% filter(!is.na(Response)):</span> could not find function "%&gt;%"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: dplyr</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:MASS’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     select</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in pivot_longer(., -Replicates, names_to = "Treatment", values_to = "Response"):</span> could not find function "pivot_longer"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

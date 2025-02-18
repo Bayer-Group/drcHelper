@@ -30,9 +30,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
@@ -110,8 +111,9 @@
 <div class="section level2">
 <h2 id="model-comparison-criteria">Model Comparison Criteria<a class="anchor" aria-label="anchor" href="#model-comparison-criteria"></a>
 </h2>
-<p>Apart from generic model comparison criteria, EFSA has proposed to
-use the following two criteria</p>
+<p>Apart from generic model comparison criteria, like scaled residuals,
+visual fit, AIC, lack-of-fit test or goodness-of-fit test, etc., EFSA
+has proposed to use the following two criteria:</p>
 <p><strong>Normalized Width</strong></p>
 <table class="table">
 <thead><tr class="header">
@@ -136,12 +138,15 @@ use the following two criteria</p>
 <td align="left">Poor</td>
 </tr>
 <tr class="odd">
-<td align="left"><span class="math inline">\(&gt;2\)</span></td>
+<td align="left"><span class="math inline">\(\geq2\)</span></td>
 <td align="left">Bad</td>
 </tr>
 </tbody>
 </table>
+<p>Normalized width can be calculated by <code>calc</code></p>
 <p><strong>Overlapping of EC10, 20 and 50</strong></p>
+<p>Certainty of protection is classified based on the relationship
+between EC10 and EC20/EC50 confidence intervals</p>
 <table class="table">
 <colgroup>
 <col width="54%">
@@ -172,17 +177,48 @@ EC<span class="math inline">\(_{50,low}\)</span>
 </tr>
 </tbody>
 </table>
+<p><strong>Steepness of the curve</strong></p>
+<p>Steepness is defined as the ratio between EC<span class="math inline">\(_{10}\)</span> and EC<span class="math inline">\(_{50}\)</span>.</p>
+<p>The certainty of protection level and the steepness of the curves can
+be calculated by
+<code>calcSteepnessOverlap(mod = mod, trend = "Decrease")</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="bmd-guidance-2012-criteria">BMD Guidance 2012 Criteria<a class="anchor" aria-label="anchor" href="#bmd-guidance-2012-criteria"></a>
+<h2 id="model-selection-and-model-averaging">Model Selection and Model Averaging<a class="anchor" aria-label="anchor" href="#model-selection-and-model-averaging"></a>
 </h2>
 </div>
 <div class="section level2">
-<h2 id="bmd-guidance-2022-criteria">BMD Guidance 2022 Criteria<a class="anchor" aria-label="anchor" href="#bmd-guidance-2022-criteria"></a>
+<h2 id="additional-criteria-in-guidances">Additional Criteria in Guidances<a class="anchor" aria-label="anchor" href="#additional-criteria-in-guidances"></a>
 </h2>
+<div class="section level3">
+<h3 id="bm-guidance-2022-criteria">BM Guidance 2022 Criteria<a class="anchor" aria-label="anchor" href="#bm-guidance-2022-criteria"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="efsa-bmd-guidance-2012-criteria">EFSA BMD Guidance 2012 Criteria<a class="anchor" aria-label="anchor" href="#efsa-bmd-guidance-2012-criteria"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="efsa-bmd-guidance-2022-criteria">EFSA BMD Guidance 2022 Criteria<a class="anchor" aria-label="anchor" href="#efsa-bmd-guidance-2022-criteria"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="us-epa-bmds-criteria">US EPA BMDS Criteria<a class="anchor" aria-label="anchor" href="#us-epa-bmds-criteria"></a>
+</h3>
+<p>BMD:BMDL ratio is used in the BMDS program as part of its model
+choice criteria. It is an indicator of the uncertainty level (how much
+information is provided) on BMD given the experimental design assuming
+the model is correct. This is similar to NW criteria used by EFSA.</p>
+<ul>
+<li>a BMD:BMDL ratio of &gt;20 results in a model being placed in the
+“questionable” bin</li>
+<li>a BMD:BMDL ratio of &gt;5 result in a “caution” flag. User-specified
+modifications to this decision logic are also possible.</li>
+</ul>
+</div>
 </div>
 <div class="section level2">
-<h2 id="us-epa-bmds-criteria">US EPA BMDS Criteria<a class="anchor" aria-label="anchor" href="#us-epa-bmds-criteria"></a>
+<h2 id="test-guidelines">Test Guidelines<a class="anchor" aria-label="anchor" href="#test-guidelines"></a>
 </h2>
 <table class="table">
 <colgroup><col width="100%"></colgroup>

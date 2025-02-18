@@ -30,9 +30,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
@@ -94,13 +95,13 @@
 
     
     
-<p>This package includes a collection of helping functions for
-dose-response analysis that are generic and might be useful outside our
-own organization.</p>
-<p>There are lots of examples for doing various type of dose-response
-analysis. Pros and cons for different methods are illustrated.
-Verification or validation of certain functions from certain packages
-are also included.</p>
+<p>This R package is designed to facilitate robust statistical analyses,
+particularly in the realm of dose-response modeling. Our package
+provides a suite of tools and examples that enable users to analyze
+datasets effectively, leveraging various statistical methods to draw
+meaningful conclusions. Pros and cons for different methods are
+illustrated. Verification or validation of certain functions from
+certain packages are also included.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: drc</span></span>
@@ -114,32 +115,99 @@ are also included.</p>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
+<p>The website is built using the pkgdown framework. There are 4
+sections other than the function references page: Get started, Examples,
+Articles, and Validation.</p>
+<div class="section level2">
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p>In the <strong>Getting Started</strong> section, we introduce the
+main helper functions that serve as the foundation for your analyses.
+Here, you’ll find typical workflows that illustrate how to navigate
+through the functionalities of our package. It’s important to note that
+there are multiple approaches to analyzing a dataset, and the choice of
+method can significantly influence the results. When the dataset
+contains information with a degree of certainty, different analytical
+methods should converge on similar conclusions. Conversely, when the
+data lacks sufficient information to address a specific question,
+disparate methods may yield distinct and potentially conflicting
+results. Thus, characterizing uncertainty is a crucial component of any
+statistical analysis, and our package emphasizes this aspect throughout
+its functionalities.</p>
+<p>For routine analyses, we adopt the <strong>drc</strong> package as
+our core analysis tool, given its robust capabilities for dose-response
+modeling. However, we recognize that there are numerous other packages
+designed for similar analyses, such as <strong>drda</strong>,
+<strong>DoseFinding</strong>, and others. In the
+<strong>Articles</strong> section, we provide examples and reproduce
+analyses using these alternative packages, allowing users to explore
+different methodologies and gain insights into how similar analyses can
+be conducted across various frameworks. Additionally, for specific types
+of data, we offer supplementary analyses utilizing other testing or
+modeling approaches, ensuring a well-rounded perspective on statistical
+evaluation.</p>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<p>The <strong>Examples</strong> section showcases practical
+applications of our package’s functionalities, demonstrating how to
+implement analyses in real-world scenarios. These examples serve as a
+guide for users to replicate analyses and adapt them to their own
+datasets.</p>
+</div>
+<div class="section level2">
+<h2 id="articles">Articles<a class="anchor" aria-label="anchor" href="#articles"></a>
+</h2>
+<p>In the <strong>Articles</strong> section, we delve deeper into
+various topics related to dose-response analysis, providing insights,
+comparisons, and discussions on methodologies. This section aims to
+broaden your understanding of statistical approaches and their
+implications in research.</p>
+</div>
+<div class="section level2">
+<h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
+</h2>
+<p>Lastly, the <strong>Validation</strong> section outlines the
+validation processes employed within our package. Here, we discuss how
+we ensure the reliability and accuracy of the methods implemented,
+providing users with confidence in the results generated by our
+analyses.</p>
+</div>
 <div class="section level2">
 <h2 id="other-useful-packages">Other useful packages<a class="anchor" aria-label="anchor" href="#other-useful-packages"></a>
 </h2>
-<p>There are several packages I find useful for the statistical analysis
-of (eco)toxicological data.</p>
-<div class="section level3">
-<h3 id="ecotoxicology-package">ecotoxicology package<a class="anchor" aria-label="anchor" href="#ecotoxicology-package"></a>
-</h3>
+<p>There are several other packages I find useful for the statistical
+analysis of (eco)toxicological data.</p>
 <ul>
-<li><a href="https://cran.r-project.org/web/packages/ecotoxicology/index.html" class="external-link uri">https://cran.r-project.org/web/packages/ecotoxicology/index.html</a></li>
-</ul>
-<p>Implementation of the EPA’s Ecological Exposure Research Division
+<li>
+<p><a href="https://cran.r-project.org/web/packages/ecotoxicology/index.html" class="external-link">ecotoxicology
+package</a></p>
+<ul>
+<li>Implementation of the EPA’s Ecological Exposure Research Division
 (EERD) tools (discontinued in 1999) for Probit and Trimmed
-Spearman-Karber Analysis. Probit and Spearman-Karber methods from
-Finney’s book “Probit analysis a statistical treatment of the sigmoid
-response curve” with options for most accurate results or identical
-results to the book. Probit and all the tables from Finney’s book
-(code-generated, not copied) with the generating functions included.
-Control correction: Abbott, Schneider-Orelli, Henderson-Tilton,
+Spearman-Karber Analysis.</li>
+<li>Probit and all the tables from Finney’s book (code-generated, not
+copied) with the generating functions included.</li>
+<li>Control correction: Abbott, Schneider-Orelli, Henderson-Tilton,
 Sun-Shepard. Toxicity scales: Horsfall-Barratt, Archer, Gauhl-Stover,
-Fullerton-Olsen, etc.</p>
-</div>
-<div class="section level3">
-<h3 id="nsec-package">NSEC package<a class="anchor" aria-label="anchor" href="#nsec-package"></a>
-</h3>
-</div>
+Fullerton-Olsen, etc.</li>
+</ul>
+</li>
+<li><p><a href="https://cran.r-project.org/web/packages/drda/index.html" class="external-link">drda</a>
+- Has Gompertz and log-gompertz function - for both growth curves and
+dose-response analysis - Probably with better optimiation algorithms
+compared to drc.</p></li>
+<li>
+<p><a href="https://github.com/open-AIMS/bayesnec" class="external-link">bayesnec</a></p>
+<ul>
+<li>No-Effect-Concentration estimation</li>
+<li>NSEC: <a href="https://setac.onlinelibrary.wiley.com/doi/10.1002/etc.5610" class="external-link">Introducing
+the No-Significant-Effect Concentration</a>
+</li>
+</ul>
+</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
