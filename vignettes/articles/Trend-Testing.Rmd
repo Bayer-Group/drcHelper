@@ -1,0 +1,33 @@
+---
+title: "Trend Testing"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## Trend Test by Testing Linear and Quadratic Contrasts
+
+Generate mock data for testing
+
+```{r}
+library(ggplot2)
+mock_data <- data.frame(
+  treatment_var = factor(rep(c("Control", "Dose1", "Dose2", "Dose3"), each = 10)),
+  response_var = c(rnorm(10, mean = 5), rnorm(10, mean = 7), rnorm(10, mean = 8), rnorm(10, mean = 10))
+)
+ggplot(mock_data,aes(x=treatment_var,y=response_var))+geom_point()
+```
+
+```{r}
+result <- monotonicityTest(mock_data, "treatment_var", "response_var")
+result
+```
+

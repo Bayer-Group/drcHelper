@@ -20,7 +20,7 @@ development:
 authors:
   before: We define *authors* as those who are actively maintaining the code base,
     and *contributors* as those who made a significant contribution in the past. For
-    all acknowledgements, see the section in the [Home Page](https://effective-adventure-2klnejq.pages.github.io/).
+    all acknowledgements, see the section in the [Home Page](https://bayer-group.github.io/drcHelper/index.html).
   footer:
     roles:
     - aut
@@ -46,10 +46,12 @@ navbar:
     - github
   components:
     getstarted:
-      text: Get Started
+      text: Getting Started
       menu:
       - text: Introduction
         href: articles/Introduction.html
+      - text: Exampla Analysis Workflow
+        href: Example_Analysis_workflow.html
       - text: Package Dependencies
         href: articles/drcHelper.html
     reference:

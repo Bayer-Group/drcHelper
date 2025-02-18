@@ -51,24 +51,31 @@ describe("Williams test modified based on StatCharrms package works",{
 
 })
 
-describe("WilliamsTest_JG gives the same results as in PCPMRplus::williamsTest",{
+describe("WilliamsTest_JG gives the same results as in PMCMRplus::williamsTest",{
+  x <- c(106, 114, 116, 127, 145,
+         110, 125, 143, 148, 151,
+         136, 139, 149, 160, 174)
+  g <- gl(3,5)
+  levels(g) <- c("0", "I", "II")
+
+  ## Williams Test
+  library(PMCMRplus)
+  res1 <- williamsTest(x ~ g)
+  res2 <- williamsTest_JG(data.frame(Trt=x,Dose=g),"Trt", "Dose", "increasing")
   it("Using Sachs data",{
     ## Example from Sachs (1997, p. 402)
-    x <- c(106, 114, 116, 127, 145,
-           110, 125, 143, 148, 151,
-           136, 139, 149, 160, 174)
-    g <- gl(3,5)
-    levels(g) <- c("0", "I", "II")
 
-    ## Williams Test
-    res1 <- williamsTest(x ~ g)
-    res2 <- williamsTest_JG(data.frame(Trt=x,Dose=g),"Trt", "Dose", "increasing")
     expect_equal(as.numeric(res1$crit.value),
                  res2$TCrit[rev(1:length(res2$TCrit))],tolerance = 1e-3)
     expect_equal(rev(as.numeric(res1$statistic)),res2$Will,tolerance = 1e-3)
 
   })
   it("pava Mean calculated correctly",{
+    x <- c(106, 114, 116, 127, 145,
+           110, 125, 143, 148, 151,
+           136, 139, 149, 160, 174)
+    g <- gl(3,5)
+    levels(g) <- c("0", "I", "II")
     res3 <- pavaMean(x,g)
     expect_identical(rev(res3$pavaMean)[1:2],res2$Y.Tilde)
     expect_identical(rev(res3$SE.diff)[1:2],res2$Se.Diff,tolerance=1e-2)

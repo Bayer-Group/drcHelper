@@ -13,10 +13,13 @@ calcTaronesTest(mylist, referencerow = 2)
 \item{referencerow}{Unexposed row}
 }
 \value{
-string with results
+string with a list of p-values
 }
 \description{
 \code{calcTaronesTest} is used to test whether the OR in different strata are different
+}
+\details{
+modified the output to return p-values, need metafor package to run
 }
 \examples{
 mymatrix1 <- matrix(c(4,5,5,103),nrow=2,byrow=TRUE)

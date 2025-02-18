@@ -22,6 +22,8 @@ using Penalized Quasi-Likelihood (PQL).
 }
 \examples{
 # Assuming `glmm_model` is a fitted glmmPQL model
+library(MASS)
+glmm_model <- glmmPQL(yt ~ dose,random= ~1 | Obs,family= quasibinomial(link="logit"),data=pvi_example)
 dose_result <- dose.p.glmmPQL(glmm_model)
 print(dose_result)
 

@@ -237,7 +237,7 @@ ED.ZG <- ED.plus
 #' @param respCol
 #' @param doseCol
 #' @param data
-#' @param type 
+#' @param type
 #' @param additionalReliability additional reliability need to be calculated
 #'
 #' @return mselect.plus
@@ -358,7 +358,7 @@ mselect.ZG <- mselect.plus
 #'
 #' @return The function prints the `Comparison` and `EFSA` components
 #'  of the object by default.
-#' @S3method 
+#' @S3method
 #' @export
 print.drcComp <- function(x, ...) {
   x <- x[c("Comparison", "EFSA")]
@@ -448,7 +448,7 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
                 alpha = 0.2) +
     xlab(doseName) +
     ylab(responseName) +
-    geom_line(data = predData, aes_(x = as.name(doseName), y = ~p, 
+    geom_line(data = predData, aes_(x = as.name(doseName), y = ~p,
                                     col = ~Model)) +
     geom_point()
 
@@ -518,18 +518,22 @@ plot.edList <- function(edList, fctNames, ...) {
 #' @param obj Calculated ED 10, 20, 50 object if available.
 #' mod should set to be NULL in this case
 #' @param trend "Decrease" or "Increase"
-#' @param ... other parameters that wil be passed into ED.plus
+#' @param ... other parameters that will be passed into ED.plus
 #'
 #' @return a table with certainty of potection level and steepness of the models
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
+#'  datTn<- subset(oecd201,Time==72)
+#'  mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
+#'  calcSteepnessOverlap(mod = mod, trend = "Decrease")
+#' }
 calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI = "inv", ...) { # nolint: line_length_linter.
   # |Overlapping  Conditions                  |Certainty of the Protection Level | # nolint
   # |-----------------------------------------|----------------------------------| # nolint
   # |EC$_{10}$ < EC$_{20,low}$                | High                             | # nolint
   # |EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           | # nolint
-  # |EC$_{10}$ > EC$_{50,low}$                | Low                             | # nolint
+  # |EC$_{10}$ > EC$_{50,low}$                | Low                              | # nolint
   res <- rep(NA, 2)
   if (!is.null(mod) & !inherits(mod, "try-error")) {
     if (class(mod) == "drc") obj <- ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...)
@@ -567,7 +571,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
   }
 }
 
-#' ECx calculation together with normalized width proposed by EFSA SO. 
+#' ECx calculation together with normalized width proposed by EFSA SO.
 #'
 #' @param modList list of models
 #' @param respLev

@@ -4,7 +4,7 @@
 \alias{summaryZG}
 \title{Summary Williams Test results.}
 \usage{
-summaryZG(object, ...)
+summaryZG(object, verbose = F, ...)
 }
 \arguments{
 \item{object}{William test result object}
@@ -16,4 +16,16 @@ William test results
 }
 \description{
 Summary Williams Test results.
+}
+\examples{
+## Example from Sachs (1997, p. 402)
+x <- c(106, 114, 116, 127, 145,
+       110, 125, 143, 148, 151,
+       136, 139, 149, 160, 174)
+g <- gl(3,5)
+levels(g) <- c("0", "I", "II")
+
+## Williams Test
+res <- williamsTest(x ~ g)
+summaryZG(res) ## return a data frame instead of a list.
 }

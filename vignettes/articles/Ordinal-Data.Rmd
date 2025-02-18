@@ -1,16 +1,263 @@
 ---
-title: "An example: RSCABS for Histopath Data"
+title: "Example Ordinal Data Analysis"
 ---
 
 
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warnings = FALSE,
+  message = FALSE
+)
+library(tidyverse)
+```
+
 ## Background
 
+There is no routine procedures in regulatory frameworks for ordinal data analysis yet. For histopathological data, it is recommended to use RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to derive NOEALs. An alternative is MQJT.
+
+Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively 
+
+## Ordinal Data in General
+
+From a statistical point view, ordinal data is a type of categorical data where the order matters, but the exact differences or distances between the categories are not defined. For example, survey responses like "satisfied," "neutral," and "dissatisfied", ranking like 1st, 2nd, 3rd, levels of education like high school, bachelor, master. Market research, psychology, health studies, and social sciences often use ordinal data.
+
+Since ordinal data doesn't assume equal intervals, non-parametric methods are often used. Medians rather than means are often the basis of comparisons. Chi-Square test can be used to determine if there is a significant association between two categorical variables. Spearman's Rank Correlation and Kendall's tau are correlation measures that can assess the strength and direction of association between two ranked variables.
+
+Ordinal Regression is a somewhat complex method that can predict outcomes based on ordinal data. It helps understand how different factors influence rankings and the transition between the ordered categories.
+
+- Proportional Odds Model: Coefficient (slopes) remains constant across all categories. 
+- Continuation Ratio Model: Model cumulative odds ratios.
+- Adjacent Categories Model: useful when neighboring categories influence each other. 
+
+Due to the limited information and potentially unequal intervals, it requires a clear understanding of its subtleties and complexities, and careful attentions when implementing regression modelling. 
 
 
-## An example of performing the Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices.
+In the ecotoxicology area, histopathology assessment and visual injury data are ranked categorical data. 
+
+## Regression Approaches
+
+Ordinal regression can be conducted using MASS::polr function or the function provided in GLMcat, which is an R package that encompasses lots of models specified in a similar way: (ratio, cdf, design: parallel or complete).
+
+When transforming the ordinal variable into percentages or proportions, it is also possible to model them as continuous data or using logitic regression with quasibinomial assumptions. The two approaches produce similar results when the data is behaving truly like a dose-response with overe-dispersed binomial distributions.
+
+```{r}
+library(drcHelper)
+```
 
 
-RSCABS: designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT. 
+```{r collapse=TRUE}
+dattab_new <- read.table(textConnection("Obs	rep	dose	yt  y0 
+1	1	2	0.02021	0
+2	2	2	0.02491	0
+3	3	2	0.00760	0
+4	5	2	0.04466	0
+5	6	2	0.00037	0
+6	8	2	0.05386	0
+7	9	2	0.07205	0
+8	10	2	0.01125	0
+9	1	4	0.02011	0
+10	7	4	0.09058	0
+11	8	4	0.06255	0
+12	10	8	0.09431	0
+13	4	2	0.14060	A
+14	7	2	0.22223	A
+15	2	4	0.20943	A
+16	3	4	0.20959	A
+17	4	4	0.17305	A
+18	9	4	0.11405	A
+19	10	4	0.17668	A
+20	1	8	0.12756	A
+21	6	8	0.11478	A
+22	6	32	0.20602	A
+23	5	4	0.26650	B
+24	6	4	0.27344	B
+25	3	8	0.27021	B
+26	5	8	0.30662	B
+27	8	8	0.29319	B
+28	9	8	0.37300	B
+29	6	16	0.36224	B
+30	9	16	0.31316	B
+31	2	8	0.55845	C
+32	4	8	0.44811	C
+33	3	16	0.42677	C
+34	3	32	0.52315	C
+35	7	8	0.67080	D
+36	2	16	0.71776	D
+37	4	16	0.73038	D
+38	5	16	0.64232	D
+39	7	16	0.68720	D
+40	8	16	0.61088	D
+41	5	32	0.72342	D
+42	8	32	0.63594	D
+43	1	16	0.77171	E
+44	10	16	0.74087	E
+45	2	32	0.79477	E
+46	4	32	0.88546	E
+47	7	32	0.78002	E
+48	9	32	0.81456	E
+49	10	32	0.89465	E
+50	1	32	0.96129	F
+51	1	64	0.96127	F
+52	2	64	0.91687	F
+53	3	64	0.97204	F
+54	4	64	0.99268	F
+55	5	64	0.98935	F
+56	6	64	0.96263	F
+57	7	64	0.95435	F
+58	8	64	0.92081	F
+59	9	64	0.91776	F
+60	10	64	0.99104	F"),header = TRUE)
+```
+
+
+```{r collapse=FALSE}
+dattab_new <- dattab_new %>% mutate(yy = as.numeric(plyr::mapvalues(y0,from = c("0","A","B","C","D","E","F"),to = c(0,10,30,50,70,90,100)))/100) %>% mutate(yy2 = as.numeric(plyr::mapvalues(y0,from = c("0","A","B","C","D","E","F"),to = c(0.05,0.18,0.34,0.50,0.66,0.82,0.95))))
+
+ftable(xtabs(~ y0 + dose, data = dattab_new)) ##%>% gt::gt() ## as.data.frame(.) %>% knitr::kable(.,digits = 3)
+```
+
+
+```{r}
+
+
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2)) %>% knitr::kable(.,digits = 3)
+
+dattab_new %>% group_by(dose) %>% summarise(n=n(),meany=mean(yt),meanyy=mean(yy)) %>% knitr::kable(.,digits = 3)
+```
+
+
+```{r}
+ggplot(dattab_new,aes(x = dose, y=yt))+geom_point() +  geom_smooth(method="glm", method.args=list(family="quasibinomial"), formula="y ~ log(x)",
+                       se =TRUE, size=1.5)
+```
+
+
+
+```{r}
+## fit ordered logit model and store results 'm'
+dattab_new $y0 <- factor(dattab_new$y0, levels = c("0","A","B","C","D","E","F"),ordered = TRUE)
+
+m <- MASS::polr(y0 ~ log(dose), data = dattab_new, Hess=TRUE)
+summary(m)
+ctable <- coef(summary(m))
+
+## At ER50, the cumulative probability probability of the response being in a higher category is close to 1.
+plogis(ctable[,1] + ctable[,2]*log(12.18))
+## calculate and store p values
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+
+## combined table
+(ctable <- cbind(ctable, "p value" = p))
+
+(ci <- confint(m)) ## profiled CI
+
+exp(cbind(coef(m),t(ci)))
+## OR and CI
+exp(cbind(OR = coef(m), ci))
+
+newdat <- data.frame(dose = unique(dattab_new$dose)) %>% mutate(logdose = log(dose))
+(phat <- predict(object = m, newdat, type="p"))
+
+phat %>% knitr::kable(.,digits = 3)
+
+library(GLMcat)
+
+dattab_new <- dattab_new %>% mutate(logdose = log(dose))
+mod_ref_log_c <- glmcat(formula = y0 ~ logdose, ratio = "reference", cdf = "logistic", data = as.data.frame(dattab_new),ref="0",parallel = F)
+summary(mod_ref_log_c)
+(phat <- predict(object = mod_ref_log_c, newdat, type="prob"))
+phat %>% knitr::kable(.,digits = 3)
+
+## (phat <- predict(object = mod_ref_log_c, newdat, type="linear.predictor"))
+
+mod_cum_logis <- glmcat(formula = y0 ~ logdose, ratio = "cumulative", cdf = "logistic", data = as.data.frame(dattab_new),parallel = TRUE)
+summary(mod_cum_logis)
+
+(phat <- predict(object = mod_cum_logis, newdat, type="prob"))
+phat %>% knitr::kable(.,digits = 3)
+```
+
+### Other understanding of the dataset
+
+```{r}
+fit0 <- MASS::polr(y0 ~ 1,
+                      data = dattab_new,
+                      Hess= T)
+fit0
+#source("https://github.com/rwnahhas/RMPH_Resources/raw/main/Functions_rmph.R")
+ilogit <- function(x) exp(x)/(1+exp(x))
+ilogit(fit0$zeta)
+
+
+sf <- function(y) {
+  c('Y>=1' = qlogis(mean(y >= 1)),
+    'Y>=2' = qlogis(mean(y >= 2)),
+    'Y>=3' = qlogis(mean(y >= 3)),
+    'Y>=4' = qlogis(mean(y >= 4)),
+    'Y>=5' = qlogis(mean(y >= 5)))
+}
+
+(s <- with(dattab_new, summary(as.numeric(y0) ~ factor(dose), fun=sf)))
+
+
+glm(I(as.numeric(y0) >= 2) ~ log(dose), family="binomial", data = dattab_new)
+glm(I(as.numeric(y0) >= 3) ~ log(dose), family="binomial", data = dattab_new)
+glm(I(as.numeric(y0) >= 4) ~ log(dose), family="binomial", data = dattab_new)
+
+```
+
+
+### log-logistic with quasi-binomial
+
+- TRUE ER50=12.18.
+
+
+```{r warning=FALSE,message=FALSE}
+mod <- glm(yy2~log(dose),data = dattab_new,family = quasibinomial)
+summary(mod)
+ER50 <- exp(-coef(mod)[1]/coef(mod)[2])
+ER50
+getEC50(mod)
+pred <- predict(mod,newdata = dattab_new,type = "response")
+dattab_new$pred <- pred
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2),meanEst=mean(pred)) %>% knitr::kable(.,digits = 3)
+
+## Consider Replicate effect
+modr <- MASS::glmmPQL(yy2~ log(dose),random=~1|rep,family="quasibinomial",data=dattab_new)
+ER50 <- exp(-coef(modr)[1]/coef(modr)[2])
+exp(-modr$coefficients$fixed[1]/ modr$coefficients$fixed[2])
+summary(modr)
+getEC50(modr)
+pred <- predict(modr,newdata = dattab_new,type = "response")
+dattab_new$predr <- pred
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2),meanEst=mean(pred),meanEstR=mean(predr)) %>% knitr::kable(.,digits = 3)
+```
+
+
+Note that glmer and glmmPQL (based on lme from the nlme pacakge) differs in terms of parameter estimation algorithm and nlme is not optimized for dealing with crossed random effects, which are associated with a sparse design matrix. See more in the book from Pinheiro & Bates.[^1] 
+
+
+### DRM Ordinal
+
+```{r}
+library(drc)
+library(bmd)
+dat_ord <- dattab_new %>% group_by(y0,dose) %>% summarise(n=n()) %>% ungroup() %>% pivot_wider(names_from = y0,values_from = n)
+dat_ord <- dat_ord %>% mutate(across(c(`0`,`A`,`B`,`C`,`D`,`E`,`F`),~ifelse(is.na(.),0,.))) %>% mutate(total=rowSums(across(c(`0`,`A`,`B`,`C`,`D`,`E`,`F`))))
+mod_ord <- drmOrdinal(levels = unique(dattab_new$y0),  weights="total",dose = "dose", data = dat_ord, fct = LL.2())
+plot(mod_ord) # uses ggplot
+
+bmdOrdinal(mod_ord, bmr = 0.5, backgType = "modelBased", def = "excess")
+
+```
+
+
+## RSCABS
+
+Here we give an example of performing the Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices. RSCABS is designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT. 
 
 Steps in the testing procedure:
 
@@ -20,25 +267,6 @@ Steps in the testing procedure:
 4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left. 
 
 
-### Notes on RSCABS
-
-1. Select responses maximum value should be > 0 and smaller than 20??
-2. for each to be tested response/endpoints, *convert2score*
-3. for each to be tested response/endpoints, *prepDataRSCABS*, prepare the data into matrix/table format, treatment as column, replicate as row
-4. for each to be tested response/endpoints, *stepKRSCABS*.
-
-```
-$Gon_Asynch_Dev
-           Effect Treatment R.Score Statistic     P.Value Signif
-1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
-2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
-5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-```
-
-5. combine the results into a big matrix.
 
 ```{r}
 library(drcHelper)
@@ -51,7 +279,9 @@ library(tidyverse)
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -81,29 +311,7 @@ exampleResults %>% knitr::kable(.,digits=3)
 
 ```{r}
 ggplot(exampleHistData.Sub,aes(x=Treatment,fill=factor(Gon_Asynch_Dev)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Data: Gon_Asynch_Dev",subtitle = "subset: F2 generation, 15 week age and female")
-# xlab<-'Group'
-# ylab<-'Total Fish'
-# main<-'Example Graph for \n Example Data and Gon_Asynch_Dev'
-# col<-c('purple1','red3')
-# Metric="Total"
-# Lowest ="Include"
-# # PlotParms<-list()
-# # PlotParms$xlab<-'Group'
-# # PlotParms$ylab<-'Total Fish'
-# # PlotParms$main<-'Example Graph for \n Example Data and Gon_Asynch_Dev'
-# # PlotParms$Colors<-c('purple1','red3')
-# plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Asynch_Dev",
-# 	Treatment="Treatment", Metric="Total", Lowest = "Include",
-# 	#PlotParms =PlotParms,
-# 	Format = NULL, File = NULL,
-# 	xlab=xlab,main=main,ylab=ylab,col=col)
-# ####################
-# col <- c("purple","green","black")
-# plotRSCABS(Data=exampleHistData.Sub, Effect="Gon_Incr_Oocyte_Atresia",
-# 	Treatment="Treatment", Metric="Total", Lowest = "Include",
-# 	#PlotParms =PlotParms, 
-# 	Format = NULL, File = NULL,
-# 	xlab=xlab,main=main,ylab=ylab,col=col)
+
 cids <-which(apply(exampleHistData.Sub[,-(1:5)],2,max)>0)
 responses <- names(cids)
 
@@ -118,7 +326,17 @@ dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_
 ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
 ```
 
-## Dependencies
+
+
+## Multi-quantile JT
+
+From: John Green, personal communication.
+
+
+
+
+
+## Function Notes
 
 ```{r eval=FALSE}
 library(DependenciesGraphs)
@@ -129,6 +347,28 @@ plot(dep)
 
 ```
 
+### Notes on RSCABS functions
+
+1. Select responses maximum value should be > 0 and smaller than 20??
+2. for each to be tested response/endpoints, *convert2score*
+3. for each to be tested response/endpoints, *prepDataRSCABS*, prepare the data into matrix/table format, treatment as column, replicate as row
+4. for each to be tested response/endpoints, *stepKRSCABS*.
+
+The results look like below:
+
+```
+$Gon_Asynch_Dev
+           Effect Treatment R.Score Statistic     P.Value Signif
+1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
+2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
+5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+```
+
+5. combine the results into a big matrix.
+
 
 
 ## References
@@ -136,9 +376,3 @@ plot(dep)
 - Agresti, A. (2002) Categorical Data Analysis, Second Edition. Hoboken, New Jersey: John Wiley & Sons, Inc.
 - Harrell, F. E, (2001) Regression Modeling Strategies. New York: Springer-Verlag.
 - http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/
-
-## Multi-quantile JT
-
-From: John Green, personal communication.
-
-

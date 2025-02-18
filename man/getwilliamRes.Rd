@@ -4,11 +4,25 @@
 \alias{getwilliamRes}
 \title{get from william res accept/reject}
 \usage{
-getwilliamRes(william)
+getwilliamRes(william, n = NULL)
 }
 \arguments{
 \item{william}{william test results}
+
+\item{n}{number of hypotheses to be tested. description}
 }
 \description{
 get from william res accept/reject
+}
+\examples{
+## Example from Sachs (1997, p. 402)
+x <- c(106, 114, 116, 127, 145,
+       110, 125, 143, 148, 151,
+       136, 139, 149, 160, 174)
+g <- gl(3,5)
+levels(g) <- c("0", "I", "II")
+
+## Williams Test
+res <- williamsTest(x ~ g)
+getwilliamRes(res)
 }

@@ -26,7 +26,8 @@ treatment2dose <- function(x){
 #'
 #' @examples  reshape_drcData(collembola_juveniles) ## note collembola_juveniles is fake data.
 reshape_drcData <- function(dat){
-  dat <- dat%>%pivot_longer(-Replicates,names_to = "Treatment",values_to = "Response")%>%
+  require(dplyr)
+  dat <- dat %>% pivot_longer(-Replicates,names_to = "Treatment",values_to = "Response")%>%
     mutate(Dose=treatment2dose(Treatment))%>%filter(!is.na(Response))
   return(dat)
 }

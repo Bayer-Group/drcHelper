@@ -4,6 +4,8 @@ description: |
   General ethods for NOEC calculations for dose-response studies
 date: December 4, 2024
 author: "Sarah Baumert, Zhenglei Gao"
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -14,7 +16,29 @@ Dunnett's test is a multiple comparison test for determining significant differe
 
 There are several packages providing function for the calculation of the Dunnett’s test. The function "DunnettTest` from the library `DescTools` is calculating correct results for the "two.sided" direction. The function `dunnettTest` from the library `PMCMRplus` can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of `DunnettTest` from the library “DescTools`. The function 
 
+## Tamhane-Dunnett's Test
 
+For many-to-one comparisons in an one-factorial layout with normally distributed residuals and unequal variances Tamhane-Dunnett's test can be used.
+
+```{r}
+set.seed(245)
+mn <- c(1, 2, 2^2, 2^3, 2^4)
+x <- rep(mn, each=5) + rnorm(25)
+g <- factor(rep(1:5, each=5))
+
+fit <- aov(x ~ g - 1)
+shapiro.test(residuals(fit))
+bartlett.test(x ~ g - 1)
+anova(fit)
+## works with object of class aov
+summary(tamhaneDunnettTest(fit, alternative = "greater"))
+## summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="single-step"))
+## p.adjust “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”, “none”
+summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="holm"))
+DescTools::DunnettTest(x~g, alternative = "greater") ## alternative is not taking effect in this case
+PMCMRplus::dunnettTest(x~g)
+PMCMRplus::dunnettTest(x~g, alternative = "greater")
+```
 
 
 

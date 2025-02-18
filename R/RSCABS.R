@@ -81,11 +81,11 @@ runRSCABS <- function(Data,Treatment,Replicate='',Effects='',test.type='RS'){
   options(warn=0) #turn on warnings
 
 
-  #Need to remove factors
+  #Need to remove factors,done 01.2025,ZG
   #Prep Data
 
-  ##browser()
   Data.Prep<-sapply(c('&Fill#',Effects),prepDataRSCABS,Data=Data,Treatment=Treatment,Replicate=Replicate)
+
   Results.Raw<-sapply(c('&Fill#',Effects),stepKRSCABS,Data=Data.Prep,Treatment=Treatment,Replicate=Replicate,test.type=test.type)
   Results<-do.call("rbind", lapply(Results.Raw, data.frame, stringsAsFactors = FALSE))
 
@@ -138,7 +138,7 @@ RSCABK <-
   function(x.i.j,n.i.j,m.i,TestK,test.type){
     #This function is called for the detailed results functions
     #This is just for 1 slice
-    #' @export
+
     K=1
     #Variable names are the same as in Rao and Scott 1992
 
@@ -200,7 +200,13 @@ RSCABK <-
   }
 
 
-
+#' Convert Values to Scores
+#'
+#' Converts any non-positive numbers to NA.
+#'
+#' @param Dvec A numeric vector to be converted.
+#'
+#' @return A numeric vector with non-positive values set to NA.
 convert2Score <-
   function(Dvec){
     #This Function will convert any object that is not zero or a positive number to NA
@@ -270,7 +276,7 @@ prepDataRSCABS <-
       return()
     }
     #Replicates are rows, Treatment are columns  [Replicate,Treatment]
-
+    if(!is.factor(Data[,Replicate])) Data[,Replicate] <- factor(Data[,Replicate])
     n.i.j<-xtabs( ~Data[[Replicate]]+Data[[Treatment]])
     m.i<-apply(n.i.j,2,function(Vec){
       if (length(which(Vec==0))>0){
@@ -284,7 +290,9 @@ prepDataRSCABS <-
 
     x.i.j<-array(dim=c(dim(n.i.j)[1],dim(n.i.j)[2],K.max)) #Declare x.i.j , frequency array of scores k or larger
     #Each k level is on the 3rd dimension
+    ## browser()
     for (K in 1:K.max){
+
       x.i.j[ , ,K]<-xtabs( ~Data[[Replicate]]+Data[[Treatment]],subset=Data[ ,Effect]>=K)
     }
     RSCABS.Prep.Data<-list(x.i.j=x.i.j,n.i.j=n.i.j,m.i=m.i,K.max=K.max)
@@ -319,7 +327,8 @@ stepDownRSCABS <-
       Result<-RSCABK(x.i.j.K,n.i.j,m.i,TestK,test.type=test.type)
 
       #The step down
-      Next<- Result['P-Value']>0.05 | dim(x.i.j.K)[2]<=2 #Stop conditions of too high of p.val or 2 treatments
+      Next<- Result['P-Value']>0.05 | dim(x.i.j.K)[2]<=2 #Stop conditions of
+      ## too high of p.val or 2 treatments
       x.i.j.K<-x.i.j.K[ ,-dim(x.i.j.K)[2]]
       n.i.j<-n.i.j[ ,-dim(n.i.j)[2]]
       m.i<-m.i[-length(m.i)]
@@ -327,7 +336,7 @@ stepDownRSCABS <-
     }
 
 
-    Result.K<-rbind(Result.K, as.data.frame(Result))
+    ## Result.K<-rbind(Result.K, as.data.frame(Result))
 
     Effect<-paste(Effect,TestK,sep='')
     Result.K<-cbind(Effect,Result.K)

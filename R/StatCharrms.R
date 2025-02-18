@@ -3,7 +3,8 @@
 ## Original package licence is License: CC0, which means no copyrights reserved. However,
 ## the authors and the archive link are kept in this file so the source can be traced back.
 
-
+## unit testing: test_StatCharrms.R
+## test_williamsSummary.R
 
 #' Williams Test from the StatCharrms Package
 #'

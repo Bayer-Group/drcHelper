@@ -4,7 +4,7 @@
 \alias{getEC50}
 \title{Get the EC50 Estimate from a Model}
 \usage{
-getEC50(mod)
+getEC50(mod, approximate = FALSE)
 }
 \arguments{
 \item{mod}{A fitted model object. This can be of class "glm" or "glmmPQL", or other models compatible with the \code{ED} function.}
@@ -22,6 +22,7 @@ from a fitted model. It supports generalized linear models (GLMs) and generalize
 }
 \examples{
 # Assuming `fit` is a fitted glm model
+fit <- glm(yt ~ log(dose),family= quasibinomial(link="logit"),data=pvi_example)
 ec50_result <- getEC50(fit)
 print(ec50_result)
 

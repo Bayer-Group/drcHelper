@@ -3,6 +3,9 @@
 ## Original package licence is License: CC0, which means no copyrights reserved. However,
 ## the authors and the archive link are kept in this file so the source can be traced back.
 
+## Unit Testing: test_TrendTeset.R
+
+
 #' Testing Monotonicity
 #'
 #' @param Data Data frame

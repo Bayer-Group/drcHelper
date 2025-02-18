@@ -30,6 +30,7 @@
 #' levels(g) <- c("0", "I", "II")
 #' pavaMean(x,g)
 pavaMean <- function(x,g,alternative = "greater"){
+  require(PMCMRplus)
   alternative <- match.arg(alternative, choices = c("greater", "less"))
   xold <- x
   if (alternative == "less") {
@@ -45,8 +46,10 @@ pavaMean <- function(x,g,alternative = "greater"){
   df <- N - k
   s2i <- tapply(x, g, var)
   s2in <- 1/df * sum(s2i * (ni - 1))
-  xiiso <- .Fortran("pava", y = as.double(xi), w = as.double(ni),
-                    kt = integer(k), n = as.integer(k))$y
+  # browser()
+  # xiiso <- .Fortran("pava", y = as.double(xi), w = as.double(ni),
+  #                   kt = integer(k), n = as.integer(k))$y
+  xiiso <- Iso::pava(xi,ni)
   mui <- rep(NA, k)
   for (i in 1:k) {
     v <- k

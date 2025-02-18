@@ -38,8 +38,11 @@ for incidence data.
 }
 \examples{
 # For incidence data:
-my_incidence <- incidence(tobacco_viruses)
-my_fisher <- agg_index(my_incidence, method = "fisher")
+# my_incidence <- epiphy::incidence(epiphy::tobacco_viruses)
+# my_fisher <- epiphy::agg_index(my_incidence, method = "fisher")
+my_fisher <- structure(list(index = 3.14396182555326,
+name = "Fisher's index of dispersion", flavor = "incidence", N = 75L, n = 40L),
+class = c("fisher", "agg_index"))
 calpha.test(my_fisher)
 
 }

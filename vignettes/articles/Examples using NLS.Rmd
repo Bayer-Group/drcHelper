@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This article demonstrates how to use nls function to fit a dose-response model, taken from ggprism package.
+This article demonstrates how to use nls function to fit a dose-response model, reproduced from ggprism package.
 
 ```{r setup}
 library(drcHelper)

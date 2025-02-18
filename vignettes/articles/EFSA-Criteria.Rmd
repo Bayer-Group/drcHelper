@@ -16,7 +16,7 @@ library(drcHelper)
 
 ## Model Comparison Criteria
 
-Apart from generic model comparison criteria, EFSA has proposed to use the following two criteria 
+Apart from generic model comparison criteria, like scaled residuals, visual fit, AIC, lack-of-fit test or goodness-of-fit test, etc., EFSA has proposed to use the following two criteria: 
 
 **Normalized Width**
 
@@ -26,10 +26,14 @@ Apart from generic model comparison criteria, EFSA has proposed to use the follo
 |$<0.5$ | Good     |
 |$<1$   | Fair     |
 |$<2$   | Poor     |
-|$>2$ | Bad      |
+|$\geq2$ | Bad      |
+
+
+Normalized width can be calculated by `calc`
 
 **Overlapping of EC10, 20 and 50**
 
+Certainty of protection is classified based on the relationship between EC10 and EC20/EC50 confidence intervals
 
 |Overlapping  Conditions                  |Certainty of the Protection Level |
 |:----------------------------------------|:---------------------------------|
@@ -38,20 +42,36 @@ Apart from generic model comparison criteria, EFSA has proposed to use the follo
 |EC$_{10}$ > EC$_{50,low}$                | Low                              |
 
 
+**Steepness of the curve**
+
+Steepness is defined as the ratio between EC$_{10}$ and EC$_{50}$.
+
+The certainty of protection level and the steepness of the curves can be calculated by `calcSteepnessOverlap(mod = mod, trend = "Decrease")`.
 
 
-## BMD Guidance 2012 Criteria
-
-## BMD Guidance 2022 Criteria
-
-## US EPA BMDS Criteria
+## Model Selection and Model Averaging
 
 
+## Additional Criteria in Guidances
+
+### BM Guidance 2022 Criteria
+
+### EFSA BMD Guidance 2012 Criteria
+
+### EFSA BMD Guidance 2022 Criteria
+
+### US EPA BMDS Criteria
+
+BMD:BMDL ratio is used in the BMDS program as part of its model choice criteria. It is an indicator of the uncertainty level (how much information is provided) on BMD given the experimental design assuming the model is correct. This is similar to NW criteria used by EFSA. 
+
+- a BMD:BMDL ratio of >20 results in a model being placed in the “questionable” bin
+- a BMD:BMDL ratio of >5 result in a "caution" flag. 
+User-specified modifications to this decision logic are also possible.
 
 
 
 
-
+## Test Guidelines
 
 | Possible Guidelines                                                                                                       |
 |:--------------------------------------------------------------------------------------------------------------------------|
