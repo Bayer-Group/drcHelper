@@ -1,0 +1,41 @@
+---
+title: "Equivalence Testing"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## Introduction
+
+The null and alternative hypotheses in equivalence tests are
+
+$$
+H_0
+$$
+ 
+
+## An example using chick weights dataset
+
+```{r}
+library(equivUMP)
+```
+
+```{r}
+  # compare two feed from chickwts dataset
+  data("chickwts")
+  chickwts2 <- chickwts[chickwts$feed %in% c("linseed", "soybean"),]
+  chickwts2$feed <- droplevels(chickwts2$feed)
+
+  # similar but cannot be shown to be equivalent up to 0.5 sigma at 0.05 level^
+  plot(weight ~ feed, data = chickwts2)
+  equiv.test(weight ~ feed, data = chickwts2, eps = 0.5)
+```
+
