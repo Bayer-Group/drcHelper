@@ -37,7 +37,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
-    <li><a class="dropdown-item" href="../Example_Analysis_workflow.html">Exampla Analysis Workflow</a></li>
+    <li><a class="dropdown-item" href="../Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
@@ -103,6 +103,58 @@ Zhenglei Gao</h4>
     
     
 <div class="section level2">
+<h2 id="noec-in-general">NOEC in General<a class="anchor" aria-label="anchor" href="#noec-in-general"></a>
+</h2>
+<p>The NOEC (No Observed Effect Concentration) is a critical value in
+ecotoxicology, representing the highest concentration of a substance
+that does not produce a statistically significant effect on the test
+organisms compared to a control group.</p>
+<p>It is relatively straightforward to calulate and intepret NOEC, and
+it is widely used and accepted in the regulatory world. However, it is
+also criticized for its limitations:</p>
+<ol style="list-style-type: decimal">
+<li>It focuses only on the single concentration without statistically
+significant adverse effects that was tested in the study, potentially
+overlooking the information in the complete dose-response study.</li>
+<li>The observed responses at the NOEC vary between studies, making it
+harder to compare studies as ECx values.</li>
+<li>NOEC approach does not take the test concentrations as continuous
+variable, therefore not allow the estimation/prediction of response at
+any test concentrations.</li>
+<li>It is heavily impacted by the sample size and test concentration
+selections. Poor experimental design may yield high NOEC due to
+decreased statistical sensitivity, which is not desired in a regulatory
+context.</li>
+</ol>
+<div class="section level3">
+<h3 id="methods-for-deriving-noec">Methods for deriving NOEC<a class="anchor" aria-label="anchor" href="#methods-for-deriving-noec"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>Dunnett’s Test: used to compare multiple treatment groups against a
+control group while controlling for Type I error,</li>
+<li>Step-Down Williams’ test: used to identify a significant trend.</li>
+<li>Non-parametric tests: like Dunn’s test after Kruskal-Wallis test or
+step-down Jonckheere-Terpstra trend test.</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="dealing-with-inhomogenous-variance">Dealing with inhomogenous variance<a class="anchor" aria-label="anchor" href="#dealing-with-inhomogenous-variance"></a>
+</h3>
+<p>There are several ways to deal with inhomogeneous variances.</p>
+<ol style="list-style-type: decimal">
+<li>Welch’s ANOVA (an adaptation of ANOVA that dose not assume equal
+variance) followed by Dunnett’s test with inhomogeneous variances.</li>
+<li>Robust statistical techniques such as sandwich standard error
+estimations.</li>
+<li>Bootstrapping can be used to estimate confidence intervals for NOEC
+without relying on normality assumptions.</li>
+<li>Applying data transformations can stablize variances and meet the
+assumptions of parametric tests. However, this increases the complexity
+of results interpretation and should be avoided if possible.</li>
+</ol>
+</div>
+</div>
+<div class="section level2">
 <h2 id="dunnet-tests">Dunnet Tests<a class="anchor" aria-label="anchor" href="#dunnet-tests"></a>
 </h2>
 <p>Dunnett’s test is a multiple comparison test for determining
@@ -112,8 +164,7 @@ variance. Dunnett’s test is robust to slight violations of the normality
 and variance homogeneity assumptions.</p>
 <p>There are several packages providing function for the calculation of
 the Dunnett’s test. The function
-“DunnettTest<code>from the library</code>DescTools<code>is calculating correct results for the "two.sided" direction. The function</code>dunnettTest<code>from the library</code>PMCMRplus<code>can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of</code>DunnettTest<code>from the library “DescTools</code>.
-The function</p>
+“DunnettTest<code>from the library</code>DescTools<code>is calculating correct results for the "two.sided" direction. The function</code>dunnettTest<code>from the library</code>PMCMRplus<code>can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of</code>DunnettTest<code>from the library “DescTools</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="tamhane-dunnetts-test">Tamhane-Dunnett’s Test<a class="anchor" aria-label="anchor" href="#tamhane-dunnetts-test"></a>
@@ -229,9 +280,21 @@ be used.</p>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## P value adjustment method: single-step</span></span></code></pre>
 <pre><code><span><span class="co">## alternative hypothesis: greater</span></span></code></pre>
-<p>DUNNETT C. W. (1955): A multiple comparison procedure for comparing
+</div>
+<div class="section level2">
+<h2 id="williams-trend-test">Williams’ trend test<a class="anchor" aria-label="anchor" href="#williams-trend-test"></a>
+</h2>
+<p>Inside the <strong>drcHelper</strong> package,
+<code>getwilliamRes</code></p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li>DUNNETT C. W. (1955): A multiple comparison procedure for comparing
 several treatments with a control, Journal of the American Statistical
-Association, 50, pp. 1096-1121.</p>
+Association, 50, pp. 1096-1121.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
