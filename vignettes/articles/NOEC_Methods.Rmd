@@ -8,13 +8,40 @@ editor_options:
   chunk_output_type: console
 ---
 
+## NOEC in General
+
+The NOEC (No Observed Effect Concentration) is a critical value in ecotoxicology, representing the highest concentration of a substance that does not produce a statistically significant effect on the test organisms compared to a control group. 
+
+It is relatively straightforward to calulate and intepret NOEC, and it is widely used and accepted in the regulatory world. However, it is also criticized for its limitations:
+
+1. It focuses only on the single concentration without statistically significant adverse effects that was tested in the study, potentially overlooking the information in the complete dose-response study.
+2. The observed responses at the NOEC vary between studies, making it harder to compare studies as ECx values.
+3. NOEC approach does not take the test concentrations as continuous variable, therefore not allow the estimation/prediction of response at any test concentrations.
+4. It is heavily impacted by the sample size and test concentration selections. Poor experimental design may yield high NOEC due to decreased statistical sensitivity, which is not desired in a regulatory context.
+
+### Methods for deriving NOEC 
+
+1. Dunnett's Test: used to compare multiple treatment groups against a control group while controlling for Type I error, 
+2. Step-Down Williams' test: used to identify a significant trend.
+3. Non-parametric tests: like Dunn's test after Kruskal-Wallis test or step-down Jonckheere-Terpstra trend test.
+
+
+### Dealing with inhomogenous variance
+
+There are several ways to deal with inhomogeneous variances. 
+
+1. Welch's ANOVA (an adaptation of ANOVA that dose not assume equal variance) followed by Dunnett's test with inhomogeneous variances.
+2. Robust statistical techniques such as sandwich standard error estimations.
+3. Bootstrapping can be used to estimate confidence intervals for NOEC without relying on normality assumptions.
+4. Applying data transformations can stablize variances and meet the assumptions of parametric tests. However, this  increases the complexity of results interpretation  and should be avoided if possible.
+
 
 
 ## Dunnet Tests
 
 Dunnett's test is a multiple comparison test for determining significant differences between the mean values of several test groups and a control with normally distributed errors with homogeneous variance. Dunnett's test is robust to slight violations of the normality and variance homogeneity assumptions.
 
-There are several packages providing function for the calculation of the Dunnett’s test. The function "DunnettTest` from the library `DescTools` is calculating correct results for the "two.sided" direction. The function `dunnettTest` from the library `PMCMRplus` can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of `DunnettTest` from the library “DescTools`. The function 
+There are several packages providing function for the calculation of the Dunnett’s test. The function "DunnettTest` from the library `DescTools` is calculating correct results for the "two.sided" direction. The function `dunnettTest` from the library `PMCMRplus` can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of `DunnettTest` from the library “DescTools`. 
 
 ## Tamhane-Dunnett's Test
 
@@ -41,6 +68,10 @@ PMCMRplus::dunnettTest(x~g)
 PMCMRplus::dunnettTest(x~g, alternative = "greater")
 ```
 
+## Williams' trend test
 
+Inside the **drcHelper** package, `getwilliamRes`
 
-DUNNETT C. W. (1955): A multiple comparison procedure for comparing several treatments with a control, Journal of the American Statistical Association, 50, pp. 1096-1121.
+## References
+
+- DUNNETT C. W. (1955): A multiple comparison procedure for comparing several treatments with a control, Journal of the American Statistical Association, 50, pp. 1096-1121.

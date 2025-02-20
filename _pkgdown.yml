@@ -50,8 +50,8 @@ navbar:
       menu:
       - text: Introduction
         href: articles/Introduction.html
-      - text: Exampla Analysis Workflow
-        href: Example_Analysis_workflow.html
+      - text: Example Analysis Workflow
+        href: Example_Analysis_Workflow.html
       - text: Package Dependencies
         href: articles/drcHelper.html
     reference:

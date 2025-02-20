@@ -107,6 +107,7 @@ qqline(Response$res, col = "steelblue", lwd = 2)
 knitr::kable(broom::tidy(res), digits = 2)
 pander::pander(broom::tidy(res), digits = 2)
 ```
+
 ## Limitations
 
 For example, mixture of normals (almost-normal in terms of Q-Q plots) cannot be detected easily with small sample size (smaller than 1000) (taken from this post^[https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless]).   
