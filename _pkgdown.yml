@@ -71,6 +71,10 @@ navbar:
     articles:
       text: Articles
       menu:
+      - text: Quantal Data
+        href: articles/Quantal-Data.html
+      - text: Ordinal Data
+        href: articles/Ordinal-Data.html
       - text: NLS
         href: articles/Examples using NLS.html
       - text: drda
@@ -79,10 +83,6 @@ navbar:
         href: articles/TSK_method.html
       - text: MQJT
         href: articles/MQJT.html
-      - text: Quantal Data
-        href: articles/Quantal-Data.html
-      - text: Ordinal Data
-        href: articles/Ordinal-Data.html
       - text: Fitting A biphasic dose response model
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
       - text: Count Data
