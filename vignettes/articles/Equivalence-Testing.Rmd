@@ -15,20 +15,47 @@ library(drcHelper)
 
 ## Introduction
 
+Equivalence testing is a statistical testing approach used to determine whether two treatments or interventions produce effects that are practically the same within a predefined margin of difference. This method is particularly useful in fields like pharmaceuticals, where demonstrating that a new drug is not worse than an existing one by more than a specified margin is crucial.
+
+Equivalence testing is closely related to difference testing. While the latter focuses on identifying whether a difference exists by controlling the false positive error, the former aims to show that any difference is within a predefined acceptable range, by controlling the false negative error in the difference testing scenario.
+
+he design and interpretation of equivalence tests can be more complex than traditional difference tests, requiring careful consideration of the equivalence margin, which could be so called biologically relevant effect size.
+
 The null and alternative hypotheses in equivalence tests are
 
 $$
-H_0
+H_0: | \mu_1 - \mu_0 | > \Delta
 $$
+$$
+H_1: | \mu_1 - \mu_0 | \leq \Delta
+$$
+ where $\mu_1$ and $\mu_0$ are the means of the two treatments, and $\Delta$ is the equivalence margin.
  
+ There are also non-inferiority or non-superiority cases, where the nulls are $\mu_1 - \mu_0 <= - \Delta$ or $\mu_1 - \mu_0 > \Delta$
+ 
+Sometimes the tests can be formulated on standardized differences or means. Depending on how you frame the problem, the multiplicative model for ratios-to-control comparisons could be used. Related approach is available
+ 
+The $\alpha$ level in equivalence testing is the probability of making a Type I error, which occurs when the null hypothesis is incorrectly rejected. This means concluding that the treatments are equivalent when they are not.
+
+The $\beta$ in difference testing is the probability of making a Type II error, which occurs when the null hypothesis is not rejected when it should be. This means failing to detect a difference (concluding equivalence) when one actually exists.
+
+In equivalence testing, a low alpha level is crucial to ensure that the conclusion of equivalence is reliable. Conversely, in difference testing, a low beta level is important to ensure that a true difference is detected.
+
+On the other hand, the $\alpha$ level in difference testing is playing similarly a complementary role to the $\beta$ in equivalence testing. 
+
+## Impacts of changing from difference to equivalence testing
+
+- Equivalence testing often requires larger sample sizes to achieve sufficient power, which can be resource-intensive.
+- The design and interpretation of equivalence tests can be more complex than traditional difference tests, requiring careful consideration of the "equivalence margin".
 
 ## An example using chick weights dataset
 
 ```{r}
-library(equivUMP)
+
 ```
 
 ```{r}
+if(require(equivUMP))
   # compare two feed from chickwts dataset
   data("chickwts")
   chickwts2 <- chickwts[chickwts$feed %in% c("linseed", "soybean"),]
@@ -39,3 +66,10 @@ library(equivUMP)
   equiv.test(weight ~ feed, data = chickwts2, eps = 0.5)
 ```
 
+
+## References
+
+- Dilba, G., Bretz, F., Guiard, V., and Hothorn, L. A. (2004). Simultaneous confidence intervals for ratios with applications to the comparison of several treatments with a control. Methods of Information in Medicine 43, 465–469.
+- Djira G, Hasler M, Gerhard D, Segbehoe L, Schaarschmidt F (2025). _mratios: 
+Ratios of Coefficients in the General Linear Model_. R package version 1.4.4,
+  <https://CRAN.R-project.org/package=mratios>.
