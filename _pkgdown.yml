@@ -51,7 +51,7 @@ navbar:
       - text: Introduction
         href: articles/Introduction.html
       - text: Example Analysis Workflow
-        href: Example_Analysis_Workflow.html
+        href: articles/Example_Analysis_Workflow.html
       - text: Package Dependencies
         href: articles/drcHelper.html
     reference:

@@ -1,10 +1,5 @@
 ---
 title: "Example_Analysis_Workflow"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Example_Analysis_Workflow}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -27,14 +22,14 @@ For a particular endpoint, analysis should follow the recommended flowchart in O
 
 Typical flowcharts for derving NOECs and ECx are shown in @fig-NOEC-Monotonic , @fig-NOEC-nonMonotonic and @fig-ECx-Monotonic . For dose response with hormesis effects or highly erratic, it should be consulted with at statistician. 
 
-![NOEC Monotonic](./articles/assets/NOEC_Monotonic.png){#fig-NOEC-Monotonic}
+![NOEC Monotonic](./assets/NOEC_Monotonic.png){#fig-NOEC-Monotonic}
 
 
 
-![NOEC non-Monotonic](./articles/assets/NOEC_nonMonotonic.png){#fig-NOEC-nonMonotonic}
+![NOEC non-Monotonic](./assets/NOEC_nonMonotonic.png){#fig-NOEC-nonMonotonic}
 
 
-![ECx Monotonic](./articles/assets/ECx_monotonic.png){#fig-ECx-Monotonic}
+![ECx Monotonic](./assets/ECx_monotonic.png){#fig-ECx-Monotonic}
 
 In this vignette, we are going to use dataset oecd201 as an example.
 
