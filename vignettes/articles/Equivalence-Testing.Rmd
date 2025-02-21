@@ -54,7 +54,7 @@ On the other hand, the $\alpha$ level in difference testing is playing similarly
 
 ```
 
-```{r}
+```{r include=FALSE}
 if(require(equivUMP)){
   # compare two feed from chickwts dataset
   data("chickwts")

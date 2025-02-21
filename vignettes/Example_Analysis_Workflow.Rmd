@@ -1,0 +1,68 @@
+---
+title: "Example_Analysis_Workflow"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+
+For a particular endpoint, analysis should follow the recommended flowchart in OECD 54 or in specific test guidelines. Deviations from a standard procedure should be justified.
+
+## Example Routine Analysis Flowcharts
+
+Typical flowcharts for derving NOECs and ECx are shown in @fig-NOEC-Monotonic , @fig-NOEC-nonMonotonic and @fig-ECx-Monotonic . For dose response with hormesis effects or highly erratic, it should be consulted with at statistician. 
+
+![NOEC Monotonic](./assets/NOEC_Monotonic.png){#fig-NOEC-Monotonic}
+
+
+
+![NOEC non-Monotonic](./assets/NOEC_nonMonotonic.png){#fig-NOEC-nonMonotonic}
+
+
+![ECx Monotonic](./assets/ECx_monotonic.png){#fig-ECx-Monotonic}
+
+In this vignette, we are going to use dataset oecd201 as an example.
+
+## Data overview
+
+
+## Assumptions check
+
+Pretests or checks could be conducted before testing, however, assumptions could also be checked after modelling, using a more holistic approach. Here we follow the routine procedure. 
+
+> To allow the choice of the appropriate statistical tests, the normality and homoscedasticity (variance homogeneity) of a certain endpoint (e.g., shoot dry weight) data were checked.
+
+
+
+### Check for normality
+
+
+## NOER determination
+
+
+## ER and ER determination 
+
+
+
+## An overview of the endpoints
+
+```{r}
+
+```
+
+
+The NOER, LOER, ER25 and ER50 for survival, plant height and shoot dry weight expressed as g a.s./ha
+are summarized for each of the plant species for the final assessment (21 days after application) and can
+be found in the following tables.
+
+
