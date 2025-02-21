@@ -37,7 +37,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
-    <li><a class="dropdown-item" href="../Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
@@ -163,8 +163,16 @@ and a control with normally distributed errors with homogeneous
 variance. Dunnett’s test is robust to slight violations of the normality
 and variance homogeneity assumptions.</p>
 <p>There are several packages providing function for the calculation of
-the Dunnett’s test. The function
-“DunnettTest<code>from the library</code>DescTools<code>is calculating correct results for the "two.sided" direction. The function</code>dunnettTest<code>from the library</code>PMCMRplus<code>can be used to calculate the test options “less” (smaller), “greater” and "two.sided". The results for the "two.sided" option differ in some cases from the results of</code>DunnettTest<code>from the library “DescTools</code>.</p>
+the Dunnett’s test. The function <code>DunnettTest</code> from the
+library <code>DescTools</code> is calculating correct results for the
+“two.sided” direction. The function <code>dunnettTest</code> from the
+library <code>PMCMRplus</code> can be used to calculate the test options
+“less” (smaller), “greater” and “two.sided”. The results for the
+“two.sided” option differ in some cases from the results of
+<code>DunnettTest</code> from the library “DescTools`.</p>
+<p>There are also possibilities to use other packages. For example,
+<strong>emmeans</strong> is a package for estimating marginal means and
+conducting pairwise comparisons.</p>
 </div>
 <div class="section level2">
 <h2 id="tamhane-dunnetts-test">Tamhane-Dunnett’s Test<a class="anchor" aria-label="anchor" href="#tamhane-dunnetts-test"></a>

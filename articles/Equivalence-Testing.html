@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Examples of NOEC Derivation by MCP • drcHelper</title>
+<title>Equivalence Testing • drcHelper</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Examples of NOEC Derivation by MCP">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Equivalence Testing">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -86,19 +86,16 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Examples of NOEC Derivation by MCP</h1>
+      <h1>Equivalence Testing</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/Examples_MCP.Rmd" class="external-link"><code>vignettes/articles/Examples_MCP.Rmd</code></a></small>
-      <div class="d-none name"><code>Examples_MCP.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/Equivalence-Testing.Rmd" class="external-link"><code>vignettes/articles/Equivalence-Testing.Rmd</code></a></small>
+      <div class="d-none name"><code>Equivalence-Testing.Rmd</code></div>
     </div>
 
     
     
-<p>Note that to install “PMCMRplus” properly, you need probably install
-libmpfr-dev first for Linux OS.</p>
-<pre><code>sudo apt-get install libmpfr-dev</code></pre>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: drc</span></span>
 <span><span class="co">#&gt; Loading required package: MASS</span></span>
@@ -110,14 +107,89 @@ libmpfr-dev first for Linux OS.</p>
 <span><span class="co">#&gt; Attaching package: 'drc'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gaussian, getInitial</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">PMCMRplus</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'PMCMRplus'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:drc':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     algae</span></span></code></pre></div>
-  </main>
+<span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>Equivalence testing is a statistical testing approach used to
+determine whether two treatments or interventions produce effects that
+are practically the same within a predefined margin of difference. This
+method is particularly useful in fields like pharmaceuticals, where
+demonstrating that a new drug is not worse than an existing one by more
+than a specified margin is crucial.</p>
+<p>Equivalence testing is closely related to difference testing. While
+the latter focuses on identifying whether a difference exists by
+controlling the false positive error, the former aims to show that any
+difference is within a predefined acceptable range, by controlling the
+false negative error in the difference testing scenario.</p>
+<p>he design and interpretation of equivalence tests can be more complex
+than traditional difference tests, requiring careful consideration of
+the equivalence margin, which could be so called biologically relevant
+effect size.</p>
+<p>The null and alternative hypotheses in equivalence tests are</p>
+<p><span class="math display">\[
+H_0: | \mu_1 - \mu_0 | &gt; \Delta
+\]</span> <span class="math display">\[
+H_1: | \mu_1 - \mu_0 | \leq \Delta
+\]</span> where <span class="math inline">\(\mu_1\)</span> and <span class="math inline">\(\mu_0\)</span> are the means of the two
+treatments, and <span class="math inline">\(\Delta\)</span> is the
+equivalence margin.</p>
+<p>There are also non-inferiority or non-superiority cases, where the
+nulls are <span class="math inline">\(\mu_1 - \mu_0 &lt;= -
+\Delta\)</span> or <span class="math inline">\(\mu_1 - \mu_0 &gt;
+\Delta\)</span></p>
+<p>Sometimes the tests can be formulated on standardized differences or
+means. Depending on how you frame the problem, the multiplicative model
+for ratios-to-control comparisons could be used. Related approach is
+available</p>
+<p>The <span class="math inline">\(\alpha\)</span> level in equivalence
+testing is the probability of making a Type I error, which occurs when
+the null hypothesis is incorrectly rejected. This means concluding that
+the treatments are equivalent when they are not.</p>
+<p>The <span class="math inline">\(\beta\)</span> in difference testing
+is the probability of making a Type II error, which occurs when the null
+hypothesis is not rejected when it should be. This means failing to
+detect a difference (concluding equivalence) when one actually
+exists.</p>
+<p>In equivalence testing, a low alpha level is crucial to ensure that
+the conclusion of equivalence is reliable. Conversely, in difference
+testing, a low beta level is important to ensure that a true difference
+is detected.</p>
+<p>On the other hand, the <span class="math inline">\(\alpha\)</span>
+level in difference testing is playing similarly a complementary role to
+the <span class="math inline">\(\beta\)</span> in equivalence
+testing.</p>
+</div>
+<div class="section level2">
+<h2 id="impacts-of-changing-from-difference-to-equivalence-testing">Impacts of changing from difference to equivalence testing<a class="anchor" aria-label="anchor" href="#impacts-of-changing-from-difference-to-equivalence-testing"></a>
+</h2>
+<ul>
+<li>Equivalence testing often requires larger sample sizes to achieve
+sufficient power, which can be resource-intensive.</li>
+<li>The design and interpretation of equivalence tests can be more
+complex than traditional difference tests, requiring careful
+consideration of the “equivalence margin”.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="an-example-using-chick-weights-dataset">An example using chick weights dataset<a class="anchor" aria-label="anchor" href="#an-example-using-chick-weights-dataset"></a>
+</h2>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li>Dilba, G., Bretz, F., Guiard, V., and Hothorn, L. A. (2004).
+Simultaneous confidence intervals for ratios with applications to the
+comparison of several treatments with a control. Methods of Information
+in Medicine 43, 465–469.</li>
+<li>Djira G, Hasler M, Gerhard D, Segbehoe L, Schaarschmidt F (2025).
+<em>mratios: Ratios of Coefficients in the General Linear Model</em>. R
+package version 1.4.4, <a href="https://CRAN.R-project.org/package=mratios" class="external-link uri">https://CRAN.R-project.org/package=mratios</a>.</li>
+</ul>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
