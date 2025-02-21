@@ -55,7 +55,7 @@ On the other hand, the $\alpha$ level in difference testing is playing similarly
 ```
 
 ```{r}
-if(require(equivUMP))
+if(require(equivUMP)){
   # compare two feed from chickwts dataset
   data("chickwts")
   chickwts2 <- chickwts[chickwts$feed %in% c("linseed", "soybean"),]
@@ -64,6 +64,8 @@ if(require(equivUMP))
   # similar but cannot be shown to be equivalent up to 0.5 sigma at 0.05 level^
   plot(weight ~ feed, data = chickwts2)
   equiv.test(weight ~ feed, data = chickwts2, eps = 0.5)
+}
+  
 ```
 
 
