@@ -182,6 +182,11 @@ p_drc_qb
 ```
 
 
+### On the GoF
+
+Normally we could test lack of fit for continuous data by comparing the model fit with ANOVA model, which should achieve the least square estimation. Changjian proposed to use the prediction intervals from the models to estimate the frequency table that would usually be a product of conventional ordinal regression, followed by a chi-square test. 
+
+
 ## Additional Thoughts
 
 Thinking about (quasi)-binomial type modelling and data-generation process, it is possible to assume when you see level B injury, you had many independent binary yes/no outcomes (conditional on the observed covariate values for each replicate or experiment unit) for each injury level or for an arbitrary number of categories, the proportion of yes answer is then the average injury. The probabilities of each binary outcome are the same, which may mismatch the observed data rather badly. 
