@@ -22,8 +22,8 @@
 #'
 #' @export
 getEC50 <- function(mod,approximate = FALSE){
-  if (!inherits(mod, c("glm", "glmmPQL"))) {
-    stop("The model must be of class 'glm' or 'glmmPQL'.")
+  if (!inherits(mod, c("glm", "glmmPQL","drc"))) {
+    stop("The model must be of class 'glm' or 'glmmPQL' of 'drc'.")
   }
   if("glm" %in% class(mod)){
     ec50 <- MASS::dose.p(mod,p=0.5)

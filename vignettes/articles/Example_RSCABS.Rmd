@@ -1,0 +1,180 @@
+---
+title: "RSCABS"
+author: "Zhenglei Gao"
+date: '2023-04-11'
+output: html_document
+---
+
+
+
+
+
+
+
+## RSCABS
+
+RSCABS (Rao-Scott Cochran-Armitage by slice) is designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT.
+
+Steps in the testing procedure:
+
+1.The Cochran-Armitage (CA) trend test was used to test a set of organisms for an increase in the presences (score $>$ 0) or absence (score = 0) of an effect with an increase in the dose concentration of the treatments.
+2. The Rao-Scott (RS) adjustment controls for the similarity in each experiment unit / apparatus (*e.g.*, fish tank) by calculating an adjustment to the CA test statistic from correlation of organisms within each apparatuses.
+3. The by slices (BS) part allows for testing at each severity score (*e.g.*, from 1 to 5) instead of just presences or absence. By slices works by splitting the severity scores associated with an endpoint into **two** groups based on the severity score being tested.  The RSCA test statistic is calculated based on these two groups.
+4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left.
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+```
+
+- Take the subset of F2-females with 16 weeks of age, run RSCABS. 
+
+```{r}
+data("exampleHistData")
+exampleHistData <- exampleHistData %>% as_tibble %>% mutate(across(where(is.integer),as.numeric)) %>% as.data.frame(.)
+#Take the subset corresponding to F0-females of 16 weeks of age
+
+subIndex<-which(exampleHistData$Generation=='F2' &
+                  exampleHistData$Genotypic_Sex=='Female' &
+                  exampleHistData$Age=='16_wk' )
+exampleHistData.Sub<-exampleHistData[subIndex, ]
+#Run RSCABS
+exampleResults<-runRSCABS(exampleHistData.Sub,'Treatment',
+                          'Replicate',test.type='RS')
+```
+
+```{r}
+exampleResults %>% knitr::kable(.,digits=3)
+```
+Note that the R.score in the table only shows the scores occured in the respective treatment groups. 
+
+
+```{r}
+ggplot(exampleHistData.Sub,aes(x=Treatment,fill=factor(Gon_Asynch_Dev)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Data: Gon_Asynch_Dev",subtitle = "subset: F2 generation, 16 week age and female")
+
+cids <-which(apply(exampleHistData.Sub[,-(1:5)],2,max)>0)
+responses <- names(cids)
+
+
+
+ggplot(exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint"),aes(x=Treatment,fill=factor(Response)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint)
+
+
+library(scales)
+dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint") %>% group_by(Endpoint,Treatment,Response) %>% summarise(counts=n())%>% group_by(Endpoint,Treatment) %>% mutate(total=sum(counts))
+
+ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
+```
+## Using R's prop.test instead
+
+
+
+## Alternative Nonparametric Tests
+
+The example below is taken from Hothorn's paper. `independence_test` function from the `coin` package can be used to test the independence of two sets of variables measured on arbitrary scales. Transformations can be done via `trafo` so that various test statsitcs can be calculated, including Pearson $\chi^2$ test, the generalized Cochran-Mantel-Haenszel test, the Spearman correlation test, the Fisher-Pitman permutation test, the Wilcoxon-Mann-Whitney test, the Kruskal-Wallis test and the family of weighted logrank tests for censored data.
+
+However, the Williams' contrast is not the same as Williams' test, just like in multcomp package. 
+
+```{r inlcude=FALSE}
+ifcoin <- require(coin)
+```
+
+
+```{r eval=ifcoin}
+data(exampleHistData)
+subIndex<-which(exampleHistData$Generation=="F1" &
+exampleHistData$Genotypic_Sex=="Male" &
+exampleHistData$Age=="8_wk")
+LH<-exampleHistData[subIndex, ]
+lh<-LH[, c(2,6)]
+lh$Gon<-as.numeric(lh$Gon_Phenotype)
+lh$EP1<-ifelse(lh$Gon >1,1,0)
+lh$EP2<-ifelse(lh$Gon >2,1,0)
+lh$EP3<-ifelse(lh$Gon >3,1,0)
+lh$treat<-as.factor(lh$Treatment)
+lhh<-droplevels(lh[lh$treat!=6, ])
+Lhh<-droplevels(lhh[lhh$treat!=3, ])
+library("coin")
+library("multcomp")
+Co1 <- function(data) trafo(data, factor_trafo = function(x)
+model.matrix(~x - 1) %*% t(contrMat(table(x), "Dunnett")))
+Codu <-independence_test(EP1 +EP2+EP3~ treat, data = Lhh, teststat = "maximum",
+distribution = "approximate", xtrafo=Co1, alternative="greater")
+pvalCODU <-pvalue(Codu, method="single-step")
+pvalCODU
+```
+
+```{r eval=ifcoin}
+CoW <- function(data) trafo(data, factor_trafo = function(x)
+model.matrix(~x - 1) %*% t(contrMat(table(x), "Williams")))
+Cowi <-independence_test(EP1 +EP2+EP3~ treat, data = Lhh, teststat = "maximum",
+distribution = "approximate", xtrafo=CoW, alternative="greater")
+pvalCOWI <-pvalue(Cowi, method="single-step")
+pvalCOWI
+```
+
+
+
+## Multi-quantile JT
+
+From: John Green, personal communication.
+
+
+
+
+
+## Function Notes
+
+```{r eval=FALSE}
+library(DependenciesGraphs)
+dep <- funDependencies("package:drcHelper", "runRSCABS")
+
+# visualization
+plot(dep)
+
+```
+
+### Notes on RSCABS functions
+
+1. Select responses maximum value should be > 0 and smaller than 20 (limited ranks in response). 
+2. for each to be tested response/endpoints, *convert2score*
+3. for each to be tested response/endpoints, *prepDataRSCABS*, prepare the data into matrix/table format, treatment as column, replicate as row
+4. for each to be tested response/endpoints, *stepKRSCABS*.
+
+The results look like below:
+
+```
+$Gon_Asynch_Dev
+           Effect Treatment R.Score Statistic     P.Value Signif
+1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
+2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
+4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
+5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
+```
+
+5. combine the results into a big matrix.
+
+
+
+## Validation by SAS
+
+The RSCABS code in R written by  is validated in SAS by Chen Meng and also against the RSCABS procedure in the archived statCharrms package.
+
+
+## References
+
+- Green, John W. and Springer, Timothy A. and Saulnier, Amy N. and Swintek, Joe, (2014) Statistical analysis of histopathological endpoints. Environmental Toxicology and Chemistry, 33(5), 1108-1116
+
+- Hothorn, T., Hornik, K., van de Wiel, M. A. and Zeileis, A. (2008). Implementing a class of permutation tests: The coin package. Journal of Statistical Software 28(8), 1–23. doi: 10.18637/jss.v028.i08

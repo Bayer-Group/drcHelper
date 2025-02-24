@@ -52,22 +52,24 @@ navbar:
         href: articles/Introduction.html
       - text: Example Analysis Workflow
         href: articles/Example_Analysis_Workflow.html
+      - text: Example DRC: OECD 201
+        href: articles/Examples_oecd201.html
+      - text: Example Helper Functions
+        href: articles/Examples_drc.html
       - text: Package Dependencies
         href: articles/drcHelper.html
     reference:
       text: Reference
       href: reference/
     tutorials:
-      text: Examples
+      text: Regulatory Concepts
       menu:
-      - text: Example Helper Functions
-        href: articles/Examples_drc.html
+      - text: NOEC Calculations
+        href: articles/NOEC_Methods.html
       - text: EFSA Criteria and Other Reliability Criteria
         href: articles/EFSA-Criteria.html
       - text: RSCABS
         href: articles/Example_RSCABS.html
-      - text: OECD 201
-        href: articles/Examples_oecd201.html
     articles:
       text: Articles
       menu:

@@ -9,11 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Note that to install "PMCMRplus" properly, you need probably install libmpfr-dev first for Linux OS. 
-
-```
-sudo apt-get install libmpfr-dev
-```
+## Multiple comparison
 
 
 
@@ -25,4 +21,14 @@ library(PMCMRplus)
 ```{r}
 
 ```
+
+
+## Tips
+
+Note that to install "PMCMRplus" properly under ubuntu (Platform: x86_64-pc-linux-gnu), you need probably install libmpfr-dev first. 
+
+```
+sudo apt-get install libmpfr-dev
+```
+
 

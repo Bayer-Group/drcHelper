@@ -37,7 +37,7 @@ In this vignettes we illustrate how to use drcHelper to produce tables and graph
 ## Dependencies
 
 ```r
-
+library(drcHelper)
 library(DependenciesGraphs)
 dep <- funDependencies("package:drcHelper","ED.plus")
 plot(dep)

@@ -1,5 +1,7 @@
 ---
 title: "Example Ordinal Data Analysis"
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -11,6 +13,12 @@ knitr::opts_chunk$set(
   warnings = FALSE,
   message = FALSE
 )
+
+```
+
+
+```{r setup}
+library(drcHelper)
 library(tidyverse)
 ```
 
@@ -41,80 +49,24 @@ In the ecotoxicology area, histopathology assessment and visual injury data are 
 
 Ordinal regression can be conducted using MASS::polr function or the function provided in GLMcat, which is an R package that encompasses lots of models specified in a similar way: (ratio, cdf, design: parallel or complete).
 
-When transforming the ordinal variable into percentages or proportions, it is also possible to model them as continuous data or using logitic regression with quasibinomial assumptions. The two approaches produce similar results when the data is behaving truly like a dose-response with overe-dispersed binomial distributions.
+When transforming the ordinal variable into percentages or proportions, it is also possible to model them as continuous data or using logitic regression with quasibinomial assumptions. The two approaches produce similar results when the data is behaving truly like a dose-response with over-dispersed binomial distributions.
+
 
 ```{r}
 library(drcHelper)
 ```
 
 
+The data is artificial and with full dose-response relationship observed with true ER50=12.18.
+
 ```{r collapse=TRUE}
-dattab_new <- read.table(textConnection("Obs	rep	dose	yt  y0 
-1	1	2	0.02021	0
-2	2	2	0.02491	0
-3	3	2	0.00760	0
-4	5	2	0.04466	0
-5	6	2	0.00037	0
-6	8	2	0.05386	0
-7	9	2	0.07205	0
-8	10	2	0.01125	0
-9	1	4	0.02011	0
-10	7	4	0.09058	0
-11	8	4	0.06255	0
-12	10	8	0.09431	0
-13	4	2	0.14060	A
-14	7	2	0.22223	A
-15	2	4	0.20943	A
-16	3	4	0.20959	A
-17	4	4	0.17305	A
-18	9	4	0.11405	A
-19	10	4	0.17668	A
-20	1	8	0.12756	A
-21	6	8	0.11478	A
-22	6	32	0.20602	A
-23	5	4	0.26650	B
-24	6	4	0.27344	B
-25	3	8	0.27021	B
-26	5	8	0.30662	B
-27	8	8	0.29319	B
-28	9	8	0.37300	B
-29	6	16	0.36224	B
-30	9	16	0.31316	B
-31	2	8	0.55845	C
-32	4	8	0.44811	C
-33	3	16	0.42677	C
-34	3	32	0.52315	C
-35	7	8	0.67080	D
-36	2	16	0.71776	D
-37	4	16	0.73038	D
-38	5	16	0.64232	D
-39	7	16	0.68720	D
-40	8	16	0.61088	D
-41	5	32	0.72342	D
-42	8	32	0.63594	D
-43	1	16	0.77171	E
-44	10	16	0.74087	E
-45	2	32	0.79477	E
-46	4	32	0.88546	E
-47	7	32	0.78002	E
-48	9	32	0.81456	E
-49	10	32	0.89465	E
-50	1	32	0.96129	F
-51	1	64	0.96127	F
-52	2	64	0.91687	F
-53	3	64	0.97204	F
-54	4	64	0.99268	F
-55	5	64	0.98935	F
-56	6	64	0.96263	F
-57	7	64	0.95435	F
-58	8	64	0.92081	F
-59	9	64	0.91776	F
-60	10	64	0.99104	F"),header = TRUE)
+dattab_new <- pvi_example ## use the example PVI data in the drcHelper package
+## Note that yy2 is transformed by increment of 90/5 = 16. 
+dattab_new$y0 <- factor(dattab_new$y0,ordered = T)
 ```
 
 
 ```{r collapse=FALSE}
-dattab_new <- dattab_new %>% mutate(yy = as.numeric(plyr::mapvalues(y0,from = c("0","A","B","C","D","E","F"),to = c(0,10,30,50,70,90,100)))/100) %>% mutate(yy2 = as.numeric(plyr::mapvalues(y0,from = c("0","A","B","C","D","E","F"),to = c(0.05,0.18,0.34,0.50,0.66,0.82,0.95))))
 
 ftable(xtabs(~ y0 + dose, data = dattab_new)) ##%>% gt::gt() ## as.data.frame(.) %>% knitr::kable(.,digits = 3)
 ```
@@ -131,10 +83,116 @@ dattab_new %>% group_by(dose) %>% summarise(n=n(),meany=mean(yt),meanyy=mean(yy)
 
 ```{r}
 ggplot(dattab_new,aes(x = dose, y=yt))+geom_point() +  geom_smooth(method="glm", method.args=list(family="quasibinomial"), formula="y ~ log(x)",
-                       se =TRUE, size=1.5)
+                       se =TRUE, linewidth=1.5)
+```
+
+```{r}
+library(drc)
+mod_drc  <- drm(yy2 ~ dose, data = dattab_new, fct = LL.2())
+summary(mod_drc)
+ED(mod_drc, c(50), interval = "delta")
+plot(mod_drc, type = "all",main="log-logistic + normal, ER50= 12.74", broken = TRUE)
+plot(mod_drc, broken = TRUE, type="confidence", add=TRUE)
+```
+
+### Putting quasi-binomial and normal fit together
+
+```{r collapse=TRUE}
+library(drc)
+predictCIglm <- function(mod,dat,newdata=NULL){
+ if(is.null(newdata)){
+    preddata <- with(dat, data.frame(x = seq(min(x), max(x), length = 100)))
+ }else predata <- newdata
+  preds <- predict(mod, newdata = preddata, type = "link", se.fit = TRUE)
+  critval <- 1.96 ## approx 95% CI qnorm(0.975)
+  upr <- preds$fit + (critval * preds$se.fit)
+  lwr <- preds$fit - (critval * preds$se.fit)
+  fit <- preds$fit
+  fit2 <- mod$family$linkinv(fit)
+  upr2 <- mod$family$linkinv(upr)
+  lwr2 <- mod$family$linkinv(lwr)
+  preddata$Prediction <- fit2 
+  preddata$Lower <- lwr2 
+  preddata$Upper <- upr2 
+  return(preddata)
+}
+
+
+preddrc <- function(mod,dat,newdata=NULL){
+ if(is.null(newdata)){
+    preddata <- with(dat, data.frame(x = seq(min(x), max(x), length = 100)))
+ }else predata <- newdata
+ preds <- predict(mod,newdata=preddata,interval="confidence")
+ preddata <- cbind(preddata,preds)
+ return(preddata)
+}
+modelall <- function(dat,addbeta = FALSE){
+  mod1 <- glm(y~log(x),data=dat,family = "quasibinomial")
+  mod2 <- drm(y~x,fct=LL.2(),data=dat)
+ 
+  ## mod3 <- MASS::glmmPQL(y ~ log(x),random=~1|x,family="quasibinomial",data=dat) 
+  ## Estimation the same as quasibinomial without random effects, uncertainty estimation wider. 
+  ## mod3 <- lme4::glmer(y ~ log(x)+ (1|x),family="binomial",data=dat) ## dose not work without sample size.
+  # mod4 <- betareg::betareg(y ~ log(x),link="logit",data=dat)
+  # y3<- predict(mod3,newdata=data.frame(x=dat$x),type="response")
+  y1 <- predictCIglm(mod1,dat=dat)
+  y1$model <- "quasibinomial"
+
+  y2 <- preddrc(mod2,dat = dat)
+  y2$model <- "drc LL.2"
+  preddata <- rbind(y1,y2)
+  
+  ec1 <- getEC50(mod1)
+  ec2 <- getEC50(mod2)
+  ec50 <- data.frame(rbind(ec1,ec2),model=c("quasibinomial","drc LL.2"))
+  
+  if(addbeta) {
+    mod3 <- gam(y ~ log(x), family=betar(link="logit"), data=dat)
+    y3 <- predictCIglm(mod3,dat=dat)
+    y3$model <- "beta"
+    preddata <- rbind(preddata,y3)
+    ec3 <- getEC50(mod3)
+    ec50 <- rbind(ec50,data.frame(ec3,model=c("beta")))
+  }
+  #ec4 <- uniroot(function(x) predict(mod4, newdata = data.frame(x=x)) - 0.5,lower = 1, upper = 80)$root
+  ## 19.55968 beta regression does not perform better than binomial or quasi-binomial regression!
+  
+  return(list(ec50=ec50,predata=preddata))
+}
+modelallbeta <- function(dat){
+  modelall(dat,addbeta=TRUE)
+}
 ```
 
 
+
+```{r}
+dattab_new <- dattab_new %>% mutate(y=yy,x=dose)%>%as.data.frame(.)
+modres <- modelall(dattab_new)
+predres <- modres[[2]]
+knitr::kable(modres[[1]]%>%mutate(TrueEC50 = 12.18),digits=3)
+p_drc_qb <- ggplot(dattab_new, aes(x=dose, y=yt)) +geom_point(alpha=0.1)+ geom_point(aes(x=dose, y=yy),col="green")+
+                #scale_color_viridis_d()+scale_fill_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_ribbon(data=predres,aes(x=x,y=Prediction,ymin=Lower,ymax=Upper,col=model,fill=model),alpha=0.2)+geom_line(data=predres,aes(x=x,y=Prediction,col=model))+
+        xlab("Concentration") + 
+        ylab("% Injury / 100")
+p_drc_qb
+```
+
+
+## Additional Thoughts
+
+Thinking about (quasi)-binomial type modelling and data-generation process, it is possible to assume when you see level B injury, you had many independent binary yes/no outcomes (conditional on the observed covariate values for each replicate or experiment unit) for each injury level or for an arbitrary number of categories, the proportion of yes answer is then the average injury. The probabilities of each binary outcome are the same, which may mismatch the observed data rather badly. 
+
+Beta regression can be used to model proportions too, however, 0 and 1's need to be specifically handled.  
+
+### Using Conventional Ordinal Regression Approaches
+
+Ordinal regression approaches works well in terms of prediction but would need a specific function to calculate ER50. $\sum p_i Y_{ij}$ would be the average injury level.  
+
+The proportional odds model can be interpreted in terms of probabilities of transitions and also in terms of covariate-specific cumulative probabilities. The latter is a bit easier to understand. 
 
 ```{r}
 ## fit ordered logit model and store results 'm'
@@ -182,11 +240,15 @@ phat %>% knitr::kable(.,digits = 3)
 
 ### Other understanding of the dataset
 
+In principle, ordinal regression is treating the ranked categorical as several binomial for each category. Note that how the intercept of `0|A` is -1.386294e+00. 
+
 ```{r}
-fit0 <- MASS::polr(y0 ~ 1,
+fit0 <- MASS::polr(y0 ~  1,
                       data = dattab_new,
                       Hess= T)
 fit0
+## Note that 
+
 #source("https://github.com/rwnahhas/RMPH_Resources/raw/main/Functions_rmph.R")
 ilogit <- function(x) exp(x)/(1+exp(x))
 ilogit(fit0$zeta)
@@ -197,22 +259,27 @@ sf <- function(y) {
     'Y>=2' = qlogis(mean(y >= 2)),
     'Y>=3' = qlogis(mean(y >= 3)),
     'Y>=4' = qlogis(mean(y >= 4)),
-    'Y>=5' = qlogis(mean(y >= 5)))
+    'Y>=5' = qlogis(mean(y >= 5)),
+    'Y>=6' = qlogis(mean(y >= 6))
+    )
 }
+library(Hmisc)
+(s <- with(dattab_new,summary(as.numeric(y0) ~ (dose), fun=sf)))
 
-(s <- with(dattab_new, summary(as.numeric(y0) ~ factor(dose), fun=sf)))
 
-
-glm(I(as.numeric(y0) >= 2) ~ log(dose), family="binomial", data = dattab_new)
-glm(I(as.numeric(y0) >= 3) ~ log(dose), family="binomial", data = dattab_new)
-glm(I(as.numeric(y0) >= 4) ~ log(dose), family="binomial", data = dattab_new)
+mod2 <- glm(I(as.numeric(y0) >= 2) ~ factor(dose), family="binomial", data = dattab_new)
+predict.glm(mod2,data.frame(dose=2))
+predict.glm(mod2,data.frame(dose=4))
+mod3 <- glm(I(as.numeric(y0) >= 3) ~ factor(dose), family="binomial", data = dattab_new)
+predict.glm(mod3,data.frame(dose=2))
+glm(I(as.numeric(y0) >= 4) ~ factor(dose), family="binomial", data = dattab_new)
 
 ```
 
 
-### log-logistic with quasi-binomial
+### log-logistic with quasi-binomial: replicate effects
 
-- TRUE ER50=12.18.
+Original study design is CRD. However, it was argued to treat it as RCBD with blocking effect coming from the replicate numbering. We can compare the result differences. 
 
 
 ```{r warning=FALSE,message=FALSE}
@@ -257,117 +324,128 @@ bmdOrdinal(mod_ord, bmr = 0.5, backgType = "modelBased", def = "excess")
 
 ## RSCABS
 
-Here we give an example of performing the Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices. RSCABS is designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT. 
+Details about RSCABS approach you can find [here](https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html)
 
-Steps in the testing procedure:
 
-1.The Cochran-Armitage (CA) trend test was used to test a set of organisms for an increase in the presences (score > 0) or absence (score = 0) of an effect with an increase in the dose concentration of the treatments. 
-2. The Rao-Scott (RS) adjustment controls for the similarity in each experiment unit / apparatus (*e.g.*, fish tank) by calculating an adjustment to the CA test statistic from correlation of organisms within each apparatuses. 
-3. The by slices (BS) part allows for testing at each severity score (*e.g.*, from 1 to 5) instead of just presences or absence. By slices works by splitting the severity scores associated with an endpoint into **two** groups based on the severity score being tested.  The RSCA test statistic is calculated based on these two groups.
-4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left. 
+## Simulation Study
+
+Simulation studies show that glm with quasibinomial and nonlinear log-logistic with normal perfom similary when there are limited dose groups. When we observe the full dose-response curve, quasibinomial is less flexible in adapting to the data. 
+
+### Data generated using the logistic CDF. 
+
+
+
+The data is generated using the cumulative function for logistic distribution. Note that the logistic function is just an inverse logit ($\log(p/(1-p))$) function in R. The code is modified based on [this blog post](https://www.r-bloggers.com/2016/01/s-shaped-data-smoothing-with-quasibinomial-distribution-2/). 
+$$F(x;\mu,s) = \frac{1}{2} + \frac{1}{2} \tanh((x-\mu)/2s) = \frac{1}{1+e^{-(x-\mu)/s}}$$
+
+where,  $\tanh(x) = \frac{\sinh(x)}{\cosh(x)} = \frac{e^x - e^{-x}}{e^x + e^{-x}}$, is the [hyperbolic tangent function](https://en.wikipedia.org/wiki/Hyperbolic_functions) that maps real numbers to the range between -1 and 1. 
+
+Quantile of the CDF is then $\mu+s\log(\frac{p}{1-p})$, therefore, the EC50 should be $\mu$ or $\exp(\mu)$.
+
+Random noises are added afterwards to the logistic distribution CDF.
+
+We simulate $n$ studies over concentration $x$, denoted, $X_{1}, X_{2}, …, X_{n}$ for $k$ study $X=(x_{1}, x_{2}, …, x_{k})$, where $k$ is the number of different studies with different $\mu$ and $\sigma$. 
+
+Let’s say there are $k=6$ study groups with the following parameter sets, $\mu = \{9,2,3,5,7,5\}$  and $s=\{2,2,4,3,4,2\}$
 
 
 
 ```{r}
-library(drcHelper)
-# Prepare data
+generate_logit_cdf <- function(mu, s, 
+                               sigma_y=0.1, 
+                               x=seq(-5,20,0.1)) {
+  x_ms <- (x-mu)/s
+  y    <- 0.5 + 0.5 * tanh(x_ms)  
+  y    <- abs(y + rnorm(length(x), 0, sigma_y))
+  ix   <- which(y>=1.0)
+  if(length(ix)>=1) { 
+    y[ix] <- 1.0
+  }
+  return(y)
+}
+tanh(0)
+set.seed(424242)
+x      <- seq(-5,15,0.025) 
+mu_vec <- c(1,2,3,5,7,8)   # 6 Studies
+idx <- sapply(mu_vec,function(mu) which(x==mu))  ## we just need to know which index to find the ER50
+s_vec  <- c(2,2,4,3,4,2)
+# Synthetic Study ID
+studies_df<- mapply(generate_logit_cdf, 
+                              mu_vec, 
+                              s_vec, 
+                              MoreArgs = list(x=x))
+# Give them names
+colnames(studies_df) <- c("Study1", "Study2", "Study3", "Study4", "Study5", "Study6")
+  
+dim(studies_df)
+```
 
+```{r fig.width=8,fig.height=5}
+library(ggplot2)
+theme_set(theme_bw())
 library(tidyverse)
+df_all <- tidyr::pivot_longer(data.frame(x=(1:length(x))/10,studies_df),cols=2:7)
+true_ec50 <- ((1:length(x))/10)[idx]
+colnames(df_all) <- c("x", "study", "y")
+df_all$study <- as.factor(df_all$study)
+
+p_quasibinomial<- ggplot(df_all, aes(x=x, y=y, color=study)) +
+        geom_point(alpha=0.2)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="glm", method.args=list(family="quasibinomial"), formula="y ~ log(x)",
+                       se =TRUE, size=1.5) +
+        xlab("Concentration") + 
+        ylab("% Injury / 100") + ggtitle("Quasibinomial Fit")
+
+p_quasibinomial#+scale_x_log10()
+
+p_quasibinomial +facet_wrap(~study)
 ```
 
+Nonlinear log-logistic modelling with normal errors seem to be more flexible in dealing with very different curve shapes. It also fits the data generation process in this case. 
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  message = FALSE,
-  warning = FALSE
-)
-```
+```{r}
+library(drc)
+p_drc<- ggplot(df_all, aes(x=x, y=y, color=study)) +
+        geom_point(alpha=0.2)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="drm", method.args=list(fct=LL.2()), formula="y ~ x",
+                       se = FALSE, size=1.5) +
+        xlab("Concentration") + 
+        ylab("% Injury / 100") + ggtitle("DRC nonlinear normal fit")
+p_drc#+scale_x_log10()
 
-```{r setup}
-library(drcHelper)
-library(tidyverse)
+p_drc + facet_wrap(~study)
+
 ```
 
 ```{r}
-data("exampleHistData")
-exampleHistData <- exampleHistData %>% as_tibble %>% mutate(across(where(is.integer),as.numeric)) %>% as.data.frame(.)
-#Take the subset corresponding to F0-females of 16 weeks of age
-
-subIndex<-which(exampleHistData$Generation=='F2' &
-                  exampleHistData$Genotypic_Sex=='Female' &
-                  exampleHistData$Age=='16_wk' )
-exampleHistData.Sub<-exampleHistData[subIndex, ]
-#Run RSCABS	
-exampleResults<-runRSCABS(exampleHistData.Sub,'Treatment',
-                          'Replicate',test.type='RS')
+df_nested <- df_all %>% group_by(study) %>% nest()
+dfres <- df_nested %>% mutate(modres=map(data,modelall))
+ec50 <- dfres %>% mutate(ec50=modres[[1]][1]) %>% dplyr::select(-c(data,modres)) %>% unnest(cols=c(ec50)) %>% ungroup() %>% mutate(TrueEC50 = rep(true_ec50,each=2))
+knitr::kable(ec50)
 ```
 
 ```{r}
-exampleResults %>% knitr::kable(.,digits=3)
+predres <- dfres %>% mutate(preds=modres[[1]][2]) %>% dplyr::select(-c(data,modres)) %>% unnest(cols=c(preds)) %>% ungroup()
+p_drc_qb <- ggplot(df_all, aes(x=x, y=y)) +
+        geom_point(alpha=0.1)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="drm", method.args=list(fct=LL.2()), formula="y~x",
+                       se = FALSE, size=1.5,col=scales::hue_pal()(2)[1]) +
+                       geom_smooth(aes(group=study),method="glm", method.args=list(family="quasibinomial"), formula="y~log(x)",
+                       se = FALSE, size=1.5,lty=3,col=scales::hue_pal()(2)[2])+
+        xlab("Concentration") + 
+        ylab("% Injury / 100")  + facet_wrap(~study)
+ p_drc_qb + geom_hline(yintercept=0.5,col="purple") + geom_vline(data=ec50,aes(xintercept=TrueEC50),col="purple")+ geom_ribbon(data=predres,aes(x=x,ymin=Lower,ymax=Upper,y=Prediction,fill=model),alpha=0.3) + ggtitle("drc and quasibinomial fit with CI") + geom_vline(data=ec50,aes(xintercept=EC50,col=model))
 ```
 
-
-```{r}
-ggplot(exampleHistData.Sub,aes(x=Treatment,fill=factor(Gon_Asynch_Dev)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Data: Gon_Asynch_Dev",subtitle = "subset: F2 generation, 15 week age and female")
-
-cids <-which(apply(exampleHistData.Sub[,-(1:5)],2,max)>0)
-responses <- names(cids)
-
-
-
-ggplot(exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint"),aes(x=Treatment,fill=factor(Response)))+geom_bar()+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint)
-
-
-library(scales)
-dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_to = "Response",names_to = "Endpoint") %>% group_by(Endpoint,Treatment,Response) %>% summarise(counts=n())%>% group_by(Endpoint,Treatment) %>% mutate(total=sum(counts))
-
-ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
-```
-
-
-
-## Multi-quantile JT
-
-From: John Green, personal communication.
-
-
-
-
-
-## Function Notes
-
-```{r eval=FALSE}
-library(DependenciesGraphs)
-dep <- funDependencies("package:drcHelper", "runRSCABS")
-
-# visualization
-plot(dep)
-
-```
-
-### Notes on RSCABS functions
-
-1. Select responses maximum value should be > 0 and smaller than 20??
-2. for each to be tested response/endpoints, *convert2score*
-3. for each to be tested response/endpoints, *prepDataRSCABS*, prepare the data into matrix/table format, treatment as column, replicate as row
-4. for each to be tested response/endpoints, *stepKRSCABS*.
-
-The results look like below:
-
-```
-$Gon_Asynch_Dev
-           Effect Treatment R.Score Statistic     P.Value Signif
-1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
-2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
-5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-```
-
-5. combine the results into a big matrix.
 
 
 
