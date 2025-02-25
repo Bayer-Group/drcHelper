@@ -33,7 +33,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, any::tidyverse, any::drda, any::pander, any::metafor, any::kableExtra, any::plyr, any::ggprism, any::ggnewscale, any::GLMcat, any::quarto, local::.
+          extra-packages: any::pkgdown, any::tidyverse, any::drda, any::pander, any::metafor, any::kableExtra, any::plyr, any::ggprism, any::ggnewscale, any::GLMcat, any::quarto,any::Hmisc, local::.
           needs: website
 
       - name: Build site

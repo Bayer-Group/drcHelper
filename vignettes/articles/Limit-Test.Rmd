@@ -1,0 +1,18 @@
+---
+title: "Limit Test"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",  
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+In some cases (e.g. when a test chemical is expected to be of low toxicity or when a test chemical is poorly soluble) a limit test may be performed, in order to demonstrate that the NOEDD is greater than or equal to the limit dose tested, and the LDD50 is greater than the limit dose tested, if no effects are observed in the study. 
