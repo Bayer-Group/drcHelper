@@ -10,7 +10,7 @@ editor_options:
 
 ## NOEC in General
 
-The NOEC (No Observed Effect Concentration) is a critical value in ecotoxicology, representing the highest concentration of a substance that does not produce a statistically significant effect on the test organisms compared to a control group. 
+The NOEC (No Observed Effect Concentration) is a critical value in ecotoxicology, representing the highest concentration of a substance that does not produce a statistically significant effect on the test organisms compared to a control group. The concept has various names, including NOER(No Observed Effect Rate), NOEDD(No Observed Effect Daily Dose), NOAEL(No Observed Adverse Effect Level), and so on. It is an important metric for determining safe exposure levels for chemicals and assessing their potential risks to human health and the environment.
 
 It is relatively straightforward to calulate and intepret NOEC, and it is widely used and accepted in the regulatory world. However, it is also criticized for its limitations:
 

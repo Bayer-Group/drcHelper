@@ -9,10 +9,274 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+library(dplyr)
 ```
 
 ```{r setup}
 library(drcHelper)
+
 ```
 
-In some cases (e.g. when a test chemical is expected to be of low toxicity or when a test chemical is poorly soluble) a limit test may be performed, in order to demonstrate that the NOEDD is greater than or equal to the limit dose tested, and the LDD50 is greater than the limit dose tested, if no effects are observed in the study. 
+In certain situations, such as when a test chemical is anticipated to have low toxicity or is poorly soluble, a limit test may be conducted. This test aims to show that the No Observed Effect Concentration (NOEC) is greater than or equal to the tested limit concentration, and that the LD50 or EC50 is also greater than the tested limit dose, provided no effects are observed during the study.
+
+Below is an example for Limit Test analysis.
+
+
+```{r}
+data("test_cases_data")
+testdata <- test_cases_data%>% filter(Design =="Limit")
+metainfo <- testdata[1,]
+design <- ifelse(metainfo$Design=="Limit","limit test", "full dose response study")
+nconc <- length(unique(testdata$Dose))
+```
+
+The test is a `r design` for test organism `r metainfo[,"Test organism"]`. There are `r nconc` test concentrations. The interested endpoint is `r metainfo$Endpoint` for `r metainfo[,"Measurement Variable"]` at `r metainfo$Time`.
+
+
+
+## Preliminary Assessment
+
+```{r}
+ctr <- testdata %>% filter(Dose == "0")
+ctr0 <- mean(ctr$Response)
+sres <- testdata %>% group_by(Dose)%>% dplyr::summarize(Mean=mean(Response),SD=sd(Response)) %>% mutate(`% Inhibition` = - ((Mean-ctr0)/ctr0)*100)
+sres %>% knitr::kable(.,digits = 3)
+```
+## Outlier Check
+
+```{r}
+dixon.test <- outliers::dixon.test
+DixonQ[DixonQ$n==6,"Q_critical"]
+outRes <- testdata %>% group_by(Dose) %>% nest() %>% mutate(normtest=map(data,~dixon.test(.x$Response)),
+                                       tidies= map(normtest,broom::tidy))
+outRes <- outRes %>% dplyr::select(-c(data,normtest)) %>% unnest(c(tidies))
+outRes %>% knitr::kable(.,digits = 3)
+## by specifying the opposite: a logical indicating whether you want to check not the value with largest difference from the mean, but opposite (lowest, if most suspicious is highest etc.)
+outRes <- testdata %>% group_by(Dose) %>% nest() %>% mutate(normtest=map(data,~dixon.test(.x$Response,opposite = TRUE)),
+                                       tidies= map(normtest,broom::tidy))
+outRes <- outRes %>% dplyr::select(-c(data,normtest)) %>% unnest(c(tidies))
+outRes %>% knitr::kable(.,digits = 3)
+```
+
+
+## Normality Check
+
+Welch's t-test only requires normality for each group.
+
+**Normality for residuals**
+
+```{r}
+mod <- lm(Response~factor(Dose),data=testdata)
+normalres <- shapiro.test(residuals(mod))
+```
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Shapiro-Wilk's") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(c(normalres$statistic,normalres$p.value)),as.numeric(eres$`expected result value`,tolerance=1e-4))
+
+```
+
+**Normality for each group**
+
+
+```{r}
+normRes <- testdata %>% group_by(Dose) %>% nest() %>% mutate(normtest=map(data,~shapiro.test(.x$Response)),
+                                       tidies= map(normtest,broom::tidy))
+normRes <- normRes %>% dplyr::select(-c(data,normtest)) %>% unnest(c(tidies))
+normRes %>% knitr::kable(.,digits = 3)
+```
+
+
+**Variance Homogeneity**
+
+```{r}
+(varTest <- car::leveneTest(Response~factor(Dose),data=testdata,center=mean))
+## lawstat::levene.test(testdata$Response,testdata$Dose,location="mean")
+car::leveneTest(Response~factor(Dose),data=testdata,center=median)
+```
+## Student's t-test
+
+
+
+**two-sided**
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose,var.equal = TRUE))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+```
+
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Student's t-test, two-sided") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+
+
+**one-sided greater**
+
+Note that if using formula, the greater means test group is greater than control
+
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose,var.equal = TRUE,alternative="greater"))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+```
+
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Student's t-test, smaller") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+
+**one-sided smaller**
+
+Note that if using formula, the greater means test group is greater than control
+
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose,var.equal = TRUE,alternative="less"))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+```
+
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Student's t-test, greater") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+## Welch's t-test
+
+Welch Two Sample t-test
+
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+
+```
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Welch's test, two-sided") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+
+**one-sided greagter **
+
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose,alternative ="less"))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+
+```
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Welch's test, greater") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+
+**one-sided smaller **
+
+```{r}
+(res <- t.test(testdata$Response~testdata$Dose,alternative ="greater"))
+tres <- broom::tidy(res)
+tres1 <- c(tres$estimate1,tres$estimate2, tres$parameter,sres$`% Inhibition`[2], -tres$statistic,tres$p.value)
+names(tres1) <- c("Mean Control", "Mean Test Item", "df", "%Inhibition", "T-statistic", "p-value")
+tres1
+
+```
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Welch's test, smaller") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(tres1),as.numeric(eres$`expected result value`[1:6],tolerance=1e-4))
+
+```
+
+
+## Nonparametric test 
+
+### Kruskal–Wallis test
+
+```{r}
+(kwres <- kruskal.test(Response~Dose,data=testdata))
+```
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Kruskal–Wallis") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(c(kwres$statistic,kwres$p.value)),as.numeric(eres$`expected result value`[1:2],tolerance=1e-4))
+
+```
+
+
+### Dunn's test (many-to-one)
+
+In essence, Dunn's test can be viewed as a series of Wilcoxon rank sum tests applied to pairs of groups, with adjustments made for multiple comparisons.
+
+The link between Dunn's test and the Wilcoxon rank sum test lies in their non-parametric nature and rank-based approach. While the Wilcoxon rank sum test is used for comparing two groups, Dunn's test extends the concept of rank comparisons to multiple groups following the Kruskal-Wallis test.
+
+
+```{r}
+## (dunnres <- PMCMRplus::kwManyOneDunnTest(Response~factor(Dose),data=testdata))
+```
+
+### Wilcoxon test
+
+Wilcoxon rank-sum test (also called  Mann–Whitney U-test) when the data deviates significantly from normal.
+
+```{r}
+(Ures <- wilcox.test(Response~factor(Dose),data=testdata))
+## same results would be obtained by specifying x and y instead of a formula
+## wilcox.test(testdata$Response[testdata$Dose=="0"],testdata$Response[testdata$Dose=="100"],data=testdata)
+(Ures <- wilcox.test(Response~factor(Dose),data=testdata,alternative="greater"))
+(Ures <- wilcox.test(Response~factor(Dose),data=testdata,alternative="less"))
+
+```
+
+
+```{r include=FALSE,eval=FALSE}
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"Kruskal–Wallis") & `Study ID`=="Limit")
+eres
+
+testthat::expect_equal(as.numeric(c(kwres$statistic,kwres$p.value)),as.numeric(eres$`expected result value`[1:2],tolerance=1e-4))
+
+```
