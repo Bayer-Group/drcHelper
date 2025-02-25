@@ -62,7 +62,7 @@ navbar:
       text: Reference
       href: reference/
     tutorials:
-      text: Regulatory Insights
+      text: Regulatory Stats
       menu:
       - text: NOEC Calculations
         href: articles/NOEC_Methods.html

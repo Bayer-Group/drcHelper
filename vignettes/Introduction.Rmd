@@ -30,9 +30,9 @@ In the **Getting Started** section, we introduce the main helper functions that 
 
 For routine analyses, we adopt the **drc** package as our core analysis tool, given its robust capabilities for dose-response modeling. However, we recognize that there are numerous other packages designed for similar analyses, such as **drda**, **DoseFinding**, and others. In the **Articles** section, we provide examples and reproduce analyses using these alternative packages, allowing users to explore different methodologies and gain insights into how similar analyses can be conducted across various frameworks. Additionally, for specific types of data, we offer supplementary analyses utilizing other testing or modeling approaches, ensuring a well-rounded perspective on statistical evaluation.
 
-## Examples
+## Regulatory Stats
 
-The **Examples** section showcases practical applications of our package's functionalities, demonstrating how to implement analyses in real-world scenarios. These examples serve as a guide for users to replicate analyses and adapt them to their own datasets.
+The **Regulatory Stats** section explains some regulatory concepts and showcases practical applications of our package's functionalities, demonstrating how to implement analyses in real-world scenarios. These examples serve as a guide for users to replicate analyses and adapt them to their own datasets.
 
 ## Articles
 In the **Articles** section, we delve deeper into various topics related to dose-response analysis, providing insights, comparisons, and discussions on methodologies. This section aims to broaden your understanding of statistical approaches and their implications in research.
