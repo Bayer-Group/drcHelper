@@ -70,6 +70,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-validation">
 <li><a class="dropdown-item" href="../articles/System_Testing.html">System Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
       </ul>
@@ -104,9 +105,9 @@ Zhenglei Gao</h4>
 
     
     
-<div class="section level2">
-<h2 id="noec-in-general">NOEC in General<a class="anchor" aria-label="anchor" href="#noec-in-general"></a>
-</h2>
+<div class="section level3">
+<h3 id="noec-in-general">NOEC in General<a class="anchor" aria-label="anchor" href="#noec-in-general"></a>
+</h3>
 <p>The NOEC (No Observed Effect Concentration) is a critical value in
 ecotoxicology, representing the highest concentration of a substance
 that does not produce a statistically significant effect on the test
@@ -132,9 +133,9 @@ selections. Poor experimental design may yield high NOEC due to
 decreased statistical sensitivity, which is not desired in a regulatory
 context.</li>
 </ol>
-<div class="section level3">
-<h3 id="methods-for-deriving-noec">Methods for deriving NOEC<a class="anchor" aria-label="anchor" href="#methods-for-deriving-noec"></a>
-</h3>
+<div class="section level4">
+<h4 id="methods-for-deriving-noec">Methods for deriving NOEC<a class="anchor" aria-label="anchor" href="#methods-for-deriving-noec"></a>
+</h4>
 <ol style="list-style-type: decimal">
 <li>Dunnett’s Test: used to compare multiple treatment groups against a
 control group while controlling for Type I error,</li>
@@ -143,9 +144,9 @@ control group while controlling for Type I error,</li>
 step-down Jonckheere-Terpstra trend test.</li>
 </ol>
 </div>
-<div class="section level3">
-<h3 id="dealing-with-inhomogenous-variance">Dealing with inhomogenous variance<a class="anchor" aria-label="anchor" href="#dealing-with-inhomogenous-variance"></a>
-</h3>
+<div class="section level4">
+<h4 id="dealing-with-inhomogenous-variance">Dealing with inhomogenous variance<a class="anchor" aria-label="anchor" href="#dealing-with-inhomogenous-variance"></a>
+</h4>
 <p>There are several ways to deal with inhomogeneous variances.</p>
 <ol style="list-style-type: decimal">
 <li>Welch’s ANOVA (an adaptation of ANOVA that dose not assume equal
@@ -160,9 +161,9 @@ of results interpretation and should be avoided if possible.</li>
 </ol>
 </div>
 </div>
-<div class="section level2">
-<h2 id="dunnet-tests">Dunnet Tests<a class="anchor" aria-label="anchor" href="#dunnet-tests"></a>
-</h2>
+<div class="section level3">
+<h3 id="dunnet-tests">Dunnet Tests<a class="anchor" aria-label="anchor" href="#dunnet-tests"></a>
+</h3>
 <p>Dunnett’s test is a multiple comparison test for determining
 significant differences between the mean values of several test groups
 and a control with normally distributed errors with homogeneous
@@ -180,9 +181,20 @@ library <code>PMCMRplus</code> can be used to calculate the test options
 <strong>emmeans</strong> is a package for estimating marginal means and
 conducting pairwise comparisons.</p>
 </div>
+<div class="section level3">
+<h3 id="williams-trend-test">Williams’ trend test<a class="anchor" aria-label="anchor" href="#williams-trend-test"></a>
+</h3>
+<p>Inside the <strong>drcHelper</strong> package,
+<code>getwilliamRes</code></p>
+</div>
 <div class="section level2">
-<h2 id="tamhane-dunnetts-test">Tamhane-Dunnett’s Test<a class="anchor" aria-label="anchor" href="#tamhane-dunnetts-test"></a>
+<h2 id="alternative-approaches">Alternative Approaches<a class="anchor" aria-label="anchor" href="#alternative-approaches"></a>
 </h2>
+<p>These approaches are not routinely used in the regulatory NOEC
+calculations. However, they are very useful in certain situations.</p>
+<div class="section level3">
+<h3 id="tamhane-dunnetts-test">Tamhane-Dunnett’s Test<a class="anchor" aria-label="anchor" href="#tamhane-dunnetts-test"></a>
+</h3>
 <p>For many-to-one comparisons in an one-factorial layout with normally
 distributed residuals and unequal variances Tamhane-Dunnett’s test can
 be used.</p>
@@ -295,20 +307,15 @@ be used.</p>
 <span><span class="co">## P value adjustment method: single-step</span></span></code></pre>
 <pre><code><span><span class="co">## alternative hypothesis: greater</span></span></code></pre>
 </div>
-<div class="section level2">
-<h2 id="williams-trend-test">Williams’ trend test<a class="anchor" aria-label="anchor" href="#williams-trend-test"></a>
-</h2>
-<p>Inside the <strong>drcHelper</strong> package,
-<code>getwilliamRes</code></p>
-</div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
+<div class="section level3">
+<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
 <ul>
 <li>DUNNETT C. W. (1955): A multiple comparison procedure for comparing
 several treatments with a control, Journal of the American Statistical
 Association, 50, pp. 1096-1121.</li>
 </ul>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
