@@ -52,7 +52,7 @@ navbar:
         href: articles/Introduction.html
       - text: Example Analysis Workflow
         href: articles/Example_Analysis_Workflow.html
-      - text: Example DRC: OECD 201
+      - text: Example DRC - OECD 201
         href: articles/Examples_oecd201.html
       - text: Example Helper Functions
         href: articles/Examples_drc.html
