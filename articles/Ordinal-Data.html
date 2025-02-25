@@ -34,17 +34,18 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
+    <li><a class="dropdown-item" href="../articles/Examples_drc.html">Example Helper Functions</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-examples">
-<li><a class="dropdown-item" href="../articles/Examples_drc.html">Example Helper Functions</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-regulatory-insights" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Regulatory Insights</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-regulatory-insights">
+<li><a class="dropdown-item" href="../articles/NOEC_Methods.html">NOEC Calculations</a></li>
     <li><a class="dropdown-item" href="../articles/EFSA-Criteria.html">EFSA Criteria and Other Reliability Criteria</a></li>
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
-    <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">OECD 201</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -95,6 +96,9 @@
 
     
     
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
@@ -150,75 +154,17 @@ complete).</p>
 proportions, it is also possible to model them as continuous data or
 using logitic regression with quasibinomial assumptions. The two
 approaches produce similar results when the data is behaving truly like
-a dose-response with overe-dispersed binomial distributions.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+a dose-response with over-dispersed binomial distributions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/textconnections.html" class="external-link">textConnection</a></span><span class="op">(</span><span class="st">"Obs    rep dose    yt  y0 </span></span>
-<span><span class="st">1   1   2   0.02021 0</span></span>
-<span><span class="st">2   2   2   0.02491 0</span></span>
-<span><span class="st">3   3   2   0.00760 0</span></span>
-<span><span class="st">4   5   2   0.04466 0</span></span>
-<span><span class="st">5   6   2   0.00037 0</span></span>
-<span><span class="st">6   8   2   0.05386 0</span></span>
-<span><span class="st">7   9   2   0.07205 0</span></span>
-<span><span class="st">8   10  2   0.01125 0</span></span>
-<span><span class="st">9   1   4   0.02011 0</span></span>
-<span><span class="st">10  7   4   0.09058 0</span></span>
-<span><span class="st">11  8   4   0.06255 0</span></span>
-<span><span class="st">12  10  8   0.09431 0</span></span>
-<span><span class="st">13  4   2   0.14060 A</span></span>
-<span><span class="st">14  7   2   0.22223 A</span></span>
-<span><span class="st">15  2   4   0.20943 A</span></span>
-<span><span class="st">16  3   4   0.20959 A</span></span>
-<span><span class="st">17  4   4   0.17305 A</span></span>
-<span><span class="st">18  9   4   0.11405 A</span></span>
-<span><span class="st">19  10  4   0.17668 A</span></span>
-<span><span class="st">20  1   8   0.12756 A</span></span>
-<span><span class="st">21  6   8   0.11478 A</span></span>
-<span><span class="st">22  6   32  0.20602 A</span></span>
-<span><span class="st">23  5   4   0.26650 B</span></span>
-<span><span class="st">24  6   4   0.27344 B</span></span>
-<span><span class="st">25  3   8   0.27021 B</span></span>
-<span><span class="st">26  5   8   0.30662 B</span></span>
-<span><span class="st">27  8   8   0.29319 B</span></span>
-<span><span class="st">28  9   8   0.37300 B</span></span>
-<span><span class="st">29  6   16  0.36224 B</span></span>
-<span><span class="st">30  9   16  0.31316 B</span></span>
-<span><span class="st">31  2   8   0.55845 C</span></span>
-<span><span class="st">32  4   8   0.44811 C</span></span>
-<span><span class="st">33  3   16  0.42677 C</span></span>
-<span><span class="st">34  3   32  0.52315 C</span></span>
-<span><span class="st">35  7   8   0.67080 D</span></span>
-<span><span class="st">36  2   16  0.71776 D</span></span>
-<span><span class="st">37  4   16  0.73038 D</span></span>
-<span><span class="st">38  5   16  0.64232 D</span></span>
-<span><span class="st">39  7   16  0.68720 D</span></span>
-<span><span class="st">40  8   16  0.61088 D</span></span>
-<span><span class="st">41  5   32  0.72342 D</span></span>
-<span><span class="st">42  8   32  0.63594 D</span></span>
-<span><span class="st">43  1   16  0.77171 E</span></span>
-<span><span class="st">44  10  16  0.74087 E</span></span>
-<span><span class="st">45  2   32  0.79477 E</span></span>
-<span><span class="st">46  4   32  0.88546 E</span></span>
-<span><span class="st">47  7   32  0.78002 E</span></span>
-<span><span class="st">48  9   32  0.81456 E</span></span>
-<span><span class="st">49  10  32  0.89465 E</span></span>
-<span><span class="st">50  1   32  0.96129 F</span></span>
-<span><span class="st">51  1   64  0.96127 F</span></span>
-<span><span class="st">52  2   64  0.91687 F</span></span>
-<span><span class="st">53  3   64  0.97204 F</span></span>
-<span><span class="st">54  4   64  0.99268 F</span></span>
-<span><span class="st">55  5   64  0.98935 F</span></span>
-<span><span class="st">56  6   64  0.96263 F</span></span>
-<span><span class="st">57  7   64  0.95435 F</span></span>
-<span><span class="st">58  8   64  0.92081 F</span></span>
-<span><span class="st">59  9   64  0.91776 F</span></span>
-<span><span class="st">60  10  64  0.99104 F"</span><span class="op">)</span>,header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<p>The data is artificial and with full dose-response relationship
+observed with true ER50=12.18.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>yy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html" class="external-link">mapvalues</a></span><span class="op">(</span><span class="va">y0</span>,from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="fl">30</span>,<span class="fl">50</span>,<span class="fl">70</span>,<span class="fl">90</span>,<span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>yy2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/mapvalues.html" class="external-link">mapvalues</a></span><span class="op">(</span><span class="va">y0</span>,from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>,<span class="fl">0.18</span>,<span class="fl">0.34</span>,<span class="fl">0.50</span>,<span class="fl">0.66</span>,<span class="fl">0.82</span>,<span class="fl">0.95</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/ftable.html" class="external-link">ftable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">y0</span> <span class="op">+</span> <span class="va">dose</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span><span class="op">)</span> <span class="co">##%&gt;% gt::gt() ## as.data.frame(.) %&gt;% knitr::kable(.,digits = 3)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">pvi_example</span> <span class="co">## use the example PVI data in the drcHelper package</span></span>
+<span><span class="co">## Note that yy2 is transformed by increment of 90/5 = 16. </span></span>
+<span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span>,ordered <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/ftable.html" class="external-link">ftable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">y0</span> <span class="op">+</span> <span class="va">dose</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span><span class="op">)</span> <span class="co">##%&gt;% gt::gt() ## as.data.frame(.) %&gt;% knitr::kable(.,digits = 3)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;    dose  2  4  8 16 32 64</span></span>
 <span><span class="co">#&gt; y0                       </span></span>
 <span><span class="co">#&gt; 0        8  3  1  0  0  0</span></span>
@@ -228,7 +174,7 @@ a dose-response with overe-dispersed binomial distributions.</p>
 <span><span class="co">#&gt; D        0  0  1  5  2  0</span></span>
 <span><span class="co">#&gt; E        0  0  0  2  5  0</span></span>
 <span><span class="co">#&gt; F        0  0  0  0  1 10</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
@@ -284,7 +230,7 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,meany<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yt</span><span class="op">)</span>,meanyy<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">yy</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -333,16 +279,587 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dattab_new</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dose</span>, y<span class="op">=</span><span class="va">yt</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"glm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family<span class="op">=</span><span class="st">"quasibinomial"</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y ~ log(x)"</span>,</span>
-<span>                       se <span class="op">=</span><span class="cn">TRUE</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dattab_new</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dose</span>, y<span class="op">=</span><span class="va">yt</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>method<span class="op">=</span><span class="st">"glm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family<span class="op">=</span><span class="st">"quasibinomial"</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y ~ log(x)"</span>,</span>
+<span>                       se <span class="op">=</span><span class="cn">TRUE</span>, linewidth<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
+<span><span class="va">mod_drc</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">yy2</span> <span class="op">~</span> <span class="va">dose</span>, data <span class="op">=</span> <span class="va">dattab_new</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod_drc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0 and upper limit at 1 (2 parms)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Parameter estimates:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;               Estimate Std. Error t-value   p-value    </span></span>
+<span><span class="co">#&gt; b:(Intercept) -1.33865    0.13595 -9.8465 5.487e-14 ***</span></span>
+<span><span class="co">#&gt; e:(Intercept) 12.74391    1.03919 12.2633 &lt; 2.2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  0.1446638 (58 degrees of freedom)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">mod_drc</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>, interval <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error   Lower   Upper</span></span>
+<span><span class="co">#&gt; e:1:50  12.7439     1.0392 10.6637 14.8241</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_drc</span>, type <span class="op">=</span> <span class="st">"all"</span>,main<span class="op">=</span><span class="st">"log-logistic + normal, ER50= 12.74"</span>, broken <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_drc</span>, broken <span class="op">=</span> <span class="cn">TRUE</span>, type<span class="op">=</span><span class="st">"confidence"</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<div class="section level3">
+<h3 id="putting-quasi-binomial-and-normal-fit-together">Putting quasi-binomial and normal fit together<a class="anchor" aria-label="anchor" href="#putting-quasi-binomial-and-normal-fit-together"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
+<span><span class="va">predictCIglm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mod</span>,<span class="va">dat</span>,<span class="va">newdata</span><span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">{</span></span>
+<span> <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">newdata</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">preddata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dat</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span> <span class="op">}</span><span class="kw">else</span> <span class="va">predata</span> <span class="op">&lt;-</span> <span class="va">newdata</span></span>
+<span>  <span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>, newdata <span class="op">=</span> <span class="va">preddata</span>, type <span class="op">=</span> <span class="st">"link"</span>, se.fit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">critval</span> <span class="op">&lt;-</span> <span class="fl">1.96</span> <span class="co">## approx 95% CI qnorm(0.975)</span></span>
+<span>  <span class="va">upr</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">$</span><span class="va">fit</span> <span class="op">+</span> <span class="op">(</span><span class="va">critval</span> <span class="op">*</span> <span class="va">preds</span><span class="op">$</span><span class="va">se.fit</span><span class="op">)</span></span>
+<span>  <span class="va">lwr</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">$</span><span class="va">fit</span> <span class="op">-</span> <span class="op">(</span><span class="va">critval</span> <span class="op">*</span> <span class="va">preds</span><span class="op">$</span><span class="va">se.fit</span><span class="op">)</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">preds</span><span class="op">$</span><span class="va">fit</span></span>
+<span>  <span class="va">fit2</span> <span class="op">&lt;-</span> <span class="va">mod</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span>  <span class="va">upr2</span> <span class="op">&lt;-</span> <span class="va">mod</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">upr</span><span class="op">)</span></span>
+<span>  <span class="va">lwr2</span> <span class="op">&lt;-</span> <span class="va">mod</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">lwr</span><span class="op">)</span></span>
+<span>  <span class="va">preddata</span><span class="op">$</span><span class="va">Prediction</span> <span class="op">&lt;-</span> <span class="va">fit2</span> </span>
+<span>  <span class="va">preddata</span><span class="op">$</span><span class="va">Lower</span> <span class="op">&lt;-</span> <span class="va">lwr2</span> </span>
+<span>  <span class="va">preddata</span><span class="op">$</span><span class="va">Upper</span> <span class="op">&lt;-</span> <span class="va">upr2</span> </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">preddata</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span><span class="va">preddrc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mod</span>,<span class="va">dat</span>,<span class="va">newdata</span><span class="op">=</span><span class="cn">NULL</span><span class="op">)</span><span class="op">{</span></span>
+<span> <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">newdata</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">preddata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dat</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span> <span class="op">}</span><span class="kw">else</span> <span class="va">predata</span> <span class="op">&lt;-</span> <span class="va">newdata</span></span>
+<span> <span class="va">preds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod</span>,newdata<span class="op">=</span><span class="va">preddata</span>,interval<span class="op">=</span><span class="st">"confidence"</span><span class="op">)</span></span>
+<span> <span class="va">preddata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">preddata</span>,<span class="va">preds</span><span class="op">)</span></span>
+<span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">preddata</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">modelall</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span>,<span class="va">addbeta</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">mod1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,data<span class="op">=</span><span class="va">dat</span>,family <span class="op">=</span> <span class="st">"quasibinomial"</span><span class="op">)</span></span>
+<span>  <span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="va">x</span>,fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span>,data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span> </span>
+<span>  <span class="co">## mod3 &lt;- MASS::glmmPQL(y ~ log(x),random=~1|x,family="quasibinomial",data=dat) </span></span>
+<span>  <span class="co">## Estimation the same as quasibinomial without random effects, uncertainty estimation wider. </span></span>
+<span>  <span class="co">## mod3 &lt;- lme4::glmer(y ~ log(x)+ (1|x),family="binomial",data=dat) ## dose not work without sample size.</span></span>
+<span>  <span class="co"># mod4 &lt;- betareg::betareg(y ~ log(x),link="logit",data=dat)</span></span>
+<span>  <span class="co"># y3&lt;- predict(mod3,newdata=data.frame(x=dat$x),type="response")</span></span>
+<span>  <span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu">predictCIglm</span><span class="op">(</span><span class="va">mod1</span>,dat<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span>  <span class="va">y1</span><span class="op">$</span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"quasibinomial"</span></span>
+<span></span>
+<span>  <span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu">preddrc</span><span class="op">(</span><span class="va">mod2</span>,dat <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
+<span>  <span class="va">y2</span><span class="op">$</span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"drc LL.2"</span></span>
+<span>  <span class="va">preddata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">y1</span>,<span class="va">y2</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">ec1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getEC50.html">getEC50</a></span><span class="op">(</span><span class="va">mod1</span><span class="op">)</span></span>
+<span>  <span class="va">ec2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getEC50.html">getEC50</a></span><span class="op">(</span><span class="va">mod2</span><span class="op">)</span></span>
+<span>  <span class="va">ec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">ec1</span>,<span class="va">ec2</span><span class="op">)</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quasibinomial"</span>,<span class="st">"drc LL.2"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="va">addbeta</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, family<span class="op">=</span><span class="fu">betar</span><span class="op">(</span>link<span class="op">=</span><span class="st">"logit"</span><span class="op">)</span>, data<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span>    <span class="va">y3</span> <span class="op">&lt;-</span> <span class="fu">predictCIglm</span><span class="op">(</span><span class="va">mod3</span>,dat<span class="op">=</span><span class="va">dat</span><span class="op">)</span></span>
+<span>    <span class="va">y3</span><span class="op">$</span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"beta"</span></span>
+<span>    <span class="va">preddata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">preddata</span>,<span class="va">y3</span><span class="op">)</span></span>
+<span>    <span class="va">ec3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getEC50.html">getEC50</a></span><span class="op">(</span><span class="va">mod3</span><span class="op">)</span></span>
+<span>    <span class="va">ec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">ec50</span>,<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">ec3</span>,model<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"beta"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="co">#ec4 &lt;- uniroot(function(x) predict(mod4, newdata = data.frame(x=x)) - 0.5,lower = 1, upper = 80)$root</span></span>
+<span>  <span class="co">## 19.55968 beta regression does not perform better than binomial or quasi-binomial regression!</span></span>
+<span>  </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ec50<span class="op">=</span><span class="va">ec50</span>,predata<span class="op">=</span><span class="va">preddata</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">modelallbeta</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu">modelall</span><span class="op">(</span><span class="va">dat</span>,addbeta<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">yy</span>,x<span class="op">=</span><span class="va">dose</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span></span>
+<span><span class="va">modres</span> <span class="op">&lt;-</span> <span class="fu">modelall</span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
+<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error   Lower   Upper</span></span>
+<span><span class="co">#&gt; e:1:50  12.7097     1.0856 10.5367 14.8826</span></span>
+<span><span class="va">predres</span> <span class="op">&lt;-</span> <span class="va">modres</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">modres</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TrueEC50 <span class="op">=</span> <span class="fl">12.18</span><span class="op">)</span>,digits<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">EC50</th>
+<th align="right">lower</th>
+<th align="right">upper</th>
+<th align="right">se</th>
+<th align="left">model</th>
+<th align="right">TrueEC50</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">12.789</td>
+<td align="right">10.744</td>
+<td align="right">15.223</td>
+<td align="right">1.144</td>
+<td align="left">quasibinomial</td>
+<td align="right">12.18</td>
+</tr>
+<tr class="even">
+<td align="right">12.710</td>
+<td align="right">10.537</td>
+<td align="right">14.883</td>
+<td align="right">1.086</td>
+<td align="left">drc LL.2</td>
+<td align="right">12.18</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p_drc_qb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dattab_new</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">dose</span>, y<span class="op">=</span><span class="va">yt</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">dose</span>, y<span class="op">=</span><span class="va">yy</span><span class="op">)</span>,col<span class="op">=</span><span class="st">"green"</span><span class="op">)</span><span class="op">+</span></span>
+<span>                <span class="co">#scale_color_viridis_d()+scale_fill_viridis_d()+</span></span>
+<span>        <span class="co"># scale_color_brewer(palette = "Reds") + </span></span>
+<span>        <span class="co"># #geom_smooth(method="loess", se = FALSE, size=1.5) +</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">predres</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">Prediction</span>,ymin<span class="op">=</span><span class="va">Lower</span>,ymax<span class="op">=</span><span class="va">Upper</span>,col<span class="op">=</span><span class="va">model</span>,fill<span class="op">=</span><span class="va">model</span><span class="op">)</span>,alpha<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">predres</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">Prediction</span>,col<span class="op">=</span><span class="va">model</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"% Injury / 100"</span><span class="op">)</span></span>
+<span><span class="va">p_drc_qb</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="on-the-gof">On the GoF<a class="anchor" aria-label="anchor" href="#on-the-gof"></a>
+</h3>
+<p>Normally we could test lack of fit for continuous data by comparing
+the model fit with ANOVA model, which should achieve the least square
+estimation. Changjian proposed to use the prediction intervals from the
+models to estimate the frequency table that would usually be a product
+of conventional ordinal regression, followed by a chi-square test.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="additional-thoughts">Additional Thoughts<a class="anchor" aria-label="anchor" href="#additional-thoughts"></a>
+</h2>
+<p>Thinking about (quasi)-binomial type modelling and data-generation
+process, it is possible to assume when you see level B injury, you had
+many independent binary yes/no outcomes (conditional on the observed
+covariate values for each replicate or experiment unit) for each injury
+level or for an arbitrary number of categories, the proportion of yes
+answer is then the average injury. The probabilities of each binary
+outcome are the same, which may mismatch the observed data rather
+badly.</p>
+<p>Beta regression can be used to model proportions too, however, 0 and
+1’s need to be specifically handled.</p>
+<div class="section level3">
+<h3 id="using-conventional-ordinal-regression-approaches">Using Conventional Ordinal Regression Approaches<a class="anchor" aria-label="anchor" href="#using-conventional-ordinal-regression-approaches"></a>
+</h3>
+<p>Ordinal regression approaches works well in terms of prediction but
+would need a specific function to calculate ER50. <span class="math inline">\(\sum p_i Y_{ij}\)</span> would be the average
+injury level.</p>
+<p>The proportional odds model can be interpreted in terms of
+probabilities of transitions and also in terms of covariate-specific
+cumulative probabilities. The latter is a bit easier to understand.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## fit ordered logit model and store results 'm'</span></span>
 <span><span class="va">dattab_new</span> <span class="op">$</span><span class="va">y0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>,<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>,<span class="st">"E"</span>,<span class="st">"F"</span><span class="op">)</span>,ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -484,7 +1001,7 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ylleonv/GLMcat" class="external-link">GLMcat</a></span><span class="op">)</span></span>
 <span></span>
@@ -596,7 +1113,7 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## (phat &lt;- predict(object = mod_ref_log_c, newdat, type="linear.predictor"))</span></span>
 <span></span>
@@ -699,11 +1216,15 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <div class="section level3">
 <h3 id="other-understanding-of-the-dataset">Other understanding of the dataset<a class="anchor" aria-label="anchor" href="#other-understanding-of-the-dataset"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit0</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">polr</a></span><span class="op">(</span><span class="va">y0</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<p>In principle, ordinal regression is treating the ranked categorical
+as several binomial for each category. Note that how the intercept of
+<code>0|A</code> is -1.386294e+00.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit0</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">polr</a></span><span class="op">(</span><span class="va">y0</span> <span class="op">~</span>  <span class="fl">1</span>,</span>
 <span>                      data <span class="op">=</span> <span class="va">dattab_new</span>,</span>
 <span>                      Hess<span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="va">fit0</span></span>
@@ -720,6 +1241,8 @@ a dose-response with overe-dispersed binomial distributions.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual Deviance: 228.003 </span></span>
 <span><span class="co">#&gt; AIC: 240.003</span></span>
+<span><span class="co">## Note that </span></span>
+<span></span>
 <span><span class="co">#source("https://github.com/rwnahhas/RMPH_Resources/raw/main/Functions_rmph.R")</span></span>
 <span><span class="va">ilogit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">ilogit</span><span class="op">(</span><span class="va">fit0</span><span class="op">$</span><span class="va">zeta</span><span class="op">)</span></span>
@@ -732,58 +1255,61 @@ a dose-response with overe-dispersed binomial distributions.</p>
 <span>    <span class="st">'Y&gt;=2'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="st">'Y&gt;=3'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="st">'Y&gt;=4'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    <span class="st">'Y&gt;=5'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="st">'Y&gt;=5'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="st">'Y&gt;=6'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span></span>
-<span><span class="op">(</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dattab_new</span>, <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, fun<span class="op">=</span><span class="va">sf</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  Length   Class    Mode </span></span>
-<span><span class="co">#&gt;       3 formula    call</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hbiostat.org/R/Hmisc/" class="external-link">Hmisc</a></span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dattab_new</span>,<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">~</span> <span class="op">(</span><span class="va">dose</span><span class="op">)</span>, fun<span class="op">=</span><span class="va">sf</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; as.numeric(y0)      N= 60  </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 2) ~ log(dose), family = "binomial", </span></span>
+<span><span class="co">#&gt; +-------+--+--+----+----------+----------+----------+----------+----------+</span></span>
+<span><span class="co">#&gt; |       |  | N|Y&gt;=1|      Y&gt;=2|      Y&gt;=3|      Y&gt;=4|      Y&gt;=5|      Y&gt;=6|</span></span>
+<span><span class="co">#&gt; +-------+--+--+----+----------+----------+----------+----------+----------+</span></span>
+<span><span class="co">#&gt; |   dose| 2|10| Inf|-1.3862944|      -Inf|      -Inf|      -Inf|      -Inf|</span></span>
+<span><span class="co">#&gt; |       | 4|10| Inf| 0.8472979|-1.3862944|      -Inf|      -Inf|      -Inf|</span></span>
+<span><span class="co">#&gt; |       | 8|10| Inf| 2.1972246| 0.8472979|-0.8472979|-2.1972246|      -Inf|</span></span>
+<span><span class="co">#&gt; |       |16|10| Inf|       Inf|       Inf| 1.3862944| 0.8472979|-1.3862944|</span></span>
+<span><span class="co">#&gt; |       |32|10| Inf|       Inf| 2.1972246| 2.1972246| 1.3862944| 0.4054651|</span></span>
+<span><span class="co">#&gt; |       |64|10| Inf|       Inf|       Inf|       Inf|       Inf|       Inf|</span></span>
+<span><span class="co">#&gt; +-------+--+--+----+----------+----------+----------+----------+----------+</span></span>
+<span><span class="co">#&gt; |Overall|  |60| Inf| 1.3862944| 0.5465437| 0.0000000|-0.2682640|-0.8472979|</span></span>
+<span><span class="co">#&gt; +-------+--+--+----+----------+----------+----------+----------+----------+</span></span>
+<span></span>
+<span></span>
+<span><span class="va">mod2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.glm.html" class="external-link">predict.glm</a></span><span class="op">(</span><span class="va">mod2</span>,<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         1 </span></span>
+<span><span class="co">#&gt; -1.386294</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.glm.html" class="external-link">predict.glm</a></span><span class="op">(</span><span class="va">mod2</span>,<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose<span class="op">=</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         1 </span></span>
+<span><span class="co">#&gt; 0.8472979</span></span>
+<span><span class="va">mod3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.glm.html" class="external-link">predict.glm</a></span><span class="op">(</span><span class="va">mod3</span>,<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         1 </span></span>
+<span><span class="co">#&gt; -20.56607</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 4) ~ factor(dose), family = "binomial", </span></span>
 <span><span class="co">#&gt;     data = dattab_new)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
-<span><span class="co">#&gt;      -3.305        2.874  </span></span>
+<span><span class="co">#&gt;    (Intercept)   factor(dose)4   factor(dose)8  factor(dose)16  factor(dose)32  </span></span>
+<span><span class="co">#&gt;     -2.057e+01       9.728e-12       1.972e+01       2.195e+01       2.276e+01  </span></span>
+<span><span class="co">#&gt; factor(dose)64  </span></span>
+<span><span class="co">#&gt;      4.113e+01  </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
-<span><span class="co">#&gt; Null Deviance:       60.05 </span></span>
-<span><span class="co">#&gt; Residual Deviance: 29.19     AIC: 33.19</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 3) ~ log(dose), family = "binomial", </span></span>
-<span><span class="co">#&gt;     data = dattab_new)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
-<span><span class="co">#&gt;      -5.089        2.726  </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
-<span><span class="co">#&gt; Null Deviance:       78.86 </span></span>
-<span><span class="co">#&gt; Residual Deviance: 33.83     AIC: 37.83</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">y0</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family<span class="op">=</span><span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">dattab_new</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  glm(formula = I(as.numeric(y0) &gt;= 4) ~ log(dose), family = "binomial", </span></span>
-<span><span class="co">#&gt;     data = dattab_new)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Coefficients:</span></span>
-<span><span class="co">#&gt; (Intercept)    log(dose)  </span></span>
-<span><span class="co">#&gt;      -7.440        3.067  </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  58 Residual</span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 59 Total (i.e. Null);  54 Residual</span></span>
 <span><span class="co">#&gt; Null Deviance:       83.18 </span></span>
-<span><span class="co">#&gt; Residual Deviance: 30.69     AIC: 34.69</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual Deviance: 28.73     AIC: 40.73</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="log-logistic-with-quasi-binomial">log-logistic with quasi-binomial<a class="anchor" aria-label="anchor" href="#log-logistic-with-quasi-binomial"></a>
+<h3 id="log-logistic-with-quasi-binomial-replicate-effects">log-logistic with quasi-binomial: replicate effects<a class="anchor" aria-label="anchor" href="#log-logistic-with-quasi-binomial-replicate-effects"></a>
 </h3>
-<ul>
-<li>TRUE ER50=12.18.</li>
-</ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Original study design is CRD. However, it was argued to treat it as
+RCBD with blocking effect coming from the replicate numbering. We can
+compare the result differences.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>,data <span class="op">=</span> <span class="va">dattab_new</span>,family <span class="op">=</span> <span class="va">quasibinomial</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -874,7 +1400,7 @@ a dose-response with overe-dispersed binomial distributions.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Consider Replicate effect</span></span>
 <span><span class="va">modr</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span><span class="va">yy2</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>,random<span class="op">=</span><span class="op">~</span><span class="fl">1</span><span class="op">|</span><span class="va">rep</span>,family<span class="op">=</span><span class="st">"quasibinomial"</span>,data<span class="op">=</span><span class="va">dattab_new</span><span class="op">)</span></span>
@@ -993,15 +1519,15 @@ Bates.[^1]</p>
 <div class="section level3">
 <h3 id="drm-ordinal">DRM Ordinal<a class="anchor" aria-label="anchor" href="#drm-ordinal"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bmd</span><span class="op">)</span></span>
 <span><span class="va">dat_ord</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">y0</span>,<span class="va">dose</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">y0</span>,values_from <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">dat_ord</span> <span class="op">&lt;-</span> <span class="va">dat_ord</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">`0`</span>,<span class="va">`A`</span>,<span class="va">`B`</span>,<span class="va">`C`</span>,<span class="va">`D`</span>,<span class="va">`E`</span>,<span class="va">`F`</span><span class="op">)</span>,<span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,<span class="fl">0</span>,<span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>total<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">`0`</span>,<span class="va">`A`</span>,<span class="va">`B`</span>,<span class="va">`C`</span>,<span class="va">`D`</span>,<span class="va">`E`</span>,<span class="va">`F`</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod_ord</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/bmd/man/drmOrdinal.html" class="external-link">drmOrdinal</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">$</span><span class="va">y0</span><span class="op">)</span>,  weights<span class="op">=</span><span class="st">"total"</span>,dose <span class="op">=</span> <span class="st">"dose"</span>, data <span class="op">=</span> <span class="va">dat_ord</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_ord</span><span class="op">)</span> <span class="co"># uses ggplot</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/bmd/man/bmdOrdinal.html" class="external-link">bmdOrdinal</a></span><span class="op">(</span><span class="va">mod_ord</span>, bmr <span class="op">=</span> <span class="fl">0.5</span>, backgType <span class="op">=</span> <span class="st">"modelBased"</span>, def <span class="op">=</span> <span class="st">"excess"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   BMD      BMDL</span></span>
@@ -1016,225 +1542,305 @@ Bates.[^1]</p>
 <div class="section level2">
 <h2 id="rscabs">RSCABS<a class="anchor" aria-label="anchor" href="#rscabs"></a>
 </h2>
-<p>Here we give an example of performing the Rao-Scott Adjusted
-Cochran-Armitage Trend Test by Slices. RSCABS is designed to analyze
-histopathological results from standard toxicology experiments, for
-example the MEOGRT.</p>
-<p>Steps in the testing procedure:</p>
-<p>1.The Cochran-Armitage (CA) trend test was used to test a set of
-organisms for an increase in the presences (score &gt; 0) or absence
-(score = 0) of an effect with an increase in the dose concentration of
-the treatments. 2. The Rao-Scott (RS) adjustment controls for the
-similarity in each experiment unit / apparatus (<em>e.g.</em>, fish
-tank) by calculating an adjustment to the CA test statistic from
-correlation of organisms within each apparatuses. 3. The by slices (BS)
-part allows for testing at each severity score (<em>e.g.</em>, from 1 to
-5) instead of just presences or absence. By slices works by splitting
-the severity scores associated with an endpoint into
-<strong>two</strong> groups based on the severity score being tested.
-The RSCA test statistic is calculated based on these two groups. 4.
-Carry out a step-down procedure by excluding the highest treatment level
-in the analysis and recalculate the RSCA test statistic until the test
-stats is not significant or there is only control group left.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="co"># Prepare data</span></span>
+<p>Details about RSCABS approach you can find <a href="https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html" class="external-link">here</a></p>
+</div>
+<div class="section level2">
+<h2 id="simulation-study">Simulation Study<a class="anchor" aria-label="anchor" href="#simulation-study"></a>
+</h2>
+<p>Simulation studies show that glm with quasibinomial and nonlinear
+log-logistic with normal perfom similary when there are limited dose
+groups. When we observe the full dose-response curve, quasibinomial is
+less flexible in adapting to the data.</p>
+<div class="section level3">
+<h3 id="data-generated-using-the-logistic-cdf-">Data generated using the logistic CDF.<a class="anchor" aria-label="anchor" href="#data-generated-using-the-logistic-cdf-"></a>
+</h3>
+<p>The data is generated using the cumulative function for logistic
+distribution. Note that the logistic function is just an inverse logit
+(<span class="math inline">\(\log(p/(1-p))\)</span>) function in R. The
+code is modified based on <a href="https://www.r-bloggers.com/2016/01/s-shaped-data-smoothing-with-quasibinomial-distribution-2/" class="external-link">this
+blog post</a>. <span class="math display">\[F(x;\mu,s) = \frac{1}{2} +
+\frac{1}{2} \tanh((x-\mu)/2s) = \frac{1}{1+e^{-(x-\mu)/s}}\]</span></p>
+<p>where, <span class="math inline">\(\tanh(x) =
+\frac{\sinh(x)}{\cosh(x)} = \frac{e^x - e^{-x}}{e^x + e^{-x}}\)</span>,
+is the <a href="https://en.wikipedia.org/wiki/Hyperbolic_functions" class="external-link">hyperbolic
+tangent function</a> that maps real numbers to the range between -1 and
+1.</p>
+<p>Quantile of the CDF is then <span class="math inline">\(\mu+s\log(\frac{p}{1-p})\)</span>, therefore, the
+EC50 should be <span class="math inline">\(\mu\)</span> or <span class="math inline">\(\exp(\mu)\)</span>.</p>
+<p>Random noises are added afterwards to the logistic distribution
+CDF.</p>
+<p>We simulate <span class="math inline">\(n\)</span> studies over
+concentration <span class="math inline">\(x\)</span>, denoted, <span class="math inline">\(X_{1}, X_{2}, …, X_{n}\)</span> for <span class="math inline">\(k\)</span> study <span class="math inline">\(X=(x_{1}, x_{2}, …, x_{k})\)</span>, where <span class="math inline">\(k\)</span> is the number of different studies with
+different <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>.</p>
+<p>Let’s say there are <span class="math inline">\(k=6\)</span> study
+groups with the following parameter sets, <span class="math inline">\(\mu = \{9,2,3,5,7,5\}\)</span> and <span class="math inline">\(s=\{2,2,4,3,4,2\}\)</span></p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">generate_logit_cdf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mu</span>, <span class="va">s</span>, </span>
+<span>                               <span class="va">sigma_y</span><span class="op">=</span><span class="fl">0.1</span>, </span>
+<span>                               <span class="va">x</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>,<span class="fl">20</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x_ms</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="va">s</span></span>
+<span>  <span class="va">y</span>    <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">tanh</a></span><span class="op">(</span><span class="va">x_ms</span><span class="op">)</span>  </span>
+<span>  <span class="va">y</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">y</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fl">0</span>, <span class="va">sigma_y</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">ix</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">&gt;=</span><span class="fl">1.0</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ix</span><span class="op">)</span><span class="op">&gt;=</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span> </span>
+<span>    <span class="va">y</span><span class="op">[</span><span class="va">ix</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1.0</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">tanh</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">424242</span><span class="op">)</span></span>
+<span><span class="va">x</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>,<span class="fl">15</span>,<span class="fl">0.025</span><span class="op">)</span> </span>
+<span><span class="va">mu_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">5</span>,<span class="fl">7</span>,<span class="fl">8</span><span class="op">)</span>   <span class="co"># 6 Studies</span></span>
+<span><span class="va">idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">mu_vec</span>,<span class="kw">function</span><span class="op">(</span><span class="va">mu</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">x</span><span class="op">==</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span>  <span class="co">## we just need to know which index to find the ER50</span></span>
+<span><span class="va">s_vec</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co"># Synthetic Study ID</span></span>
+<span><span class="va">studies_df</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="va">generate_logit_cdf</span>, </span>
+<span>                              <span class="va">mu_vec</span>, </span>
+<span>                              <span class="va">s_vec</span>, </span>
+<span>                              MoreArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Give them names</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">studies_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Study1"</span>, <span class="st">"Study2"</span>, <span class="st">"Study3"</span>, <span class="st">"Study4"</span>, <span class="st">"Study5"</span>, <span class="st">"Study6"</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">studies_df</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 801   6</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="va">df_all</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x<span class="op">=</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span>,<span class="va">studies_df</span><span class="op">)</span>,cols<span class="op">=</span><span class="fl">2</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">true_ec50</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df_all</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"study"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span><span class="va">df_all</span><span class="op">$</span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">df_all</span><span class="op">$</span><span class="va">study</span><span class="op">)</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exampleHistData"</span><span class="op">)</span></span>
-<span><span class="va">exampleHistData</span> <span class="op">&lt;-</span> <span class="va">exampleHistData</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">as_tibble</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.integer</span><span class="op">)</span>,<span class="va">as.numeric</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span></span>
-<span><span class="co">#Take the subset corresponding to F0-females of 16 weeks of age</span></span>
+<span><span class="va">p_quasibinomial</span><span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_all</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, color<span class="op">=</span><span class="va">study</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span>  <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>        <span class="co"># scale_color_brewer(palette = "Reds") + </span></span>
+<span>        <span class="co"># #geom_smooth(method="loess", se = FALSE, size=1.5) +</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group<span class="op">=</span><span class="va">study</span><span class="op">)</span>,method<span class="op">=</span><span class="st">"glm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family<span class="op">=</span><span class="st">"quasibinomial"</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y ~ log(x)"</span>,</span>
+<span>                       se <span class="op">=</span><span class="cn">TRUE</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"% Injury / 100"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Quasibinomial Fit"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span></span>
-<span><span class="va">subIndex</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">exampleHistData</span><span class="op">$</span><span class="va">Generation</span><span class="op">==</span><span class="st">'F2'</span> <span class="op">&amp;</span></span>
-<span>                  <span class="va">exampleHistData</span><span class="op">$</span><span class="va">Genotypic_Sex</span><span class="op">==</span><span class="st">'Female'</span> <span class="op">&amp;</span></span>
-<span>                  <span class="va">exampleHistData</span><span class="op">$</span><span class="va">Age</span><span class="op">==</span><span class="st">'16_wk'</span> <span class="op">)</span></span>
-<span><span class="va">exampleHistData.Sub</span><span class="op">&lt;-</span><span class="va">exampleHistData</span><span class="op">[</span><span class="va">subIndex</span>, <span class="op">]</span></span>
-<span><span class="co">#Run RSCABS </span></span>
-<span><span class="va">exampleResults</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/runRSCABS.html">runRSCABS</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span>,<span class="st">'Treatment'</span>,</span>
-<span>                          <span class="st">'Replicate'</span>,test.type<span class="op">=</span><span class="st">'RS'</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">exampleResults</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">p_quasibinomial</span><span class="co">#+scale_x_log10()</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">p_quasibinomial</span> <span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">study</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-2.png" width="768"></p>
+<p>Nonlinear log-logistic modelling with normal errors seem to be more
+flexible in dealing with very different curve shapes. It also fits the
+data generation process in this case.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
+<span><span class="va">p_drc</span><span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_all</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, color<span class="op">=</span><span class="va">study</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.2</span><span class="op">)</span>  <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>        <span class="co"># scale_color_brewer(palette = "Reds") + </span></span>
+<span>        <span class="co"># #geom_smooth(method="loess", se = FALSE, size=1.5) +</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group<span class="op">=</span><span class="va">study</span><span class="op">)</span>,method<span class="op">=</span><span class="st">"drm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y ~ x"</span>,</span>
+<span>                       se <span class="op">=</span> <span class="cn">FALSE</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"% Injury / 100"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"DRC nonlinear normal fit"</span><span class="op">)</span></span>
+<span><span class="va">p_drc</span><span class="co">#+scale_x_log10()</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">p_drc</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">study</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-16-2.png" width="700"></p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df_nested</span> <span class="op">&lt;-</span> <span class="va">df_all</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html" class="external-link">nest</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">dfres</span> <span class="op">&lt;-</span> <span class="va">df_nested</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>modres<span class="op">=</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">data</span>,<span class="va">modelall</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 23.72221    0.13908 23.44921 23.99521</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 27.53930    0.14351 27.25759 27.82100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 30.85168    0.20483 30.44961 31.25375</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 39.35892    0.18648 38.99287 39.72498</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 47.09152    0.20831 46.68262 47.50042</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50 51.84412    0.14198 51.56541 52.12283</span></span>
+<span><span class="co">#&gt; Warning: There were 609 warnings in `mutate()`.</span></span>
+<span><span class="co">#&gt; The first warning was:</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `modres = map(data, modelall)`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In group 1: `study = Study1`.</span></span>
+<span><span class="co">#&gt; Caused by warning in `log()`:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> NaNs produced</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 608 remaining warnings.</span></span>
+<span><span class="va">ec50</span> <span class="op">&lt;-</span> <span class="va">dfres</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>ec50<span class="op">=</span><span class="va">modres</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span>,<span class="va">modres</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ec50</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TrueEC50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">true_ec50</span>,each<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">ec50</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="36%">
-<col width="14%">
-<col width="11%">
-<col width="14%">
-<col width="11%">
-<col width="10%">
+<col width="9%">
+<col width="12%">
+<col width="13%">
+<col width="15%">
+<col width="16%">
+<col width="19%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Effect</th>
-<th align="right">Treatment</th>
-<th align="right">R.Score</th>
-<th align="right">Statistic</th>
-<th align="right">P.Value</th>
-<th align="left">Signif</th>
+<th align="left">study</th>
+<th align="right">EC50</th>
+<th align="right">lower</th>
+<th align="right">upper</th>
+<th align="right">se</th>
+<th align="left">model</th>
+<th align="right">TrueEC50</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Gon_Incr_Oocyte_Atresia1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">1.330</td>
-<td align="right">0.092</td>
-<td align="left">.</td>
+<td align="left">Study1</td>
+<td align="right">20.93803</td>
+<td align="right">12.727863</td>
+<td align="right">34.44419</td>
+<td align="right">5.5815848</td>
+<td align="left">quasibinomial</td>
+<td align="right">24.1</td>
 </tr>
 <tr class="even">
-<td align="left">Gon_Incr_Oocyte_Atresia2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
+<td align="left">Study1</td>
+<td align="right">23.72221</td>
+<td align="right">23.449208</td>
+<td align="right">23.99521</td>
+<td align="right">0.1390778</td>
+<td align="left">drc LL.2</td>
+<td align="right">24.1</td>
 </tr>
 <tr class="odd">
-<td align="left">Gon_Incr_Oocyte_Atresia3</td>
-<td align="right">5</td>
-<td align="right">3</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
+<td align="left">Study2</td>
+<td align="right">24.47938</td>
+<td align="right">4.590626</td>
+<td align="right">130.53558</td>
+<td align="right">36.5249031</td>
+<td align="left">quasibinomial</td>
+<td align="right">28.1</td>
 </tr>
 <tr class="even">
-<td align="left">Gon_Incr_Oocyte_Atresia4</td>
-<td align="right">5</td>
-<td align="right">4</td>
-<td align="right">1.231</td>
-<td align="right">0.109</td>
-<td align="left">.</td>
+<td align="left">Study2</td>
+<td align="right">27.53930</td>
+<td align="right">27.257594</td>
+<td align="right">27.82100</td>
+<td align="right">0.1435116</td>
+<td align="left">drc LL.2</td>
+<td align="right">28.1</td>
 </tr>
 <tr class="odd">
-<td align="left">Gon_Proteinaceous_fluid1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">-1.410</td>
-<td align="right">0.079</td>
-<td align="left">.</td>
+<td align="left">Study3</td>
+<td align="right">27.64177</td>
+<td align="right">20.206538</td>
+<td align="right">37.81290</td>
+<td align="right">4.5043310</td>
+<td align="left">quasibinomial</td>
+<td align="right">32.1</td>
 </tr>
 <tr class="even">
-<td align="left">Gon_Asynch_Dev1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">2.622</td>
-<td align="right">0.004</td>
-<td align="left">**</td>
+<td align="left">Study3</td>
+<td align="right">30.85168</td>
+<td align="right">30.449615</td>
+<td align="right">31.25375</td>
+<td align="right">0.2048285</td>
+<td align="left">drc LL.2</td>
+<td align="right">32.1</td>
 </tr>
 <tr class="odd">
-<td align="left">Gon_Asynch_Dev2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">2.622</td>
-<td align="right">0.004</td>
-<td align="left">**</td>
+<td align="left">Study4</td>
+<td align="right">35.49035</td>
+<td align="right">16.028210</td>
+<td align="right">78.58425</td>
+<td align="right">16.2927035</td>
+<td align="left">quasibinomial</td>
+<td align="right">40.1</td>
 </tr>
 <tr class="even">
-<td align="left">Kid_Tub_Mineralization1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">0.358</td>
-<td align="right">0.360</td>
-<td align="left">.</td>
+<td align="left">Study4</td>
+<td align="right">39.35892</td>
+<td align="right">38.992866</td>
+<td align="right">39.72498</td>
+<td align="right">0.1864849</td>
+<td align="left">drc LL.2</td>
+<td align="right">40.1</td>
 </tr>
 <tr class="odd">
-<td align="left">Kid_Tub_Mineralization2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">-0.070</td>
-<td align="right">0.472</td>
-<td align="left">.</td>
+<td align="left">Study5</td>
+<td align="right">43.08117</td>
+<td align="right">4.914720</td>
+<td align="right">377.63846</td>
+<td align="right">123.5039983</td>
+<td align="left">quasibinomial</td>
+<td align="right">48.1</td>
 </tr>
 <tr class="even">
-<td align="left">Kid_Tub_Dilation1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">-0.070</td>
-<td align="right">0.472</td>
-<td align="left">.</td>
+<td align="left">Study5</td>
+<td align="right">47.09152</td>
+<td align="right">46.682623</td>
+<td align="right">47.50042</td>
+<td align="right">0.2083091</td>
+<td align="left">drc LL.2</td>
+<td align="right">48.1</td>
 </tr>
 <tr class="odd">
-<td align="left">Kid_Tub_Dilation2</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">-0.049</td>
-<td align="right">0.480</td>
-<td align="left">.</td>
+<td align="left">Study6</td>
+<td align="right">47.45811</td>
+<td align="right">1.938822</td>
+<td align="right">1161.67056</td>
+<td align="right">655.5640528</td>
+<td align="left">quasibinomial</td>
+<td align="right">52.1</td>
 </tr>
 <tr class="even">
-<td align="left">Kid_Tub_Regeneration1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">-1.375</td>
-<td align="right">0.085</td>
-<td align="left">.</td>
+<td align="left">Study6</td>
+<td align="right">51.84412</td>
+<td align="right">51.565412</td>
+<td align="right">52.12283</td>
+<td align="right">0.1419849</td>
+<td align="left">drc LL.2</td>
+<td align="right">52.1</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Gon_Asynch_Dev</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Data: Gon_Asynch_Dev"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">cids</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">]</span>,<span class="fl">2</span>,<span class="va">max</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cids</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">+</span><span class="va">cids</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,values_to <span class="op">=</span> <span class="st">"Response"</span>,names_to <span class="op">=</span> <span class="st">"Endpoint"</span><span class="op">)</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Histopath Data"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Endpoint</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-2.png" width="700"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
-<span><span class="va">dat1</span> <span class="op">&lt;-</span> <span class="va">exampleHistData.Sub</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">+</span><span class="va">cids</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,values_to <span class="op">=</span> <span class="st">"Response"</span>,names_to <span class="op">=</span> <span class="st">"Endpoint"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Endpoint</span>,<span class="va">Treatment</span>,<span class="va">Response</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>counts<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Endpoint</span>,<span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>total<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dat1</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Treatment</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">counts</span><span class="op">/</span><span class="va">total</span><span class="op">)</span>,stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Example Histopath Data"</span>,subtitle <span class="op">=</span> <span class="st">"subset: F2 generation, 15 week age and female"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Endpoint</span>,drop <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="va">percent</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-3.png" width="700"></p>
-</div>
-<div class="section level2">
-<h2 id="multi-quantile-jt">Multi-quantile JT<a class="anchor" aria-label="anchor" href="#multi-quantile-jt"></a>
-</h2>
-<p>From: John Green, personal communication.</p>
-</div>
-<div class="section level2">
-<h2 id="function-notes">Function Notes<a class="anchor" aria-label="anchor" href="#function-notes"></a>
-</h2>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DependenciesGraphs</span><span class="op">)</span></span>
-<span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">funDependencies</span><span class="op">(</span><span class="st">"package:drcHelper"</span>, <span class="st">"runRSCABS"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># visualization</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="notes-on-rscabs-functions">Notes on RSCABS functions<a class="anchor" aria-label="anchor" href="#notes-on-rscabs-functions"></a>
-</h3>
-<ol style="list-style-type: decimal">
-<li>Select responses maximum value should be &gt; 0 and smaller than
-20??</li>
-<li>for each to be tested response/endpoints,
-<em>convert2score</em>
-</li>
-<li>for each to be tested response/endpoints, <em>prepDataRSCABS</em>,
-prepare the data into matrix/table format, treatment as column,
-replicate as row</li>
-<li>for each to be tested response/endpoints, <em>stepKRSCABS</em>.</li>
-</ol>
-<p>The results look like below:</p>
-<pre><code>$Gon_Asynch_Dev
-           Effect Treatment R.Score Statistic     P.Value Signif
-1 Gon_Asynch_Dev1         5       1  2.622022 0.004370488     **
-2 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-3 Gon_Asynch_Dev1         4       1       NaN 1.000000000      .
-4 Gon_Asynch_Dev2         5       2  2.622022 0.004370488     **
-5 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .
-6 Gon_Asynch_Dev2         4       2       NaN 1.000000000      .</code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li>combine the results into a big matrix.</li>
-</ol>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">predres</span> <span class="op">&lt;-</span> <span class="va">dfres</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>preds<span class="op">=</span><span class="va">modres</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span>,<span class="va">modres</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">preds</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">p_drc_qb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_all</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span>  <span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_d</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>        <span class="co"># scale_color_brewer(palette = "Reds") + </span></span>
+<span>        <span class="co"># #geom_smooth(method="loess", se = FALSE, size=1.5) +</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group<span class="op">=</span><span class="va">study</span><span class="op">)</span>,method<span class="op">=</span><span class="st">"drm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y~x"</span>,</span>
+<span>                       se <span class="op">=</span> <span class="cn">FALSE</span>, size<span class="op">=</span><span class="fl">1.5</span>,col<span class="op">=</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/pal_hue.html" class="external-link">hue_pal</a></span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
+<span>                       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group<span class="op">=</span><span class="va">study</span><span class="op">)</span>,method<span class="op">=</span><span class="st">"glm"</span>, method.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family<span class="op">=</span><span class="st">"quasibinomial"</span><span class="op">)</span>, formula<span class="op">=</span><span class="st">"y~log(x)"</span>,</span>
+<span>                       se <span class="op">=</span> <span class="cn">FALSE</span>, size<span class="op">=</span><span class="fl">1.5</span>,lty<span class="op">=</span><span class="fl">3</span>,col<span class="op">=</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/pal_hue.html" class="external-link">hue_pal</a></span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">+</span></span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"% Injury / 100"</span><span class="op">)</span>  <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">study</span><span class="op">)</span></span>
+<span> <span class="va">p_drc_qb</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept<span class="op">=</span><span class="fl">0.5</span>,col<span class="op">=</span><span class="st">"purple"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ec50</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>xintercept<span class="op">=</span><span class="va">TrueEC50</span><span class="op">)</span>,col<span class="op">=</span><span class="st">"purple"</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">predres</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,ymin<span class="op">=</span><span class="va">Lower</span>,ymax<span class="op">=</span><span class="va">Upper</span>,y<span class="op">=</span><span class="va">Prediction</span>,fill<span class="op">=</span><span class="va">model</span><span class="op">)</span>,alpha<span class="op">=</span><span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"drc and quasibinomial fit with CI"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">ec50</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>xintercept<span class="op">=</span><span class="va">EC50</span>,col<span class="op">=</span><span class="va">model</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">

@@ -8,12 +8,14 @@ articles:
   articles/EFSA-Criteria: EFSA-Criteria.html
   articles/Equivalence-Testing: Equivalence-Testing.html
   Example_Analysis_Workflow: Example_Analysis_Workflow.html
+  articles/Example_RSCABS: Example_RSCABS.html
   articles/Examples using NLS: Examples using NLS.html
   articles/Examples_drc: Examples_drc.html
   articles/Examples_MCP: Examples_MCP.html
   articles/Examples_oecd201: Examples_oecd201.html
   articles/Examples_using_drda: Examples_using_drda.html
   Introduction: Introduction.html
+  articles/Limit-Test: Limit-Test.html
   articles/LMM-GLMM-and-GAMM: LMM-GLMM-and-GAMM.html
   articles/MQJT: MQJT.html
   articles/NOEC_Methods: NOEC_Methods.html
@@ -23,7 +25,7 @@ articles:
   articles/System_Testing: System_Testing.html
   articles/Trend-Testing: Trend-Testing.html
   articles/TSK_method: TSK_method.html
-last_built: 2025-02-21T16:52Z
+last_built: 2025-02-25T16:27Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

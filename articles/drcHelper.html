@@ -34,17 +34,18 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
+    <li><a class="dropdown-item" href="../articles/Examples_drc.html">Example Helper Functions</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Package Dependencies</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-examples" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Examples</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-examples">
-<li><a class="dropdown-item" href="../articles/Examples_drc.html">Example Helper Functions</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-regulatory-insights" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Regulatory Insights</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-regulatory-insights">
+<li><a class="dropdown-item" href="../articles/NOEC_Methods.html">NOEC Calculations</a></li>
     <li><a class="dropdown-item" href="../articles/EFSA-Criteria.html">EFSA Criteria and Other Reliability Criteria</a></li>
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
-    <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">OECD 201</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -117,7 +118,7 @@ report.</p>
 <h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DependenciesGraphs</span><span class="op">)</span></span>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">funDependencies</span><span class="op">(</span><span class="st">"package:drcHelper"</span>,<span class="st">"ED.plus"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span>
