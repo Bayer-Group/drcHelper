@@ -186,6 +186,8 @@ p_drc_qb
 
 Normally we could test lack of fit for continuous data by comparing the model fit with ANOVA model, which should achieve the least square estimation. Changjian proposed to use the prediction intervals from the models to estimate the frequency table that would usually be a product of conventional ordinal regression, followed by a chi-square test. 
 
+The common goodness of fit tests and measures for logistic regression include deviance or likelihood ratio test, the Hosmer-Lemeshow Test, the pseudo R-squared measures, residual analysis, and classification/frequency tables.
+
 
 ## Additional Thoughts
 

@@ -45,6 +45,19 @@ There are several packages providing function for the calculation of the Dunnett
 
 There are also possibilities to use other packages. For example, **emmeans** is a package for estimating marginal means and conducting pairwise comparisons.
 
+
+
+## Williams' trend test
+
+
+
+Inside the **drcHelper** package, `getwilliamRes`
+
+
+# Alternative Approaches
+
+These approaches are not routinely used in the regulatory NOEC calculations. However, they are very useful in certain situations.
+
 ## Tamhane-Dunnett's Test
 
 For many-to-one comparisons in an one-factorial layout with normally distributed residuals and unequal variances Tamhane-Dunnett's test can be used.
@@ -69,12 +82,6 @@ DescTools::DunnettTest(x~g, alternative = "greater") ## alternative is not takin
 PMCMRplus::dunnettTest(x~g)
 PMCMRplus::dunnettTest(x~g, alternative = "greater")
 ```
-
-## Williams' trend test
-
-
-
-Inside the **drcHelper** package, `getwilliamRes`
 
 ## References
 

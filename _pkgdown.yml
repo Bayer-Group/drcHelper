@@ -96,6 +96,8 @@ navbar:
       menu:
       - text: System Testing
         href: articles/System_Testing.html
+      - text: Study Types and Templates
+        href: articles/Test-Guidelines.html
     newissue:
       icon: fa-bug
       href: https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue
