@@ -66,6 +66,8 @@ navbar:
       menu:
       - text: NOEC Calculations
         href: articles/NOEC_Methods.html
+      - text: Limit Test Calculations
+        href: articles/Limit-Test.html
       - text: EFSA Criteria and Other Reliability Criteria
         href: articles/EFSA-Criteria.html
       - text: RSCABS
