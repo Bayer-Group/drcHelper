@@ -200,6 +200,7 @@ There are also possibilities to use other packages. For example, **emmeans** is 
 
 
 ```{r}
+library(multcomp)
 (dun <- summary(glht(aov(Response~Treatment, data=testdata), linfct=mcp(Treatment="Dunnett"),alternative="less")))
 
 (dun <- summary(glht(aov(Response~Treatment, data=testdata), linfct=mcp(Treatment="Dunnett"),alternative="two.sided")))
