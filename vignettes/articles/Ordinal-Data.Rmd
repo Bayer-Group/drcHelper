@@ -91,7 +91,7 @@ library(drc)
 mod_drc  <- drm(yy2 ~ dose, data = dattab_new, fct = LL.2())
 summary(mod_drc)
 ED(mod_drc, c(50), interval = "delta")
-supressWarnings({
+suppressWarnings({
 plot(mod_drc, type = "all",main="log-logistic + normal, ER50= 12.74", broken = TRUE)
 plot(mod_drc, broken = TRUE, type="confidence", add=TRUE)
 })
@@ -170,7 +170,7 @@ modelallbeta <- function(dat){
 
 ```{r}
 dattab_new <- dattab_new %>% mutate(y=yy,x=dose)%>%as.data.frame(.)
-supressWarnings({modres <- modelall(dattab_new)})
+suppressWarnings({modres <- modelall(dattab_new)})
 predres <- modres[[2]]
 knitr::kable(modres[[1]]%>%mutate(TrueEC50 = 12.18),digits=3)
 p_drc_qb <- ggplot(dattab_new, aes(x=dose, y=yt)) +geom_point(alpha=0.1)+ geom_point(aes(x=dose, y=yy),col="green")+
