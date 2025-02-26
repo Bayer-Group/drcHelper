@@ -99,8 +99,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
 </h2>
@@ -158,7 +157,7 @@ using logitic regression with quasibinomial assumptions. The two
 approaches produce similar results when the data is behaving truly like
 a dose-response with over-dispersed binomial distributions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://effective-adventure-2klnejq.pages.github.io/" class="external-link">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
 <p>The data is artificial and with full dose-response relationship
 observed with true ER50=12.18.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -309,208 +308,10 @@ observed with true ER50=12.18.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        Estimate Std. Error   Lower   Upper</span></span>
 <span><span class="co">#&gt; e:1:50  12.7439     1.0392 10.6637 14.8241</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_drc</span>, type <span class="op">=</span> <span class="st">"all"</span>,main<span class="op">=</span><span class="st">"log-logistic + normal, ER50= 12.74"</span>, broken <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod_drc</span>, broken <span class="op">=</span> <span class="cn">TRUE</span>, type<span class="op">=</span><span class="st">"confidence"</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span></code></pre></div>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div class="section level3">
 <h3 id="putting-quasi-binomial-and-normal-fit-together">Putting quasi-binomial and normal fit together<a class="anchor" aria-label="anchor" href="#putting-quasi-binomial-and-normal-fit-together"></a>
@@ -582,207 +383,7 @@ observed with true ER50=12.18.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">yy</span>,x<span class="op">=</span><span class="va">dose</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span></span>
-<span><span class="va">modres</span> <span class="op">&lt;-</span> <span class="fu">modelall</span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
-<span><span class="co">#&gt; Warning in (tquan * sqrt(varVal + sumObjRV)) * c(-1, 1): Recycling array of length 1 in array-vector arithmetic is deprecated.</span></span>
-<span><span class="co">#&gt;   Use c() or as.vector() instead.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span><span class="va">modres</span> <span class="op">&lt;-</span> <span class="fu">modelall</span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Estimated effective doses</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1013,10 +614,6 @@ cumulative probabilities. The latter is a bit easier to understand.</p>
 <span></span>
 <span><span class="va">dattab_new</span> <span class="op">&lt;-</span> <span class="va">dattab_new</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>logdose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mod_ref_log_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GLMcat/man/glmcat.html" class="external-link">glmcat</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">y0</span> <span class="op">~</span> <span class="va">logdose</span>, ratio <span class="op">=</span> <span class="st">"reference"</span>, cdf <span class="op">=</span> <span class="st">"logistic"</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">dattab_new</span><span class="op">)</span>,ref<span class="op">=</span><span class="st">"0"</span>,parallel <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in glmcat(formula = y0 ~ logdose, ratio = "reference", cdf =</span></span>
-<span><span class="co">#&gt; "logistic", : The response variable is defined as an ordered variable. Recall</span></span>
-<span><span class="co">#&gt; that the the reference ratio is appropiate for nominal responses, while for</span></span>
-<span><span class="co">#&gt; ordinal responses the ratios to use are cumulative, sequential or adjacent.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod_ref_log_c</span><span class="op">)</span></span>
 <span><span class="co">#&gt; y0 ~ logdose</span></span>
 <span><span class="co">#&gt;                 ratio      cdf nobs niter    logLik</span></span>
@@ -1628,11 +1225,6 @@ groups with the following parameter sets, <span class="math inline">\(\mu = \{9,
 <span>                       se <span class="op">=</span><span class="cn">TRUE</span>, size<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"% Injury / 100"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Quasibinomial Fit"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span></span>
 <span><span class="va">p_quasibinomial</span><span class="co">#+scale_x_log10()</span></span></code></pre></div>
 <p><img src="Ordinal-Data_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
@@ -1693,13 +1285,6 @@ data generation process in this case.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        Estimate Std. Error    Lower    Upper</span></span>
 <span><span class="co">#&gt; e:1:50 51.84412    0.14198 51.56541 52.12283</span></span>
-<span><span class="co">#&gt; Warning: There were 609 warnings in `mutate()`.</span></span>
-<span><span class="co">#&gt; The first warning was:</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `modres = map(data, modelall)`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In group 1: `study = Study1`.</span></span>
-<span><span class="co">#&gt; Caused by warning in `log()`:</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> NaNs produced</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 608 remaining warnings.</span></span>
 <span><span class="va">ec50</span> <span class="op">&lt;-</span> <span class="va">dfres</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>ec50<span class="op">=</span><span class="va">modres</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span>,<span class="va">modres</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ec50</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TrueEC50 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">true_ec50</span>,each<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">ec50</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
@@ -1867,7 +1452,7 @@ Springer-Verlag.</li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Zhenglei Gao.</p>
+  <p>Developed by Zhenglei Gao, Sean Ryan.</p>
 </div>
 
 <div class="pkgdown-footer-right">
