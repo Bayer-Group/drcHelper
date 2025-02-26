@@ -28,7 +28,4 @@ Imports:
     multcomp,
     PMCMRplus,
     bmd
-    drcData
-Remotes: DoseResponse/bmd,
-         DoseResponse/drc,
-          DoseResponse/drcData
+Remotes: DoseResponse/bmd
