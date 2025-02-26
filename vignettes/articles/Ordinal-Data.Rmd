@@ -10,7 +10,7 @@ editor_options:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  warnings = FALSE,
+  warning = FALSE,
   message = FALSE
 )
 library(tidyverse)
@@ -168,7 +168,7 @@ modelallbeta <- function(dat){
 
 
 
-```{r}
+```{r warning=FALSE}
 dattab_new <- dattab_new %>% mutate(y=yy,x=dose)%>%as.data.frame(.)
 suppressWarnings({modres <- modelall(dattab_new)})
 predres <- modres[[2]]
