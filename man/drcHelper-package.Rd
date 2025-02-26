@@ -11,12 +11,17 @@ Helper functions for drc package and other dose-response analysis functions.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://effective-adventure-2klnejq.pages.github.io/}
+  \item \url{https://bayer-group.github.io/drcHelper/index.html}
 }
 
 }
 \author{
 \strong{Maintainer}: Zhenglei Gao \email{zhenglei.gao@bayer.com} (\href{https://orcid.org/0000-0002-4042-310X}{ORCID})
+
+Authors:
+\itemize{
+  \item Sean Ryan \email{sryan@exponent.com}
+}
 
 }
 \keyword{internal}

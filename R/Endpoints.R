@@ -1,5 +1,6 @@
 ## PMCMRplus package helpers
 ## testthat/test_williamsSummary.R
+## testthat/test_endpoints.R
 
 #' Calculate Means Using the Pool Adjacent Violators Algorithm (PAVA)
 #'
@@ -154,7 +155,7 @@ summaryZG <-function (object, verbose=F,...)
 #' @param william william test results
 #' @param n number of hypotheses to be tested. description
 #'
-#' @return
+#' @return a vector of accept and rejects.
 #' @export
 #'
 #' @examples ## Example from Sachs (1997, p. 402)
@@ -183,11 +184,17 @@ getwilliamRes <- function(william,n=NULL){
 #' @param doses corresponding doses
 #' @param procedure procedure to obtain NOEC
 #'
-#' @return
+#' @return NOEC
 #' @export
 #'
+#' @details
+#' If all p-values are NA, it initializes them to zeros. If there are fewer p-values than doses,
+#' it pads the p-values with zeros.It checks which doses are significant by comparing the p-values
+#' to a threshold (0.05).Depending on the specified procedure, it either steps down from the highest
+#' dose to find the NOEC or steps up from the lowest dose..
+#'
 #' @examples
-#' pvals <- c(0.01, 0.03, 0.07, 0.08)
+#' pvals <- c(0.01, 0.03, 0.07)
 #' doses <- c("Control", "B", "C", "D")
 #' getEndpoint(pvals, doses)
 getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown"){
@@ -197,7 +204,7 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
   }
   np <- length(pvals)
   if(np < (nd-1)){
-    pvals <- c(pvals,rep(0,nd-1-np)) ## Asumming missing the high doses
+    pvals <- c(pvals,rep(0,nd-1-np)) ## Assuming missing the high doses
   }
   sig <- pvals<0.05
 
@@ -218,7 +225,7 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
   }else{
     for(i in 1:(nd-1)){
       if(sig[i]){
-        NOEC <- doses[i]
+        NOEC <- doses[i] ## note this dose is actually the dose level where the next one is significant.
         return(NOEC)
       }
 
@@ -232,50 +239,70 @@ getEndpoint <- function(pvals,doses=c("Control","B","C","D"),procedure="stepDown
 
 #' get Endpoint for continuous data according to results of a series of tests
 #'
-#' @param paov
-#' @param pks
-#' @param pnormal
-#' @param phomogeneity
-#' @param monotonicity
-#' @param william
-#' @param dunnett
-#' @param dunn
-#' @param jonckheere
-#' @param procedure
-#' @param doses
+#' @param paov Anova p-value
+#' @param pks Kolmogorov-Smirnov test p-value
+#' @param pnormal Normal test p-value
+#' @param phomogeneity Homogeneity variance test p-value
+#' @param monotonicity Monotonicity test p-value
+#' @param william Williams' test p-value
+#' @param dunnett Dunnett's test p-value
+#' @param dunn Dunn's test p-value
+#' @param jonckheere Jonckheere-Tepstra test p-value
+#' @param procedure step down of up
+#' @param doses tested doses
 #'
-#' @return
+#' @return NOEC along with an attribute indicating which test was used.
 #' @export
+#' @details
+#' Purpose: The contEndpoint function computes the No Observed Effect Concentration (NOEC) based on the results of various statistical tests. It evaluates these tests'
+#' p-values to determine which statistical analysis is most appropriate.The function first checks the
+#' significance of the monotonicity test. Depending on the results, it selects the appropriate
+#' p-value from the relevant test (Dunnett, Dunn, Williams, or Jonckheere) to compute the NOEC.
+#' The function returns the NOEC along with an attribute indicating which test was used. Original function
+#' used directly the williams' test or dunnett's test objects as input, which can cause conflicts when
+#' using different functions to get the pvals.
 #'
-#' @examples
+#'
+#' @examples contEndpoint(paov = 0.01, pks = 0.03, pnormal = 0.06,
+#' phomogeneity = 0.07, monotonicity = c(0.1,0.2),
+#' william = c(0.07, 0.06, 0.03, 0.01), dunnett = c(0.07, 0.06, 0.03, 0.01),
+#' dunn = c(0.07, 0.06, 0.03, 0.01),
+#' jonckheere = c(0.07, 0.06, 0.03, 0.01),
+#' procedure = "stepDown",
+#' doses = c("Control","A", "B", "C", "D"))
 contEndpoint <- function(paov,pks,pnormal,phomogeneity,monotonicity,william,dunnett,dunn,jonckheere,procedure="stepDown",doses=c("A","B","C","D")){
-  ## if monotone not rejected. linear contrast not significant quadratic sig!
+  ## if monotone not rejected. linear contrast not significant and quadratic sig! Strong mono assumption!
   test <- "NK"
   if(is.character(monotonicity)){
-    monotonicity <- as.numeric(gsub("<","",monotonicity))
+    monotonicity <- as.numeric(gsub("<","",monotonicity))-0.001
   }
-  if(monotonicity[1] >0.05 & monotonicity[2] < 0.05){
+  if(monotonicity[1] >0.05 & monotonicity[2] < 0.05){ ## not monotonic
     if(pnormal>0.05 & phomogeneity>0.05){
       ## check if PAVA Problem!
-      pvals <- dunnett$p.value
+      ## pvals <- dunnett$p.value
+      pvals <- dunnett
       test <- "Dunnett"
     }else{
-      pvals <- dunn$p.value
+      ## pvals <- dunn$p.value
+      pvals <- dunn
       test <- "Dunn"
     }
-  }else{
+  }else{ ## monotonic
     if(pnormal>0.05 & phomogeneity>0.05){
       ## check if PAVA Problem!
       if(class(william)!="try-error"){
-        pvals <- as.character(summaryZG(william)$decision)
-        pvals <- as.numeric(plyr::mapvalues(pvals,from=c("accept","reject"),to=c(0.2,0.01)))
+       # pvals <- as.character(summaryZG(william)$decision)
+        #pvals <- as.numeric(plyr::mapvalues(pvals,from=c("accept","reject"),to=c(0.2,0.01)))
+        pvals <- william
         test <- "Williams"
       }else{
-        pvals <- jonckheere$p.value
+        ## pvals <- jonckheere$p.value
+        pvals <- jonckheere
         test <- "Jonckheere"
       }
     }else{
-      pvals <- jonckheere$p.value
+      ## pvals <- jonckheere$p.value
+      pvals <- jonckheere
       test <- "Jonckheere"
     }
   }

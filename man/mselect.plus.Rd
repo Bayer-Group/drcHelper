@@ -19,8 +19,6 @@ mselect.plus(
 )
 }
 \arguments{
-\item{type}{}
-
 \item{additionalReliability}{additional reliability need to be calculated}
 }
 \value{

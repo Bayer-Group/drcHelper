@@ -16,6 +16,18 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
+#' 136, 139, 149, 160, 174)
+#' g <- gl(3,5)
+#' levels(g) <- c("0", "I", "II")
+#' monotonicityTest(data.frame(treatment_var = g,response_var=x), "treatment_var", "response_var")
+#' mock_data <- data.frame(
+#' treatment_var = factor(rep(c("Control", "Dose1", "Dose2", "Dose3"), each = 10)),
+#' response_var = c(rnorm(10, mean = 5), rnorm(10, mean = 7), rnorm(10, mean = 8), rnorm(10, mean = 10))
+#' )
+#' monotonicityTest(mock_data, "treatment_var", "response_var")
+#' }
 monotonicityTest <-function(Data,Treatment,Response){
   #' @export
   #This is the test for monotonicity as done in the SAS Version

@@ -1,0 +1,60 @@
+---
+title: "Verification and Validation of NOEC Derivation by MCP"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Multiple Comparison Tests
+
+
+
+```{r setup}
+library(drcHelper)
+library(PMCMRplus)
+```
+
+
+## Dunnett's Test
+
+`glht` pulls its P-values out of a multivariate t distribution. mvtnorm::pmvt is called with the observed t statistics and correlation matrix (actual code here). DescTools::DunnettTest does roughly the same. emmeans uses a close approximation to the Dunnett adjustment. 
+
+```{r}
+
+```
+
+
+
+
+## Williams' Test
+
+PMCMRplus::williamsTest produces more accurate results since regarding the calculation of degrees of freedom, based on the isotonic regression. 
+
+Both functions use tabulated critical values provided by Williams (only for a=0.05). 
+
+The `williamsTest` function from **PMCMRplus** produces the same results as in `williamsTest_JG`
+
+```{r}
+x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
+136, 139, 149, 160, 174)
+g <- gl(3,5)
+levels(g) <- c("0", "I", "II")
+PMCMRplus::williamsTest(x ~ g)
+williamsTest_JG(data.frame(treatment_var = g,response_var=x),"response_var","treatment_var",direction="increasing")
+
+```
+
+
+## Tips
+
+Note that to install "PMCMRplus" properly under ubuntu (Platform: x86_64-pc-linux-gnu), you need probably install libmpfr-dev first. 
+
+```
+sudo apt-get install libmpfr-dev
+```
+
+

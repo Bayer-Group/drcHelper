@@ -331,14 +331,15 @@ bmdOrdinal(mod_ord, bmr = 0.5, backgType = "modelBased", def = "excess")
 ```
 
 
-## RSCABS
+## RSCABS and other testing approaches
 
 Details about RSCABS approach you can find [here](https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html)
 
+Other testing approaches that could be implemented. For example post hoc testings are available for a regression modeling where the independent variable is the dose levels as a factor.  All these testing approaches are targeting at a NOEC at a certain injury level. By default, these testing approaches actually treat the test rates or concentrations in the study as categorical variable, losing the continuous property and therefore an ER50 cannot be directly calculated. However, the NOEC at the medium injury level is comparable to ER50, which will always be smaller than ER50. 
 
 ## Simulation Study
 
-Simulation studies show that glm with quasibinomial and nonlinear log-logistic with normal perfom similary when there are limited dose groups. When we observe the full dose-response curve, quasibinomial is less flexible in adapting to the data. 
+Simulation studies show that glm with quasibinomial and nonlinear log-logistic with normal perfom similarly when there are limited dose groups. When we observe the full dose-response curve, quasibinomial is less flexible in adapting to the data. 
 
 ### Data generated using the logistic CDF. 
 

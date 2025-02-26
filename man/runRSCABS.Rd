@@ -22,6 +22,9 @@ The analysis assumes that higher scores indicate a worse outcome.}
 \item{test.type}{Indicate the type of analysis to be performed.  Use "RS" to select the Rao-Scott
 adjustment to the Cochran-Armitage test and "CA" to ignore the adjustment.}
 }
+\value{
+a table of the test results for each treatment and injury score.
+}
 \description{
 Runs the Rao-Scott adjusted Cochran-Armitage trend test by slices (RSCABS) analysis.
 }

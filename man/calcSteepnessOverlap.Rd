@@ -20,11 +20,18 @@ mod should set to be NULL in this case}
 
 \item{trend}{"Decrease" or "Increase"}
 
-\item{...}{other parameters that wil be passed into ED.plus}
+\item{...}{other parameters that will be passed into ED.plus}
 }
 \value{
 a table with certainty of potection level and steepness of the models
 }
 \description{
 Steepness and overlap calcuation
+}
+\examples{
+\dontrun{
+ datTn<- subset(oecd201,Time==72)
+ mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
+ calcSteepnessOverlap(mod = mod, trend = "Decrease")
+}
 }

@@ -37,7 +37,7 @@ The test statistic corresponding to that row's endpoint treatment level and R-Sc
 The corresponding p-value
 }
 \item{Signif}{
-The significance flag where "." is a p-value > 0.05, "\emph{" is a 0.01 < p-value <=  0.05, "\strong{" for 0.001 <  p-value <=  0.01, and "}}" for p-value <= 0.001.
+The significance flag where the cutoffs for stars and dot are 0, 1e-04, 0.001, 0.01,0.05,1.
 }
 }
 \description{

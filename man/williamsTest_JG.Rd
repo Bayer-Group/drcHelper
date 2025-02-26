@@ -17,6 +17,18 @@ williamsTest_JG(df, resp, trt, direction = "decreasing", SeIn = NULL)
 
 \item{SeIn}{the standard error, default is program selected. WilliamsTest can take in a different value in the case of repeated measures}
 }
+\value{
+Williams' test result
+}
 \description{
 Williams Test from the StatCharrms Package
+}
+\examples{
+## Williams Test
+x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
+136, 139, 149, 160, 174)
+g <- gl(3,5)
+levels(g) <- c("0", "I", "II")
+PMCMRplus::williamsTest(x ~ g)
+williamsTest_JG(data.frame(treatment_var = g,response_var=x),"response_var","treatment_var",direction="increasing")
 }

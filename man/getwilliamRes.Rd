@@ -11,6 +11,9 @@ getwilliamRes(william, n = NULL)
 
 \item{n}{number of hypotheses to be tested. description}
 }
+\value{
+a vector of accept and rejects.
+}
 \description{
 get from william res accept/reject
 }

@@ -20,7 +20,7 @@
 #' @param test.type Indicate the type of analysis to be performed.  Use "RS" to select the Rao-Scott
 #' adjustment to the Cochran-Armitage test and "CA" to ignore the adjustment.
 #'
-#' @return
+#' @return a table of the test results for each treatment and injury score.
 #' @export
 #' @references Green, John W. and Springer, Timothy A. and Saulnier, Amy N. and Swintek, Joe,
 #' (2014) Statistical analysis of histopathological endpoints. Environmental Toxicology and Chemistry, 33(5), 1108-1116
@@ -128,11 +128,10 @@ runRSCABS <- function(Data,Treatment,Replicate='',Effects='',test.type='RS'){
 #' 		The corresponding p-value
 #' 	}
 #' 	\item{Signif}{
-#' 		The significance flag where "." is a p-value > 0.05, "*" is a 0.01 < p-value <=  0.05, "**" for 0.001 <  p-value <=  0.01, and "***" for p-value <= 0.001.
+#' 		The significance flag where the cutoffs for stars and dot are 0, 1e-04, 0.001, 0.01,0.05,1.
 #' 	}
 #' @export
 #'
-#' @examples
 #' @author Joe Swintek
 RSCABK <-
   function(x.i.j,n.i.j,m.i,TestK,test.type){
@@ -243,7 +242,6 @@ convert2Score <-
 #' }
 #' @export
 #'
-#' @examples
 #' @author Joe Swintek
 prepDataRSCABS <-
   function(Effect='',Data={},Treatment='',Replicate=''){
@@ -314,7 +312,6 @@ prepDataRSCABS <-
 #' @return \item{Result.K}{An intermediary result.}
 #' @export
 #'
-#' @examples
 #' @author Joe Swintek
 stepDownRSCABS <-
   function(TestK,x.i.j,n.i.j,m.i,Effect,test.type){
