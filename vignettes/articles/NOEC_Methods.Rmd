@@ -236,6 +236,9 @@ treat.means <- emmeans(gls0, ~ Treatment)
 ## contrast(treat.means, adjust="none", method="dunnett", ref = 1)
 contrast(treat.means, method="dunnett", ref = 1)
 summary(glht(gls0,mcp(Treatment="Dunnett"))) 
+fit <- aov(Response ~ Treatment, data=testdata)
+summary(PMCMRplus::welchManyOneTTest(fit, alternative = "two.sided", p.adjust="holm"))
+summary(glht(gls0,mcp(Treatment="Dunnett")),test = adjusted("holm")) 
 ```
 
 
