@@ -89,15 +89,61 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-additionalreliability">additionalReliability<a class="anchor" aria-label="anchor" href="#arg-additionalreliability"></a></dt>
+<dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
+<dd><p>a fitted object of class 'drc'.</p></dd>
+
+
+<dt id="arg-fctlist">fctList<a class="anchor" aria-label="anchor" href="#arg-fctlist"></a></dt>
+<dd><p>a list of dose-response functions to be compared.</p></dd>
+
+
+<dt id="arg-nested">nested<a class="anchor" aria-label="anchor" href="#arg-nested"></a></dt>
+<dd><p>logical. TRUE results in F tests between adjacent models (in 'fctList'). Only sensible for nested models.</p></dd>
+
+
+<dt id="arg-sorted">sorted<a class="anchor" aria-label="anchor" href="#arg-sorted"></a></dt>
+<dd><p>character string determining according to which criterion the model fits are ranked, default is IC.</p></dd>
+
+
+<dt id="arg-linreg">linreg<a class="anchor" aria-label="anchor" href="#arg-linreg"></a></dt>
+<dd><p>logical indicating whether or not additionally polynomial regression models (linear, quadratic, and cubic models) should be fitted (they could be useful for a kind of informal lack-of-test consideration for the models specified, capturing unexpected departures).</p></dd>
+
+
+<dt id="arg-icfct">icfct<a class="anchor" aria-label="anchor" href="#arg-icfct"></a></dt>
+<dd><p>function for supplying the information criterion to be used. AIC and BIC are two options.</p></dd>
+
+
+<dt id="arg-respcol">respCol<a class="anchor" aria-label="anchor" href="#arg-respcol"></a></dt>
+<dd><p>name of the response column</p></dd>
+
+
+<dt id="arg-dosecol">doseCol<a class="anchor" aria-label="anchor" href="#arg-dosecol"></a></dt>
+<dd><p>name of the dose column</p></dd>
+
+
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>data used</p></dd>
+
+
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dd><p>type of models, binomial, continuous, etc.</p></dd>
+
+
+<dt id="arg-additionalreliability">additionalReliability<a class="anchor" aria-label="anchor" href="#arg-additionalreliability"></a></dt>
 <dd><p>additional reliability need to be calculated</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>mselect.plus</p>
+    <p>a model comparison object with class drcComp</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
