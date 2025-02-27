@@ -11,7 +11,6 @@ articles:
   articles/Example_RSCABS: Example_RSCABS.html
   articles/Examples using NLS: Examples using NLS.html
   articles/Examples_drc: Examples_drc.html
-  articles/Examples_MCP: Examples_MCP.html
   articles/Examples_oecd201: Examples_oecd201.html
   articles/Examples_using_drda: Examples_using_drda.html
   Introduction: Introduction.html
@@ -26,7 +25,8 @@ articles:
   articles/Test-Guidelines: Test-Guidelines.html
   articles/Trend-Testing: Trend-Testing.html
   articles/TSK_method: TSK_method.html
-last_built: 2025-02-26T11:24Z
+  articles/Validation_MCP_tests: Validation_MCP_tests.html
+last_built: 2025-02-27T08:26Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

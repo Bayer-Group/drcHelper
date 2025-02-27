@@ -105,6 +105,8 @@ Zhenglei Gao</h4>
 
     
     
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="noec-in-general">NOEC in General<a class="anchor" aria-label="anchor" href="#noec-in-general"></a>
 </h3>
@@ -143,6 +145,22 @@ control group while controlling for Type I error,</li>
 <li>Non-parametric tests: like Dunn’s test after Kruskal-Wallis test or
 step-down Jonckheere-Terpstra trend test.</li>
 </ol>
+<p>Williams’ test and Dunnett’s test are both commonly used parametric
+methods used for NOEC calculations. Williams’ test assumes that the data
+is monotonic, meaning that the response variable consistently increases
+or decreases across the levels of the independent variable. This
+assumption is crucial for the validity of the test results. In contrast,
+Dunnett’s test does not require the data to be monotonic. This
+flexibility allows it to be applied in a wider range of situations. When
+the data does meet the monotonicity assumption, Williams’ test tends to
+have a bit greater statistical power compared to Dunnett’s test. This
+means that Williams’ test is more likely to detect a true effect when
+one exists, leading to fewer Type II errors (failing to reject a false
+null hypothesis). However, in situations where the data is not
+monotonic, Dunnett’s test is more appropriate. While it may have
+slightly less power when the data is monotonic, its robustness in
+handling non-monotonic data makes it a valuable tool in statistical
+analysis.</p>
 </div>
 <div class="section level4">
 <h4 id="dealing-with-inhomogenous-variance">Dealing with inhomogenous variance<a class="anchor" aria-label="anchor" href="#dealing-with-inhomogenous-variance"></a>
@@ -159,10 +177,199 @@ without relying on normality assumptions.</li>
 assumptions of parametric tests. However, this increases the complexity
 of results interpretation and should be avoided if possible.</li>
 </ol>
+<p>Below we use a mock Myriophyllum study to illustrate how the NOECs
+are derived with different approaches.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"test_cases_data"</span><span class="op">)</span></span>
+<span><span class="va">testdata</span> <span class="op">&lt;-</span> <span class="va">test_cases_data</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">`Test organism`</span> <span class="op">==</span> <span class="st">"Myriophyllum"</span> <span class="op">&amp;</span> <span class="va">Design</span> <span class="op">==</span><span class="st">"NOEC/ECx"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">testdata</span><span class="op">$</span><span class="va">`Study ID`</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "MOCK0065"</span></span>
+<span><span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">","</span>,<span class="st">"."</span>,<span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">metainfo</span> <span class="op">&lt;-</span> <span class="va">testdata</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span></span>
+<span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">metainfo</span><span class="op">$</span><span class="va">Design</span><span class="op">==</span><span class="st">"Limit"</span>,<span class="st">"limit test"</span>, <span class="st">"full dose response study"</span><span class="op">)</span></span>
+<span><span class="va">nconc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># endpoints &lt;- unique(testdata$Endpoint)</span></span>
+<span><span class="co"># obsVar &lt;- unique(testdata$`Measurement Variable`)</span></span>
+<span><span class="va">endpoints</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">testdata</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Endpoint"</span>,<span class="st">"Measurement Variable"</span>,<span class="st">"Time"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">str_endpoints</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">endpoints</span>,<span class="fl">1</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"of"</span>,<span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="st">"at"</span>,<span class="va">x</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">concunit</span> <span class="op">&lt;-</span> <span class="va">metainfo</span><span class="op">$</span><span class="va">Unit</span></span>
+<span><span class="va">conctype</span> <span class="op">&lt;-</span> <span class="va">metainfo</span><span class="op">$</span><span class="va">`Concentration type`</span></span></code></pre></div>
+<p>The test is a full dose response study for test organism
+Myriophyllum. There are 7 test concentrations. The interested endpoint
+is Growth Rate of Total shoot length at 14 d in this mock study
+data.</p>
+<p><strong>Visualize the data</strong></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#log1p &lt;- function(x) log(x+1)</span></span>
+<span><span class="va">ilog1p</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_update</a></span><span class="op">(</span>plot.title <span class="op">=</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">testdata</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span>,y<span class="op">=</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Growth Rate"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Test Concentration ["</span>,<span class="va">conctype</span>,<span class="st">", "</span>,<span class="va">concunit</span>,<span class="st">"]"</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Total Shoot Length"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">doses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span><span class="op">)</span></span>
+<span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">doses</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="va">doses</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">doses</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">## note that the factor between the doses is around 2.95.</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">testdata</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Dose</span>,y<span class="op">=</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Growth Rate"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Test Concentration ["</span>,<span class="va">conctype</span>,<span class="st">", "</span>,<span class="va">concunit</span>,<span class="st">"]"</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Total Shoot Length"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks<span class="op">=</span><span class="va">doses</span>,trans <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/new_transform.html" class="external-link">trans_new</a></span><span class="op">(</span><span class="st">"log1p"</span>,<span class="va">log1p</span>,<span class="va">ilog1p</span><span class="op">)</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, vjust <span class="op">=</span> <span class="fl">0.5</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
+<p><strong>Basic Summary of the Data</strong></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ctr</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Dose</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">ctr0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">ctr</span><span class="op">$</span><span class="va">Response</span><span class="op">)</span></span>
+<span><span class="va">sres</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>Mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span>,SD<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>`% Inhibition` <span class="op">=</span> <span class="op">-</span> <span class="op">(</span><span class="op">(</span><span class="va">Mean</span><span class="op">-</span><span class="va">ctr0</span><span class="op">)</span><span class="op">/</span><span class="va">ctr0</span><span class="op">)</span><span class="op">*</span><span class="fl">100</span>, CV<span class="op">=</span><span class="va">SD</span><span class="op">/</span><span class="va">Mean</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">sres</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">Dose</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">% Inhibition</th>
+<th align="right">CV</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.000</td>
+<td align="right">0.126</td>
+<td align="right">0.005</td>
+<td align="right">0.000</td>
+<td align="right">4.334</td>
+</tr>
+<tr class="even">
+<td align="right">0.045</td>
+<td align="right">0.124</td>
+<td align="right">0.005</td>
+<td align="right">2.119</td>
+<td align="right">4.253</td>
+</tr>
+<tr class="odd">
+<td align="right">0.132</td>
+<td align="right">0.100</td>
+<td align="right">0.007</td>
+<td align="right">20.929</td>
+<td align="right">6.953</td>
+</tr>
+<tr class="even">
+<td align="right">0.390</td>
+<td align="right">0.072</td>
+<td align="right">0.012</td>
+<td align="right">42.971</td>
+<td align="right">16.139</td>
+</tr>
+<tr class="odd">
+<td align="right">1.150</td>
+<td align="right">0.046</td>
+<td align="right">0.004</td>
+<td align="right">63.343</td>
+<td align="right">8.444</td>
+</tr>
+<tr class="even">
+<td align="right">3.390</td>
+<td align="right">0.028</td>
+<td align="right">0.003</td>
+<td align="right">77.942</td>
+<td align="right">11.957</td>
+</tr>
+<tr class="odd">
+<td align="right">10.000</td>
+<td align="right">0.030</td>
+<td align="right">0.002</td>
+<td align="right">76.409</td>
+<td align="right">7.267</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">testdata</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mod0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>,data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Check normality of residuals</strong></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/shapiro.test.html" class="external-link">shapiro.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">mod0</span><span class="op">)</span><span class="op">)</span> <span class="co">## not completely normal </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Shapiro-Wilk normality test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  residuals(mod0)</span></span>
+<span><span class="co">#&gt; W = 0.98098, p-value = 0.851</span></span>
+<span><span class="va">opar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/qqnorm.html" class="external-link">qqnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">mod0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/qqnorm.html" class="external-link">qqline</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">mod0</span><span class="op">)</span>, col <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#par(mfrow = c(2, 2), oma = c(0, 0, 2, 0)) </span></span>
+<span><span class="co">#plot(mod0,ask=F)</span></span></code></pre></div>
+<p><strong>Check homogeneity of variance</strong></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/leveneTest.html" class="external-link">leveneTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>,data<span class="op">=</span><span class="va">testdata</span>,center<span class="op">=</span><span class="va">mean</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Levene's Test for Homogeneity of Variance (center = mean)</span></span>
+<span><span class="co">#&gt;       Df F value  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; group  6  3.6043 0.01148 *</span></span>
+<span><span class="co">#&gt;       23                  </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/leveneTest.html" class="external-link">leveneTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>,data<span class="op">=</span><span class="va">testdata</span>,center<span class="op">=</span><span class="va">median</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Levene's Test for Homogeneity of Variance (center = median)</span></span>
+<span><span class="co">#&gt;       Df F value  Pr(&gt;F)  </span></span>
+<span><span class="co">#&gt; group  6  2.7571 0.03616 *</span></span>
+<span><span class="co">#&gt;       23                  </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<p>At <span class="math inline">\(\alpha=0.01\)</span>, homogeneity
+variance assumption cannot be rejected. At <span class="math inline">\(\alpha=0.05\)</span>, there is enough evidence to
+reject the homogeneity variance assumption.</p>
+<p><strong>Check Monotonicity</strong></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/monotonicityTest.html">monotonicityTest</a></span><span class="op">(</span><span class="va">testdata</span>,Treatment<span class="op">=</span><span class="st">"Treatment"</span>,Response<span class="op">=</span><span class="st">"Response"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        Test t value Pr(&gt;|t|) Significance</span></span>
+<span><span class="co">#&gt; 1    Linear  -12.55  &lt;0.0001          ***</span></span>
+<span><span class="co">#&gt; 2 Quadratic    1.10   0.2814            .</span></span></code></pre></div>
+<p>The data shows significant linear trend and can be considered
+monotonic.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="dunnet-tests">Dunnet Tests<a class="anchor" aria-label="anchor" href="#dunnet-tests"></a>
+<h3 id="williams-trend-test">Williams’ trend test<a class="anchor" aria-label="anchor" href="#williams-trend-test"></a>
+</h3>
+<p>Note that <code><a href="https://rdrr.io/pkg/PMCMRplus/man/williamsTest.html" class="external-link">PMCMRplus::williamsTest</a></code> produces more accurate
+results. But both functions gives almost perfect agreement in most
+cases.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">will</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/williamsTest.html" class="external-link">williamsTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>,<span class="va">testdata</span>,alternative <span class="op">=</span><span class="st">"less"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Williams trend test </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  Response by Treatment </span></span>
+<span><span class="co">#&gt; alternative hypothesis:  less </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; H0</span></span>
+<span><span class="co">#&gt;                t'-value df t'-crit decision alpha</span></span>
+<span><span class="co">#&gt; mu1 - ctr &gt;= 0    0.672 23   1.714   accept  0.05</span></span>
+<span><span class="co">#&gt; mu2 - ctr &gt;= 0    6.635 23   1.784   reject  0.05</span></span>
+<span><span class="co">#&gt; mu3 - ctr &gt;= 0   13.624 23   1.808   reject  0.05</span></span>
+<span><span class="co">#&gt; mu4 - ctr &gt;= 0   20.082 23   1.817   reject  0.05</span></span>
+<span><span class="co">#&gt; mu5 - ctr &gt;= 0   24.468 23   1.825   reject  0.05</span></span>
+<span><span class="co">#&gt; mu6 - ctr &gt;= 0   24.468 23   1.827   reject  0.05</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="fu">drcHelper</span><span class="fu">::</span><span class="fu"><a href="../reference/williamsTest_JG.html">williamsTest_JG</a></span><span class="op">(</span><span class="va">testdata</span>,trt <span class="op">=</span><span class="st">"Treatment"</span>,res <span class="op">=</span><span class="st">"Response"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Treatment Y.Tilde     Y0  Se.Diff DF    Will TCrit Signif</span></span>
+<span><span class="co">#&gt; Q6        10 0.02885 0.1264 0.003987 23 24.4700 1.827      *</span></span>
+<span><span class="co">#&gt; Q5      3.39 0.02885 0.1264 0.003987 23 24.4700 1.825      *</span></span>
+<span><span class="co">#&gt; Q4      1.15 0.04630 0.1264 0.003987 23 20.0900 1.817      *</span></span>
+<span><span class="co">#&gt; Q3      0.39 0.07210 0.1264 0.003987 23 13.6200 1.808      *</span></span>
+<span><span class="co">#&gt; Q2     0.132 0.09990 0.1264 0.003987 23  6.6470 1.785      *</span></span>
+<span><span class="co">#&gt;       0.0448 0.12370 0.1264 0.003987 23  0.6772 1.714      .</span></span></code></pre></div>
+<p>Inside the <strong>drcHelper</strong> package,
+<code>getwilliamRes</code> is a function to get accept or reject vector
+results.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/getwilliamRes.html">getwilliamRes</a></span><span class="op">(</span><span class="va">will</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "accept" "reject" "reject" "reject" "reject" "reject"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="dunnetts-tests">Dunnett’s Tests<a class="anchor" aria-label="anchor" href="#dunnetts-tests"></a>
 </h3>
 <p>Dunnett’s test is a multiple comparison test for determining
 significant differences between the mean values of several test groups
@@ -176,16 +383,211 @@ library <code>DescTools</code> is calculating correct results for the
 library <code>PMCMRplus</code> can be used to calculate the test options
 “less” (smaller), “greater” and “two.sided”. The results for the
 “two.sided” option differ in some cases from the results of
-<code>DunnettTest</code> from the library “DescTools`.</p>
+<code>DunnettTest</code> from the library <strong>DescTools</strong>,
+due to multivariate normal calculations. Another commonly used tool is
+the <code>glht</code> function with Dunnet type contrast in the
+<strong>multcomp</strong> package.</p>
 <p>There are also possibilities to use other packages. For example,
 <strong>emmeans</strong> is a package for estimating marginal means and
 conducting pairwise comparisons.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://multcomp.R-forge.R-project.org" class="external-link">multcomp</a></span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">dun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">glht</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span>, linfct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">mcp</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="st">"Dunnett"</span><span class="op">)</span>,alternative<span class="op">=</span><span class="st">"less"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Simultaneous Tests for General Linear Hypotheses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Multiple Comparisons of Means: Dunnett Contrasts</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fit: aov(formula = Response ~ Treatment, data = testdata)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear Hypotheses:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error t value Pr(&lt;t)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 &gt;= 0 -0.002679   0.003987  -0.672  0.648    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 &gt;= 0  -0.026454   0.003987  -6.635 &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 0.39 - 0 &gt;= 0   -0.054314   0.003987 -13.624 &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 1.15 - 0 &gt;= 0   -0.080064   0.003987 -20.082 &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 3.39 - 0 &gt;= 0   -0.098517   0.003987 -24.711 &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 &gt;= 0     -0.096580   0.003987 -24.225 &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; (Adjusted p values reported -- single-step method)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">dun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">glht</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span>, linfct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">mcp</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="st">"Dunnett"</span><span class="op">)</span>,alternative<span class="op">=</span><span class="st">"two.sided"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Simultaneous Tests for General Linear Hypotheses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Multiple Comparisons of Means: Dunnett Contrasts</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fit: aov(formula = Response ~ Treatment, data = testdata)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear Hypotheses:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 == 0 -0.002679   0.003987  -0.672     0.97    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 == 0  -0.026454   0.003987  -6.635   &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 0.39 - 0 == 0   -0.054314   0.003987 -13.624   &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 1.15 - 0 == 0   -0.080064   0.003987 -20.082   &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 3.39 - 0 == 0   -0.098517   0.003987 -24.711   &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 == 0     -0.096580   0.003987 -24.225   &lt;1e-04 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; (Adjusted p values reported -- single-step method)</span></span></code></pre></div>
+<p>Another approach is to use <strong>emmeans</strong> package. Note
+that the p value adjustment method is different and is called
+“dunnettx”. However the t statistic, df, and SE estimations are all the
+same.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rvlenth.github.io/emmeans/" class="external-link">emmeans</a></span><span class="op">)</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rvlenth.github.io/emmeans/reference/emmeans.html" class="external-link">emmeans</a></span><span class="op">(</span><span class="va">m</span>, specs <span class="op">=</span> <span class="va">trt.vs.ctrl</span> <span class="op">~</span> <span class="va">Treatment</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $emmeans</span></span>
+<span><span class="co">#&gt;  Treatment emmean      SE df lower.CL upper.CL</span></span>
+<span><span class="co">#&gt;  0         0.1264 0.00252 23   0.1212   0.1316</span></span>
+<span><span class="co">#&gt;  0.0448    0.1237 0.00309 23   0.1173   0.1301</span></span>
+<span><span class="co">#&gt;  0.132     0.0999 0.00309 23   0.0936   0.1063</span></span>
+<span><span class="co">#&gt;  0.39      0.0721 0.00309 23   0.0657   0.0785</span></span>
+<span><span class="co">#&gt;  1.15      0.0463 0.00309 23   0.0399   0.0527</span></span>
+<span><span class="co">#&gt;  3.39      0.0279 0.00309 23   0.0215   0.0343</span></span>
+<span><span class="co">#&gt;  10        0.0298 0.00309 23   0.0234   0.0362</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Confidence level used: 0.95 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $contrasts</span></span>
+<span><span class="co">#&gt;  contrast                     estimate      SE df t.ratio p.value</span></span>
+<span><span class="co">#&gt;  Treatment0.0448 - Treatment0 -0.00268 0.00399 23  -0.672  0.9198</span></span>
+<span><span class="co">#&gt;  Treatment0.132 - Treatment0  -0.02645 0.00399 23  -6.635  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment0.39 - Treatment0   -0.05431 0.00399 23 -13.624  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment1.15 - Treatment0   -0.08006 0.00399 23 -20.082  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment3.39 - Treatment0   -0.09852 0.00399 23 -24.711  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment10 - Treatment0     -0.09658 0.00399 23 -24.225  &lt;.0001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; P value adjustment: dunnettx method for 6 tests</span></span></code></pre></div>
+<p>NOEC is the lowest tested concentration <code>r</code>doses[2]`.</p>
 </div>
 <div class="section level3">
-<h3 id="williams-trend-test">Williams’ trend test<a class="anchor" aria-label="anchor" href="#williams-trend-test"></a>
+<h3 id="dunnetts-tests-with-inhomogenious-variance">Dunnett’s Tests with Inhomogenious Variance<a class="anchor" aria-label="anchor" href="#dunnetts-tests-with-inhomogenious-variance"></a>
 </h3>
-<p>Inside the <strong>drcHelper</strong> package,
-<code>getwilliamRes</code></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">inhomo</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">nlme</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">nlme</a></span><span class="op">)</span></span>
+<span><span class="va">gls0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html" class="external-link">gls</a></span><span class="op">(</span><span class="va">Response</span> <span class="op">~</span> <span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/varIdent.html" class="external-link">varIdent</a></span><span class="op">(</span>form<span class="op">=</span> <span class="op">~</span><span class="fl">1</span><span class="op">|</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="va">Treatment</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Looking at the variances</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="va">Treatment</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">resid</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,abline<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-17-2.png" width="700"></p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">treat.means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rvlenth.github.io/emmeans/reference/emmeans.html" class="external-link">emmeans</a></span><span class="op">(</span><span class="va">gls0</span>, <span class="op">~</span> <span class="va">Treatment</span><span class="op">)</span></span>
+<span><span class="co">## no adjustment for p-values</span></span>
+<span><span class="co">## contrast(treat.means, adjust="none", method="dunnett", ref = 1)</span></span>
+<span><span class="fu"><a href="https://rvlenth.github.io/emmeans/reference/contrast.html" class="external-link">contrast</a></span><span class="op">(</span><span class="va">treat.means</span>, method<span class="op">=</span><span class="st">"dunnett"</span>, ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  contrast                     estimate      SE   df t.ratio p.value</span></span>
+<span><span class="co">#&gt;  Treatment0.0448 - Treatment0 -0.00268 0.00345 6.66  -0.776  0.8819</span></span>
+<span><span class="co">#&gt;  Treatment0.132 - Treatment0  -0.02645 0.00413 5.43  -6.402  0.0043</span></span>
+<span><span class="co">#&gt;  Treatment0.39 - Treatment0   -0.05431 0.00623 3.89  -8.715  0.0042</span></span>
+<span><span class="co">#&gt;  Treatment1.15 - Treatment0   -0.08006 0.00297 7.96 -26.947  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment3.39 - Treatment0   -0.09852 0.00279 8.01 -35.321  &lt;.0001</span></span>
+<span><span class="co">#&gt;  Treatment10 - Treatment0     -0.09658 0.00248 6.99 -38.867  &lt;.0001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees-of-freedom method: satterthwaite </span></span>
+<span><span class="co">#&gt; P value adjustment: dunnettx method for 6 tests</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">glht</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">mcp</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="st">"Dunnett"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Simultaneous Tests for General Linear Hypotheses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Multiple Comparisons of Means: Dunnett Contrasts</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fit: gls(model = Response ~ Treatment, data = testdata, weights = varIdent(form = ~1 | </span></span>
+<span><span class="co">#&gt;     Treatment))</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear Hypotheses:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 == 0 -0.002679   0.003453  -0.776    0.935    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 == 0  -0.026454   0.004132  -6.402   &lt;1e-05 ***</span></span>
+<span><span class="co">#&gt; 0.39 - 0 == 0   -0.054314   0.006232  -8.715   &lt;1e-05 ***</span></span>
+<span><span class="co">#&gt; 1.15 - 0 == 0   -0.080064   0.002971 -26.947   &lt;1e-05 ***</span></span>
+<span><span class="co">#&gt; 3.39 - 0 == 0   -0.098517   0.002789 -35.321   &lt;1e-05 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 == 0     -0.096580   0.002485 -38.867   &lt;1e-05 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; (Adjusted p values reported -- single-step method)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">Response</span> <span class="op">~</span> <span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/welchManyOneTTest.html" class="external-link">welchManyOneTTest</a></span><span class="op">(</span><span class="va">fit</span>, alternative <span class="op">=</span> <span class="st">"two.sided"</span>, p.adjust<span class="op">=</span><span class="st">"holm"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 t value   Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 == 0  -0.776  0.4640697    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 == 0   -6.402  0.0030079  **</span></span>
+<span><span class="co">#&gt; 0.39 - 0 == 0    -8.715  0.0030079  **</span></span>
+<span><span class="co">#&gt; 1.15 - 0 == 0   -26.947 1.9119e-08 ***</span></span>
+<span><span class="co">#&gt; 3.39 - 0 == 0   -35.321 2.7730e-09 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 == 0     -38.867 1.0129e-08 ***</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">glht</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/glht.html" class="external-link">mcp</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="st">"Dunnett"</span><span class="op">)</span><span class="op">)</span>,test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/multcomp/man/methods.html" class="external-link">adjusted</a></span><span class="op">(</span><span class="st">"holm"</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Simultaneous Tests for General Linear Hypotheses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Multiple Comparisons of Means: Dunnett Contrasts</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fit: gls(model = Response ~ Treatment, data = testdata, weights = varIdent(form = ~1 | </span></span>
+<span><span class="co">#&gt;     Treatment))</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Linear Hypotheses:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 == 0 -0.002679   0.003453  -0.776    0.438    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 == 0  -0.026454   0.004132  -6.402 3.07e-10 ***</span></span>
+<span><span class="co">#&gt; 0.39 - 0 == 0   -0.054314   0.006232  -8.715  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; 1.15 - 0 == 0   -0.080064   0.002971 -26.947  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; 3.39 - 0 == 0   -0.098517   0.002789 -35.321  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 == 0     -0.096580   0.002485 -38.867  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; (Adjusted p values reported -- holm method)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="nonparametric-tests">Nonparametric Tests<a class="anchor" aria-label="anchor" href="#nonparametric-tests"></a>
+</h3>
+<div class="section level4">
+<h4 id="jonckheere-terpstra-test">Jonckheere-Terpstra test<a class="anchor" aria-label="anchor" href="#jonckheere-terpstra-test"></a>
+</h4>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jonckheere</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/stepDownTrendTest.html" class="external-link">stepDownTrendTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,test <span class="op">=</span> <span class="st">"jonckheereTest"</span>,</span>
+<span>                         alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jonckheere</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Step down Jonckheere-Terpstra test </span></span>
+<span><span class="co">#&gt; data:  Response by Treatment </span></span>
+<span><span class="co">#&gt; alternative hypothesis:  less </span></span>
+<span><span class="co">#&gt; P value adjustment method:  none </span></span>
+<span><span class="co">#&gt; H0</span></span>
+<span><span class="co">#&gt;                           z value     Pr(&lt;z)    </span></span>
+<span><span class="co">#&gt; 0.0448 &gt;= 0                -1.066  0.1432110    </span></span>
+<span><span class="co">#&gt; 0.132 &gt;= 0.0448 &gt;= 0       -2.946  0.0016081  **</span></span>
+<span><span class="co">#&gt; 0.39 &gt;= 0.132 &gt;= ... &gt;= 0  -4.181 1.4491e-05 ***</span></span>
+<span><span class="co">#&gt; 1.15 &gt;= 0.39 &gt;= ... &gt;= 0   -5.150 1.3033e-07 ***</span></span>
+<span><span class="co">#&gt; 3.39 &gt;= 1.15 &gt;= ... &gt;= 0   -5.968 1.2019e-09 ***</span></span>
+<span><span class="co">#&gt; 10 &gt;= 3.39 &gt;= ... &gt;= 0     -6.290 1.5913e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="dunns-test">Dunn’s test<a class="anchor" aria-label="anchor" href="#dunns-test"></a>
+</h4>
+<p>Dunn’s test is not very powerful in general.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span>
+<span><span class="va">dunn</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/kwManyOneDunnTest.html" class="external-link">kwManyOneDunnTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dunn</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 z value     Pr(&lt;z)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 &gt;= 0  -0.367 0.77628979    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 &gt;= 0   -1.378 0.30712086    </span></span>
+<span><span class="co">#&gt; 0.39 - 0 &gt;= 0    -2.082 0.08745722   .</span></span>
+<span><span class="co">#&gt; 1.15 - 0 &gt;= 0    -2.786 0.01442079   *</span></span>
+<span><span class="co">#&gt; 3.39 - 0 &gt;= 0    -3.974 0.00022799 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 &gt;= 0      -3.710 0.00059525 ***</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="alternative-approaches">Alternative Approaches<a class="anchor" aria-label="anchor" href="#alternative-approaches"></a>
@@ -198,114 +600,76 @@ calculations. However, they are very useful in certain situations.</p>
 <p>For many-to-one comparisons in an one-factorial layout with normally
 distributed residuals and unequal variances Tamhane-Dunnett’s test can
 be used.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">245</span><span class="op">)</span></span>
 <span><span class="va">mn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">^</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">^</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">^</span><span class="fl">4</span><span class="op">)</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">mn</span>, each<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, each<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aov.html" class="external-link">aov</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="va">g</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/shapiro.test.html" class="external-link">shapiro.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Shapiro-Wilk normality test</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## data:  residuals(fit)</span></span>
-<span><span class="co">## W = 0.96609, p-value = 0.5484</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/bartlett.test.html" class="external-link">bartlett.test</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="va">g</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Bartlett test of homogeneity of variances</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## data:  x by g</span></span>
-<span><span class="co">## Bartlett's K-squared = 1.0766, df = 4, p-value = 0.898</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Analysis of Variance Table</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Response: x</span></span>
-<span><span class="co">##           Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span><span class="co">## g          5 1761.11  352.22  171.01 1.069e-15 ***</span></span>
-<span><span class="co">## Residuals 20   41.19    2.06                      </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## works with object of class aov</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/shapiro.test.html" class="external-link">shapiro.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Shapiro-Wilk normality test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  residuals(fit)</span></span>
+<span><span class="co">#&gt; W = 0.96609, p-value = 0.5484</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/bartlett.test.html" class="external-link">bartlett.test</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="va">g</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Bartlett test of homogeneity of variances</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  x by g</span></span>
+<span><span class="co">#&gt; Bartlett's K-squared = 1.0766, df = 4, p-value = 0.898</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Analysis of Variance Table</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Response: x</span></span>
+<span><span class="co">#&gt;           Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
+<span><span class="co">#&gt; g          5 1761.11  352.22  171.01 1.069e-15 ***</span></span>
+<span><span class="co">#&gt; Residuals 20   41.19    2.06                      </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">## works with object of class aov</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">PMCMRplus</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/tamhaneDunnettTest.html" class="external-link">tamhaneDunnettTest</a></span><span class="op">(</span><span class="va">fit</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Pairwise comparisons using Tamhane-Dunnett's-test for multiple  </span></span>
-<span><span class="co">##                          comparisons with one control</span></span></code></pre>
-<pre><code><span><span class="co">## data: x by g</span></span></code></pre>
-<pre><code><span><span class="co">## alternative hypothesis: greater</span></span></code></pre>
-<pre><code><span><span class="co">## P value adjustment method: single-step</span></span></code></pre>
-<pre><code><span><span class="co">## H0</span></span></code></pre>
-<pre><code><span><span class="co">##            t value     Pr(&gt;t)    </span></span>
-<span><span class="co">## 2 - 1 &lt;= 0   1.399 0.32792374    </span></span>
-<span><span class="co">## 3 - 1 &lt;= 0   3.368 0.01849964   *</span></span>
-<span><span class="co">## 4 - 1 &lt;= 0   7.223 0.00021346 ***</span></span>
-<span><span class="co">## 5 - 1 &lt;= 0  15.186 3.5096e-09 ***</span></span></code></pre>
-<pre><code><span><span class="co">## ---</span></span></code></pre>
-<pre><code><span><span class="co">## Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="single-step"))</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/tamhaneDunnettTest.html" class="external-link">tamhaneDunnettTest</a></span><span class="op">(</span><span class="va">fit</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            t value     Pr(&gt;t)    </span></span>
+<span><span class="co">#&gt; 2 - 1 &lt;= 0   1.399 0.32792374    </span></span>
+<span><span class="co">#&gt; 3 - 1 &lt;= 0   3.368 0.01849964   *</span></span>
+<span><span class="co">#&gt; 4 - 1 &lt;= 0   7.223 0.00021346 ***</span></span>
+<span><span class="co">#&gt; 5 - 1 &lt;= 0  15.186 3.5096e-09 ***</span></span>
+<span><span class="co">## summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="single-step"))</span></span>
 <span><span class="co">## p.adjust “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”, “none”</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/welchManyOneTTest.html" class="external-link">welchManyOneTTest</a></span><span class="op">(</span><span class="va">fit</span>, alternative <span class="op">=</span> <span class="st">"greater"</span>, p.adjust<span class="op">=</span><span class="st">"holm"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Pairwise comparisons using Welch's t-test</span></span></code></pre>
-<pre><code><span><span class="co">## data: x by g</span></span></code></pre>
-<pre><code><span><span class="co">## alternative hypothesis: greater</span></span></code></pre>
-<pre><code><span><span class="co">## P value adjustment method: holm</span></span></code></pre>
-<pre><code><span><span class="co">## H0</span></span></code></pre>
-<pre><code><span><span class="co">##            t value     Pr(&gt;t)    </span></span>
-<span><span class="co">## 2 - 1 &lt;= 0   1.399 0.10262533    </span></span>
-<span><span class="co">## 3 - 1 &lt;= 0   3.368 0.01089476   *</span></span>
-<span><span class="co">## 4 - 1 &lt;= 0   7.223 0.00013621 ***</span></span>
-<span><span class="co">## 5 - 1 &lt;= 0  15.186 7.0276e-07 ***</span></span></code></pre>
-<pre><code><span><span class="co">## ---</span></span></code></pre>
-<pre><code><span><span class="co">## Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">DescTools</span><span class="fu">::</span><span class="fu"><a href="https://andrisignorell.github.io/DescTools/reference/DunnettTest.html" class="external-link">DunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span> <span class="co">## alternative is not taking effect in this case</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##   Dunnett's test for comparing several treatments with a control :  </span></span>
-<span><span class="co">##     95% family-wise confidence level</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $`1`</span></span>
-<span><span class="co">##          diff     lwr.ci    upr.ci    pval    </span></span>
-<span><span class="co">## 2-1  1.201147 -1.2064128  3.608708  0.4992    </span></span>
-<span><span class="co">## 3-1  3.041632  0.6340717  5.449192  0.0110 *  </span></span>
-<span><span class="co">## 4-1  7.245476  4.8379162  9.653037 5.1e-08 ***</span></span>
-<span><span class="co">## 5-1 15.611204 13.2036439 18.018764 &lt; 2e-16 ***</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/dunnettTest.html" class="external-link">dunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Pairwise comparisons using Dunnett's-test for multiple  </span></span>
-<span><span class="co">##                          comparisons with one control</span></span></code></pre>
-<pre><code><span><span class="co">## data: x by g</span></span></code></pre>
-<pre><code><span><span class="co">##   1      </span></span>
-<span><span class="co">## 2 0.511  </span></span>
-<span><span class="co">## 3 0.012  </span></span>
-<span><span class="co">## 4 1.2e-07</span></span>
-<span><span class="co">## 5 &lt; 2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## P value adjustment method: single-step</span></span></code></pre>
-<pre><code><span><span class="co">## alternative hypothesis: two.sided</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/dunnettTest.html" class="external-link">dunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Pairwise comparisons using Dunnett's-test for multiple  </span></span>
-<span><span class="co">##                          comparisons with one control</span></span></code></pre>
-<pre><code><span><span class="co">## data: x by g</span></span></code></pre>
-<pre><code><span><span class="co">##   1      </span></span>
-<span><span class="co">## 2 0.2554 </span></span>
-<span><span class="co">## 3 0.0055 </span></span>
-<span><span class="co">## 4 1.9e-08</span></span>
-<span><span class="co">## 5 &lt; 2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## P value adjustment method: single-step</span></span></code></pre>
-<pre><code><span><span class="co">## alternative hypothesis: greater</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/welchManyOneTTest.html" class="external-link">welchManyOneTTest</a></span><span class="op">(</span><span class="va">fit</span>, alternative <span class="op">=</span> <span class="st">"greater"</span>, p.adjust<span class="op">=</span><span class="st">"holm"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            t value     Pr(&gt;t)    </span></span>
+<span><span class="co">#&gt; 2 - 1 &lt;= 0   1.399 0.10262533    </span></span>
+<span><span class="co">#&gt; 3 - 1 &lt;= 0   3.368 0.01089476   *</span></span>
+<span><span class="co">#&gt; 4 - 1 &lt;= 0   7.223 0.00013621 ***</span></span>
+<span><span class="co">#&gt; 5 - 1 &lt;= 0  15.186 7.0276e-07 ***</span></span>
+<span><span class="fu">DescTools</span><span class="fu">::</span><span class="fu"><a href="https://andrisignorell.github.io/DescTools/reference/DunnettTest.html" class="external-link">DunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span> <span class="co">## alternative is not taking effect in this case</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Dunnett's test for comparing several treatments with a control :  </span></span>
+<span><span class="co">#&gt;     95% family-wise confidence level</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`1`</span></span>
+<span><span class="co">#&gt;          diff     lwr.ci    upr.ci    pval    </span></span>
+<span><span class="co">#&gt; 2-1  1.201147 -1.2064128  3.608708  0.4992    </span></span>
+<span><span class="co">#&gt; 3-1  3.041632  0.6340717  5.449192  0.0110 *  </span></span>
+<span><span class="co">#&gt; 4-1  7.245476  4.8379162  9.653037 5.1e-08 ***</span></span>
+<span><span class="co">#&gt; 5-1 15.611204 13.2036439 18.018764 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/dunnettTest.html" class="external-link">dunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   1      </span></span>
+<span><span class="co">#&gt; 2 0.511  </span></span>
+<span><span class="co">#&gt; 3 0.012  </span></span>
+<span><span class="co">#&gt; 4 1.2e-07</span></span>
+<span><span class="co">#&gt; 5 &lt; 2e-16</span></span>
+<span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/dunnettTest.html" class="external-link">dunnettTest</a></span><span class="op">(</span><span class="va">x</span><span class="op">~</span><span class="va">g</span>, alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   1      </span></span>
+<span><span class="co">#&gt; 2 0.2554 </span></span>
+<span><span class="co">#&gt; 3 0.0055 </span></span>
+<span><span class="co">#&gt; 4 1.9e-08</span></span>
+<span><span class="co">#&gt; 5 &lt; 2e-16</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

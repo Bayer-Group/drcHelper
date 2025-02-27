@@ -1143,15 +1143,24 @@ Bates.[^1]</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="rscabs">RSCABS<a class="anchor" aria-label="anchor" href="#rscabs"></a>
+<h2 id="rscabs-and-other-testing-approaches">RSCABS and other testing approaches<a class="anchor" aria-label="anchor" href="#rscabs-and-other-testing-approaches"></a>
 </h2>
 <p>Details about RSCABS approach you can find <a href="https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html" class="external-link">here</a></p>
+<p>Other testing approaches that could be implemented. For example post
+hoc testings are available for a regression modeling where the
+independent variable is the dose levels as a factor. All these testing
+approaches are targeting at a NOEC at a certain injury level. By
+default, these testing approaches actually treat the test rates or
+concentrations in the study as categorical variable, losing the
+continuous property and therefore an ER50 cannot be directly calculated.
+However, the NOEC at the medium injury level is comparable to ER50,
+which will always be smaller than ER50.</p>
 </div>
 <div class="section level2">
 <h2 id="simulation-study">Simulation Study<a class="anchor" aria-label="anchor" href="#simulation-study"></a>
 </h2>
 <p>Simulation studies show that glm with quasibinomial and nonlinear
-log-logistic with normal perfom similary when there are limited dose
+log-logistic with normal perfom similarly when there are limited dose
 groups. When we observe the full dose-response curve, quasibinomial is
 less flexible in adapting to the data.</p>
 <div class="section level3">

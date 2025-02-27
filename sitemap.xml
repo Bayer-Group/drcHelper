@@ -8,7 +8,6 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Example_Analysis_Workflow.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Example_RSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples using NLS.html</loc></url>
-<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_MCP.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_drc.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_oecd201.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Examples_using_drda.html</loc></url>
@@ -24,6 +23,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/TSK_method.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Test-Guidelines.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Trend-Testing.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Validation_MCP_tests.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/drcHelper.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/index.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/authors.html</loc></url>
@@ -64,6 +64,10 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pavaMean.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.edList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.modList.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prelimPlot1.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prelimPlot2.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prelimPlot3.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prelimSummary.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prepDataRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.drcComp.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pvi_example.html</loc></url>

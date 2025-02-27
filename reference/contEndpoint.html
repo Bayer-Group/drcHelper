@@ -89,11 +89,79 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-doses">doses<a class="anchor" aria-label="anchor" href="#arg-doses"></a></dt>
-<dd></dd>
+<dl><dt id="arg-paov">paov<a class="anchor" aria-label="anchor" href="#arg-paov"></a></dt>
+<dd><p>Anova p-value</p></dd>
+
+
+<dt id="arg-pks">pks<a class="anchor" aria-label="anchor" href="#arg-pks"></a></dt>
+<dd><p>Kolmogorov-Smirnov test p-value</p></dd>
+
+
+<dt id="arg-pnormal">pnormal<a class="anchor" aria-label="anchor" href="#arg-pnormal"></a></dt>
+<dd><p>Normal test p-value</p></dd>
+
+
+<dt id="arg-phomogeneity">phomogeneity<a class="anchor" aria-label="anchor" href="#arg-phomogeneity"></a></dt>
+<dd><p>Homogeneity variance test p-value</p></dd>
+
+
+<dt id="arg-monotonicity">monotonicity<a class="anchor" aria-label="anchor" href="#arg-monotonicity"></a></dt>
+<dd><p>Monotonicity test p-value</p></dd>
+
+
+<dt id="arg-william">william<a class="anchor" aria-label="anchor" href="#arg-william"></a></dt>
+<dd><p>Williams' test p-value</p></dd>
+
+
+<dt id="arg-dunnett">dunnett<a class="anchor" aria-label="anchor" href="#arg-dunnett"></a></dt>
+<dd><p>Dunnett's test p-value</p></dd>
+
+
+<dt id="arg-dunn">dunn<a class="anchor" aria-label="anchor" href="#arg-dunn"></a></dt>
+<dd><p>Dunn's test p-value</p></dd>
+
+
+<dt id="arg-jonckheere">jonckheere<a class="anchor" aria-label="anchor" href="#arg-jonckheere"></a></dt>
+<dd><p>Jonckheere-Tepstra test p-value</p></dd>
+
+
+<dt id="arg-procedure">procedure<a class="anchor" aria-label="anchor" href="#arg-procedure"></a></dt>
+<dd><p>step down of up</p></dd>
+
+
+<dt id="arg-doses">doses<a class="anchor" aria-label="anchor" href="#arg-doses"></a></dt>
+<dd><p>tested doses</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>NOEC along with an attribute indicating which test was used.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Purpose: The contEndpoint function computes the No Observed Effect Concentration (NOEC) based on the results of various statistical tests. It evaluates these tests'
+p-values to determine which statistical analysis is most appropriate.The function first checks the
+significance of the monotonicity test. Depending on the results, it selects the appropriate
+p-value from the relevant test (Dunnett, Dunn, Williams, or Jonckheere) to compute the NOEC.
+The function returns the NOEC along with an attribute indicating which test was used. Original function
+used directly the williams' test or dunnett's test objects as input, which can cause conflicts when
+using different functions to get the pvals.</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">contEndpoint</span><span class="op">(</span>paov <span class="op">=</span> <span class="fl">0.01</span>, pks <span class="op">=</span> <span class="fl">0.03</span>, pnormal <span class="op">=</span> <span class="fl">0.06</span>,</span></span>
+<span class="r-in"><span>phomogeneity <span class="op">=</span> <span class="fl">0.07</span>, monotonicity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>,<span class="fl">0.2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>william <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.07</span>, <span class="fl">0.06</span>, <span class="fl">0.03</span>, <span class="fl">0.01</span><span class="op">)</span>, dunnett <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.07</span>, <span class="fl">0.06</span>, <span class="fl">0.03</span>, <span class="fl">0.01</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>dunn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.07</span>, <span class="fl">0.06</span>, <span class="fl">0.03</span>, <span class="fl">0.01</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>jonckheere <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.07</span>, <span class="fl">0.06</span>, <span class="fl">0.03</span>, <span class="fl">0.01</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>procedure <span class="op">=</span> <span class="st">"stepDown"</span>,</span></span>
+<span class="r-in"><span>doses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control"</span>,<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "B"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"test")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Williams"</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
