@@ -32,7 +32,7 @@ library(PMCMRplus)
 
 ## Williams' Test
 
-PMCMRplus::williamsTest produces more accurate results since regarding the calculation of degrees of freedom, based on the isotonic regression. 
+PMCMRplus::williamsTest produces more accurate results since it is based on the isotonic regression.
 
 Both functions use tabulated critical values provided by Williams (only for a=0.05). 
 

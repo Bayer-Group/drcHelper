@@ -77,8 +77,8 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
     Effect <- cVal + respLev / 100 * d ## note, for survival, d=1, for continuous, it is a different topic!!!!
   }
   EDdat <- data.frame(EDres,
-    Effect = Effect,
-    text = paste0(endpoint, respLev)
+                      Effect = Effect,
+                      text = paste0(endpoint, respLev)
   )
   EDdat$Lower <- ifelse(EDdat$Lower > xmin, EDdat$Lower, xmin)
   p <- p + geom_point(data = EDdat, aes(x = (Estimate), y = Effect), size = 3, col = "red") +
@@ -177,9 +177,9 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
         y <- object
         if (object$type == "binomial") {
           ## browser()
-          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "excess", interval = "delta", display = F))
+          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "excess", interval = "delta", display = F),silent = TRUE)
         } else {
-          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "relative", interval = "inv", display = F))
+          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "relative", interval = "inv", display = F),silent = TRUE)
         }
         if (!inherits(res, "try-error")) {
           return(c(res$Results[1], res$SE, res$interval))
@@ -276,7 +276,7 @@ mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
   } else {
     modList <- lapply(fctList, function(fct) {
       try(update(object, fct = fct),
-        silent = TRUE
+          silent = TRUE
       )
     })
     modList[[length(fctList) + 1]] <- object
@@ -317,8 +317,8 @@ mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
     drcData <- as.data.frame(object$data[, c(2, 1)])
     names(drcData) <- c("yVec", "xVec")
     linFitList <- list(lm(yVec ~ xVec, data = drcData), lm(yVec ~
-      xVec + I(xVec * xVec), data = drcData), lm(yVec ~
-      xVec + I(xVec * xVec) + I(xVec * xVec * xVec), data = drcData))
+                                                             xVec + I(xVec * xVec), data = drcData), lm(yVec ~
+                                                                                                          xVec + I(xVec * xVec) + I(xVec * xVec * xVec), data = drcData))
     linModMat <- matrix(unlist(lapply(linFitList, function(listObj) {
       c(logLik(listObj), icfct(listObj), NA, (summary(listObj)$sigma)^2)
     })), 3, 4, byrow = TRUE)
@@ -431,8 +431,8 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
   predData <- plyr::ldply(modList, function(tempObj) {
     if (!inherits(tempObj, "try-error")) {
       pm <- predict(tempObj,
-        newdata = DoseData,
-        interval = "confidence", ...
+                    newdata = DoseData,
+                    interval = "confidence", ...
       )
       newdata <- DoseData
       newdata$p <- pm[, 1]
@@ -506,14 +506,14 @@ plot.edList <- function(edList, fctNames, ...) {
   if (is.null(edResTab$Rating)) {
     plotED <- ggplot(edResTab, aes(x = ED, y = Estimate, col = Model)) +
       geom_pointrange(aes(ymin = Lower, ymax = Upper),
-        position = position_dodge(width = 0.4)
+                      position = position_dodge(width = 0.4)
       ) #+scale_y_log10()
   } else {
     edResTab$Rating <- factor(edResTab$Rating, levels = c("Excellent", "Good", "Fair", "Poor", "Bad"))
 
     plotED <- ggplot(edResTab, aes(x = EC, y = Estimate, col = Model, shape = Rating)) +
       geom_pointrange(aes(ymin = Lower, ymax = Upper),
-        position = position_dodge(width = 0.4)
+                      position = position_dodge(width = 0.4)
       ) #+scale_y_log10()
   }
   return(plotED)
@@ -543,7 +543,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
   # |EC$_{10}$ > EC$_{50,low}$                | Low                              | # nolint
   res <- rep(NA, 2)
   if (!is.null(mod) & !inherits(mod, "try-error")) {
-    if (class(mod) == "drc") obj <- ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...)
+    if (class(mod) == "drc") obj <- try(ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...),silent = TRUE)
     obj <- as.data.frame(obj)
     steep <- obj$Estimate[1] / obj$Estimate[3] # the Ratio between EC 10 and EC 50
     if (!is.na(steep)) {
@@ -593,9 +593,9 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
 mselect.ED <- function(modList, respLev = c(10, 20, 50),
                        trend = "Decrease", ...) {
   edList <- lapply(modList, function(obj) {
-                                           ED.plus(obj,
-                                                   respLev,
-                                                   trend = trend, ...) })
+    ED.plus(obj,
+            respLev,
+            trend = trend, ...) })
   ## map2(modList,edList,function(x,y){
   ## predict(x,newdata=data.frame(Concentration=y[,1]))})
   ## Check if Prediction Make sense
@@ -740,3 +740,57 @@ invlogxp <- function(x, a) {
 ## logxp_trans <- function(a=0.001) scales::trans_new("logxp",
 ## transform=function(x)logxp(x,a=a),
 ## inverse=function(x)invlogxp(x,a=a))
+
+
+#' Wrapper around rdrm
+#'
+#' Wrapper around rdrm to generate a data frame or a tibble object instead of a list of two matrices
+#'
+#' @param nosim numeric. The number of simulated curves to be returned.
+#' @param fct list. Any built-in function in the package drc or a list with similar components.
+#' @param mpar numeric. The model parameters to be supplied to fct.
+#' @param xerror numeric or character. The distribution for the dose values.
+#' @param xpar numeric vector supplying the parameter values defining the distribution for the dose values. If xerror is a distribution then remember that the number of dose values also is part of this argument (the first argument).
+#' @param yerror numeric or character. The error distribution for the response values.
+#' @param ypar numeric vector supplying the parameter values defining the error distribution for the response values.
+#' @param onlyY logical. If TRUE then only the response values are returned (useful in simulations). Otherwise both dose values and response values (and for binomial data also the weights) are returned.
+#'
+#' @return a data frame
+#' @seealso [drc::rdrm()], [MCPMod::genDFdata()]
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' dat <- rdrm(1, LL.3(), c(`b:(Intercept)` = 3,
+#' `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+#' xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+#'          3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+#' yerror = "rnorm", ypar = c(0, 0.6))
+#' dat <- data.frame(Dose = dat$x[1,], Response = dat$y[1,])
+#' simDRdata(10, LL.3(), c(`b:(Intercept)` = 3,
+#' `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+#' xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+#'          3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+#' yerror = "rnorm", ypar = c(0, 0.6))
+#' }
+simDRdata <- function(nosim, fct, mpar, xerror, xpar = 1, yerror = "rnorm",
+                      ypar = c(0, 1), onlyY = FALSE){
+  if(yerror=="rbinom"){
+    dat <- drc::rdrm(nosim=nosim, fct=fct, mpar=mpar, xerror=xerror, xpar=xpar , yerror="rbinom" , ypar=ypar, onlyY=onlyY)
+    if(onlyY){
+      dat <- plyr::ldply(1:nosim,function(i) data.frame(Dose=xerror,Response=dat$y[i,],Weight=ypar,Sim=paste("Sim",i) ))
+    } else
+      dat <- plyr::ldply(1:nosim,function(i) data.frame(Dose=dat$x[i,],Response=dat$y[i,],Weight=dat$w[i,],Sim=paste("Sim",i) ))
+
+  }else{
+    if(yerror=="rnorm"){
+      dat <- drc::rdrm(nosim=nosim, fct=fct, mpar=mpar, xerror=xerror, xpar=xpar , yerror="rnorm" , ypar=ypar, onlyY=onlyY)
+      if(onlyY){
+        dat <- plyr::ldply(1:nosim,function(i) data.frame(Dose=xerror,Response=dat$y[i,],Sim=paste("Sim",i) ))
+      } else
+        dat <- plyr::ldply(1:nosim,function(i) data.frame(Dose=dat$x[i,],Response=dat$y[i,],Sim=paste("Sim",i) ))
+
+    }
+  }
+  return(dat)
+}

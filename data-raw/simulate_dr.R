@@ -29,3 +29,49 @@ mod1 <- drm(Response~Dose,data=dat_noED50,fct=LL.4())
 result <- calcSteepnessOverlap(mod = mod1, trend = "Decrease")
 ED(mod1,50)
 ED.plus(mod1, c(10, 20, 50), trend = "Decrease", CI = "inv")
+
+
+dat_steep <- rdrm(1, LL.3(), c(`b:(Intercept)` = 5,
+                                `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+                   xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+                            3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+                   yerror = "rnorm", ypar = c(0, 0.6))
+dat_steep <- data.frame(Dose = dat_steep$x[1,], Response = dat_steep$y[1,])
+prelimPlot2(dat_steep)
+usethis::use_data(dat_steep,overwrite = TRUE)
+
+mod1 <- drm(Response~Dose,data=dat_steep,fct=LL.3())
+## plot(mod1,type="all")
+result <- calcSteepnessOverlap(mod = mod1, trend = "Decrease")
+result
+
+
+
+dat_medium <- rdrm(1, LL.3(), c(`b:(Intercept)` = 3,
+                               `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+                  xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+                           3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+                  yerror = "rnorm", ypar = c(0, 0.6))
+dat_medium <- data.frame(Dose = dat_medium$x[1,], Response = dat_medium$y[1,])
+prelimPlot2(dat_medium)
+
+mod1 <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+## plot(mod1,type="all")
+result <- calcSteepnessOverlap(mod = mod1, trend = "Decrease")
+result
+usethis::use_data(dat_medium,overwrite = TRUE)
+
+
+dat <- rdrm(10, LL.3(), c(`b:(Intercept)` = 3,
+                                `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+                   xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+                            3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+                   yerror = "rnorm", ypar = c(0, 0.6))
+
+plyr::ldply(1:10,function(i) data.frame(Dose=dat$x[i,],Response=dat$y[i,],Sim=paste("Sim",i) ))
+
+simDR(10, LL.3(), c(`b:(Intercept)` = 3,
+                    `d:(Intercept)` = 8, `e:(Intercept)` = 3),
+      xerror=c(0, 0, 0, 0, 0, 0, 0.94, 0.94, 0.94, 1.88, 1.88, 1.88, 3.75,
+               3.75, 3.75, 7.5, 7.5, 7.5, 15, 15, 15, 30, 30, 30),
+      yerror = "rnorm", ypar = c(0, 0.6))
