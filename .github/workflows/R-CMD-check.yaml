@@ -2,8 +2,8 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    # Only build on release branch
-    branches: [main,releases]
+    # Only build on releases branch
+    branches: ['releases']
     # Sequence of patterns matched against refs/tags
     tags:
       - release

@@ -19,11 +19,35 @@ mselect.plus(
 )
 }
 \arguments{
+\item{object}{a fitted object of class 'drc'.}
+
+\item{fctList}{a list of dose-response functions to be compared.}
+
+\item{nested}{logical. TRUE results in F tests between adjacent models (in 'fctList'). Only sensible for nested models.}
+
+\item{sorted}{character string determining according to which criterion the model fits are ranked, default is IC.}
+
+\item{linreg}{logical indicating whether or not additionally polynomial regression models (linear, quadratic, and cubic models) should be fitted (they could be useful for a kind of informal lack-of-test consideration for the models specified, capturing unexpected departures).}
+
+\item{icfct}{function for supplying the information criterion to be used. AIC and BIC are two options.}
+
+\item{respCol}{name of the response column}
+
+\item{doseCol}{name of the dose column}
+
+\item{data}{data used}
+
+\item{type}{type of models, binomial, continuous, etc.}
+
 \item{additionalReliability}{additional reliability need to be calculated}
 }
 \value{
-mselect.plus
+a model comparison object with class drcComp
 }
 \description{
 added functionality for mselect
+}
+\examples{
+\dontrun{
+}
 }

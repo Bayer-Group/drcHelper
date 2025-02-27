@@ -13,6 +13,9 @@
 
 \item{...}{additional parameters}
 }
+\value{
+a ggplot object
+}
 \description{
 Plot the ECx estimation and confidence intervals from the list of models.
 }

@@ -1,8 +1,4 @@
 
-r
-
-
-
 library(testthat)
 
 describe("contEndpoint Function", {

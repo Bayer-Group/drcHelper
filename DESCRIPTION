@@ -33,5 +33,6 @@ Imports:
     scales,
     magrittr,
     Iso,
-    plyr
+    plyr,
+    metafor
 Remotes: DoseResponse/bmd

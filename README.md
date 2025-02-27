@@ -4,6 +4,8 @@
 # drcHelper
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of drcHelper is to assist with routine dose-response analysis
@@ -26,6 +28,13 @@ foundation for standardized practices in the regulatory statistics field
 for plant protection product registration. Additionally, it is hoped
 that this project will contribute to the ongoing OECD 54 revision
 process.
+
+Some of the functions are adapted from archived packages or single
+functions of a bigger package so that the loaded namespace is not too
+big for small calculations. Some of the functions are included for
+testing and validation purposes. All third-party code with a different
+license are specified in the relevant source files with the license name
+and the relevant copyright texts.
 
 ## Installation
 
@@ -243,9 +252,17 @@ To use the pkgdown github workflow, some of the vignettes need to be
 pre-knit before pushing to the remote github repository.
 
 ``` r
-knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd")
+knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",fi)
 knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
 knitr::knit("vignettes/articles/Examples using NLS.Rmd.orig", output = "vignettes/articles/Examples using NLS.Rmd")
 knitr::knit("vignettes/articles/Examples_drc.Rmd.orig", output = "vignettes/articles/Examples_drc.Rmd")
 knitr::knit("vignettes/articles/Examples_oecd201.Rmd.orig", output = "vignettes/articles/Examples_oecd201.Rmd")
 ```
+
+## Acknowledgements
+
+The work is supported by Bayer Environment Effects team members,
+especially by Andreas Solga and Daniela Jans. The Mesocosm colleagues
+Sarah Baumert and Harald Schulz have supported the verification and
+validation with extensive examples and scripts and SAS / VB validated
+calculations.

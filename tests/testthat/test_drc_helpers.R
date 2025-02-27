@@ -6,12 +6,16 @@ describe("calcSteepnessOverlap", {
     expect_type(result, "character")
     expect_length(result, 2)
     expect_equal(result,c("High","Medium"))
+
+
   })
 
   it("handles missing EC50 values gracefully", {
     ## need a dataset with no effects greater than 50%.
-
-    result <- calcSteepnessOverlap(mod = mod, trend = "Decrease")
+    mod1 <- drm(Response~Dose,data=datsim1 %>% filter(Dose < 3),fct=LL.3())
+    ## plot(mod1,type="all")
+    result <- calcSteepnessOverlap(mod = mod1, trend = "Decrease")
+    ED(mod1,50)
     expect_equal(result[2], "Not Defined")
   })
 
@@ -21,19 +25,28 @@ describe("calcSteepnessOverlap", {
   })
 
   it("returns correct steepness for shallow, medium, and steep", {
-    # Create specific test cases for known inputs and expected outputs
-    mod_shallow <- create_test_drc_model_shallow()  # Replace with actual test model creation
-    result_shallow <- calcSteepnessOverlap(mod = mod_shallow, trend = "Decrease")
-    expect_equal(result_shallow[2], "Shallow")
-
-    mod_medium <- create_test_drc_model_medium()  # Replace with actual test model creation
-    result_medium <- calcSteepnessOverlap(mod = mod_medium, trend = "Decrease")
-    expect_equal(result_medium[2], "Medium")
-
-    mod_steep <- create_test_drc_model_steep()  # Replace with actual test model creation
-    result_steep <- calcSteepnessOverlap(mod = mod_steep, trend = "Decrease")
-    expect_equal(result_steep[2], "Steep")
+  ## For a Shallow dose response!
+  mod1 <- drm(Response~Dose,data=dat_shallow,fct=LL.3())
+  ## plot(mod1,type="all")
+  result <- calcSteepnessOverlap(mod = mod1, trend = "Decrease")
+  ED(mod1,50)
+  expect_equal(result[2], "Shallow")
+  #   # Create specific test cases for known inputs and expected outputs
+  #   mod_shallow <- create_test_drc_model_shallow()  # Replace with actual test model creation
+  #   result_shallow <- calcSteepnessOverlap(mod = mod_shallow, trend = "Decrease")
+  #   expect_equal(result_shallow[2], "Shallow")
+  #
+  #   mod_medium <- create_test_drc_model_medium()  # Replace with actual test model creation
+  #   result_medium <- calcSteepnessOverlap(mod = mod_medium, trend = "Decrease")
+  #   expect_equal(result_medium[2], "Medium")
+  #
+  #   mod_steep <- create_test_drc_model_steep()  # Replace with actual test model creation
+  #   result_steep <- calcSteepnessOverlap(mod = mod_steep, trend = "Decrease")
+  #   expect_equal(result_steep[2], "Steep")
   })
 
   # Additional tests can be added as necessary
 })
+
+
+

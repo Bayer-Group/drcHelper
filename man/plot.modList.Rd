@@ -47,3 +47,7 @@ data provided in the modList}
 \description{
 Plot a list of models together.
 }
+\examples{
+\dontrun{
+}
+}

@@ -48,8 +48,15 @@ addECxCI(
 
 \item{xmin}{when confidence intervals very wide including even negative values.}
 
-\item{...}{}
+\item{...}{additional inputs passed into ED functions.}
+}
+\value{
+ggplot object with added ECx CIs.
 }
 \description{
 adding ECx estimation and interval to the model output plot
+}
+\examples{
+\dontrun{
+}
 }

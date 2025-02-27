@@ -2,7 +2,7 @@
 % Please edit documentation in R/drc_Helper.R
 \name{ED.plus}
 \alias{ED.plus}
-\title{Calculating ED following the regulatrory ED definition.}
+\title{Calculating ED following the regulatory ED definition.}
 \usage{
 \method{ED}{plus}(
   object,
@@ -33,5 +33,9 @@
 Back calculated regulatory ECx
 }
 \description{
-Calculating ED following the regulatrory ED definition.
+Calculating ED following the regulatory ED definition.
+}
+\examples{
+\dontrun{
+}
 }

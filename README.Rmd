@@ -137,14 +137,10 @@ pander::pander(coef(modsum))
 gh pr create --title "Title of the pull request" --body "Description of the pull request"
 gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
 ```
-To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository.
+To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository if extra packages are needed and you don's want to add those to the workflow. An example is given below.
 
 ```r
 knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",fi)
-knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
-knitr::knit("vignettes/articles/Examples using NLS.Rmd.orig", output = "vignettes/articles/Examples using NLS.Rmd")
-knitr::knit("vignettes/articles/Examples_drc.Rmd.orig", output = "vignettes/articles/Examples_drc.Rmd")
-knitr::knit("vignettes/articles/Examples_oecd201.Rmd.orig", output = "vignettes/articles/Examples_oecd201.Rmd")
 ```
 ## Acknowledgements
 

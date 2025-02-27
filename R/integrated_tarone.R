@@ -14,6 +14,7 @@
 #' @return string with a list of p-values
 #' @export
 #' @details modified the output to return p-values, need metafor package to run
+#' @importFrom metafor rma.mh
 #'
 #' @aliases Tarones
 #' @examples

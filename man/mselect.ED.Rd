@@ -11,6 +11,9 @@ mselect.ED(modList, respLev = c(10, 20, 50), trend = "Decrease", ...)
 
 \item{...}{}
 }
+\value{
+ED result table
+}
 \description{
 ECx calculation together with normalized width proposed by EFSA SO.
 }

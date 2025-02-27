@@ -13,12 +13,14 @@
 #' @param textsize label text size
 #' @param lineheight errorbar height
 #' @param xmin when confidence intervals very wide including even negative values.
-#' @param ...
+#' @param ... additional inputs passed into ED functions.
 #'
-#' @return
+#' @return ggplot object with added ECx CIs.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' }
 addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoint = "ErC", respLev = c(10, 20, 50),
                      textAjust.x = 0.1, textAjust.y = 0.05, useObsCtr = FALSE, d0 = NULL, textsize = 2, lineheight = 1, xmin = 0.05, ...) {
   if (respLev[1] < 1) respLev <- respLev * 100
@@ -85,7 +87,7 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
   return(p)
 }
 
-#' Calculating ED following the regulatrory ED definition.
+#' Calculating ED following the regulatory ED definition.
 #'
 #' @param object fitted model using drc::drm
 #' @param respLev response level, the x of ECx.
@@ -99,6 +101,8 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #' @export ED.plus
 #'
 #' @examples
+#' \dontrun{
+#' }
 ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = "Percentage", CI = c("delta", "inv", "bmd-inv"), ...) {
   ## Note that this might not be suitable for models with fixed c or d parameters, where
   CI <- match.arg(CI)
@@ -228,22 +232,24 @@ ED.ZG <- ED.plus
 
 #' added functionality for mselect
 #'
-#' @param object
-#' @param fctList
-#' @param nested
-#' @param sorted
-#' @param linreg
-#' @param icfct
-#' @param respCol
-#' @param doseCol
-#' @param data
-#' @param type
+#' @param object a fitted object of class 'drc'.
+#' @param fctList a list of dose-response functions to be compared.
+#' @param nested logical. TRUE results in F tests between adjacent models (in 'fctList'). Only sensible for nested models.
+#' @param sorted character string determining according to which criterion the model fits are ranked, default is IC.
+#' @param linreg logical indicating whether or not additionally polynomial regression models (linear, quadratic, and cubic models) should be fitted (they could be useful for a kind of informal lack-of-test consideration for the models specified, capturing unexpected departures).
+#' @param icfct function for supplying the information criterion to be used. AIC and BIC are two options.
+#' @param respCol name of the response column
+#' @param doseCol name of the dose column
+#' @param data data used
+#' @param type type of models, binomial, continuous, etc.
 #' @param additionalReliability additional reliability need to be calculated
 #'
-#' @return mselect.plus
+#' @return a model comparison object with class drcComp
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' }
 mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
                          sorted = c("IC", "Res var", "Lack of fit", "no"),
                          linreg = FALSE, icfct = AIC, respCol = "effect",
@@ -386,6 +392,8 @@ print.drcComp <- function(x, ...) {
 #' @export plot.modList
 #'
 #' @examples
+#' \dontrun{
+#' }
 plot.modList <- function(modList, respLev = NULL, data = NULL,
                          xmin, xmax, scale = c("logx", "logy", "logxy", "orig"),
                          npts = 100, plot_respLev = FALSE, xbreaks = NULL,
@@ -469,10 +477,9 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
 #' @param fctNames fct function names
 #' @param ... additional parameters
 #'
-#' @return
+#' @return a ggplot object
 #' @export plot.edList
 #'
-#' @examples
 plot.edList <- function(edList, fctNames, ...) {
   if (!is.data.frame(edList)) {
     edResTab <- plyr::ldply(lapply(edList, function(x) {
@@ -546,7 +553,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
         if (steep < 0.66) res[2] <- "Medium" else res[2] <- "Steep"
       }
     } else {
-      steep <- "Not Defined"
+      res[2] <- "Not Defined"
     }
     if (nrow(obj) != 3) {
       print("Without EC50, not able to calculate Steepness")
@@ -558,7 +565,8 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
           if (!is.na(obj$Lower[3])) {
             if (obj$Estimate[1] < obj$Lower[3]) res[1] <- "Medium" else res[1] <- "Low"
           } else { ## cannot compare due to missing EC 50 lower limits.
-            res[1] <- "Not Low (missing LCI of EC50)"
+            ## Assuming that EC50 cannot be estimated since it is extrapolated
+            res[1] <- "Medium (missing LCI of EC50)"
           }
         }
       } else {
@@ -578,7 +586,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
 #' @param trend
 #' @param ...
 #'
-#' @return
+#' @return ED result table
 #' @export mselect.ED
 #'
 #' @examples
