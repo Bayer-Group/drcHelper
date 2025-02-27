@@ -30,5 +30,7 @@ Imports:
     bmd,
     dplyr,
     ggplot2,
-    scales
+    scales,
+    magrittr,
+    Iso
 Remotes: DoseResponse/bmd
