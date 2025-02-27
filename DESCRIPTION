@@ -27,5 +27,8 @@ Imports:
     isotone,
     multcomp,
     PMCMRplus,
-    bmd
+    bmd,
+    dplyr,
+    ggplot2,
+    scales
 Remotes: DoseResponse/bmd
