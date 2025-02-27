@@ -19,3 +19,30 @@ https://github.com/brodieG/vetr
 pkgdown::build_site_github_pages()
 ```
 
+
+
+## Using Github actions
+
+- https://speakerdeck.com/jimhester/github-actions-for-r
+
+Use a Github package
+
+
+```
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Install remotes
+        run: |
+          Rscript -e "install.packages('remotes', repos='https://ftp.belnet.be/mirror/CRAN')"
+
+      - name: Install gyro from Github
+        run: |
+          Rscript -e "remotes::install_github('stla/gyro')"
+
+      - uses: r-lib/actions/check-r-package@v2
+```
+
