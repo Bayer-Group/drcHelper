@@ -52,12 +52,12 @@ navbar:
         href: articles/Introduction.html
       - text: Example Analysis Workflow
         href: articles/Example_Analysis_Workflow.html
+      - text: Example Helper Functions Usage
+        href: articles/drcHelper.html
+      - text: Using DRC and BMD
+        href: articles/Examples_drc.html
       - text: Example DRC - OECD 201
         href: articles/Examples_oecd201.html
-      - text: Example Helper Functions
-        href: articles/Examples_drc.html
-      - text: Package Dependencies
-        href: articles/drcHelper.html
     reference:
       text: Reference
       href: reference/
