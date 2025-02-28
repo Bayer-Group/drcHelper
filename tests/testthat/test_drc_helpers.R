@@ -90,3 +90,9 @@ describe("simDRdata function", {
   })
 
 })
+
+
+
+
+
+## testthat::test_file("tests/testthat/test_drc_helpers.R")

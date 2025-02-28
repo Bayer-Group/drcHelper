@@ -9,30 +9,76 @@ vignette: >
 
 
 
-
-```r
-library(drcHelper)
-library(drc)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",  
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 7
+)
+## library(dplyr)
+library(tidyverse)
 ```
 
-In this vignettes we illustrate how to use drcHelper to produce tables and graphs that will be included in a dose-response analysis report.
+```{r setup}
+library(drcHelper)
 
+```
 
+In this vignette, we demonstrate how to use the **{drcHelper}** package to create tables and graphs for inclusion in a dose-response analysis report. While the functions were developed some time ago and may not represent the most elegant solutions, they are functional. We welcome any suggestions for improvement. 
+
+## Preliminary Summary
+
+```{r}
+data("dat_medium")
+dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose))) 
+dat_medium$Response[dat_medium$Response < 0] <- 0
+prelimPlot3(dat_medium)
+prelimSummary(dat_medium) %>% knitr::kable(.,digits = 3)
+```
 
 ## Fitting multiple models and rank them.
 
+```{r}
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+# plot(mod,type="all")
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+res$Comparison
+
+drcCompare(modRes=res)
+```
 
 
+```{r}
+library(purrr)
+edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend="Decrease",CI="inv")
+edResTab
+```
 
+
+## Plot multiple models together
+
+```{r}
+p <- plot.modList(modList[1:3])
+p
+```
 
 
 ## Adding ECx and ECx CI's to the plots
+
+```{r}
+## addECxCI(p)
+```
 
 
 
 
 ## Outputting
 
+_To be written_
 
 ## Dependencies
 

@@ -34,5 +34,6 @@ Imports:
     magrittr,
     Iso,
     plyr,
-    metafor
+    metafor,
+    purrr
 Remotes: DoseResponse/bmd

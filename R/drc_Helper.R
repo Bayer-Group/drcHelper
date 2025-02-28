@@ -588,6 +588,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
 #'
 #' @return ED result table
 #' @export mselect.ED
+#' @importFrom purrr map2
 #'
 #' @examples
 mselect.ED <- function(modList, respLev = c(10, 20, 50),
@@ -601,7 +602,7 @@ mselect.ED <- function(modList, respLev = c(10, 20, 50),
   ## Check if Prediction Make sense
 
   NW <- lapply(edList, calcNW)
-  edRes <- map2(edList, NW, cbind)
+  edRes <- purrr::map2(edList, NW, cbind)
 
 
   edResTab <- plyr::ldply(lapply(edRes, function(x) {

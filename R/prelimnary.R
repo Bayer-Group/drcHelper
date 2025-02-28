@@ -13,7 +13,8 @@
 #' @export
 prelimPlot1 <- function(testdata,ylab="Response",xlab="Test Concentration [nominal, mg a.s./L]",
                         title="Measured Variable"){
-  p <- ggplot(testdata,aes(x=as.character(Dose),y=Response))+geom_point() +
+  if(is.numeric(testdata$Dose)) testdata$Dose <- factor(testdata$Dose,levels=sort(unique(testdata$Dose)))
+  p <- ggplot(testdata,aes(x=as.factor(Dose),y=Response))+geom_point() +
     ylab(ylab) + xlab(xlab)+
     ggtitle(title)
   return(p)
@@ -60,6 +61,7 @@ prelimPlot2 <- function(testdata,ylab="Response",xlab="Test Concentration [nomin
 #' @export
 prelimPlot3 <- function(testdata,ylab="Response",xlab="Test Concentration [nominal, mg a.s./L]",
                         title="Measured Variable",a=1.96){
+  if(is.numeric(testdata$Dose)) testdata$Dose <- factor(testdata$Dose,levels=sort(unique(testdata$Dose)))
   p <- prelimPlot1(testdata = testdata,ylab=ylab,xlab=xlab,title=title)
   datsum <- testdata %>% group_by(Dose) %>%
     summarise(mean=mean(Response), SE=sd(Response)/sqrt(length(Response))) %>%
