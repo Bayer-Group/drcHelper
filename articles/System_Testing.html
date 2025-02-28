@@ -108,15 +108,21 @@ Gao</h4>
 <div class="section level2">
 <h2 id="purpose-of-testing">Purpose of Testing<a class="anchor" aria-label="anchor" href="#purpose-of-testing"></a>
 </h2>
-<p>The testing in this phase is to ensure the R package meets all user
-requirements (URS) and behaves as the end users expect. If any of the
-tests fail, it is possible to detect loopholes and fix errors early in
-development.</p>
+<p>The testing in this phase is to ensure the R package and the UI on
+top of it meet all user requirements (URS) and behaves as the end users
+expect. If any of the tests fail, it is possible to detect loopholes and
+fix errors early in development.</p>
 <p>Note that access security and scalability are taken care of by the
 V-COP environment. The purpose of this testing is limited to all
 functional requirements. Interfacing ability via API with V-COP file
 management and the validated run environment is designed to be tested
 manually.</p>
+<p>One important aspect of testing is to verify the functions used in
+the analysis do what they are supposed to do. There are many functions
+in different R packages designed to perform the same task, however, with
+different assumptions behind. The outcome may be similar or different,
+it is important that we understand the details and choose the most
+appropriate ones.</p>
 </div>
 <div class="section level2">
 <h2 id="structure-of-testing">Structure of Testing<a class="anchor" aria-label="anchor" href="#structure-of-testing"></a>

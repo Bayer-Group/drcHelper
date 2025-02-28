@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Examples of using drc and drcHelper • drcHelper</title>
+<title>Examples of using drc and bmd • drcHelper</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Examples of using drc and drcHelper">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Examples of using drc and bmd">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -89,7 +89,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Examples of using drc and drcHelper</h1>
+      <h1>Examples of using drc and bmd</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/Examples_drc.Rmd" class="external-link"><code>vignettes/articles/Examples_drc.Rmd</code></a></small>
@@ -113,6 +113,41 @@
 <span><span class="co">#&gt;     gaussian, getInitial</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://had.co.nz/plyr" class="external-link">plyr</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="is-there-a-difference-between-ecx-and-bmd">Is there a difference between ECx and BMD?<a class="anchor" aria-label="anchor" href="#is-there-a-difference-between-ecx-and-bmd"></a>
+</h2>
+<p>BMD (Benchmark Dose) and ECx (Effect Concentration x) are both
+important concepts in the fields of toxicology and ecotoxicology,
+respectively. While they originate from different domains and have
+distinct definitions and applications, they share similarities in their
+purpose—specifying a dose or concentration that elicits a specific
+effect relative to a control or background level.</p>
+<p>ECx (Effect Concentration x) is commonly used in ecotoxicology. ECx
+represents the concentration of a substance that causes a specified
+effect on a certain percentage of the test population (e.g., 10%, 50%,
+or 90%) or causes a x% reduction / inhibition / stimulation in average
+compared to control.</p>
+<p>BMD (Benchmark Dose) is primarily used in toxicology. It refers to a
+dose of a substance that produces a predefined change in response
+compared to a control group. The flexibility in defining BMD allows for
+tailored assessments based on the specific toxicological thresholds and
+regulatory requirements. For example, in bmd package, “excess”,
+“additional” and “point” are provide for binomial response. “relative”,
+“extra”, “added”, “excess hybrid”, “additional hybrid”, and “point” are
+for continuous response. “relative”, “extra”, and “point” are for count
+response data.</p>
+<p>In ecotoxicology area, the two concepts are essentially the same,
+however, in terms of tools, the calculations use different default model
+suites, parameterizations, evaluation criteria, and even methodology
+framework.</p>
+<ul>
+<li>Crump, K. (2002) Critical Issues in Benchmark Calculations from
+Continuous Data, Critical Reviews in Toxicology 32, 133–153.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
 <ul>
 <li>From the help page of <code><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">drc::ED</a></code>
 </li>
@@ -262,7 +297,9 @@ obtained through inverse regression.</p>
 <span><span class="co">## Plot of curves 1 and 2 only</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spinach.m1</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"User-specified curves"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
-  </main>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
