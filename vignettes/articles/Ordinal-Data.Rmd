@@ -1,5 +1,6 @@
 ---
 title: "Example Ordinal Data Analysis"
+author: Zhenglei Gao
 editor_options: 
   chunk_output_type: console
 ---
@@ -24,9 +25,9 @@ library(drcHelper)
 
 ## Background
 
-There is no routine procedures in regulatory frameworks for ordinal data analysis yet. For histopathological data, it is recommended to use RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to derive NOEALs. An alternative is MQJT.
+There is no routine procedures in regulatory frameworks for ordinal data analysis yet. For histopathological data, it is recommended to use RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to derive NOEALs. An alternative is MQJT(Multiquantal Jonckheere–Terpstra), which is mentioned in OECD TG 231 for AMA life stage analysis.
 
-Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively 
+Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively. 
 
 ## Ordinal Data in General
 
@@ -43,11 +44,29 @@ Ordinal Regression is a somewhat complex method that can predict outcomes based 
 Due to the limited information and potentially unequal intervals, it requires a clear understanding of its subtleties and complexities, and careful attentions when implementing regression modelling. 
 
 
-In the ecotoxicology area, histopathology assessment and visual injury data are ranked categorical data. 
+In the ecotoxicology area, histopathology assessment and visual injury data are ranked categorical data. We focus on the plant visual injury data (PVI). 
 
-## Regression Approaches
+## Type of Endpoints
 
-Ordinal regression can be conducted using MASS::polr function or the function provided in GLMcat, which is an R package that encompasses lots of models specified in a similar way: (ratio, cdf, design: parallel or complete).
+Depending on how the response variables and the independent variables are treated, different types of endpoints can be derived.
+
+If the independent variable is treated as a factor or categorical, then the No Observed Effect Concentration (NOEC) regarding a specific injury level can be derived by treating the response as ordinal. Alternatively, a NOEC can be calculated by treating the response as continuous, using either direct hypothesis testing or post hoc testing after regression modeling. Conversely, if the independent variable is treated as continuous, endpoints such as ECx or Benchmark Dose (BMDx) regarding a specific injury level (with the response treated as ordinal) or regarding the average injury level (with the response treated as continuous) can be calculated.
+
+
+## Data Characteristics
+
+The systematic error or bias that can occur during the assessment of Plant Visual Injury (PVI) data is beyond the scope of this discussion. Here, we focus solely on the analysis approaches. 
+
+## Limitations
+
+Each method makes its own assumptions and has inherent limitations. For example, the Rao-Scott Cochran-Armitage by slice (RSCABS) method cannot handle too many categories effectively. Ordinal regression can be complex when determining an Effective Rate (ER50) or Effective Concentration (EC50). Additionally, treating the response as continuous (from 0 to 1 or from 0 to 100%) may lead to issues with heterogeneous variance.
+
+
+
+
+## Regression Approaches with Continuous x 
+
+The most natural approach would be using conventional ordinal regression modelling to derive an ER50. However, this approach is not routinely applied in regulatory ecotoxicology, the interpretation including the assumption behind is a bit more complex. To derive an ER50, specific function and optimization need to be defined for this purpose. Confidence intervals need to be derived from bootstrap method and take longer time in calculation. We only use this approach in comparison with the more commonly or easily applied modelling approaches. 
 
 When transforming the ordinal variable into percentages or proportions, it is also possible to model them as continuous data or using logitic regression with quasibinomial assumptions. The two approaches produce similar results when the data is behaving truly like a dose-response with over-dispersed binomial distributions.
 
@@ -172,7 +191,7 @@ modelallbeta <- function(dat){
 dattab_new <- dattab_new %>% mutate(y=yy,x=dose)%>%as.data.frame(.)
 suppressWarnings({modres <- modelall(dattab_new)})
 predres <- modres[[2]]
-knitr::kable(modres[[1]]%>%mutate(TrueEC50 = 12.18),digits=3)
+knitr::kable(rbind(modres[[1]]%>%mutate(TrueEC50 = 12.18),data.frame(EC50=12.15856,lower=10.16505,upper=15.09790,se=NA,model="ordinal regression", TrueEC50 =12.18)),digits=3)
 p_drc_qb <- ggplot(dattab_new, aes(x=dose, y=yt)) +geom_point(alpha=0.1)+ geom_point(aes(x=dose, y=yy),col="green")+
                 #scale_color_viridis_d()+scale_fill_viridis_d()+
         # scale_color_brewer(palette = "Reds") + 
@@ -199,9 +218,24 @@ Beta regression can be used to model proportions too, however, 0 and 1's need to
 
 ### Using Conventional Ordinal Regression Approaches
 
-Ordinal regression approaches works well in terms of prediction but would need a specific function to calculate ER50. $\sum p_i Y_{ij}$ would be the average injury level.  
+Ordinal regression approaches works well in terms of prediction but would need a specific function to calculate ER50. $\sum p_i Y_{ij}$ would be the average injury level. Here we achieved by the steps below:
 
-The proportional odds model can be interpreted in terms of probabilities of transitions and also in terms of covariate-specific cumulative probabilities. The latter is a bit easier to understand. 
+1. We fit an ordinal regression model using polr with your ordinal response data.
+2. Define the expected Response Function: The key to solving this problem is calculating the expected response at any dose:
+  - We calculate the probability of being in each category at a given dose
+  - We multiply these probabilities by the corresponding injury percentages (0%, 10%, 30%, 50%, 70%, 90%, 100%)
+  - The sum gives us the expected injury percentage at that dose
+3. Finding EC50: We search through a range of doses to find where the expected injury percentage is closest to 50%. Alternatively, we could define an objective function and use optimization to find the dose, which could be more precise than the grid search approach. 
+4. Bootstrap Confidence Intervals:
+    - We resample the data with replacement 1000 times
+    - For each bootstrap sample, we calculate the EC50
+    - The 2.5th and 97.5th percentiles of these bootstrap EC50 values form our 95% confidence interval
+
+
+This approach provides a robust estimate of the EC50 with confidence intervals that account for the uncertainty in your data and model. The bootstrap method is particularly valuable here because it doesn't require assumptions about the distribution of the EC50 estimator.
+
+
+The proportional odds model can be interpreted in terms of probabilities of transitions and also in terms of covariate-specific cumulative probabilities. The latter is a bit easier to understand. Ordinal regression can be conducted using MASS::polr function or the function provided in GLMcat, which is an R package that encompasses lots of models specified in a similar way: (ratio, cdf, design: parallel or complete).
 
 ```{r}
 ## fit ordered logit model and store results 'm'
@@ -209,6 +243,119 @@ dattab_new $y0 <- factor(dattab_new$y0, levels = c("0","A","B","C","D","E","F"),
 
 m <- MASS::polr(y0 ~ log(dose), data = dattab_new, Hess=TRUE)
 summary(m)
+# Extract the coefficients and thresholds
+coefficients <- coef(m)
+thresholds <- m$zeta
+
+# Define a function to calculate the expected response category at any given dose
+expected_response <- function(log_dose, coefficients, thresholds) {
+  # Calculate probabilities for each category
+  probabilities <- sapply(1:length(thresholds), function(i) {
+    plogis(thresholds[i] - coefficients * log_dose)
+  })
+  
+  # Convert to category probabilities
+  probabilities <- c(probabilities, 1) - c(0, probabilities)
+  
+  # Define the injury percentage for each category
+  categories <- c(0, 10, 30, 50, 70, 90, 100)
+  
+  # Calculate expected value (weighted average)
+  expected_value <- sum(probabilities * categories)
+  return(expected_value)
+}
+
+# Find the dose where the expected response is closest to 50%
+log_doses <- seq(log(0.1), log(100), length.out = 1000)
+responses <- sapply(log_doses, expected_response, 
+                   coefficients = coefficients["log(dose)"], 
+                   thresholds = thresholds)
+closest_index <- which.min(abs(responses - 50))
+dose_ec50 <- exp(log_doses[closest_index])
+
+# Print the EC50 value
+print(dose_ec50)
+```
+
+or we could find the EC50 by an optimization
+
+```{r}
+# Define the objective function to minimize (distance from 50%)
+objective_function <- function(log_dose) {
+  abs(expected_response(log_dose, coefficients["log(dose)"], thresholds) - 50)
+}
+
+# Use optimization to find the EC50
+result <- optimize(objective_function, interval = c(log(0.1), log(100)))
+dose_ec50 <- exp(result$minimum)
+
+# Print the EC50 value and the corresponding expected response
+print(paste("EC50:", round(dose_ec50, 4)))
+print(paste("Expected response at EC50:", 
+            round(expected_response(result$minimum, coefficients["log(dose)"], thresholds), 4)))
+```
+
+
+Note that when implementing the bootstrap approach, some bootstrap samples are causing separation problems in the ordinal regression model, which is common when resampling from smaller datasets. Therefore, a robust solution here is given to gracefully handle this issue.
+
+```{r}
+# Define the function to calculate EC50 for a bootstrap sample with error handling
+calculate_ec50 <- function(data) {
+  # Try to fit the model, return NA if it fails
+  m_boot <- try(polr(y0 ~ log(dose), data = data, Hess = TRUE), silent = TRUE)
+  if (inherits(m_boot, "try-error")) return(NA)
+  
+  coefficients <- coef(m_boot)
+  thresholds <- m_boot$zeta
+  
+  # Define objective function to minimize
+  objective_function <- function(log_dose) {
+    abs(expected_response(log_dose, coefficients["log(dose)"], thresholds) - 50)
+  }
+  
+  # Try to optimize, return NA if it fails
+  result <- try(optimize(objective_function, interval = c(log(0.1), log(100))), silent = TRUE)
+  if (inherits(result, "try-error")) return(NA)
+  
+  dose_ec50 <- exp(result$minimum)
+  return(dose_ec50)
+}
+
+# Bootstrap resampling with error handling
+set.seed(123)
+n_bootstrap <- 1000
+bootstrap_ec50 <- replicate(n_bootstrap, {
+  # Sample with replacement
+  sample_indices <- sample(1:nrow(dattab_new), replace = TRUE)
+  bootstrap_sample <- dattab_new[sample_indices, ]
+  
+  # Calculate EC50 for this sample
+  calculate_ec50(bootstrap_sample)
+})
+
+# Remove NA values from bootstrap results
+bootstrap_ec50 <- na.omit(bootstrap_ec50)
+valid_samples <- length(bootstrap_ec50)
+
+# Calculate point estimate using original data rather than as the mean of bootstrap estimates, which is more statistically sound.
+ec50_point <- calculate_ec50(dattab_new)
+# Calculate confidence intervals
+ec50_ci <- quantile(bootstrap_ec50, c(0.025, 0.975))
+
+# Print the results
+print(paste("EC50:", round(ec50_point, 4)))
+print(paste("95% Confidence Interval:", round(ec50_ci[1], 4), "-", round(ec50_ci[2], 4)))
+## Reporting Valid Samples: how many bootstrap samples were valid, which helps assess the reliability of the confidence interval.
+print(paste("Based on", valid_samples, "valid bootstrap samples out of", n_bootstrap))
+```
+
+
+
+
+
+### Additional understanding of the ordinal regression model
+
+```{r}
 ctable <- coef(summary(m))
 
 ## At ER50, the cumulative probability probability of the response being in a higher category is close to 1.
@@ -331,11 +478,17 @@ bmdOrdinal(mod_ord, bmr = 0.5, backgType = "modelBased", def = "excess")
 ```
 
 
-## RSCABS and other testing approaches
+## RSCABS, MQJT and other testing approaches
 
-Details about RSCABS approach you can find [here](https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html)
+Details about RSCABS approach you can find [here](https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html). 
 
-Other testing approaches that could be implemented. For example post hoc testings are available for a regression modeling where the independent variable is the dose levels as a factor.  All these testing approaches are targeting at a NOEC at a certain injury level. By default, these testing approaches actually treat the test rates or concentrations in the study as categorical variable, losing the continuous property and therefore an ER50 cannot be directly calculated. However, the NOEC at the medium injury level is comparable to ER50, which will always be smaller than ER50. 
+Current implementation used Rao-Scott correction always, exact CA test is not possible, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity. 
+
+MQJT is another alternative procedure and the simplest solution would be using the standard JT test on Q50 alone. Jonckheere-test by slices on the proportions (JTBS) can also be applied similarly as RSCABS. 
+
+Non-parametric Dunnett or Williams type procedure (F. Konietschke and L. A. Hothorn Stat. Biopharm. Res., 2012, 4, 14–27) could be used follwed by regression modelling with independent variable treated as factors. 
+
+All these testing approaches are targeting at a NOEC at a certain injury level. By default, these testing approaches actually treat the test rates or concentrations in the study as categorical variable, losing the continuous property and therefore an ER50 cannot be directly calculated. However, the NOEC at the medium injury level is comparable to ER50, which will always be smaller than ER50. 
 
 ## Simulation Study
 

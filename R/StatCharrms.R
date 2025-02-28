@@ -8,6 +8,11 @@
 
 #' Williams Test from the StatCharrms Package
 #'
+#' The function is adapted from the archived version of StatCharrms developed by
+#' Joe Swintek et al with CC0 license. It is not updated anymore and included
+#' for validation purpose. We recommend to use the williamsTest from PMCMRplus
+#' package instead.
+#'
 #' @param df The data frame
 #' @param resp The name of the response as a string
 #' @param trt The name of the response as a string

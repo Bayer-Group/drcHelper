@@ -23,6 +23,8 @@ Steps in the testing procedure:
 4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left.
 
 
+Current implementation used Rao-Scott correction always, exact CA test is not possible, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity.
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,

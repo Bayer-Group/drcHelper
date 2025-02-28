@@ -18,6 +18,10 @@
 
 #' Trimmed Spearman-Karber Method by brsr
 #'
+#' The function is adapted from the single function package tsk developed with
+#' GPL3 license. It is included for validation purpose.
+#'
+#'
 #' @param ... inputs
 #' @return tsk estimations
 #' @export

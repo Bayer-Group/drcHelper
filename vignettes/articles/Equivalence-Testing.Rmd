@@ -43,6 +43,17 @@ In equivalence testing, a low alpha level is crucial to ensure that the conclusi
 
 On the other hand, the $\alpha$ level in difference testing is playing similarly a complementary role to the $\beta$ in equivalence testing. 
 
+## The Confusion
+
+If thinking from the confidence interval (CI) direction, the equivalence testing uses the 90% CI for confidence level of 95% ($\alpha = 0.05$). We illustrate it here.
+
+```{r}
+
+```
+
+
+
+
 ## Impacts of changing from difference to equivalence testing
 
 - Equivalence testing often requires larger sample sizes to achieve sufficient power, which can be resource-intensive.

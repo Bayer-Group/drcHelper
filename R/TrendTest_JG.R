@@ -8,6 +8,10 @@
 
 #' Testing Monotonicity
 #'
+#' The function is adapted from the archived version of StatCharrms developed by
+#' Joe Swintek et al with CC0 license. It is not updated anymore and included
+#' for validation purpose. There are other ways to perform a trend test.
+#'
 #' @param Data Data frame
 #' @param Treatment name of the treatment variable
 #' @param Response name of the response variable

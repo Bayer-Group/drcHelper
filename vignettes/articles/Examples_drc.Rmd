@@ -1,5 +1,5 @@
 ---
-title: "Examples of using drc and drcHelper"
+title: "Examples of using drc and bmd"
 ---
 
 ```{r, include = FALSE}
@@ -15,6 +15,20 @@ library(drcHelper)
 library(drc)
 library(plyr)
 ```
+
+## Is there a difference between ECx and BMD?
+
+BMD (Benchmark Dose) and ECx (Effect Concentration x) are both important concepts in the fields of toxicology and ecotoxicology, respectively. While they originate from different domains and have distinct definitions and applications, they share similarities in their purpose—specifying a dose or concentration that elicits a specific effect relative to a control or background level.
+
+ECx (Effect Concentration x) is commonly used in ecotoxicology. ECx represents the concentration of a substance that causes a specified effect on a certain percentage of the test population (e.g., 10%, 50%, or 90%) or causes a x% reduction / inhibition / stimulation in average compared to control. 
+
+BMD (Benchmark Dose) is primarily used in toxicology. It refers to a dose of a substance that produces a predefined change in response compared to a control group. The flexibility in defining BMD allows for tailored assessments based on the specific toxicological thresholds and regulatory requirements. For example, in bmd package, "excess", "additional" and "point" are provide for binomial response. "relative", "extra", "added", "excess hybrid", "additional hybrid", and "point" are for continuous response. "relative", "extra", and "point" are for count response data.
+
+In ecotoxicology area, the two concepts are essentially the same, however, in terms of tools, the calculations use different default model suites, parameterizations, evaluation criteria, and even methodology framework. 
+
+- Crump, K. (2002) Critical Issues in Benchmark Calculations from Continuous Data, Critical Reviews in Toxicology 32, 133–153.
+
+## Examples
 
 - From the help page of `drc::ED`
 

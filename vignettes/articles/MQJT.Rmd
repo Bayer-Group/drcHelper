@@ -13,6 +13,9 @@ knitr::opts_chunk$set(
 library(drcHelper)
 ```
 
+MQJT(Multiquantal Jonckheere–Terpstra) is mentioned in OECD TG 231 for AMA life stage analysis. It is identical to the standard JT test except that it is applied to several quantiles in addition to the median and decisions are made using the median p‐value.  
+
+
 ## The MQJT
 
 The step-down Jonckheere-Terpstra test applied to replicate medians was conventionally used for statistical analysis of amphibian developmental stage. Some questions have been raised whether an analysis focused on the median developmental stage in each rep is sufficiently sensitive to detect statistically effects on developmental stage that are biologically important. Thus John and Tim proposed a modification on standard step-down Jonckheere-Terpstra test procedure which examines multiple quantiles (i.e. shifts in Q20, Q30, Q40, Q50, . . . , Q80) simultaneously. 
@@ -54,3 +57,8 @@ set.
 7. Continue dropping treatment groups until the new median P-value is no longer
 statistically significant. The highest concentration at which this occurs is the noobserved-
 effect-concentration (NOEC).
+
+
+## References
+
+- OECD TG 231, https://onlinelibrary.wiley.com/doi/abs/10.1002/9781119488798.ch9
