@@ -99,27 +99,159 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span></code></pre></div>
-<p>In this vignettes we illustrate how to use drcHelper to produce
-tables and graphs that will be included in a dose-response analysis
-report.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<p>In this vignette, we demonstrate how to use the
+<strong>{drcHelper}</strong> package to create tables and graphs for
+inclusion in a dose-response analysis report. While the functions were
+developed some time ago and may not represent the most elegant
+solutions, they are functional. We welcome any suggestions for
+improvement.</p>
+<div class="section level2">
+<h2 id="preliminary-summary">Preliminary Summary<a class="anchor" aria-label="anchor" href="#preliminary-summary"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"dat_medium"</span><span class="op">)</span></span>
+<span><span class="va">dat_medium</span> <span class="op">&lt;-</span> <span class="va">dat_medium</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Dose</span>,levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span><span class="op">[</span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="fu"><a href="../reference/prelimPlot3.html">prelimPlot3</a></span><span class="op">(</span><span class="va">dat_medium</span><span class="op">)</span></span></code></pre></div>
+<p><img src="drcHelper_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/prelimSummary.html">prelimSummary</a></span><span class="op">(</span><span class="va">dat_medium</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">Dose</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">% Inhibition</th>
+<th align="right">CV</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.00</td>
+<td align="right">7.736</td>
+<td align="right">0.635</td>
+<td align="right">0.000</td>
+<td align="right">8.203</td>
+</tr>
+<tr class="even">
+<td align="right">0.94</td>
+<td align="right">7.669</td>
+<td align="right">0.633</td>
+<td align="right">0.858</td>
+<td align="right">8.259</td>
+</tr>
+<tr class="odd">
+<td align="right">1.88</td>
+<td align="right">6.563</td>
+<td align="right">0.275</td>
+<td align="right">15.161</td>
+<td align="right">4.197</td>
+</tr>
+<tr class="even">
+<td align="right">3.75</td>
+<td align="right">2.596</td>
+<td align="right">0.524</td>
+<td align="right">66.440</td>
+<td align="right">20.175</td>
+</tr>
+<tr class="odd">
+<td align="right">7.50</td>
+<td align="right">0.429</td>
+<td align="right">0.128</td>
+<td align="right">94.456</td>
+<td align="right">29.865</td>
+</tr>
+<tr class="even">
+<td align="right">15.00</td>
+<td align="right">0.859</td>
+<td align="right">0.372</td>
+<td align="right">88.892</td>
+<td align="right">43.296</td>
+</tr>
+<tr class="odd">
+<td align="right">30.00</td>
+<td align="right">0.465</td>
+<td align="right">0.485</td>
+<td align="right">93.984</td>
+<td align="right">104.162</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section level2">
 <h2 id="fitting-multiple-models-and-rank-them-">Fitting multiple models and rank them.<a class="anchor" aria-label="anchor" href="#fitting-multiple-models-and-rank-them-"></a>
 </h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Dose</span>,data<span class="op">=</span><span class="va">dat_medium</span>,fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.3.html" class="external-link">LL.3</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fctList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.4.html" class="external-link">LL.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/W3.html" class="external-link">W1.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL2.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># plot(mod,type="all")</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mselect.plus.html">mselect.plus</a></span><span class="op">(</span><span class="va">mod</span>,fctList <span class="op">=</span> <span class="va">fctList</span> <span class="op">)</span></span>
+<span><span class="va">modList</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">$</span><span class="va">modList</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">Comparison</span></span>
+<span><span class="co">#&gt;          logLik        IC  Lack of fit    Res var</span></span>
+<span><span class="co">#&gt; LN.4  -14.65361  39.30722 6.118094e-01  0.2382532</span></span>
+<span><span class="co">#&gt; LL.4  -14.94568  39.89136 5.241523e-01  0.2441232</span></span>
+<span><span class="co">#&gt; LL.3  -19.24379  46.48759 6.848925e-02  0.3326394</span></span>
+<span><span class="co">#&gt; W1.3  -20.46060  48.92121 3.233853e-02  0.3681387</span></span>
+<span><span class="co">#&gt; LL2.2 -70.78500 147.57000 5.059273e-17 23.2867452</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/drcCompare.html">drcCompare</a></span><span class="op">(</span>modRes<span class="op">=</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          logLik        IC  Lack of fit    Res var Certainty_Protection</span></span>
+<span><span class="co">#&gt; LN.4  -14.65361  39.30722 6.118094e-01  0.2382532                 High</span></span>
+<span><span class="co">#&gt; LL.4  -14.94568  39.89136 5.241523e-01  0.2441232                 High</span></span>
+<span><span class="co">#&gt; LL.3  -19.24379  46.48759 6.848925e-02  0.3326394                 High</span></span>
+<span><span class="co">#&gt; W1.3  -20.46060  48.92121 3.233853e-02  0.3681387               Medium</span></span>
+<span><span class="co">#&gt; LL2.2 -70.78500 147.57000 5.059273e-17 23.2867452                  Low</span></span>
+<span><span class="co">#&gt;       Steepness No Effect p-val</span></span>
+<span><span class="co">#&gt; LN.4     Medium               0</span></span>
+<span><span class="co">#&gt; LL.4     Medium               0</span></span>
+<span><span class="co">#&gt; LL.3     Medium               0</span></span>
+<span><span class="co">#&gt; W1.3     Medium               0</span></span>
+<span><span class="co">#&gt; LL2.2     Steep               1</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
+<span><span class="va">edResTab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mselect.ED.html">mselect.ED</a></span><span class="op">(</span>modList <span class="op">=</span> <span class="va">modList</span>,respLev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="st">"Decrease"</span>,CI<span class="op">=</span><span class="st">"inv"</span><span class="op">)</span></span>
+<span><span class="va">edResTab</span></span>
+<span><span class="co">#&gt;      .id Estimate Std. Error    Lower    Upper        NW      Rating    EC</span></span>
+<span><span class="co">#&gt; 1   LN.4 1.700984         NA 1.473332 1.981769 0.2989078        Good EC 10</span></span>
+<span><span class="co">#&gt; 2   LN.4 2.067640         NA 1.826100 2.313691 0.2358199        Good EC 20</span></span>
+<span><span class="co">#&gt; 3   LN.4 3.032169         NA 2.791669 3.273468 0.1588960   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 4   LL.4 1.684437         NA 1.432457 2.010475 0.3431521        Good EC 10</span></span>
+<span><span class="co">#&gt; 5   LL.4 2.085759         NA 1.822344 2.363961 0.2596737        Good EC 20</span></span>
+<span><span class="co">#&gt; 6   LL.4 3.037357         NA 2.775132 3.288824 0.1691246   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 7   LL.3 1.577783         NA 1.284085 1.961887 0.4295911        Good EC 10</span></span>
+<span><span class="co">#&gt; 8   LL.3 2.019241         NA 1.705807 2.342361 0.3152440        Good EC 20</span></span>
+<span><span class="co">#&gt; 9   LL.3 3.078550         NA 2.783875 3.366535 0.1892644   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 10  W1.3 1.588648         NA 1.208777 2.089897 0.5546347        Fair EC 10</span></span>
+<span><span class="co">#&gt; 11  W1.3 2.092308         NA 1.688186 2.490045 0.3832417        Good EC 20</span></span>
+<span><span class="co">#&gt; 12  W1.3 3.171490         NA 2.862468 3.435822 0.1807837   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 13 LL2.2       NA         NA       NA       NA        NA Not defined EC 10</span></span>
+<span><span class="co">#&gt; 14 LL2.2       NA         NA       NA       NA        NA Not defined EC 20</span></span>
+<span><span class="co">#&gt; 15 LL2.2       NA         NA       NA       NA        NA Not defined EC 50</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="plot-multiple-models-together">Plot multiple models together<a class="anchor" aria-label="anchor" href="#plot-multiple-models-together"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">p</span></span></code></pre></div>
+<p><img src="drcHelper_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-ecx-and-ecx-cis-to-the-plots">Adding ECx and ECx CI’s to the plots<a class="anchor" aria-label="anchor" href="#adding-ecx-and-ecx-cis-to-the-plots"></a>
 </h2>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## addECxCI(p)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="outputting">Outputting<a class="anchor" aria-label="anchor" href="#outputting"></a>
 </h2>
+<p><em>To be written</em></p>
 </div>
 <div class="section level2">
 <h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DependenciesGraphs</span><span class="op">)</span></span>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">funDependencies</span><span class="op">(</span><span class="st">"package:drcHelper"</span>,<span class="st">"ED.plus"</span><span class="op">)</span></span>
