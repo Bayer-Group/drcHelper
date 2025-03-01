@@ -3,6 +3,8 @@ title: "RSCABS"
 author: "Zhenglei Gao"
 date: '2023-04-11'
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -18,11 +20,17 @@ RSCABS (Rao-Scott Cochran-Armitage by slice) is designed to analyze histopatholo
 Steps in the testing procedure:
 
 1.The Cochran-Armitage (CA) trend test was used to test a set of organisms for an increase in the presences (score $>$ 0) or absence (score = 0) of an effect with an increase in the dose concentration of the treatments.
+
 2. The Rao-Scott (RS) adjustment controls for the similarity in each experiment unit / apparatus (*e.g.*, fish tank) by calculating an adjustment to the CA test statistic from correlation of organisms within each apparatuses.
+
 3. The by slices (BS) part allows for testing at each severity score (*e.g.*, from 1 to 5) instead of just presences or absence. By slices works by splitting the severity scores associated with an endpoint into **two** groups based on the severity score being tested.  The RSCA test statistic is calculated based on these two groups.
+
 4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left.
 
-Current implementation used Rao-Scott correction always, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity.
+Current implementation used Rao-Scott correction always, potential inflating type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity.
+
+The issue with zero or low counts in the RSCA test is a mathematical limitation that occurs when one or more  treatment group has zero affected individuals at a particular threshold level. This leads to a zero variance estimate for that group, then the design effect calculation involves division by zero
+The Z-statistic calculation breaks down. Possible solutions could be using alternative tests like Fisher's exact test or applying a continuity correction. 
 
 
 
@@ -43,7 +51,7 @@ library(tidyverse)
 
 ### Some Backgrounds
 
-The Rao-Scott adjustment is a method to account for clustering in binary data. Using a fish injury dataset as an example, fish are clustered within tanks (replicates), which means observations within the same tank may be correlated. Standard statistical tests assume independent observations, which could lead to incorrect inference if clustering is ignored.
+The Rao-Scott adjustment is a method to account for clustering in binary data. Using a synthetic fish injury dataset as an example, fish are clustered within tanks (replicates), which means observations within the same tank may be correlated. Standard statistical tests assume independent observations, which could lead to incorrect inference if clustering is ignored.
 
 The adjustment works by:
 
@@ -74,7 +82,7 @@ Variability:
 
 
 
-```{r}
+```{r echo=FALSE,comment=""}
 # Set seed for reproducibility
 set.seed(123)
 
@@ -96,7 +104,7 @@ sim_data <- data.frame(
 # Format: list of vectors, where each vector contains probabilities for [S0, S1, S2, S3, S4]
 # Trend: Control has mostly S0, T3 has more severe injuries
 prob_distributions <- list(
-  Control = c(0.80, 0.15, 0.03, 0.02, 0.00),  # Mostly healthy fish
+  Control = c(0.85, 0.12, 0.02, 0.00, 0.00),  # Mostly healthy fish
   T1 = c(0.60, 0.25, 0.10, 0.04, 0.01),       # Slight increase in injuries
   T2 = c(0.40, 0.30, 0.15, 0.10, 0.05),       # Moderate increase in injuries
   T3 = c(0.20, 0.25, 0.25, 0.20, 0.10)        # Substantial increase in injuries
@@ -105,7 +113,7 @@ prob_distributions <- list(
 # Function to generate counts based on multinomial distribution
 generate_counts <- function(n, probs) {
   # Add small random variation to probabilities (within tanks)
-  varied_probs <- pmax(0, probs + rnorm(length(probs), 0, 0.03))
+  varied_probs <- pmax(0, probs + rnorm(length(probs), 0, 0.01))
   varied_probs <- varied_probs / sum(varied_probs)  # Normalize to sum to 1
   
   # Generate counts using multinomial distribution
@@ -156,7 +164,7 @@ print("Average severity score by treatment:")
 print(avg_severity)
 
 # Visualize the trend
-if (requireNamespace("ggplot2", quietly = TRUE)) {
+
   library(ggplot2)
   
   # Convert to long format for plotting
@@ -180,8 +188,11 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
          fill = "Injury Score") +
     theme_minimal() +
     scale_fill_brewer(palette = "YlOrRd")
-  
-  # Plot severity score
+```
+
+
+```{r}
+# Plot severity score
   ggplot(sim_data, aes(x = tmt, y = severity_score)) +
     geom_boxplot() +
     geom_jitter(width = 0.2, alpha = 0.5) +
@@ -189,7 +200,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
          x = "Treatment Group",
          y = "Severity Score (weighted average)") +
     theme_minimal()
-}
+
 ```
 
 
@@ -197,7 +208,7 @@ The dataset shows a clear trend of increasing injury severity across treatment g
 
 
 
-```{r}
+```{r echo=FALSE}
 # Define affected fish as those with any injury (S1-S4)
 affected <- sim_data$S1 + sim_data$S2 + sim_data$S3 + sim_data$S4
 
@@ -230,30 +241,236 @@ print(paste("p-value (severe injuries):", round(p_value_severe, 4)))
 ```
 
 
-```{r}
-# Test data
-test_data <- data.frame(
-  tmt = c("C", "SC"),
-  tank = c("5A", "4A"),
-  S0 = c(2, 1),
-  S1 = c(1, 3),
-  S2 = c(0, 0),
-  S3 = c(1, 0),
-  total = c(4, 4)
+
+
+
+RSCABS performs the Rao-Scott adjusted Cochran-Armitage trend test at each injury threshold level, which will help identify at which severity level the treatment effect becomes most significant.
+
+
+```{r echo=FALSE,results='asis'}
+# Load necessary libraries
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+
+# Function to run RSCA test for a specific injury threshold
+run_threshold_RSCA <- function(data, threshold, score_cols = c("S0", "S1", "S2", "S3", "S4")) {
+  # Determine which scores are above the threshold
+  above_cols <- score_cols[as.numeric(gsub("S", "", score_cols)) >= threshold]
+  
+  # Calculate affected counts (fish with injuries at or above threshold)
+  affected <- rowSums(data[, above_cols, drop = FALSE])
+  
+  # Run the RSCA test
+  result <- run_RSCA(
+    group = data$tmt,
+    replicate = data$tank,
+    affected = affected,
+    total = data$total
+  )
+  
+  # Calculate p-value
+  p_value <- 2 * (1 - pnorm(abs(result$Z)))
+  
+  # Return results
+  list(
+    threshold = threshold,
+    threshold_label = paste0("S", threshold, "+"),
+    Z = result$Z,
+    p_value = p_value,
+    interm_values = result$interm_values
+  )
+}
+
+# Run RSCA tests for all thresholds on the simulated data
+run_all_threshold_tests <- function(data, max_score = 4) {
+  # Create a list to store results
+  results_list <- list()
+  
+  # Score column names
+  score_cols <- paste0("S", 0:max_score)
+  
+  # Run tests for each threshold (1 to max_score)
+  for (threshold in 1:max_score) {
+    results_list[[threshold]] <- run_threshold_RSCA(data, threshold, score_cols)
+  }
+  
+  # Compile results into a data frame
+  results_df <- data.frame(
+    Threshold = sapply(results_list, function(x) x$threshold_label),
+    Z_statistic = sapply(results_list, function(x) x$Z),
+    P_value = sapply(results_list, function(x) x$p_value)
+  )
+  
+  # Calculate proportions for each threshold by treatment
+  prop_by_treatment <- data.frame(Treatment = unique(data$tmt))
+  
+  for (threshold in 1:max_score) {
+    above_cols <- score_cols[as.numeric(gsub("S", "", score_cols)) >= threshold]
+    
+    # Calculate proportions by treatment
+    props <- data %>%
+      group_by(tmt) %>%
+      summarize(
+        affected = sum(rowSums(across(all_of(above_cols)))),
+        total = sum(total),
+        proportion = affected / total
+      ) %>%
+      select(tmt, proportion)
+    
+    # Add to the data frame
+    prop_by_treatment[[paste0("S", threshold, "+")]] <- 
+      props$proportion[match(prop_by_treatment$Treatment, props$tmt)]
+  }
+  
+  # Return both results and proportions
+  list(
+    results = results_df,
+    proportions = prop_by_treatment,
+    detailed_results = results_list
+  )
+}
+
+# Run the analysis on the simulated data
+threshold_results <- run_all_threshold_tests(sim_data)
+
+# Format the results table
+results_table <- threshold_results$results %>%
+  mutate(
+    Z_statistic = round(Z_statistic, 3),
+    P_value = round(P_value, 4),
+    Significance = case_when(
+      P_value < 0.001 ~ "***",
+      P_value < 0.01 ~ "**",
+      P_value < 0.05 ~ "*",
+      P_value < 0.1 ~ ".",
+      TRUE ~ ""
+    )
+  )
+
+# Format the proportions table
+prop_table <- threshold_results$proportions %>%
+  mutate(across(starts_with("S"), ~ round(., 3)))
+
+# Display the results
+cat("### Rao-Scott Adjusted Cochran-Armitage Trend Test Results\n\n")
+print(kable(results_table, caption = "RSCA Test Results by Injury Threshold"))
+
+cat("\n\n### Proportion of Fish with Injuries by Threshold and Treatment\n\n")
+print(kable(prop_table, caption = "Proportion of Affected Fish"))
+
+# Create visualizations
+# 1. Bar plot of proportions by treatment and threshold
+prop_long <- prop_table %>%
+  pivot_longer(
+    cols = starts_with("S"),
+    names_to = "Threshold",
+    values_to = "Proportion"
+  )
+
+ggplot(prop_long, aes(x = Treatment, y = Proportion, fill = Threshold)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Proportion of Fish with Injuries by Threshold and Treatment",
+    x = "Treatment Group",
+    y = "Proportion of Fish",
+    fill = "Injury Threshold"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "YlOrRd")
+
+# 2. P-value plot
+ggplot(results_table, aes(x = Threshold, y = -log10(P_value))) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "red") +
+  labs(
+    title = "Statistical Significance by Injury Threshold",
+    x = "Injury Threshold",
+    y = "-log10(p-value)",
+    caption = "Red line indicates p = 0.05"
+  ) +
+  theme_minimal()
+
+# 3. Create a summary table with design effects
+design_effects <- data.frame(
+  Threshold = character(),
+  Treatment = character(),
+  Sample_Size = numeric(),
+  Affected = numeric(),
+  Design_Effect = numeric(),
+  Adjusted_n = numeric(),
+  stringsAsFactors = FALSE
 )
 
-# Test the simplified expansion function
-individual_data <- expand_to_individual(test_data)
-print(individual_data)
+for (i in 1:length(threshold_results$detailed_results)) {
+  result <- threshold_results$detailed_results[[i]]
+  threshold_label <- result$threshold_label
+  
+  # Extract design effects
+  interm <- result$interm_values
+  
+  for (j in 1:nrow(interm)) {
+    design_effects <- rbind(design_effects, data.frame(
+      Threshold = threshold_label,
+      Treatment = interm$grp[j],
+      Sample_Size = interm$n[j],
+      Affected = interm$x[j],
+      Design_Effect = round(interm$D[j], 3),
+      Adjusted_n = round(interm$n_tilde[j], 1)
+    ))
+  }
+}
 
-# Test the simplified aggregation function
-aggregated_data <- aggregate_from_individual(individual_data)
-print(aggregated_data)
+# Display design effects table
+cat("\n\n### Design Effects and Adjusted Sample Sizes\n\n")
+print(kable(design_effects, caption = "Design Effects by Threshold and Treatment"))
 
-# Verify that the conversion is lossless
-all.equal(test_data[order(test_data$tmt, test_data$tank), c("tmt", "tank", "S0", "S1", "S2", "S3", "total")], 
-          aggregated_data[order(aggregated_data$tmt, aggregated_data$tank), c("tmt", "tank", "S0", "S1", "S2", "S3", "total")])
+# Create a comprehensive summary report
+cat("\n\n### Summary of Findings\n\n")
+cat("This analysis examined the trend in fish injury rates across treatment groups using the Rao-Scott adjusted Cochran-Armitage trend test. The test was performed at multiple injury thresholds to identify at which severity level the treatment effect is most pronounced.\n\n")
+
+# Identify most significant threshold
+most_sig_idx <- which.min(threshold_results$results$P_value)
+most_sig_threshold <- threshold_results$results$Threshold[most_sig_idx]
+most_sig_p <- threshold_results$results$P_value[most_sig_idx]
+
+cat(paste0("The strongest trend was observed at the **", most_sig_threshold, "** threshold (p = ", round(most_sig_p, 4), "). This indicates that the treatment has the most pronounced effect on injuries of severity ", substr(most_sig_threshold, 2, 2), " or higher.\n\n"))
+
+# Check if all thresholds are significant
+if(sum(is.na(threshold_results$results$P_value))>0) all_sig <- FALSE else all_sig <- all(threshold_results$results$P_value < 0.05)
+
+if (all_sig) {
+  cat("All injury thresholds showed statistically significant trends (p < 0.05), suggesting that the treatment affects injuries at all severity levels.\n\n")
+} else {
+  sig_thresholds <- threshold_results$results$Threshold[threshold_results$results$P_value < 0.05]
+  sig_thresholds <- na.omit(sig_thresholds)
+  if (length(sig_thresholds) > 0) {
+    cat(paste0("Statistically significant trends were observed at the following thresholds: ", paste(sig_thresholds, collapse = ", "), ".\n\n"))
+  } else {
+    cat("No statistically significant trends were observed at any threshold.\n\n")
+  }
+}
+
+# Comment on design effects
+mean_design <- mean(design_effects$Design_Effect,na.rm=TRUE)
+max_design <- max(design_effects$Design_Effect,na.rm=TRUE)
+
+cat(paste0("The average design effect across all analyses was ", round(mean_design, 2), ", with a maximum of ", round(max_design, 2), ". Design effects greater than 1 indicate clustering within tanks, which the Rao-Scott adjustment accounts for.\n\n"))
+
+# Final conclusion
+cat("## Conclusion\n\n")
+cat("The analysis provides evidence of a dose-response relationship between treatment level and fish injury rates. The Rao-Scott adjustment was applied to account for clustering of fish within tanks, ensuring valid statistical inference despite the clustered data structure.\n\n")
+
+if (all_sig) {
+  cat("The consistent significant findings across all injury thresholds suggest a robust treatment effect that impacts both mild and severe injuries.\n")
+} else if (length(sig_thresholds) > 0) {
+  cat(paste0("The significant findings at ", paste(sig_thresholds, collapse = ", "), " suggest that the treatment primarily affects ", ifelse(length(sig_thresholds) > 1, "these specific injury severity levels", "this specific injury severity level"), ".\n"))
+} else {
+  cat("The lack of significant findings suggests that either the treatment has no effect on injury rates or that the study may have insufficient power to detect an effect.\n")
+}
 ```
+
 
 ## Example 2:
 
@@ -296,6 +513,7 @@ dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_
 
 ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
 ```
+
 ## Using R's prop.test instead
 
 
@@ -346,9 +564,9 @@ pvalCOWI
 
 
 
-## Multi-quantile JT
+### MQJT and JTBS
 
-From: John Green, personal communication.
+
 
 
 

@@ -136,7 +136,7 @@ get_CA_Z <- function(adj_x, adj_n) {
 #' the trend test.
 #'
 #' The p-value can be calculated using: 2 * (1 - pnorm(abs(Z)))
-#'
+#' @export
 #' @examples
 #' # Test for trend in injury rates across treatment groups
 #' # Considering S1, S2, and S3 as "affected"

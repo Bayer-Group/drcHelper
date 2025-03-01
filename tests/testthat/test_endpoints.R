@@ -12,7 +12,8 @@ describe("contEndpoint Function", {
                            jonckheere = c(0.07, 0.06, 0.03, 0.01),
                            procedure = "stepDown",
                            doses = c("Control","A", "B", "C", "D"))
-    expect_true(is.numeric(result))
+    expect_true(is.character(result)) ## this case is just level "B"
+    expect_equal(result,structure("B", test = "Williams"))
   })
 
   it("should return an attribute indicating the test used", {
