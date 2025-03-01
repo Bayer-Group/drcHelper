@@ -5,7 +5,9 @@ title: "EFSA Criteria"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -13,6 +15,11 @@ knitr::opts_chunk$set(
 library(drcHelper)
 ```
 
+## EFSA: ECx reliability
+
+EFSA published in 2019 "Outcome of the Pesticides Peer Review Meeting on general recurring issues in ecotoxicology", where some additional reliability criteria are proposed.  
+
+- DOI: https://doi.org/10.2903/sp.efsa.2019.EN-1673
 
 ## Model Comparison Criteria
 
@@ -51,6 +58,13 @@ The certainty of protection level and the steepness of the curves can be calcula
 
 ## Model Selection and Model Averaging
 
+Model selection involves choosing the best statistical model from a set of candidate models based on the data at hand. Criteria for Model Selection is based on criteria like Akaike Information Criterion (AIC), residuals check, or a combination of several criteria, etc. 
+
+Model averaging is a technique that combines predictions from multiple models to improve accuracy and robustness. This approach is particularly useful when there is uncertainty about which model is the best. Bayesian Model Averaging (BMA) assigns weights to models based on their posterior probabilities, allowing for a weighted average of predictions. This method incorporates uncertainty in model selection directly into the predictions. Frequentist Model Averaging involves averaging predictions from models selected based on criteria like AIC or BIC, without the Bayesian framework, the weight could directly come from AIC. 
+
+Model averaging incoporates model uncertainty into the analysis and can improve out-of-sample predictive performance compared to single models. 
+
+Research is still needed on developing more efficient algorithms for model averaging and improving interpretability to facilitate the application of these techniques in regulatory decision-making.
 
 ## Additional Criteria in Guidances
 

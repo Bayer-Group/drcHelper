@@ -8,9 +8,9 @@
 [![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of drcHelper is to assist with routine dose-response analysis
-by providing a collection of helper functions and standalone functions
-that are generic and may be useful beyond our organization.
+The goal of **drcHelper** is to assist with routine dose-response
+analysis by providing a collection of helper functions and standalone
+functions that are generic and may be useful beyond our organization.
 
 As part of the GLP stat pilot project, this package serves as a
 cornerstone for the second use case, EFX Statistics. It will streamline
@@ -36,6 +36,14 @@ testing and validation purposes. All third-party code with a different
 license are specified in the relevant source files with the license name
 and the relevant copyright texts.
 
+This package is open source, and any contributions or improvements,
+especially on the documentation side, are welcome.
+
+*Please note that the documentation website for this package is
+currently under development. Some articles are still placeholders, and
+many more are on the way. However, the ongoing development of the
+website does not impact the usage of this R package. *
+
 ## Installation
 
 You can install the development version of drcHelper from
@@ -46,190 +54,113 @@ You can install the development version of drcHelper from
 devtools::install_github("Bayer-Group/drcHelper")
 ```
 
+or
+
+``` r
+# install.packages("pak")
+pak::pak("Bayer-Group/drcHelper")
+```
+
 ## Example
 
 ## Data Overview
 
+## Preliminary Summary
+
 ``` r
 library(drcHelper)
-library(drc)
-library(dplyr)
-library(purrr)
-library(ggplot2)
-theme_set(theme_bw())
-sum1 <- oecd201 %>% group_by(Time,Treatment) %>% summarise(Yield_mean=mean(Yield),Yield_sd=sd(Yield),GrowthRate_mean=mean(GrowthRate),GrowthRate_sd=sd(GrowthRate))
-sum0 <- sum1%>%filter(Treatment=="Control")%>%rename(Yield0=Yield_mean,GrowthRate0=GrowthRate_mean)%>%dplyr::select(c(Time,Yield0,GrowthRate0))
-# sum0
-sumtab <- left_join(sum1%>%filter(Time>0),sum0) %>% mutate(Yield_Inhibition=(Yield0-Yield_mean)/Yield0*100,GrowthRate_Inhibition=(GrowthRate0-GrowthRate_mean)/GrowthRate0*100) %>% dplyr::select(c(Time,Treatment,Yield_mean,Yield_sd,Yield_Inhibition,GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))
 ```
 
 ``` r
-sumtab%>%dplyr::select(c(Yield_mean,Yield_sd,Yield_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Yield Summary at Time 72h<strong><center>",escape = FALSE)##%>% kableExtra::kable_styling(bootstrap_options = "striped")##%>%kableExtra::kable_classic_2()
+data("dat_medium")
+dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose))) 
+dat_medium$Response[dat_medium$Response < 0] <- 0
+prelimPlot3(dat_medium)
 ```
 
-Table:
-<center>
-<strong>Yield Summary at Time 72h<strong>
-<center>
-
-| Time | Yield_mean | Yield_sd | Yield_Inhibition |
-|-----:|-----------:|---------:|-----------------:|
-|   72 |      56.26 |     3.97 |             0.00 |
-|   72 |      51.57 |     2.79 |             8.33 |
-|   72 |      52.11 |     4.72 |             7.38 |
-|   72 |      19.22 |     0.49 |            65.84 |
-|   72 |       2.47 |     0.13 |            95.61 |
-|   72 |       0.45 |     0.62 |            99.20 |
-|   72 |       0.64 |     1.07 |            98.86 |
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 ``` r
-sumtab%>%dplyr::select(c(GrowthRate_mean,GrowthRate_sd,GrowthRate_Inhibition))%>%filter(Time==72)%>%knitr::kable(.,digits = 2,caption="<center><strong>Growth Rate Summary at Time 72h<strong><center>",escape = FALSE)##%>%kableExtra::kable_classic()
+prelimSummary(dat_medium) %>% knitr::kable(.,digits = 3)
 ```
 
-Table:
-<center>
-<strong>Growth Rate Summary at Time 72h<strong>
-<center>
+|  Dose |  Mean |    SD | % Inhibition |      CV |
+|------:|------:|------:|-------------:|--------:|
+|  0.00 | 7.736 | 0.635 |        0.000 |   8.203 |
+|  0.94 | 7.669 | 0.633 |        0.858 |   8.259 |
+|  1.88 | 6.563 | 0.275 |       15.161 |   4.197 |
+|  3.75 | 2.596 | 0.524 |       66.440 |  20.175 |
+|  7.50 | 0.429 | 0.128 |       94.456 |  29.865 |
+| 15.00 | 0.859 | 0.372 |       88.892 |  43.296 |
+| 30.00 | 0.465 | 0.485 |       93.984 | 104.162 |
 
-| Time | GrowthRate_mean | GrowthRate_sd | GrowthRate_Inhibition |
-|-----:|----------------:|--------------:|----------------------:|
-|   72 |            1.35 |          0.02 |                  0.00 |
-|   72 |            1.32 |          0.02 |                  2.09 |
-|   72 |            1.32 |          0.03 |                  1.89 |
-|   72 |            1.00 |          0.01 |                 25.69 |
-|   72 |            0.41 |          0.01 |                 69.25 |
-|   72 |            0.09 |          0.18 |                 93.04 |
-|   72 |            0.09 |          0.28 |                 93.16 |
-
-## Model Fitting and Comparison For Yield
+## Fitting multiple models and rank them.
 
 ``` r
-datTn<- subset(oecd201,Time==72)
-
-mod <- drm(Yield~Concentration,data=datTn,fct=LL.3())
-fctList <- list(LL2.3(),W2.3(),W1.3(),EXD.3(),EXD.2(),LN.3(),W2.4(),LL.4(),LL2.4())
-plot(mod,type="all")
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-``` r
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+# plot(mod,type="all")
 res <- mselect.plus(mod,fctList = fctList )
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
-#> [1] "Model not Converged, Please consult a statistician."
 modList <- res$modList
-edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend=datTn$Trend_Yield[1])
-plot.edList(edResTab)
-```
+res$Comparison
+#>          logLik        IC  Lack of fit    Res var
+#> LN.4  -15.45496  40.90992 5.893537e-01  0.2547068
+#> LL.4  -15.69685  41.39370 5.180082e-01  0.2598931
+#> LL.3  -19.24379  46.48759 6.848925e-02  0.3326394
+#> W1.3  -20.55410  49.10820 4.800972e-02  0.3710183
+#> LL2.2 -70.79793 147.59586 8.398391e-17 23.3118491
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" />
-
-``` r
-resComp <- drcCompare(modRes = res,trend="Decrease")
-```
-
-Note that by default settings, the fitted models did not converge except
-for the LL.3 model.
-
-``` r
-knitr::kable(edResTab[1:3,],caption = "14 day TSL Yield",digits = 3)
-```
-
-| .id  | Estimate | Std. Error | Lower | Upper |    NW | Rating | EC    |
-|:-----|---------:|-----------:|------:|------:|------:|:-------|:------|
-| LL.3 |    0.120 |      0.020 | 0.078 | 0.162 | 0.700 | Fair   | EC 10 |
-| LL.3 |    0.158 |      0.019 | 0.118 | 0.197 | 0.504 | Fair   | EC 20 |
-| LL.3 |    0.251 |      0.013 | 0.225 | 0.277 | 0.206 | Good   | EC 50 |
-
-14 day TSL Yield
-
-``` r
-knitr::kable(resComp[1,],caption = "14 day TSL Yield, Model Comparison",digits = 3)
-```
-
-|      |  logLik |      IC | Lack of fit | Res var | Certainty_Protection | Steepness | No Effect p-val |
-|:-----|--------:|--------:|------------:|--------:|:---------------------|:----------|----------------:|
-| LL.3 | -67.245 | 142.489 |       0.117 |   7.994 | Medium               | Medium    |               0 |
-
-14 day TSL Yield, Model Comparison
-
-``` r
-plot.modList(modList,scale="logx")
-```
-
-<div class="figure">
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" alt="Yield Model Fits" width="100%" />
-<p class="caption">
-Yield Model Fits
-</p>
-
-</div>
-
-``` r
-plot.modList(modList[c(1,2,3,4)],scale="logx",npts=40)
-```
-
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
-
-``` r
-p <-plot.modList(modList[c(1)],scale="logx",npts=80)+theme(legend.position = "none")+ggtitle("14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit")
-addECxCI(p=p,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
-                     textAjust.x=0.01,textAjust.y=1,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 1,xmin=0.012)+ylab("Total Shoot Length [cm]") + xlab("Concentration [µg a.s./L]")
-```
-
-<img src="man/figures/README-unnamed-chunk-9-2.png" width="100%" />
-
-``` r
-## ggsave("TSL_14d_Yield.png")
+drcCompare(modRes=res)
+#>          logLik        IC  Lack of fit    Res var Certainty_Protection
+#> LN.4  -15.45496  40.90992 5.893537e-01  0.2547068                 High
+#> LL.4  -15.69685  41.39370 5.180082e-01  0.2598931                 High
+#> LL.3  -19.24379  46.48759 6.848925e-02  0.3326394                 High
+#> W1.3  -20.55410  49.10820 4.800972e-02  0.3710183               Medium
+#> LL2.2 -70.79793 147.59586 8.398391e-17 23.3118491                  Low
+#>       Steepness No Effect p-val
+#> LN.4     Medium               0
+#> LL.4     Medium               0
+#> LL.3     Medium               0
+#> W1.3     Medium               0
+#> LL2.2     Steep               1
 ```
 
 ``` r
-resED <- t(edResTab[1:3, c(2,4,5,6)])
-colnames(resED) <- paste("EC", c(10,20,50))
-knitr::kable(resED,caption = "Total Shoot Length Growth Yield at 14 day",digits = 3)
+library(purrr)
+edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend="Decrease",CI="inv")
+edResTab
+#>      .id Estimate Std. Error    Lower    Upper        NW      Rating    EC
+#> 1   LN.4 1.699273         NA 1.464617 1.990240 0.3093219        Good EC 10
+#> 2   LN.4 2.067034         NA 1.817202 2.321445 0.2439457        Good EC 20
+#> 3   LN.4 3.034117         NA 2.785528 3.283618 0.1641632   Excellent EC 50
+#> 4   LL.4 1.680896         NA 1.421435 2.018155 0.3550014        Good EC 10
+#> 5   LL.4 2.084252         NA 1.812372 2.371154 0.2680974        Good EC 20
+#> 6   LL.4 3.040373         NA 2.770313 3.299156 0.1739402   Excellent EC 50
+#> 7   LL.3 1.577783         NA 1.284085 1.961887 0.4295911        Good EC 10
+#> 8   LL.3 2.019241         NA 1.705807 2.342361 0.3152440        Good EC 20
+#> 9   LL.3 3.078550         NA 2.783875 3.366535 0.1892644   Excellent EC 50
+#> 10  W1.3 1.588627         NA 1.207649 2.091723 0.5565024        Fair EC 10
+#> 11  W1.3 2.092288         NA 1.686784 2.491398 0.3845617        Good EC 20
+#> 12  W1.3 3.171479         NA 2.861093 3.436843 0.1815399   Excellent EC 50
+#> 13 LL2.2       NA         NA       NA       NA        NA Not defined EC 10
+#> 14 LL2.2       NA         NA       NA       NA        NA Not defined EC 20
+#> 15 LL2.2       NA         NA       NA       NA        NA Not defined EC 50
 ```
 
-|          | EC 10 | EC 20 | EC 50 |
-|:---------|------:|------:|------:|
-| Estimate | 0.120 | 0.158 | 0.251 |
-| Lower    | 0.078 | 0.118 | 0.225 |
-| Upper    | 0.162 | 0.197 | 0.277 |
-| NW       | 0.700 | 0.504 | 0.206 |
-
-Total Shoot Length Growth Yield at 14 day
+## Plot multiple models together
 
 ``` r
-
-mod <-modList[[1]]
-edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
-pander::pander(as.data.frame(edres))
+p <- plot.modList(modList[1:3])
+p
 ```
 
-|           | Estimate | Std. Error |  Lower  | Upper  |
-|:---------:|:--------:|:----------:|:-------:|:------:|
-| **EC 5**  | 0.09351  |  0.02005   | 0.05222 | 0.1348 |
-| **EC 10** |  0.1201  |  0.02041   | 0.07812 | 0.1622 |
-| **EC 20** |  0.1577  |  0.01929   |  0.118  | 0.1974 |
-| **EC 50** |  0.251   |  0.01258   | 0.2251  | 0.2769 |
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+## Adding ECx and ECx CI’s to the plots
 
 ``` r
-modsum <- summary(mod)
-pander::pander(coef(modsum))
+## addECxCI(p)
 ```
-
-|                   | Estimate | Std. Error | t-value |  p-value  |
-|:-----------------:|:--------:|:----------:|:-------:|:---------:|
-| **b:(Intercept)** |  2.982   |   0.5414   |  5.508  | 1.008e-05 |
-| **d:(Intercept)** |  54.27   |   1.017    |  53.37  | 1.391e-27 |
-| **e:(Intercept)** |  0.251   |  0.01258   |  19.95  | 3.579e-17 |
 
 ## ToDo
 
@@ -249,14 +180,12 @@ pander::pander(coef(modsum))
     gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
 
 To use the pkgdown github workflow, some of the vignettes need to be
-pre-knit before pushing to the remote github repository.
+pre-knit before pushing to the remote github repository if extra
+packages are needed and you don’s want to add those to the workflow. An
+example is given below.
 
 ``` r
 knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",fi)
-knitr::knit("vignettes/articles/Example_RSCABS.Rmd.orig", output = "vignettes/articles/Example_RSCABS.Rmd")
-knitr::knit("vignettes/articles/Examples using NLS.Rmd.orig", output = "vignettes/articles/Examples using NLS.Rmd")
-knitr::knit("vignettes/articles/Examples_drc.Rmd.orig", output = "vignettes/articles/Examples_drc.Rmd")
-knitr::knit("vignettes/articles/Examples_oecd201.Rmd.orig", output = "vignettes/articles/Examples_oecd201.Rmd")
 ```
 
 ## Acknowledgements

@@ -1,4 +1,21 @@
 
+
+## Using box package to explicitly load modules and packages
+
+To load a namespace in R, you can use the box package, which provides a modern and modular approach to package management.
+
+https://klmr.me/box/
+
+```r
+box::use(
+    purrr,                          # 1
+    tbl = tibble,                   # 2
+    dplyr = dplyr[filter, select],  # 3
+    stats[st_filter = filter, ...]  # 4
+)
+```
+
+
 ## Reuse code snippets
 
 https://www.garrickadenbuie.com/blog/dry-vignette-and-readme/
@@ -45,4 +62,11 @@ Use a Github package
 
       - uses: r-lib/actions/check-r-package@v2
 ```
+
+
+## ‘Novartis/tidymodules’: 
+
+**tidymodules** offers a robust framework for developing ‘Shiny’ modules based on R6 classes which should facilitates inter-modules communication.
+
+https://opensource.nibr.com/tidymodules/
 
