@@ -99,18 +99,18 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: drc</span></span>
-<span><span class="co">#&gt; Loading required package: MASS</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 'drc' has been loaded.</span></span>
-<span><span class="co">#&gt; Please cite R and 'drc' if used for a publication,</span></span>
-<span><span class="co">#&gt; for references type 'citation()' and 'citation('drc')'.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'drc'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="efsa-ecx-reliability">EFSA: ECx reliability<a class="anchor" aria-label="anchor" href="#efsa-ecx-reliability"></a>
+</h2>
+<p>EFSA published in 2019 “Outcome of the Pesticides Peer Review Meeting
+on general recurring issues in ecotoxicology”, where some additional
+reliability criteria are proposed.</p>
+<ul>
+<li>DOI: <a href="https://doi.org/10.2903/sp.efsa.2019.EN-1673" class="external-link uri">https://doi.org/10.2903/sp.efsa.2019.EN-1673</a>
+</li>
+</ul>
+</div>
 <div class="section level2">
 <h2 id="model-comparison-criteria">Model Comparison Criteria<a class="anchor" aria-label="anchor" href="#model-comparison-criteria"></a>
 </h2>
@@ -189,6 +189,26 @@ be calculated by
 <div class="section level2">
 <h2 id="model-selection-and-model-averaging">Model Selection and Model Averaging<a class="anchor" aria-label="anchor" href="#model-selection-and-model-averaging"></a>
 </h2>
+<p>Model selection involves choosing the best statistical model from a
+set of candidate models based on the data at hand. Criteria for Model
+Selection is based on criteria like Akaike Information Criterion (AIC),
+residuals check, or a combination of several criteria, etc.</p>
+<p>Model averaging is a technique that combines predictions from
+multiple models to improve accuracy and robustness. This approach is
+particularly useful when there is uncertainty about which model is the
+best. Bayesian Model Averaging (BMA) assigns weights to models based on
+their posterior probabilities, allowing for a weighted average of
+predictions. This method incorporates uncertainty in model selection
+directly into the predictions. Frequentist Model Averaging involves
+averaging predictions from models selected based on criteria like AIC or
+BIC, without the Bayesian framework, the weight could directly come from
+AIC.</p>
+<p>Model averaging incoporates model uncertainty into the analysis and
+can improve out-of-sample predictive performance compared to single
+models.</p>
+<p>Research is still needed on developing more efficient algorithms for
+model averaging and improving interpretability to facilitate the
+application of these techniques in regulatory decision-making.</p>
 </div>
 <div class="section level2">
 <h2 id="additional-criteria-in-guidances">Additional Criteria in Guidances<a class="anchor" aria-label="anchor" href="#additional-criteria-in-guidances"></a>

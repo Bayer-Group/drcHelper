@@ -90,10 +90,12 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of drcHelper is to assist with routine dose-response analysis by providing a collection of helper functions and standalone functions that are generic and may be useful beyond our organization.</p>
+<p>The goal of <strong>drcHelper</strong> is to assist with routine dose-response analysis by providing a collection of helper functions and standalone functions that are generic and may be useful beyond our organization.</p>
 <p>As part of the GLP stat pilot project, this package serves as a cornerstone for the second use case, EFX Statistics. It will streamline GLP statistical analyses for various dose-response studies and test assays within our registration data package. This ensures that the analyses remain current, state-of-the-art, and flexible enough to adapt to new regulatory requirements while complying with GLP standards.</p>
 <p>The package also includes test cases and examples to help the regulatory statistical community understand the reasons behind different outcomes. For instance, point estimations and p-values may vary depending on the parties involved, the functions used, or the packages selected. It aims to promote a harmonized understanding of methodologies and provide a foundation for standardized practices in the regulatory statistics field for plant protection product registration. Additionally, it is hoped that this project will contribute to the ongoing OECD 54 revision process.</p>
 <p>Some of the functions are adapted from archived packages or single functions of a bigger package so that the loaded namespace is not too big for small calculations. Some of the functions are included for testing and validation purposes. All third-party code with a different license are specified in the relevant source files with the license name and the relevant copyright texts.</p>
+<p>This package is open source, and any contributions or improvements, especially on the documentation side, are welcome.</p>
+<p><em>Please note that the documentation website for this package is currently under development. Some articles are still placeholders, and many more are on the way. However, the ongoing development of the website does not impact the usage of this R package. </em></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -101,6 +103,10 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Bayer-Group/drcHelper"</span><span class="op">)</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Bayer-Group/drcHelper"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -109,393 +115,145 @@
 <div class="section level2">
 <h2 id="data-overview">Data Overview<a class="anchor" aria-label="anchor" href="#data-overview"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sum1</span> <span class="op">&lt;-</span> <span class="va">oecd201</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Time</span>,<span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>Yield_mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Yield</span><span class="op">)</span>,Yield_sd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">Yield</span><span class="op">)</span>,GrowthRate_mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">GrowthRate</span><span class="op">)</span>,GrowthRate_sd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">GrowthRate</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sum0</span> <span class="op">&lt;-</span> <span class="va">sum1</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">==</span><span class="st">"Control"</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>Yield0<span class="op">=</span><span class="va">Yield_mean</span>,GrowthRate0<span class="op">=</span><span class="va">GrowthRate_mean</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Time</span>,<span class="va">Yield0</span>,<span class="va">GrowthRate0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># sum0</span></span>
-<span><span class="va">sumtab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">sum1</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Time</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span>,<span class="va">sum0</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Yield_Inhibition<span class="op">=</span><span class="op">(</span><span class="va">Yield0</span><span class="op">-</span><span class="va">Yield_mean</span><span class="op">)</span><span class="op">/</span><span class="va">Yield0</span><span class="op">*</span><span class="fl">100</span>,GrowthRate_Inhibition<span class="op">=</span><span class="op">(</span><span class="va">GrowthRate0</span><span class="op">-</span><span class="va">GrowthRate_mean</span><span class="op">)</span><span class="op">/</span><span class="va">GrowthRate0</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Time</span>,<span class="va">Treatment</span>,<span class="va">Yield_mean</span>,<span class="va">Yield_sd</span>,<span class="va">Yield_Inhibition</span>,<span class="va">GrowthRate_mean</span>,<span class="va">GrowthRate_sd</span>,<span class="va">GrowthRate_Inhibition</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sumtab</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Yield_mean</span>,<span class="va">Yield_sd</span>,<span class="va">Yield_Inhibition</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Time</span><span class="op">==</span><span class="fl">72</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">2</span>,caption<span class="op">=</span><span class="st">"&lt;center&gt;&lt;strong&gt;Yield Summary at Time 72h&lt;strong&gt;&lt;center&gt;"</span>,escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="co">##%&gt;% kableExtra::kable_styling(bootstrap_options = "striped")##%&gt;%kableExtra::kable_classic_2()</span></span></code></pre></div>
-Table:
-<center>
-<strong>Yield Summary at Time 72h<strong>
-<center>
-<table class="table">
-<thead><tr class="header">
-<th align="right">Time</th>
-<th align="right">Yield_mean</th>
-<th align="right">Yield_sd</th>
-<th align="right">Yield_Inhibition</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">56.26</td>
-<td align="right">3.97</td>
-<td align="right">0.00</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">51.57</td>
-<td align="right">2.79</td>
-<td align="right">8.33</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">52.11</td>
-<td align="right">4.72</td>
-<td align="right">7.38</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">19.22</td>
-<td align="right">0.49</td>
-<td align="right">65.84</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">2.47</td>
-<td align="right">0.13</td>
-<td align="right">95.61</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">0.45</td>
-<td align="right">0.62</td>
-<td align="right">99.20</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">0.64</td>
-<td align="right">1.07</td>
-<td align="right">98.86</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sumtab</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">GrowthRate_mean</span>,<span class="va">GrowthRate_sd</span>,<span class="va">GrowthRate_Inhibition</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Time</span><span class="op">==</span><span class="fl">72</span><span class="op">)</span><span class="op"><a href="reference/pipe.html">%&gt;%</a></span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">2</span>,caption<span class="op">=</span><span class="st">"&lt;center&gt;&lt;strong&gt;Growth Rate Summary at Time 72h&lt;strong&gt;&lt;center&gt;"</span>,escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="co">##%&gt;%kableExtra::kable_classic()</span></span></code></pre></div>
-Table:
-<center>
-<strong>Growth Rate Summary at Time 72h<strong>
-<center>
-<table class="table">
-<thead><tr class="header">
-<th align="right">Time</th>
-<th align="right">GrowthRate_mean</th>
-<th align="right">GrowthRate_sd</th>
-<th align="right">GrowthRate_Inhibition</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">1.35</td>
-<td align="right">0.02</td>
-<td align="right">0.00</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">1.32</td>
-<td align="right">0.02</td>
-<td align="right">2.09</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">1.32</td>
-<td align="right">0.03</td>
-<td align="right">1.89</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">1.00</td>
-<td align="right">0.01</td>
-<td align="right">25.69</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">0.41</td>
-<td align="right">0.01</td>
-<td align="right">69.25</td>
-</tr>
-<tr class="even">
-<td align="right">72</td>
-<td align="right">0.09</td>
-<td align="right">0.18</td>
-<td align="right">93.04</td>
-</tr>
-<tr class="odd">
-<td align="right">72</td>
-<td align="right">0.09</td>
-<td align="right">0.28</td>
-<td align="right">93.16</td>
-</tr>
-</tbody>
-</table>
-</center></strong></strong>
-</center>
-</center></strong></strong>
-</center>
 </div>
 <div class="section level2">
-<h2 id="model-fitting-and-comparison-for-yield">Model Fitting and Comparison For Yield<a class="anchor" aria-label="anchor" href="#model-fitting-and-comparison-for-yield"></a>
+<h2 id="preliminary-summary">Preliminary Summary<a class="anchor" aria-label="anchor" href="#preliminary-summary"></a>
 </h2>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"dat_medium"</span><span class="op">)</span></span>
+<span><span class="va">dat_medium</span> <span class="op">&lt;-</span> <span class="va">dat_medium</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">mutate</span><span class="op">(</span>Treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Dose</span>,levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span><span class="op">[</span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="fu"><a href="reference/prelimPlot3.html">prelimPlot3</a></span><span class="op">(</span><span class="va">dat_medium</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">datTn</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">oecd201</span>,<span class="va">Time</span><span class="op">==</span><span class="fl">72</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">Yield</span><span class="op">~</span><span class="va">Concentration</span>,data<span class="op">=</span><span class="va">datTn</span>,fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.3.html" class="external-link">LL.3</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fctList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.3.html" class="external-link">LL2.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/W3.html" class="external-link">W2.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/W3.html" class="external-link">W1.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/EXD.html" class="external-link">EXD.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/EXD.html" class="external-link">EXD.2</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/W4.html" class="external-link">W2.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.4.html" class="external-link">LL.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.4.html" class="external-link">LL2.4</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mod</span>,type<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mselect.plus.html">mselect.plus</a></span><span class="op">(</span><span class="va">mod</span>,fctList <span class="op">=</span> <span class="va">fctList</span> <span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="co">#&gt; [1] "Model not Converged, Please consult a statistician."</span></span>
-<span><span class="va">modList</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">$</span><span class="va">modList</span></span>
-<span><span class="va">edResTab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mselect.ED.html">mselect.ED</a></span><span class="op">(</span>modList <span class="op">=</span> <span class="va">modList</span>,respLev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="va">datTn</span><span class="op">$</span><span class="va">Trend_Yield</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot.edList.html">plot.edList</a></span><span class="op">(</span><span class="va">edResTab</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-2.png" width="100%"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resComp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/drcCompare.html">drcCompare</a></span><span class="op">(</span>modRes <span class="op">=</span> <span class="va">res</span>,trend<span class="op">=</span><span class="st">"Decrease"</span><span class="op">)</span></span></code></pre></div>
-<p>Note that by default settings, the fitted models did not converge except for the LL.3 model.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">edResTab</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>,caption <span class="op">=</span> <span class="st">"14 day TSL Yield"</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/prelimSummary.html">prelimSummary</a></span><span class="op">(</span><span class="va">dat_medium</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
-<colgroup>
-<col width="9%">
-<col width="15%">
-<col width="18%">
-<col width="10%">
-<col width="10%">
-<col width="10%">
-<col width="12%">
-<col width="10%">
-</colgroup>
 <thead><tr class="header">
-<th align="left">.id</th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">Lower</th>
-<th align="right">Upper</th>
-<th align="right">NW</th>
-<th align="left">Rating</th>
-<th align="left">EC</th>
+<th align="right">Dose</th>
+<th align="right">Mean</th>
+<th align="right">SD</th>
+<th align="right">% Inhibition</th>
+<th align="right">CV</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">LL.3</td>
-<td align="right">0.120</td>
-<td align="right">0.020</td>
-<td align="right">0.078</td>
-<td align="right">0.162</td>
-<td align="right">0.700</td>
-<td align="left">Fair</td>
-<td align="left">EC 10</td>
+<td align="right">0.00</td>
+<td align="right">7.736</td>
+<td align="right">0.635</td>
+<td align="right">0.000</td>
+<td align="right">8.203</td>
 </tr>
 <tr class="even">
-<td align="left">LL.3</td>
-<td align="right">0.158</td>
-<td align="right">0.019</td>
-<td align="right">0.118</td>
-<td align="right">0.197</td>
-<td align="right">0.504</td>
-<td align="left">Fair</td>
-<td align="left">EC 20</td>
+<td align="right">0.94</td>
+<td align="right">7.669</td>
+<td align="right">0.633</td>
+<td align="right">0.858</td>
+<td align="right">8.259</td>
 </tr>
 <tr class="odd">
-<td align="left">LL.3</td>
-<td align="right">0.251</td>
-<td align="right">0.013</td>
-<td align="right">0.225</td>
-<td align="right">0.277</td>
-<td align="right">0.206</td>
-<td align="left">Good</td>
-<td align="left">EC 50</td>
+<td align="right">1.88</td>
+<td align="right">6.563</td>
+<td align="right">0.275</td>
+<td align="right">15.161</td>
+<td align="right">4.197</td>
+</tr>
+<tr class="even">
+<td align="right">3.75</td>
+<td align="right">2.596</td>
+<td align="right">0.524</td>
+<td align="right">66.440</td>
+<td align="right">20.175</td>
+</tr>
+<tr class="odd">
+<td align="right">7.50</td>
+<td align="right">0.429</td>
+<td align="right">0.128</td>
+<td align="right">94.456</td>
+<td align="right">29.865</td>
+</tr>
+<tr class="even">
+<td align="right">15.00</td>
+<td align="right">0.859</td>
+<td align="right">0.372</td>
+<td align="right">88.892</td>
+<td align="right">43.296</td>
+</tr>
+<tr class="odd">
+<td align="right">30.00</td>
+<td align="right">0.465</td>
+<td align="right">0.485</td>
+<td align="right">93.984</td>
+<td align="right">104.162</td>
 </tr>
 </tbody>
 </table>
-<p>14 day TSL Yield</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">resComp</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>,caption <span class="op">=</span> <span class="st">"14 day TSL Yield, Model Comparison"</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="6%">
-<col width="9%">
-<col width="9%">
-<col width="13%">
-<col width="9%">
-<col width="22%">
-<col width="11%">
-<col width="17%">
-</colgroup>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">logLik</th>
-<th align="right">IC</th>
-<th align="right">Lack of fit</th>
-<th align="right">Res var</th>
-<th align="left">Certainty_Protection</th>
-<th align="left">Steepness</th>
-<th align="right">No Effect p-val</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td align="left">LL.3</td>
-<td align="right">-67.245</td>
-<td align="right">142.489</td>
-<td align="right">0.117</td>
-<td align="right">7.994</td>
-<td align="left">Medium</td>
-<td align="left">Medium</td>
-<td align="right">0</td>
-</tr></tbody>
-</table>
-<p>14 day TSL Yield, Model Comparison</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span>,scale<span class="op">=</span><span class="st">"logx"</span><span class="op">)</span></span></code></pre></div>
-<div class="figure">
-<img src="reference/figures/README-unnamed-chunk-8-1.png" alt="Yield Model Fits" width="100%"><p class="caption">
-Yield Model Fits
-</p>
 </div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">]</span>,scale<span class="op">=</span><span class="st">"logx"</span>,npts<span class="op">=</span><span class="fl">40</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span><span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">]</span>,scale<span class="op">=</span><span class="st">"logx"</span>,npts<span class="op">=</span><span class="fl">80</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"14 day Total Shoot Length, \n3-parameter type II Weibull Model Fit"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/addECxCI.html">addECxCI</a></span><span class="op">(</span>p<span class="op">=</span><span class="va">p</span>,object<span class="op">=</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,EDres<span class="op">=</span><span class="cn">NULL</span>,trend<span class="op">=</span><span class="st">"Decrease"</span>,endpoint<span class="op">=</span><span class="st">"EC"</span>, respLev<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,</span>
-<span>                     textAjust.x<span class="op">=</span><span class="fl">0.01</span>,textAjust.y<span class="op">=</span><span class="fl">1</span>,useObsCtr<span class="op">=</span><span class="cn">FALSE</span>,d0<span class="op">=</span><span class="cn">NULL</span>,textsize <span class="op">=</span> <span class="fl">4</span>,lineheight <span class="op">=</span> <span class="fl">1</span>,xmin<span class="op">=</span><span class="fl">0.012</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Total Shoot Length [cm]"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration [µg a.s./L]"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-2.png" width="100%"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## ggsave("TSL_14d_Yield.png")</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resED</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">edResTab</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">6</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">resED</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"EC"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">resED</span>,caption <span class="op">=</span> <span class="st">"Total Shoot Length Growth Yield at 14 day"</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">EC 10</th>
-<th align="right">EC 20</th>
-<th align="right">EC 50</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Estimate</td>
-<td align="right">0.120</td>
-<td align="right">0.158</td>
-<td align="right">0.251</td>
-</tr>
-<tr class="even">
-<td align="left">Lower</td>
-<td align="right">0.078</td>
-<td align="right">0.118</td>
-<td align="right">0.225</td>
-</tr>
-<tr class="odd">
-<td align="left">Upper</td>
-<td align="right">0.162</td>
-<td align="right">0.197</td>
-<td align="right">0.277</td>
-</tr>
-<tr class="even">
-<td align="left">NW</td>
-<td align="right">0.700</td>
-<td align="right">0.504</td>
-<td align="right">0.206</td>
-</tr>
-</tbody>
-</table>
-<p>Total Shoot Length Growth Yield at 14 day</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">mod</span> <span class="op">&lt;-</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">edres</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ED.plus.html">ED.plus</a></span><span class="op">(</span><span class="va">mod</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="st">"Decrease"</span><span class="op">)</span></span>
-<span><span class="fu">pander</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pander/man/pander.html" class="external-link">pander</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">edres</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="center"> </th>
-<th align="center">Estimate</th>
-<th align="center">Std. Error</th>
-<th align="center">Lower</th>
-<th align="center">Upper</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>EC 5</strong></td>
-<td align="center">0.09351</td>
-<td align="center">0.02005</td>
-<td align="center">0.05222</td>
-<td align="center">0.1348</td>
-</tr>
-<tr class="even">
-<td align="center"><strong>EC 10</strong></td>
-<td align="center">0.1201</td>
-<td align="center">0.02041</td>
-<td align="center">0.07812</td>
-<td align="center">0.1622</td>
-</tr>
-<tr class="odd">
-<td align="center"><strong>EC 20</strong></td>
-<td align="center">0.1577</td>
-<td align="center">0.01929</td>
-<td align="center">0.118</td>
-<td align="center">0.1974</td>
-</tr>
-<tr class="even">
-<td align="center"><strong>EC 50</strong></td>
-<td align="center">0.251</td>
-<td align="center">0.01258</td>
-<td align="center">0.2251</td>
-<td align="center">0.2769</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">modsum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
-<span><span class="fu">pander</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pander/man/pander.html" class="external-link">pander</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">modsum</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="center"> </th>
-<th align="center">Estimate</th>
-<th align="center">Std. Error</th>
-<th align="center">t-value</th>
-<th align="center">p-value</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="center"><strong>b:(Intercept)</strong></td>
-<td align="center">2.982</td>
-<td align="center">0.5414</td>
-<td align="center">5.508</td>
-<td align="center">1.008e-05</td>
-</tr>
-<tr class="even">
-<td align="center"><strong>d:(Intercept)</strong></td>
-<td align="center">54.27</td>
-<td align="center">1.017</td>
-<td align="center">53.37</td>
-<td align="center">1.391e-27</td>
-</tr>
-<tr class="odd">
-<td align="center"><strong>e:(Intercept)</strong></td>
-<td align="center">0.251</td>
-<td align="center">0.01258</td>
-<td align="center">19.95</td>
-<td align="center">3.579e-17</td>
-</tr>
-</tbody>
-</table>
+<div class="section level2">
+<h2 id="fitting-multiple-models-and-rank-them">Fitting multiple models and rank them.<a class="anchor" aria-label="anchor" href="#fitting-multiple-models-and-rank-them"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Dose</span>,data<span class="op">=</span><span class="va">dat_medium</span>,fct<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.3.html" class="external-link">LL.3</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fctList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.4.html" class="external-link">LL.4</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/W3.html" class="external-link">W1.3</a></span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/drc/man/LL.2.html" class="external-link">LL2.2</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># plot(mod,type="all")</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mselect.plus.html">mselect.plus</a></span><span class="op">(</span><span class="va">mod</span>,fctList <span class="op">=</span> <span class="va">fctList</span> <span class="op">)</span></span>
+<span><span class="va">modList</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">$</span><span class="va">modList</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">Comparison</span></span>
+<span><span class="co">#&gt;          logLik        IC  Lack of fit    Res var</span></span>
+<span><span class="co">#&gt; LN.4  -15.45496  40.90992 5.893537e-01  0.2547068</span></span>
+<span><span class="co">#&gt; LL.4  -15.69685  41.39370 5.180082e-01  0.2598931</span></span>
+<span><span class="co">#&gt; LL.3  -19.24379  46.48759 6.848925e-02  0.3326394</span></span>
+<span><span class="co">#&gt; W1.3  -20.55410  49.10820 4.800972e-02  0.3710183</span></span>
+<span><span class="co">#&gt; LL2.2 -70.79793 147.59586 8.398391e-17 23.3118491</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/drcCompare.html">drcCompare</a></span><span class="op">(</span>modRes<span class="op">=</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          logLik        IC  Lack of fit    Res var Certainty_Protection</span></span>
+<span><span class="co">#&gt; LN.4  -15.45496  40.90992 5.893537e-01  0.2547068                 High</span></span>
+<span><span class="co">#&gt; LL.4  -15.69685  41.39370 5.180082e-01  0.2598931                 High</span></span>
+<span><span class="co">#&gt; LL.3  -19.24379  46.48759 6.848925e-02  0.3326394                 High</span></span>
+<span><span class="co">#&gt; W1.3  -20.55410  49.10820 4.800972e-02  0.3710183               Medium</span></span>
+<span><span class="co">#&gt; LL2.2 -70.79793 147.59586 8.398391e-17 23.3118491                  Low</span></span>
+<span><span class="co">#&gt;       Steepness No Effect p-val</span></span>
+<span><span class="co">#&gt; LN.4     Medium               0</span></span>
+<span><span class="co">#&gt; LL.4     Medium               0</span></span>
+<span><span class="co">#&gt; LL.3     Medium               0</span></span>
+<span><span class="co">#&gt; W1.3     Medium               0</span></span>
+<span><span class="co">#&gt; LL2.2     Steep               1</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
+<span><span class="va">edResTab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mselect.ED.html">mselect.ED</a></span><span class="op">(</span>modList <span class="op">=</span> <span class="va">modList</span>,respLev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="st">"Decrease"</span>,CI<span class="op">=</span><span class="st">"inv"</span><span class="op">)</span></span>
+<span><span class="va">edResTab</span></span>
+<span><span class="co">#&gt;      .id Estimate Std. Error    Lower    Upper        NW      Rating    EC</span></span>
+<span><span class="co">#&gt; 1   LN.4 1.699273         NA 1.464617 1.990240 0.3093219        Good EC 10</span></span>
+<span><span class="co">#&gt; 2   LN.4 2.067034         NA 1.817202 2.321445 0.2439457        Good EC 20</span></span>
+<span><span class="co">#&gt; 3   LN.4 3.034117         NA 2.785528 3.283618 0.1641632   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 4   LL.4 1.680896         NA 1.421435 2.018155 0.3550014        Good EC 10</span></span>
+<span><span class="co">#&gt; 5   LL.4 2.084252         NA 1.812372 2.371154 0.2680974        Good EC 20</span></span>
+<span><span class="co">#&gt; 6   LL.4 3.040373         NA 2.770313 3.299156 0.1739402   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 7   LL.3 1.577783         NA 1.284085 1.961887 0.4295911        Good EC 10</span></span>
+<span><span class="co">#&gt; 8   LL.3 2.019241         NA 1.705807 2.342361 0.3152440        Good EC 20</span></span>
+<span><span class="co">#&gt; 9   LL.3 3.078550         NA 2.783875 3.366535 0.1892644   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 10  W1.3 1.588627         NA 1.207649 2.091723 0.5565024        Fair EC 10</span></span>
+<span><span class="co">#&gt; 11  W1.3 2.092288         NA 1.686784 2.491398 0.3845617        Good EC 20</span></span>
+<span><span class="co">#&gt; 12  W1.3 3.171479         NA 2.861093 3.436843 0.1815399   Excellent EC 50</span></span>
+<span><span class="co">#&gt; 13 LL2.2       NA         NA       NA       NA        NA Not defined EC 10</span></span>
+<span><span class="co">#&gt; 14 LL2.2       NA         NA       NA       NA        NA Not defined EC 20</span></span>
+<span><span class="co">#&gt; 15 LL2.2       NA         NA       NA       NA        NA Not defined EC 50</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="plot-multiple-models-together">Plot multiple models together<a class="anchor" aria-label="anchor" href="#plot-multiple-models-together"></a>
+</h2>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">p</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="adding-ecx-and-ecx-cis-to-the-plots">Adding ECx and ECx CI’s to the plots<a class="anchor" aria-label="anchor" href="#adding-ecx-and-ecx-cis-to-the-plots"></a>
+</h2>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## addECxCI(p)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="todo">ToDo<a class="anchor" aria-label="anchor" href="#todo"></a>
@@ -512,15 +270,11 @@ Yield Model Fits
 <ul>
 <li>Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the <code>gh pr create</code> command.</li>
 </ul>
-<!-- --><div class="sourceCode" id="cb17"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>gh pr create <span class="sc">--</span>title <span class="st">"Title of the pull request"</span> <span class="sc">--</span>body <span class="st">"Description of the pull request"</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>gh pr create <span class="sc">--</span>title <span class="st">"Title of the pull request"</span> <span class="sc">--</span>body <span class="st">"Description of the pull request"</span> <span class="sc">--</span>base develop</span></code></pre></div>
-<p>To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/drcHelper.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/drcHelper.Rmd"</span>,<span class="va">fi</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/articles/Example_RSCABS.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/articles/Example_RSCABS.Rmd"</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/articles/Examples using NLS.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/articles/Examples using NLS.Rmd"</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/articles/Examples_drc.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/articles/Examples_drc.Rmd"</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/articles/Examples_oecd201.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/articles/Examples_oecd201.Rmd"</span><span class="op">)</span></span></code></pre></div>
+<!-- --><div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>gh pr create <span class="sc">--</span>title <span class="st">"Title of the pull request"</span> <span class="sc">--</span>body <span class="st">"Description of the pull request"</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>gh pr create <span class="sc">--</span>title <span class="st">"Title of the pull request"</span> <span class="sc">--</span>body <span class="st">"Description of the pull request"</span> <span class="sc">--</span>base develop</span></code></pre></div>
+<p>To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository if extra packages are needed and you don’s want to add those to the workflow. An example is given below.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knit</a></span><span class="op">(</span><span class="st">"vignettes/drcHelper.Rmd.orig"</span>, output <span class="op">=</span> <span class="st">"vignettes/drcHelper.Rmd"</span>,<span class="va">fi</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
