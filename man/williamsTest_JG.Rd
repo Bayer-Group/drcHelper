@@ -21,7 +21,10 @@ williamsTest_JG(df, resp, trt, direction = "decreasing", SeIn = NULL)
 Williams' test result
 }
 \description{
-Williams Test from the StatCharrms Package
+The function is adapted from the archived version of StatCharrms developed by
+Joe Swintek et al with CC0 license. It is not updated anymore and included
+for validation purpose. We recommend to use the williamsTest from PMCMRplus
+package instead.
 }
 \examples{
 ## Williams Test

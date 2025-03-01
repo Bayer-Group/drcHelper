@@ -21,7 +21,11 @@ Same kind of object as the one returns by the stats
 }
 \description{
 The C(alpha) test is a test of the binomial distribution against the
-alternative of the beta-binomial distribution.
+alternative of the beta-binomial distribution. Note that this is not exported
+to the package namespace but kept internal. The license is MIT with the
+COPYRIGHT HOLDER: Christophe Gigot and YEAR: 2023 (included in source code).
+The function is included for validation purpose. Please use epiphy package
+for related calculation in a non-GLP environment.
 }
 \details{
 It is based on calculation of a test statistic, z, that has an asymptotic
@@ -43,7 +47,7 @@ for incidence data.
 my_fisher <- structure(list(index = 3.14396182555326,
 name = "Fisher's index of dispersion", flavor = "incidence", N = 75L, n = 40L),
 class = c("fisher", "agg_index"))
-calpha.test(my_fisher)
+drcHelper:::calpha.test(my_fisher)
 
 }
 \references{

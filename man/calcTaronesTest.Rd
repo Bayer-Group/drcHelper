@@ -3,7 +3,11 @@
 \name{calcTaronesTest}
 \alias{calcTaronesTest}
 \alias{Tarones}
-\title{Tarones test for Stratified OR (integrated from https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R)}
+\title{Tarones test for Stratified OR (integrated from
+https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R). The original
+MIT license is included in the source code. The function
+is included for validation purpose. Please use the most updated function in
+ClinStats package for related calculation in a non-GLP environment.}
 \usage{
 calcTaronesTest(mylist, referencerow = 2)
 }

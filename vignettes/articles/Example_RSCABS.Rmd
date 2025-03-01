@@ -22,8 +22,9 @@ Steps in the testing procedure:
 3. The by slices (BS) part allows for testing at each severity score (*e.g.*, from 1 to 5) instead of just presences or absence. By slices works by splitting the severity scores associated with an endpoint into **two** groups based on the severity score being tested.  The RSCA test statistic is calculated based on these two groups.
 4. Carry out a step-down procedure by excluding the highest treatment level in the analysis and recalculate the RSCA test statistic until the test stats is not significant or there is only control group left.
 
+Current implementation used Rao-Scott correction always, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity.
 
-Current implementation used Rao-Scott correction always, exact CA test is not possible, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity.
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -38,6 +39,224 @@ knitr::opts_chunk$set(
 library(drcHelper)
 library(tidyverse)
 ```
+
+
+### Some Backgrounds
+
+The Rao-Scott adjustment is a method to account for clustering in binary data. Using a fish injury dataset as an example, fish are clustered within tanks (replicates), which means observations within the same tank may be correlated. Standard statistical tests assume independent observations, which could lead to incorrect inference if clustering is ignored.
+
+The adjustment works by:
+
+1. Calculating the observed variance within treatment groups, accounting for clustering
+2. Comparing this to the expected variance under a simple binomial model
+3. Computing a design effect (D) as the ratio of these variances
+4. Adjusting the sample sizes and counts by dividing by D
+
+**What is the Cochran-Armitage Trend Test?**
+
+The Cochran-Armitage trend test examines whether there is a linear trend in proportions across ordered categories. In this context, it tests whether the proportion of injured fish increases (or decreases) systematically with treatment level.
+
+The test assigns scores to treatment groups (typically 1, 2, 3, ...) and calculates a Z-statistic that measures the strength of the linear trend.
+
+## Example 1: synthetic dataset
+
+I'll create a simulated dataset with Control and 3 treatment groups (T1, T2, T3), each with 4 tanks, and 6 fish per tank. The data will show a trend where higher treatment groups have more severe injuries (higher scores). Injury scores from S0 (no injury) to S4 (severe injury).
+
+Treatment effects: 
+- Control group has mostly healthy fish (S0)
+- As treatment level increases, the proportion of higher injury scores increases
+- T3 (highest treatment) has the most severe injuries
+
+Variability:
+
+- Small random variations in the probabilities for each tank
+- This simulates natural tank-to-tank variability within treatment groups
+
+
+
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Define parameters
+treatments <- c("Control", "T1", "T2", "T3")
+tanks_per_treatment <- 4
+fish_per_tank <- 6
+tank_labels <- paste0(rep(1:tanks_per_treatment, length(treatments)), 
+                     rep(LETTERS[1:length(treatments)], each = tanks_per_treatment))
+
+# Create base data frame
+sim_data <- data.frame(
+  tmt = rep(treatments, each = tanks_per_treatment),
+  tank = tank_labels,
+  total = fish_per_tank
+)
+
+# Define probability distributions for each treatment
+# Format: list of vectors, where each vector contains probabilities for [S0, S1, S2, S3, S4]
+# Trend: Control has mostly S0, T3 has more severe injuries
+prob_distributions <- list(
+  Control = c(0.80, 0.15, 0.03, 0.02, 0.00),  # Mostly healthy fish
+  T1 = c(0.60, 0.25, 0.10, 0.04, 0.01),       # Slight increase in injuries
+  T2 = c(0.40, 0.30, 0.15, 0.10, 0.05),       # Moderate increase in injuries
+  T3 = c(0.20, 0.25, 0.25, 0.20, 0.10)        # Substantial increase in injuries
+)
+
+# Function to generate counts based on multinomial distribution
+generate_counts <- function(n, probs) {
+  # Add small random variation to probabilities (within tanks)
+  varied_probs <- pmax(0, probs + rnorm(length(probs), 0, 0.03))
+  varied_probs <- varied_probs / sum(varied_probs)  # Normalize to sum to 1
+  
+  # Generate counts using multinomial distribution
+  counts <- rmultinom(1, n, varied_probs)
+  return(counts)
+}
+
+# Generate injury counts for each tank
+for (i in 1:nrow(sim_data)) {
+  treatment <- sim_data$tmt[i]
+  probs <- prob_distributions[[treatment]]
+  
+  counts <- generate_counts(fish_per_tank, probs)
+  
+  sim_data$S0[i] <- counts[1]
+  sim_data$S1[i] <- counts[2]
+  sim_data$S2[i] <- counts[3]
+  sim_data$S3[i] <- counts[4]
+  sim_data$S4[i] <- counts[5]
+}
+
+# Verify that the total counts match
+sim_data$check_sum <- sim_data$S0 + sim_data$S1 + sim_data$S2 + sim_data$S3 + sim_data$S4
+all(sim_data$check_sum == sim_data$total)  # Should be TRUE
+
+# Remove the check column
+sim_data$check_sum <- NULL
+
+# Display the simulated data
+print(sim_data)
+
+# Calculate the average proportion of each score by treatment group
+summary_by_treatment <- aggregate(
+  cbind(S0, S1, S2, S3, S4) ~ tmt, 
+  data = sim_data, 
+  FUN = function(x) round(mean(x/fish_per_tank), 2)
+)
+
+print("Average proportion of each score by treatment:")
+print(summary_by_treatment)
+
+# Calculate the average severity score by treatment
+sim_data$severity_score <- with(sim_data, 
+                               (0*S0 + 1*S1 + 2*S2 + 3*S3 + 4*S4) / total)
+
+avg_severity <- aggregate(severity_score ~ tmt, data = sim_data, FUN = mean)
+print("Average severity score by treatment:")
+print(avg_severity)
+
+# Visualize the trend
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  library(ggplot2)
+  
+  # Convert to long format for plotting
+  sim_data_long <- reshape2::melt(
+    sim_data, 
+    id.vars = c("tmt", "tank", "total"), 
+    measure.vars = c("S0", "S1", "S2", "S3", "S4"),
+    variable.name = "score",
+    value.name = "count"
+  )
+  
+  # Calculate proportions
+  sim_data_long$proportion <- sim_data_long$count / sim_data_long$total
+  
+  # Plot
+  ggplot(sim_data_long, aes(x = tmt, y = proportion, fill = score)) +
+    geom_bar(stat = "identity", position = "stack") +
+    labs(title = "Distribution of Injury Scores by Treatment",
+         x = "Treatment Group",
+         y = "Proportion of Fish",
+         fill = "Injury Score") +
+    theme_minimal() +
+    scale_fill_brewer(palette = "YlOrRd")
+  
+  # Plot severity score
+  ggplot(sim_data, aes(x = tmt, y = severity_score)) +
+    geom_boxplot() +
+    geom_jitter(width = 0.2, alpha = 0.5) +
+    labs(title = "Average Injury Severity by Treatment",
+         x = "Treatment Group",
+         y = "Severity Score (weighted average)") +
+    theme_minimal()
+}
+```
+
+
+The dataset shows a clear trend of increasing injury severity across treatment groups. This can be seen in both the distribution of scores and the average severity score.
+
+
+
+```{r}
+# Define affected fish as those with any injury (S1-S4)
+affected <- sim_data$S1 + sim_data$S2 + sim_data$S3 + sim_data$S4
+
+# Run the Rao-Scott adjusted Cochran-Armitage test
+result <- run_RSCA(
+  group = sim_data$tmt,
+  replicate = sim_data$tank,
+  affected = affected,
+  total = sim_data$total
+)
+
+# View results
+print(result$interm_values)
+print(paste("Z-statistic:", round(result$Z, 3)))
+p_value <- 2 * (1 - pnorm(abs(result$Z)))
+print(paste("p-value:", round(p_value, 4)))
+
+# You can also test for a trend in more severe injuries only (S2-S4)
+severe_affected <- sim_data$S2 + sim_data$S3 + sim_data$S4
+result_severe <- run_RSCA(
+  group = sim_data$tmt,
+  replicate = sim_data$tank,
+  affected = severe_affected,
+  total = sim_data$total
+)
+
+print(paste("Z-statistic (severe injuries):", round(result_severe$Z, 3)))
+p_value_severe <- 2 * (1 - pnorm(abs(result_severe$Z)))
+print(paste("p-value (severe injuries):", round(p_value_severe, 4)))
+```
+
+
+```{r}
+# Test data
+test_data <- data.frame(
+  tmt = c("C", "SC"),
+  tank = c("5A", "4A"),
+  S0 = c(2, 1),
+  S1 = c(1, 3),
+  S2 = c(0, 0),
+  S3 = c(1, 0),
+  total = c(4, 4)
+)
+
+# Test the simplified expansion function
+individual_data <- expand_to_individual(test_data)
+print(individual_data)
+
+# Test the simplified aggregation function
+aggregated_data <- aggregate_from_individual(individual_data)
+print(aggregated_data)
+
+# Verify that the conversion is lossless
+all.equal(test_data[order(test_data$tmt, test_data$tank), c("tmt", "tank", "S0", "S1", "S2", "S3", "total")], 
+          aggregated_data[order(aggregated_data$tmt, aggregated_data$tank), c("tmt", "tank", "S0", "S1", "S2", "S3", "total")])
+```
+
+## Example 2:
+
 
 - Take the subset of F2-females with 16 weeks of age, run RSCABS. 
 

@@ -13,7 +13,8 @@ tsk(...)
 tsk estimations
 }
 \description{
-Trimmed Spearman-Karber Method by brsr
+The function is adapted from the single function package tsk developed with
+GPL3 license. It is included for validation purpose.
 }
 \references{
 \url{https://github.com/brsr/tsk}

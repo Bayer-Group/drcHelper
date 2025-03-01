@@ -26,7 +26,11 @@ adjustment to the Cochran-Armitage test and "CA" to ignore the adjustment.}
 a table of the test results for each treatment and injury score.
 }
 \description{
-Runs the Rao-Scott adjusted Cochran-Armitage trend test by slices (RSCABS) analysis.
+Runs the Rao-Scott adjusted Cochran-Armitage trend test by slices (RSCABS)
+analysis.The function is adapted from the archived version of RSCABS developed by
+Joe Swintek et al with CC0 license. It is not updated anymore and included
+for validation purpose. It is provided in this package a different function
+to perform the same task.
 }
 \examples{
 \dontrun{
