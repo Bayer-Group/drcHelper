@@ -44,6 +44,9 @@ confidence bands}
 user input when the use does not want to use the
 data provided in the modList}
 }
+\value{
+a ggplot object
+}
 \description{
 Plot a list of models together.
 }

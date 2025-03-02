@@ -9,7 +9,11 @@ mselect.ED(modList, respLev = c(10, 20, 50), trend = "Decrease", ...)
 \arguments{
 \item{modList}{list of models}
 
-\item{...}{}
+\item{respLev}{response levels or ECx for example, 10, 20, 50}
+
+\item{trend}{"Decrease" or "Incrrease".}
+
+\item{...}{optional to pass to ED function.}
 }
 \value{
 ED result table

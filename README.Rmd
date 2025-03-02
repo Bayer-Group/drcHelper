@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -112,10 +114,33 @@ p
 ## Adding ECx and ECx CI's to the plots
 
 ```{r}
+p1 <- plot.modList(modList[1])
+addECxCI(p1,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+                     textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+ ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
 ## addECxCI(p)
 ```
 
+## Report ECx
 
+```{r}
+resED <- t(edResTab[1:3, c(2,4,5,6)])
+colnames(resED) <- paste("EC", c(10,20,50))
+knitr::kable(resED,caption = "Response Variable at day N",digits = 3)
+```
+**Calculate specific ECx:  **
+```{r}
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
+edres%>%knitr::kable(.,digits = 3)
+```
+
+
+## Model Output
+
+```{r}
+modsum <- summary(mod)
+knitr::kable(coef(modsum),digits = 3)
+```
 
 
 ## ToDo

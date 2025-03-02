@@ -2,7 +2,7 @@
 % Please edit documentation in R/drc_Helper.R
 \name{drcCompare}
 \alias{drcCompare}
-\title{Compare models with multiple criteria}
+\title{Compare Dose-Response Models Using Multiple Criteria}
 \usage{
 drcCompare(
   modRes = NULL,
@@ -13,8 +13,40 @@ drcCompare(
 )
 }
 \arguments{
-\item{...}{}
+\item{modRes}{Optional. Result object containing model comparison information.
+If provided, modList parameter is ignored.}
+
+\item{modList}{Optional. List of fitted dose-response models to compare.
+Required if modRes is NULL.}
+
+\item{trend}{Character string specifying the expected trend direction.
+Must be "Decrease" or "Increase".}
+
+\item{CI}{Character string specifying the confidence interval method.
+One of "delta", "inv", or "bmd-inv". Defaults to "delta".}
+
+\item{...}{Additional arguments passed to internal functions}
+}
+\value{
+A data frame containing model comparison results with columns:
+\itemize{
+\item Original comparison metrics
+\item Certainty_Protection: Measure of protection certainty
+\item Steepness: Model steepness evaluation
+\item No Effect p-val: P-value for test against no-effect model
+}
 }
 \description{
-Compare models with multiple criteria
+Performs comprehensive comparison of dose-response models using multiple
+criteria including model fit, certainty of protection, and steepness.
+}
+\examples{
+\dontrun{
+# Compare models using modList
+models <- list(mod1 = fit1, mod2 = fit2)
+drcCompare(modList = models, trend = "Decrease")
+
+# Compare models using existing comparison results
+drcCompare(modRes = previous_results, trend = "Decrease")
+}
 }

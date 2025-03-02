@@ -159,8 +159,62 @@ p
 ## Adding ECx and ECx CI’s to the plots
 
 ``` r
+p1 <- plot.modList(modList[1])
+addECxCI(p1,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+                     textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+ ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
+``` r
 ## addECxCI(p)
 ```
+
+## Report ECx
+
+``` r
+resED <- t(edResTab[1:3, c(2,4,5,6)])
+colnames(resED) <- paste("EC", c(10,20,50))
+knitr::kable(resED,caption = "Response Variable at day N",digits = 3)
+```
+
+|          | EC 10 | EC 20 | EC 50 |
+|:---------|------:|------:|------:|
+| Estimate | 1.699 | 2.067 | 3.034 |
+| Lower    | 1.465 | 1.817 | 2.786 |
+| Upper    | 1.990 | 2.321 | 3.284 |
+| NW       | 0.309 | 0.244 | 0.164 |
+
+Response Variable at day N
+
+**Calculate specific ECx: **
+
+``` r
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
+edres%>%knitr::kable(.,digits = 3)
+```
+
+|       | Estimate | Std. Error | Lower | Upper |
+|:------|---------:|-----------:|------:|------:|
+| EC 5  |    1.447 |      0.163 | 1.107 | 1.787 |
+| EC 10 |    1.699 |      0.159 | 1.367 | 2.032 |
+| EC 20 |    2.067 |      0.151 | 1.753 | 2.382 |
+| EC 50 |    3.034 |      0.152 | 2.716 | 3.352 |
+
+## Model Output
+
+``` r
+modsum <- summary(mod)
+knitr::kable(coef(modsum),digits = 3)
+```
+
+|               | Estimate | Std. Error | t-value | p-value |
+|:--------------|---------:|-----------:|--------:|--------:|
+| b:(Intercept) |   -2.300 |      0.309 |  -7.441 |   0.000 |
+| c:(Intercept) |    0.532 |      0.177 |   3.005 |   0.007 |
+| d:(Intercept) |    7.719 |      0.174 |  44.474 |   0.000 |
+| e:(Intercept) |    2.914 |      0.148 |  19.750 |   0.000 |
 
 ## ToDo
 

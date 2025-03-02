@@ -25,7 +25,7 @@ uses adjusted values to account for clustering in the data.
 
 The function assigns scores (1, 2, 3, ...) to the treatment groups and
 calculates the Z-statistic using the formula:
-Z =  / sqrt
+\verb{\deqn\{Z = [sum(adj_x*d) - N*p_bar*d_bar] / sqrt[p_bar*(1-p_bar)*(sum(adj_n*d^2) - N*d_bar^2)]}
 where:
 \itemize{
 \item d are the scores (1, 2, 3, ...)
@@ -44,4 +44,7 @@ adj_vals <- get_RS_adj_val(
 )
 # Calculate Z-statistic
 Z <- get_CA_Z(adj_vals$x_tilde, adj_vals$n_tilde)
+}
+\author{
+Originally by Allen Olmstead
 }

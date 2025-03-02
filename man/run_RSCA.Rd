@@ -4,7 +4,7 @@
 \alias{run_RSCA}
 \title{Run Rao-Scott Adjusted Cochran-Armitage Trend Test}
 \usage{
-run_RSCA(group, replicate, affected, total)
+run_RSCA(group, replicate, affected, total, correction = 0)
 }
 \arguments{
 \item{group}{Vector of treatment group identifiers}
@@ -14,6 +14,8 @@ run_RSCA(group, replicate, affected, total)
 \item{affected}{Vector of counts of affected subjects (fish with injuries) in each replicate}
 
 \item{total}{Vector of total subjects (fish) in each replicate}
+
+\item{correction}{continuity correction when there is 1, default is 0, can be changed to 0.5.}
 }
 \value{
 A list containing:
@@ -51,4 +53,7 @@ print(result$Z)
 # Calculate p-value
 p_value <- 2 * (1 - pnorm(abs(result$Z)))
 print(paste("p-value:", p_value))
+}
+\author{
+Originally by Allen Olmstead
 }

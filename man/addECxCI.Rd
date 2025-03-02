@@ -58,5 +58,13 @@ adding ECx estimation and interval to the model output plot
 }
 \examples{
 \dontrun{
+data("dat_medium")
+dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium$Response[dat_medium$Response < 0] <- 0
+mod <- drm(Response~Dose,data=dat_medium,fct=LN.4())
+p1 <- plot.modList(list(mod))
+addECxCI(p1,object=mod,EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+
+ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
 }
 }

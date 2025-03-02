@@ -2,13 +2,33 @@
 % Please edit documentation in R/drc_Helper.R
 \name{ECx_rating}
 \alias{ECx_rating}
-\title{Title}
+\title{Rate Effect Concentration Estimates Based on Normalized Width}
 \usage{
 ECx_rating(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{Numeric vector of normalized width values to be rated}
+}
+\value{
+Character vector of ratings with the following categories:
+\itemize{
+\item "Excellent" for NW < 0.2
+\item "Good" for 0.2 <= NW < 0.5
+\item "Fair" for 0.5 <= NW < 1
+\item "Poor" for 1 <= NW < 2
+\item "Bad" for NW >= 2
+\item "Not defined" for NA or NaN values
+}
 }
 \description{
-Title
+Assigns qualitative ratings to normalized width values of confidence intervals
+based on predefined thresholds.
+}
+\examples{
+# Basic examples
+ECx_rating(c(0.1, 0.3, 0.7, 1.5, 2.5, NA))
+
+# Example with typical normalized widths
+nw_values <- c(0.15, 0.45, 0.95, 1.8, 2.5)
+ECx_rating(nw_values)
 }

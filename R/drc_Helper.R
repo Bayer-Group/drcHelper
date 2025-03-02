@@ -20,6 +20,14 @@
 #'
 #' @examples
 #' \dontrun{
+#' data("dat_medium")
+#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium$Response[dat_medium$Response < 0] <- 0
+#' mod <- drm(Response~Dose,data=dat_medium,fct=LN.4())
+#' p1 <- plot.modList(list(mod))
+#' addECxCI(p1,object=mod,EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+#' textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+
+#' ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
 #' }
 addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoint = "ErC", respLev = c(10, 20, 50),
                      textAjust.x = 0.1, textAjust.y = 0.05, useObsCtr = FALSE, d0 = NULL, textsize = 2, lineheight = 1, xmin = 0.05, ...) {
@@ -364,7 +372,6 @@ mselect.ZG <- mselect.plus
 #'
 #' @return The function prints the `Comparison` and `EFSA` components
 #'  of the object by default.
-#' @S3method
 #' @export
 print.drcComp <- function(x, ...) {
   x <- x[c("Comparison", "EFSA")]
@@ -388,7 +395,7 @@ print.drcComp <- function(x, ...) {
 #' user input when the use does not want to use the
 #' data provided in the modList
 #'
-#' @return
+#' @return a ggplot object
 #' @export plot.modList
 #'
 #' @examples
@@ -582,15 +589,14 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
 #' ECx calculation together with normalized width proposed by EFSA SO.
 #'
 #' @param modList list of models
-#' @param respLev
-#' @param trend
-#' @param ...
+#' @param respLev response levels or ECx for example, 10, 20, 50
+#' @param trend "Decrease" or "Incrrease".
+#' @param ... optional to pass to ED function.
 #'
 #' @return ED result table
 #' @export mselect.ED
 #' @importFrom purrr map2
 #'
-#' @examples
 mselect.ED <- function(modList, respLev = c(10, 20, 50),
                        trend = "Decrease", ...) {
   edList <- lapply(modList, function(obj) {
@@ -618,16 +624,49 @@ mselect.ED <- function(modList, respLev = c(10, 20, 50),
   return(edResTab)
 }
 
-## Normalised width
-#' Title
+
+#' Calculate Normalized Width for Effect Concentration Estimates
 #'
-#' @param x
-#' @param ED
+#' @description
+#' Calculates the normalized width of confidence intervals for effect concentration
+#' (EC) estimates by dividing the interval width by the estimate value. Also
+#' provides a rating for the calculated normalized width.
 #'
-#' @return
+#' @param x A data frame containing EC estimates, typically output from ED
+#'   function. Must contain columns 'Upper', 'Lower', and 'Estimate'.
+#' @param ED Character string indicating the source of EC estimates. Must be either
+#'   "ZG" (default) or "drc".
+#'
+#' @return A data frame with two columns:
+#'   \itemize{
+#'     \item NW: Normalized width calculated as (Upper - Lower) / Estimate
+#'     \item Rating: Categorical rating of the normalized width
+#'   }
+#'   Row names are preserved from input for "ZG" or modified to "EC_x" format
+#'   for "drc".
+#'
 #' @export
 #'
 #' @examples
+#' # Example with ZG format
+#' ec_data <- data.frame(
+#'   Lower = c(1.2, 2.3),
+#'   Upper = c(1.8, 3.1),
+#'   Estimate = c(1.5, 2.7),
+#'   row.names = c("EC10", "EC50")
+#' )
+#' calcNW(ec_data, ED = "ZG")
+#'
+#' # Example with drc format
+#' drc_data <- data.frame(
+#'   Lower = c(1.2, 2.3),
+#'   Upper = c(1.8, 3.1),
+#'   Estimate = c(1.5, 2.7),
+#'   row.names = c("Dose:1:10", "Dose:1:50")
+#' )
+#' calcNW(drc_data, ED = "drc")
+#'
+#' @seealso \code{\link{ECx_rating}} for the rating system used
 calcNW <- function(x, ED = "ZG") {
   x <- as.data.frame(x) ## x is the ED object from ED function.
   out <- as.data.frame((x$Upper - x$Lower) / x$Estimate)
@@ -640,14 +679,33 @@ calcNW <- function(x, ED = "ZG") {
   return(out)
 }
 
-#' Title
+#' Rate Effect Concentration Estimates Based on Normalized Width
 #'
-#' @param x
+#' @description
+#' Assigns qualitative ratings to normalized width values of confidence intervals
+#' based on predefined thresholds.
 #'
-#' @return
+#' @param x Numeric vector of normalized width values to be rated
+#'
+#' @return Character vector of ratings with the following categories:
+#'   \itemize{
+#'     \item "Excellent" for NW < 0.2
+#'     \item "Good" for 0.2 <= NW < 0.5
+#'     \item "Fair" for 0.5 <= NW < 1
+#'     \item "Poor" for 1 <= NW < 2
+#'     \item "Bad" for NW >= 2
+#'     \item "Not defined" for NA or NaN values
+#'   }
+#'
 #' @export
 #'
 #' @examples
+#' # Basic examples
+#' ECx_rating(c(0.1, 0.3, 0.7, 1.5, 2.5, NA))
+#'
+#' # Example with typical normalized widths
+#' nw_values <- c(0.15, 0.45, 0.95, 1.8, 2.5)
+#' ECx_rating(nw_values)
 ECx_rating <- function(x) {
   ## normalised width (NW) of CI
   ## NW   |  Rating # nolint: commented_code_linter.
@@ -680,17 +738,45 @@ ECx_rating <- function(x) {
   return(outRating)
 }
 
-#' Compare models with multiple criteria
+#' Compare Dose-Response Models Using Multiple Criteria
 #'
-#' @param modRes
-#' @param modList
-#' @param trend
-#' @param ...
+#' @description
+#' Performs comprehensive comparison of dose-response models using multiple
+#' criteria including model fit, certainty of protection, and steepness.
 #'
-#' @return
+#' @param modRes Optional. Result object containing model comparison information.
+#'   If provided, modList parameter is ignored.
+#' @param modList Optional. List of fitted dose-response models to compare.
+#'   Required if modRes is NULL.
+#' @param trend Character string specifying the expected trend direction.
+#'   Must be "Decrease" or "Increase".
+#' @param CI Character string specifying the confidence interval method.
+#'   One of "delta", "inv", or "bmd-inv". Defaults to "delta".
+#' @param ... Additional arguments passed to internal functions
+#'
+#' @return A data frame containing model comparison results with columns:
+#'   \itemize{
+#'     \item Original comparison metrics
+#'     \item Certainty_Protection: Measure of protection certainty
+#'     \item Steepness: Model steepness evaluation
+#'     \item No Effect p-val: P-value for test against no-effect model
+#'   }
+#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data("dat_medium")
+#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium$Response[dat_medium$Response < 0] <- 0
+#' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+#' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+#' res <- mselect.plus(mod,fctList = fctList )
+#' modList <- res$modList
+#'
+#' # Compare models using existing comparison results
+#' drcCompare(modRes = res, trend = "Decrease")
+#' }
 drcCompare <- function(modRes = NULL, modList = NULL, trend = "Decrease",
                        CI = c("delta", "inv", "bmd-inv"), ...) { # nolint
   CI <- match.arg(CI)
@@ -699,7 +785,10 @@ drcCompare <- function(modRes = NULL, modList = NULL, trend = "Decrease",
     modList <- modRes$modList
     comparison <- modRes$Comparison
   } else {
-    if (is.null(modList)) stop("Need the model output list from previous step!")
+    if (is.null(modList)) stop("Need the model output list from previous step!") else{
+      ## use modList directly
+      stop("A direct model comparison has not yet implemented, this is a placeholder.")
+    }
   }
   # A significance test is provided for the comparison of the dose-response model considered and the simple linear regression model with slope 0 (a horizontal regression line corresponding to no dose effect) # nolint: line_length_linter.
   # The likelihood ratio test statistic and the corresponding degrees of freedom and p-value are reported. # nolint: line_length_linter.

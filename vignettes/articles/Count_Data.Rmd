@@ -6,6 +6,24 @@ date: December 4, 2024
 author: "Zhenglei Gao"
 ---
 
+*To be written. Contribution is welcome.*
+
+## Testing Approaches
+
+###  Fisher's Exact Test for Count Data
+
+```{r}
+
+```
+
+### Data Transformation
+
+
+## Modelling Approaches
+
+
+
+
 
 ## Poisson, Quasi-Poisson, Negative-Binomial
 

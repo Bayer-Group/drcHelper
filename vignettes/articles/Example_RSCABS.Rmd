@@ -8,12 +8,358 @@ editor_options:
 ---
 
 
+## Example Usage of the RSCABS functions in drcHelper
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+```
+
+
+The function in *drcHelper* is `run_threshold_RSCA` and `run_all_threshold_tests`. The latter performs the Rao-Scott adjusted Cochran-Armitage trend test by slices (for multiple injury thresholds) and 
+providing a comprehensive analysis of dose-response relationships at different severity levels. It also outputs an invisible components including all the detailed interim results for each tested threshold level. A step-down procedure can be performed using `step_down_RSCABS`. 
+
+
+
+```{r}
+# Example data with increasing trend in injury rates
+# Create the simulated fish data
+sim_data_1<- tibble::tibble(
+  treatment = c(rep("Control", 8), rep("Low", 4), rep("Medium", 4), rep("High", 4)),
+  tank = c(paste0("C", 1:8), paste0("L", 1:4), paste0("M", 1:4), paste0("H", 1:4)),
+  S0 = c(3, 2, 4, 3, 2, 1, 2, 3, 3, 3, 4, 2, 2, 3, 2, 2, 2, 3, 1, 2),
+  S1 = c(1, 2, 0, 1, 2, 2, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 2, 0),
+  S2 = c(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1),
+  S3 = c(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1),
+  total = c(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
+)
+
+# Ensure treatment is an ordered factor for proper plotting
+sim_data_1$treatment <- factor(sim_data_1$treatment,
+                                        levels = c("Control", "Low", "Medium", "High"))
+
+
+# Run two-sided test
+two_sided_result <- run_threshold_RSCA(sim_data_1, threshold = 2,treatment_col = "treatment",replicate_col = "tank")
+print(paste("Two-sided p-value:", round(two_sided_result$p_value, 4)))
+
+# Run one-sided test (greater)
+greater_result <- run_threshold_RSCA(sim_data_1, threshold = 2, alternative = "greater",treatment_col = "treatment",replicate_col = "tank")
+print(paste("One-sided (greater) p-value:", round(greater_result$p_value, 4)))
+
+# Run one-sided test (less)
+less_result <- run_threshold_RSCA(sim_data_1, threshold = 1, alternative = "less",treatment_col = "treatment",replicate_col = "tank")
+print(paste("One-sided (less) p-value:", round(less_result$p_value, 4))) 
+```
+
+```{r}
+run_all_threshold_tests(sim_data_1,min_score = 0,max_score = 2,direction="less",alternative ="less",treatment_col = "treatment",replicate_col = "tank")
+run_all_threshold_tests(sim_data_1,min_score = 1,max_score = 3,direction="greater",alternative ="greater",treatment_col = "treatment",replicate_col = "tank")
+run_all_threshold_tests(sim_data_1%>%filter(treatment!="High")%>%droplevels(.),min_score = 1,max_score = 3,direction="greater",alternative ="greater",treatment_col = "treatment",replicate_col = "tank")
+```
+
+```{r}
+# Run step-down procedure
+result <- step_down_RSCABS(
+  sim_data_1,
+  treatment_col = "treatment",replicate_col = "tank",
+  treatment_order = c("Control", "Low", "Medium", "High"),
+  alternative = "greater"
+)
+result
+summary_result <- summary(result)
+print(summary_result$summary_table)
+plot(result)
+
+print(result,printLowest = T)
+```
+
+### Comparison with Joe's Implementation
+
+Note the p-values are the same for the critical treatment and score combinations. I do think Joe's implementation has some fault in terms of alternative hypothesis and p-value calculation (It can return 1-p sometimes, not sure why). But I haven't tried to figured that out.  
+
+```{r}
+dat1 <- convert_fish_data(sim_data_1,direction="to_individual",treatment_col = "treatment",replicate_col = "tank" )
+dat1 <- (dat1) %>% mutate(score1=as.numeric(factor(score))-1,score2=score1+5) %>% dplyr::select(-c(score)) %>% as.data.frame
+
+## Note runRSCABS expects more than one endpoints. 
+res <- runRSCABS(dat1,'treatment','tank',test.type='RS')
+res[1:5,] %>% mutate(Effect = gsub("score1","S",Effect) )
+```
 
 
 
 
+Note that you need to specify both direction and alternative according to your test hypotheses. The drcHelper function provides alternative specification by 
 
-## RSCABS
+
+- Two-sided test (alternative = "two.sided"):
+      -Tests whether there is any trend (increasing or decreasing) in the proportion of affected fish across treatment groups
+      - Null hypothesis (H0): No trend in proportions
+      - Alternative hypothesis (H1): There is a trend (either increasing or decreasing)
+      - P-value calculation: 2 * pnorm(-abs(Z))
+      - Use when you have no prior expectation about the direction of the effect
+
+- One-sided test (greater) (alternative = "greater"):
+      - Tests whether the proportion of affected fish increases with treatment level
+      - Null hypothesis (H0): No increasing trend
+      - Alternative hypothesis (H1): Proportion increases with treatment level
+      - P-value calculation: pnorm(-Z)
+      - Use when you expect higher treatment levels to have more affected fish
+
+- One-sided test (less) (alternative = "less"):
+     - Tests whether the proportion of affected fish decreases with treatment level
+     - Null hypothesis (H0): No decreasing trend
+     - Alternative hypothesis (H1): Proportion decreases with treatment level
+     - P-value calculation: pnorm(Z)
+     - Use when you expect higher treatment levels to have fewer affected fish
+
+In toxicology studies, alternative = "greater" in combination with direction = "greater" is often most appropriate since higher treatment levels are typically expected to cause more adverse effects.
+
+In comparison with the conventional RSCABS test by `runRSCABS`, the `run_all_threshold_tests` provides:
+
+- Flexible threshold direction: Supports both "greater than or equal to" and "less than or equal to" thresholds
+- Automatic score column detection: Identifies score columns based on naming pattern
+- Zero count handling: Provides warnings and alternative approaches for thresholds with zero counts
+- Comprehensive results: Returns detailed information including proportions, test statistics, and intermediate values
+- Fisher's exact test fallback: Optionally uses Fisher's exact test when RSCA is not valid due to zero counts
+
+
+## Visulaize the data
+
+
+```{r echo=FALSE,fig.width=15,fig.height=10}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)  # For combining plots
+simulated_fish_data <- sim_data_1
+
+# Convert to long format for easier plotting
+fish_data_long <- simulated_fish_data %>%
+  pivot_longer(
+    cols = starts_with("S"),
+    names_to = "score",
+    values_to = "count"
+  ) %>%
+  # Ensure score is an ordered factor
+  mutate(score = factor(score, levels = c("S0", "S1", "S2", "S3")))
+
+# 1. Stacked Bar Plot by Treatment Group
+p1 <- fish_data_long %>%
+  group_by(treatment, score) %>%
+  summarize(total_count = sum(count), .groups = "drop") %>%
+  ggplot(aes(x = treatment, y = total_count, fill = score)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(
+    title = "Distribution of Injury Scores by Treatment Group",
+    x = "Treatment Group",
+    y = "Number of Fish",
+    fill = "Injury Score"
+  ) +
+  scale_fill_brewer(palette = "YlOrRd") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    legend.position = "right"
+  )
+
+# 2. Proportion Plot by Treatment Group
+p2 <- fish_data_long %>%
+  group_by(treatment, score) %>%
+  summarize(total_count = sum(count), .groups = "drop") %>%
+  group_by(treatment) %>%
+  mutate(proportion = total_count / sum(total_count)) %>%
+  ggplot(aes(x = treatment, y = proportion, fill = score)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(
+    title = "Proportion of Injury Scores by Treatment Group",
+    x = "Treatment Group",
+    y = "Proportion of Fish",
+    fill = "Injury Score"
+  ) +
+  scale_fill_brewer(palette = "YlOrRd") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    legend.position = "right"
+  )
+
+# 3. Boxplot of Injury Proportions by Treatment
+p3 <- simulated_fish_data %>%
+  mutate(
+    injury_prop = (S1 + S2 + S3) / total,
+    severe_injury_prop = (S2 + S3) / total
+  ) %>%
+  pivot_longer(
+    cols = c(injury_prop, severe_injury_prop),
+    names_to = "injury_type",
+    values_to = "proportion"
+  ) %>%
+  mutate(injury_type = factor(injury_type,
+                              levels = c("injury_prop", "severe_injury_prop"),
+                              labels = c("Any Injury (S1-S3)", "Severe Injury (S2-S3)"))) %>%
+  ggplot(aes(x = treatment, y = proportion, fill = treatment)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.2, height = 0, alpha = 0.7) +
+  facet_wrap(~ injury_type) +
+  labs(
+    title = "Distribution of Injury Proportions by Treatment Group",
+    x = "Treatment Group",
+    y = "Proportion of Fish",
+    fill = "Treatment"
+  ) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent_format()) +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    legend.position = "none"
+  )
+
+# 4. Heat Map of Injury Counts by Tank
+p4 <- fish_data_long %>%
+  ggplot(aes(x = tank, y = score, fill = count)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = count), color = "black") +
+  facet_grid(. ~ treatment, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Heat Map of Injury Counts by Tank",
+    x = "Tank",
+    y = "Injury Score",
+    fill = "Count"
+  ) +
+  scale_fill_gradient(low = "white", high = "#fc8d62") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  )
+
+# 5. Dot plot showing proportion of each injury type by treatment
+p5 <- fish_data_long %>%
+  group_by(treatment, score) %>%
+  summarize(
+    total_count = sum(count),
+    .groups = "drop"
+  ) %>%
+  group_by(treatment) %>%
+  mutate(proportion = total_count / sum(total_count)) %>%
+  ggplot(aes(x = treatment, y = proportion, color = score)) +
+  geom_point(size = 4) +
+  geom_line(aes(group = score), linewidth = 1) +
+  facet_wrap(~ score, nrow = 1) +
+  labs(
+    title = "Trend in Proportion of Each Injury Score Across Treatments",
+    x = "Treatment Group",
+    y = "Proportion of Fish",
+    color = "Injury Score"
+  ) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent_format()) +
+  scale_color_brewer(palette = "YlOrRd") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    legend.position = "none",
+    panel.spacing = unit(1, "lines")
+  )
+
+# 6. Stacked bar plot for each tank
+p6 <- fish_data_long %>%
+  ggplot(aes(x = tank, y = count, fill = score)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_grid(. ~ treatment, scales = "free_x", space = "free_x") +
+  labs(
+    title = "Distribution of Injury Scores by Individual Tank",
+    x = "Tank",
+    y = "Number of Fish",
+    fill = "Injury Score"
+  ) +
+  scale_fill_brewer(palette = "YlOrRd") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right"
+  )
+
+# Combine plots using patchwork
+top_row <- p1 + p2
+middle_row <- p3
+bottom_row <- p4 / p5
+last_row <- p6
+
+combined_plot <- (top_row) / (middle_row) / (bottom_row) / (last_row) +
+  plot_layout(heights = c(1, 1, 2, 1)) +
+  plot_annotation(
+    title = "Visualization of Simulated Fish Injury Data",
+    subtitle = "Multiple visualizations showing the distribution of injury scores across treatment groups and tanks",
+    theme = theme(
+      plot.title = element_text(size = 16, face = "bold"),
+      plot.subtitle = element_text(size = 12)
+    )
+  )
+
+# Print the combined plot
+print(combined_plot)
+```
+
+### Smmary table of the data
+
+```{r echo=FALSE}
+# Statistical summary table
+summary_table <- simulated_fish_data %>%
+  group_by(treatment) %>%
+  summarize(
+    n_tanks = n(),
+    total_fish = sum(total),
+    s0_count = sum(S0),
+    s0_percent = 100 * s0_count / total_fish,
+    s1_count = sum(S1),
+    s1_percent = 100 * s1_count / total_fish,
+    s2_count = sum(S2),
+    s2_percent = 100 * s2_count / total_fish,
+    s3_count = sum(S3),
+    s3_percent = 100 * s3_count / total_fish,
+    any_injury = sum(S1 + S2 + S3),
+    any_injury_percent = 100 * any_injury / total_fish,
+    .groups = "drop"
+  ) %>%
+  mutate(across(ends_with("percent"), ~ round(., 1)))
+
+# Print the summary table
+print(summary_table)
+
+# Calculate injury severity index (weighted average of injury scores)
+severity_by_treatment <- simulated_fish_data %>%
+  mutate(
+    severity_index = (0*S0 + 1*S1 + 2*S2 + 3*S3) / total
+  ) %>%
+  group_by(treatment) %>%
+  summarize(
+    mean_severity = mean(severity_index),
+    sd_severity = sd(severity_index),
+    .groups = "drop"
+  )
+
+# Print severity index
+print(severity_by_treatment)
+```
+
+
+## Understanding RSCABS
 
 RSCABS (Rao-Scott Cochran-Armitage by slice) is designed to analyze histopathological results from standard toxicology experiments, for example the MEOGRT.
 
@@ -34,19 +380,7 @@ The Z-statistic calculation breaks down. Possible solutions could be using alter
 
 
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  message = FALSE,
-  warning = FALSE
-)
-```
 
-```{r setup}
-library(drcHelper)
-library(tidyverse)
-```
 
 
 ### Some Backgrounds
@@ -254,83 +588,6 @@ library(tidyr)
 library(knitr)
 library(ggplot2)
 
-# Function to run RSCA test for a specific injury threshold
-run_threshold_RSCA <- function(data, threshold, score_cols = c("S0", "S1", "S2", "S3", "S4")) {
-  # Determine which scores are above the threshold
-  above_cols <- score_cols[as.numeric(gsub("S", "", score_cols)) >= threshold]
-  
-  # Calculate affected counts (fish with injuries at or above threshold)
-  affected <- rowSums(data[, above_cols, drop = FALSE])
-  
-  # Run the RSCA test
-  result <- run_RSCA(
-    group = data$tmt,
-    replicate = data$tank,
-    affected = affected,
-    total = data$total
-  )
-  
-  # Calculate p-value
-  p_value <- 2 * (1 - pnorm(abs(result$Z)))
-  
-  # Return results
-  list(
-    threshold = threshold,
-    threshold_label = paste0("S", threshold, "+"),
-    Z = result$Z,
-    p_value = p_value,
-    interm_values = result$interm_values
-  )
-}
-
-# Run RSCA tests for all thresholds on the simulated data
-run_all_threshold_tests <- function(data, max_score = 4) {
-  # Create a list to store results
-  results_list <- list()
-  
-  # Score column names
-  score_cols <- paste0("S", 0:max_score)
-  
-  # Run tests for each threshold (1 to max_score)
-  for (threshold in 1:max_score) {
-    results_list[[threshold]] <- run_threshold_RSCA(data, threshold, score_cols)
-  }
-  
-  # Compile results into a data frame
-  results_df <- data.frame(
-    Threshold = sapply(results_list, function(x) x$threshold_label),
-    Z_statistic = sapply(results_list, function(x) x$Z),
-    P_value = sapply(results_list, function(x) x$p_value)
-  )
-  
-  # Calculate proportions for each threshold by treatment
-  prop_by_treatment <- data.frame(Treatment = unique(data$tmt))
-  
-  for (threshold in 1:max_score) {
-    above_cols <- score_cols[as.numeric(gsub("S", "", score_cols)) >= threshold]
-    
-    # Calculate proportions by treatment
-    props <- data %>%
-      group_by(tmt) %>%
-      summarize(
-        affected = sum(rowSums(across(all_of(above_cols)))),
-        total = sum(total),
-        proportion = affected / total
-      ) %>%
-      select(tmt, proportion)
-    
-    # Add to the data frame
-    prop_by_treatment[[paste0("S", threshold, "+")]] <- 
-      props$proportion[match(prop_by_treatment$Treatment, props$tmt)]
-  }
-  
-  # Return both results and proportions
-  list(
-    results = results_df,
-    proportions = prop_by_treatment,
-    detailed_results = results_list
-  )
-}
 
 # Run the analysis on the simulated data
 threshold_results <- run_all_threshold_tests(sim_data)
@@ -514,7 +771,6 @@ dat1 <- exampleHistData.Sub[,c(1:5,5+cids)]%>%tidyr::pivot_longer(-(1:5),values_
 ggplot(dat1,aes(x=Treatment,fill=factor(Response)))+geom_bar(aes(y=counts/total),stat = "identity")+scale_fill_viridis_d()+labs(title="Example Histopath Data",subtitle = "subset: F2 generation, 15 week age and female")+facet_wrap(~Endpoint,drop = T)+ scale_y_continuous(labels = percent)
 ```
 
-## Using R's prop.test instead
 
 
 
