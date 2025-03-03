@@ -241,17 +241,154 @@ improvement.</p>
 <h2 id="adding-ecx-and-ecx-cis-to-the-plots">Adding ECx and ECx CI’s to the plots<a class="anchor" aria-label="anchor" href="#adding-ecx-and-ecx-cis-to-the-plots"></a>
 </h2>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/addECxCI.html">addECxCI</a></span><span class="op">(</span><span class="va">p1</span>,object<span class="op">=</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,EDres<span class="op">=</span><span class="cn">NULL</span>,trend<span class="op">=</span><span class="st">"Decrease"</span>,endpoint<span class="op">=</span><span class="st">"EC"</span>, respLev<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,</span>
+<span>                     textAjust.x<span class="op">=</span><span class="fl">0.01</span>,textAjust.y<span class="op">=</span><span class="fl">0.3</span>,useObsCtr<span class="op">=</span><span class="cn">FALSE</span>,d0<span class="op">=</span><span class="cn">NULL</span>,textsize <span class="op">=</span> <span class="fl">4</span>,lineheight <span class="op">=</span> <span class="fl">0.5</span>,xmin<span class="op">=</span><span class="fl">0.012</span><span class="op">)</span><span class="op">+</span> <span class="fu">ylab</span><span class="op">(</span><span class="st">"Response Variable [unit]"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">xlab</span><span class="op">(</span><span class="st">"Concentration [µg a.s./L]"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="drcHelper_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## addECxCI(p)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="outputting">Outputting<a class="anchor" aria-label="anchor" href="#outputting"></a>
+<h2 id="report-ecx">Report ECx<a class="anchor" aria-label="anchor" href="#report-ecx"></a>
 </h2>
-<p><em>To be written</em></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">resED</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">edResTab</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">6</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">resED</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"EC"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">resED</span>,caption <span class="op">=</span> <span class="st">"Response Variable at day N"</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Response Variable at day N</caption>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">EC 10</th>
+<th align="right">EC 20</th>
+<th align="right">EC 50</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Estimate</td>
+<td align="right">1.701</td>
+<td align="right">2.068</td>
+<td align="right">3.032</td>
+</tr>
+<tr class="even">
+<td align="left">Lower</td>
+<td align="right">1.473</td>
+<td align="right">1.826</td>
+<td align="right">2.792</td>
+</tr>
+<tr class="odd">
+<td align="left">Upper</td>
+<td align="right">1.982</td>
+<td align="right">2.314</td>
+<td align="right">3.273</td>
+</tr>
+<tr class="even">
+<td align="left">NW</td>
+<td align="right">0.299</td>
+<td align="right">0.236</td>
+<td align="right">0.159</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Calculate specific ECx: </strong></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">edres</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ED.plus.html">ED.plus</a></span><span class="op">(</span><span class="va">mod</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,trend<span class="op">=</span><span class="st">"Decrease"</span><span class="op">)</span></span>
+<span><span class="va">edres</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">Std. Error</th>
+<th align="right">Lower</th>
+<th align="right">Upper</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">EC 5</td>
+<td align="right">1.449</td>
+<td align="right">0.157</td>
+<td align="right">1.122</td>
+<td align="right">1.777</td>
+</tr>
+<tr class="even">
+<td align="left">EC 10</td>
+<td align="right">1.701</td>
+<td align="right">0.154</td>
+<td align="right">1.380</td>
+<td align="right">2.022</td>
+</tr>
+<tr class="odd">
+<td align="left">EC 20</td>
+<td align="right">2.068</td>
+<td align="right">0.146</td>
+<td align="right">1.764</td>
+<td align="right">2.371</td>
+</tr>
+<tr class="even">
+<td align="left">EC 50</td>
+<td align="right">3.032</td>
+<td align="right">0.147</td>
+<td align="right">2.725</td>
+<td align="right">3.340</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
-<h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+<h2 id="model-output">Model Output<a class="anchor" aria-label="anchor" href="#model-output"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">modsum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">modsum</span><span class="op">)</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">Std. Error</th>
+<th align="right">t-value</th>
+<th align="right">p-value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">b:(Intercept)</td>
+<td align="right">-2.311</td>
+<td align="right">0.299</td>
+<td align="right">-7.719</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">c:(Intercept)</td>
+<td align="right">0.556</td>
+<td align="right">0.171</td>
+<td align="right">3.256</td>
+<td align="right">0.004</td>
+</tr>
+<tr class="odd">
+<td align="left">d:(Intercept)</td>
+<td align="right">7.719</td>
+<td align="right">0.168</td>
+<td align="right">46.004</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">e:(Intercept)</td>
+<td align="right">2.907</td>
+<td align="right">0.143</td>
+<td align="right">20.382</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="additional-notes">Additional Notes<a class="anchor" aria-label="anchor" href="#additional-notes"></a>
+</h2>
+<p><em>To be written</em></p>
+<div class="section level3">
+<h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DependenciesGraphs</span><span class="op">)</span></span>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">funDependencies</span><span class="op">(</span><span class="st">"package:drcHelper"</span>,<span class="st">"ED.plus"</span><span class="op">)</span></span>
@@ -264,6 +401,7 @@ improvement.</p>
 <span></span>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu">envirDependencies</span><span class="op">(</span><span class="st">'package:drcHelper'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
