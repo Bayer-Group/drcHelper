@@ -7,6 +7,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+In this article we illustrate how to conduct an RSCABS test and compare results using the relevant RSCABS functions in this package and those from the implementation in the archived package RSCABS. The steps behind the RSCABS test are decsribed and explained. 
+
 
 ## Example Usage of the RSCABS functions in drcHelper
 
@@ -502,12 +504,20 @@ print(avg_severity)
   library(ggplot2)
   
   # Convert to long format for plotting
-  sim_data_long <- reshape2::melt(
-    sim_data, 
-    id.vars = c("tmt", "tank", "total"), 
-    measure.vars = c("S0", "S1", "S2", "S3", "S4"),
-    variable.name = "score",
-    value.name = "count"
+  # sim_data_long <- reshape2::melt(
+  #   sim_data, 
+  #   id.vars = c("tmt", "tank", "total"), 
+  #   measure.vars = c("S0", "S1", "S2", "S3", "S4"),
+  #   variable.name = "score",
+  #   value.name = "count"
+  # )
+  
+  sim_data_long <- sim_data %>%
+  dplyr::select(tmt, tank, total, S0, S1, S2, S3, S4) %>%
+  tidyr::pivot_longer(
+    cols = starts_with("S"),
+    names_to = "score",
+    values_to = "count"
   )
   
   # Calculate proportions
@@ -830,14 +840,7 @@ pvalCOWI
 
 ## Function Notes
 
-```{r eval=FALSE}
-library(DependenciesGraphs)
-dep <- funDependencies("package:drcHelper", "runRSCABS")
 
-# visualization
-plot(dep)
-
-```
 
 ### Notes on RSCABS functions
 

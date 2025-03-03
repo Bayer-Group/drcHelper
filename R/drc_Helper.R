@@ -728,7 +728,7 @@ ECx_rating <- function(x) {
         outRating <- c(outRating, "Fair")
       } else if (i < 2) {
         outRating <- c(outRating, "Poor")
-      } else if (i > 2) {
+      } else if (i >= 2) {
         outRating <- c(outRating, "Bad")
       } else {
         outRating <- c(outRating, "Not defined")

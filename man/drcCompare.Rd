@@ -42,11 +42,15 @@ criteria including model fit, certainty of protection, and steepness.
 }
 \examples{
 \dontrun{
-# Compare models using modList
-models <- list(mod1 = fit1, mod2 = fit2)
-drcCompare(modList = models, trend = "Decrease")
+data("dat_medium")
+dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium$Response[dat_medium$Response < 0] <- 0
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
 
 # Compare models using existing comparison results
-drcCompare(modRes = previous_results, trend = "Decrease")
+drcCompare(modRes = res, trend = "Decrease")
 }
 }

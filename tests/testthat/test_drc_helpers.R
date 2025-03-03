@@ -92,7 +92,58 @@ describe("simDRdata function", {
 })
 
 
+describe("ECx_rating", {
+  it("correctly assigns ratings for various normalized widths", {
+    test_values <- c(0.1, 0.3, 0.7, 1.5, 2.5, NA)
+    expected_ratings <- c("Excellent", "Good", "Fair", "Poor", "Bad", "Not defined")
 
+    result <- ECx_rating(test_values)
+    expect_equal(result, expected_ratings)
+  })
+
+  it("handles edge cases correctly", {
+    expect_equal(ECx_rating(0.2), "Good")
+    expect_equal(ECx_rating(2), "Bad")
+    expect_equal(ECx_rating(NA), "Not defined")
+    expect_equal(ECx_rating(NaN), "Not defined")
+  })
+})
+
+describe("drcCompare", {
+  it("throws error when neither modRes nor modList is provided", {
+    expect_error(
+      drcCompare(trend = "Decrease"),
+      "Need the model output list from previous step!"
+    )
+  })
+
+  it("validates CI parameter", {
+    expect_error(
+      drcCompare(modList = list(), trend = "Decrease", CI = "invalid")##,
+      #"'arg' should be one of “delta”, “inv”, “bmd-inv”"
+    )
+  })
+
+  it("ouput the expected results", {
+    data("dat_medium")
+    dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+    dat_medium$Response[dat_medium$Response < 0] <- 0
+    set.seed(123)
+    mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+    fctList <- list(LN.4(),W1.3(),LL2.2())
+    res <- mselect.plus(mod,fctList = fctList )
+    res <- drcCompare(modRes=res)
+    expect_equal(res,structure(list(logLik = c(-15.4549616077905, -19.3508771472202,
+                                               -20.5541010938859, -70.7979296115594), IC = c(40.9099232155809,
+                                                                                             46.7017542944403, 49.1082021877719, 147.595859223119), `Lack of fit` = c(0.58935372035215,
+                                                                                                                                                                      0.0995020306142076, 0.0480097157918722, 8.3983906347998e-17),
+                                    `Res var` = c(0.254706839983221, 0.33562105157495, 0.371018290904357,
+                                                  23.3118491428803), Certainty_Protection = c("High", "High",
+                                                                                              "Medium", "Low"), Steepness = c("Medium", "Medium", "Medium",
+                                                                                                                              "Steep"), `No Effect p-val` = c(0, 0, 0, 1)), class = "data.frame", row.names = c("LN.4",
+                                                                                                                                                                                                                "LL.3", "W1.3", "LL2.2")))
+  })
+})
 
 
 ## testthat::test_file("tests/testthat/test_drc_helpers.R")
