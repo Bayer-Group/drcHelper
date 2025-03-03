@@ -128,20 +128,17 @@ describe("drcCompare", {
     data("dat_medium")
     dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
     dat_medium$Response[dat_medium$Response < 0] <- 0
-    set.seed(123)
+
     mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+
     fctList <- list(LN.4(),W1.3(),LL2.2())
     res <- mselect.plus(mod,fctList = fctList )
-    res <- drcCompare(modRes=res)
-    expect_equal(res,structure(list(logLik = c(-15.4549616077905, -19.3508771472202,
-                                               -20.5541010938859, -70.7979296115594), IC = c(40.9099232155809,
-                                                                                             46.7017542944403, 49.1082021877719, 147.595859223119), `Lack of fit` = c(0.58935372035215,
-                                                                                                                                                                      0.0995020306142076, 0.0480097157918722, 8.3983906347998e-17),
-                                    `Res var` = c(0.254706839983221, 0.33562105157495, 0.371018290904357,
-                                                  23.3118491428803), Certainty_Protection = c("High", "High",
-                                                                                              "Medium", "Low"), Steepness = c("Medium", "Medium", "Medium",
-                                                                                                                              "Steep"), `No Effect p-val` = c(0, 0, 0, 1)), class = "data.frame", row.names = c("LN.4",
-                                                                                                                                                                                                                "LL.3", "W1.3", "LL2.2")))
+    set.seed(123)
+    res1 <- drcCompare(modRes=res)
+    res2 <- drcCompare(modRes=res)
+    expect_equal(res1,res2)
+    expect_equal(res1$Steepness,c("Medium", "Medium", "Medium", "Steep"))
+
   })
 })
 

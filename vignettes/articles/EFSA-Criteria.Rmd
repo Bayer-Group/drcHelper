@@ -21,7 +21,7 @@ EFSA published in 2019 "Outcome of the Pesticides Peer Review Meeting on general
 
 - DOI: https://doi.org/10.2903/sp.efsa.2019.EN-1673
 
-## Model Comparison Criteria
+### Model Comparison Criteria
 
 Apart from generic model comparison criteria, like scaled residuals, visual fit, AIC, lack-of-fit test or goodness-of-fit test, etc., EFSA has proposed to use the following two criteria: 
 
@@ -87,15 +87,3 @@ User-specified modifications to this decision logic are also possible.
 
 ## Test Guidelines
 
-| Possible Guidelines                                                                                                       |
-|:--------------------------------------------------------------------------------------------------------------------------|
-| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 2004                                                         |
-| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 1984                                                         |
-| OECD guideline 202 (Daphnia sp. Acute Immobilisation Test) - 1981                                                         |
-| OCSPP 850.1010 Aquatic Invertebrate Acute Toxicity Test, Freshwater Daphnids - 2016                                       |
-| OPPTS 850.1010 Aquatic Invertebrate Acute Toxicity Test, Freshwater Daphnids - 1996                                       |
-| EPA OPP 72-2 (Aquatic Invertebrate Acute Toxicity Test)                                                                   |
-| ISO 6341 (Water quality - Determination of the Inhibition of the Mobility of Daphnia magna Straus (Cladocera, Crustacea)) |
-| EU Method C.2 (Acute Toxicity for Daphnia)                                                                                |
-| Japanese MAFF notification No.12-Nousan-8147 - 2000                                                                       |
-| Japanese MAFF notification No. 30-Shouan-6278 - 2019                                                                      |
