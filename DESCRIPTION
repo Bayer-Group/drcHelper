@@ -35,5 +35,8 @@ Imports:
     Iso,
     plyr,
     metafor,
-    purrr
+    purrr,
+    tidyr,
+    rlang,
+    MASS
 Remotes: DoseResponse/bmd

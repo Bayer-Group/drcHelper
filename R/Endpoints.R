@@ -86,9 +86,9 @@ pavaMean <- function(x,g,alternative = "greater"){
 #' levels(g) <- c("0", "I", "II")
 #'
 #' ## Williams Test
-#' res <- williamsTest(x ~ g)
+#' res <- PMCMRplus::williamsTest(x ~ g)
 #' summaryZG(res) ## return a data frame instead of a list.
-summaryZG <-function (object, verbose=F,...)
+summaryZG <- function (object, verbose=F,...)
 {
   critVal <- as.numeric(object$crit.value)
   stat <- as.numeric(object$statistic)
@@ -166,7 +166,7 @@ summaryZG <-function (object, verbose=F,...)
 #' levels(g) <- c("0", "I", "II")
 #'
 #' ## Williams Test
-#' res <- williamsTest(x ~ g)
+#' res <- PMCMRplus::williamsTest(x ~ g)
 #' getwilliamRes(res)
 getwilliamRes <- function(william,n=NULL){
   if(class(william)=="try-error"){

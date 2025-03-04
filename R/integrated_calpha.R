@@ -29,7 +29,7 @@
 #' where N is the number of sampling units, and I, Fisher's index of aggregation
 #' for incidence data.
 #'
-#' @param x The output of the \code{\link{agg_index}} function with
+#' @param x The output of the \code{\link[epiphy]{agg_index}} function with
 #'     \code{method = "fisher"} as parameter.
 #' @param ... Not yet implemented.
 #'
@@ -46,7 +46,7 @@
 #' class = c("fisher", "agg_index"))
 #' drcHelper:::calpha.test(my_fisher)
 #'
-#' @seealso \code{\link{chisq.test}}, \code{\link{z.test}}
+#' @seealso \code{\link{chisq.test}}, \code{\link[epiphy]{z.test}}
 #'
 #' @references
 #'

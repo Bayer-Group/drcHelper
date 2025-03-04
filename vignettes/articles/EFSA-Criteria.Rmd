@@ -87,3 +87,6 @@ User-specified modifications to this decision logic are also possible.
 
 ## Test Guidelines
 
+## References
+
+- OECD (2006), Current Approaches in the Statistical Analysis of Ecotoxicity Data: A guidance to application (annexes to this publication exist as a separate document), OECD Series on Testing and Assessment, No. 54, OECD Publishing, Paris, https://doi.org/10.1787/9789264085275-en.

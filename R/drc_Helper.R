@@ -107,6 +107,7 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #'
 #' @return Back calculated regulatory ECx
 #' @export ED.plus
+#' @rdname ED.plus
 #'
 #' @examples
 #' \dontrun{
@@ -210,7 +211,7 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 
 #' Get Model Name
 #'
-#' @param fname
+#' @param fname a character string contains the name of the fitted model.
 #'
 #' @return the model name
 #' @export
@@ -219,18 +220,18 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 #' getModelName("LL.2")
 #'
 getModelName <- function(fname = NULL) {
-  if (grep("EXD", fname)) {
+  if (any(grepl("EXD", fname))) { ## for now just one character
     noParm <- stringr::str_split(fname, fixed("."))[[1]][2]
     ModelName <- paste0(noParm, "-parameter exponential decay model")
   } else {
-    ModelName <- getMeanFunctions(fname = resComp$Model[1])
+    ModelName <- getMeanFunctions(fname = fname)
     ModelName <- paste0(ModelName[[1]]$noParm, "-parameter ", ModelName[[1]]$text)
   }
   return(ModelName)
 }
 #' Deprecated helper function for ED calculation
 #'
-#' @rdname ED.ZG
+#' @rdname ED.plus
 #' @details
 #' Due to old ECxHelper development where ED.plus is defined as ED.ZG
 #' @seealso [ED.plus()] for the public version of usage
@@ -254,6 +255,7 @@ ED.ZG <- ED.plus
 #'
 #' @return a model comparison object with class drcComp
 #' @export
+#' @rdname mselect.plus
 #'
 #' @examples
 #' \dontrun{
@@ -294,7 +296,7 @@ mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
 
   Comparison <- plyr::laply(modList, function(tempObj) {
     if (!inherits(tempObj, "try-error")) {
-      criteria <- c(logLik(tempObj), icfct(tempObj), modelFit(tempObj)[2, 5])
+      criteria <- c(logLik(tempObj), icfct(tempObj), drc::modelFit(tempObj)[2, 5])
       if (contData) {
         tryRV2 <- try(summary(tempObj)$resVar, silent = TRUE)
         if (inherits("tryRV2", "try-error")) {
@@ -353,7 +355,7 @@ mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
 }
 
 #' Deprecated helper function for mselect
-#' @rdname mselect.ZG
+#' @rdname mselect.plus
 #' @details
 #' Due to old ECxHelper development where mselect.plus is defined as mselect.ZG
 #'
@@ -792,7 +794,7 @@ drcCompare <- function(modRes = NULL, modList = NULL, trend = "Decrease",
   }
   # A significance test is provided for the comparison of the dose-response model considered and the simple linear regression model with slope 0 (a horizontal regression line corresponding to no dose effect) # nolint: line_length_linter.
   # The likelihood ratio test statistic and the corresponding degrees of freedom and p-value are reported. # nolint: line_length_linter.
-  a <- plyr::ldply(modList, function(obj) if (inherits(obj, "try-error")) c(`Chi-square test` = NA, Df = NA, `p-value` = NA) else noEffect(obj)) # nolint: line_length_linter.
+  a <- plyr::ldply(modList, function(obj) if (inherits(obj, "try-error")) c(`Chi-square test` = NA, Df = NA, `p-value` = NA) else drc::noEffect(obj)) # nolint: line_length_linter.
   Overlap <- plyr::ldply(modList, calcSteepnessOverlap, CI = CI)
   names(Overlap) <- c(".id", "Certainty_Protection", "Steepness")
   CompRes <- cbind(comparison, Overlap[, -1])

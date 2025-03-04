@@ -2,14 +2,15 @@
 % Please edit documentation in R/prelimnary.R
 \name{prelimPlot2}
 \alias{prelimPlot2}
-\title{Preliminary Plot 2 for Dose Response Data}
+\title{Preliminary Plot 2 for Dose Response Data, with x continuous.}
 \usage{
 prelimPlot2(
   testdata,
   ylab = "Response",
   xlab = "Test Concentration [nominal, mg a.s./L]",
   title = "Measured Variable",
-  dosecol = "Dose"
+  dosecol = "Dose",
+  response_col = "Response"
 )
 }
 \arguments{
@@ -20,6 +21,10 @@ prelimPlot2(
 \item{xlab}{A string for the x-axis label. Default is "Test Concentration \link{nominal, mg a.s./L}".}
 
 \item{title}{A string for the plot title. Default is "Measured Variable".}
+
+\item{dosecol}{name of the dose column, default being "Dose".  description}
+
+\item{response_col}{name of the response column. description}
 }
 \value{
 A ggplot object.

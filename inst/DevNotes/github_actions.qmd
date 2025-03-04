@@ -2,3 +2,31 @@
 
 - [On.event](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#onevent_nametypes)
 - [Managing releases in a repository](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+
+
+- https://github.com/travis-ci/travis-ci/issues/4619
+I think with github actions we can specifiy that similarly.
+
+```yml
+r_build_args: --no-build-vignettes --no-manual --no-resave-data
+r_check_args: --no-build-vignettes --no-manual
+```
+
+R buidling warnings:
+
+Found the following apparent S3 methods exported but not registered:
+     ED.plus ED.ZG plot.edList plot.modList
+   See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
+   manual.
+
+  Undocumented code objects:
+    ‘dat_bcs1’ ‘dat_medium’ ‘dat_noED50’ ‘dat_shallow’ ‘dat_steep’
+    ‘exampleHistData’ ‘getLineContrast’ ‘getQuadContrast’ ‘metaldata’
+    ‘NTA_Ar_ext_mortality_expected’ ‘NTP_example_rate_expected’
+    ‘rankTransform’ ‘test_cases_data’ ‘test_cases_res’
+    ‘williamsTestLookUpTable’
+  Undocumented data sets:
+    ‘NTA_Ar_ext_mortality_expected’ ‘NTP_example_rate_expected’
+    ‘dat_bcs1’ ‘dat_medium’ ‘dat_noED50’ ‘dat_shallow’ ‘dat_steep’
+    ‘exampleHistData’ ‘metaldata’ ‘test_cases_data’ ‘test_cases_res’
+    ‘williamsTestLookUpTable’

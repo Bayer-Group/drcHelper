@@ -1,3 +1,60 @@
+#' Williams Test Lookup Table
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"williamsTestLookUpTable"
+
+#' test_cases_data for validation purpose
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"test_cases_data"
+
+
+#' exampleHistData from StatCharrms
+#'
+#' @docType data
+#' @keywords datasets
+"exampleHistData"
+
+
+#' example data with shallow dose-response
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"dat_shallow"
+
+
+#' example data with steep dose-response
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"dat_steep"
+
+#' example data with medium dose-response
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"dat_medium"
+
+#' example data with no ED 50 response
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"dat_noED50"
+
+#' test_cases_data for validation purpose
+#'
+#' @docType data
+#' @keywords datasets
+"test_cases_data"
+
 #' An example dataset from study type OECD 201
 #'
 #' @name oecd201
@@ -23,7 +80,21 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @format NTP example rate data
+#' @keywords deprecated
 "NTP_example_rate"
+
+#' Expected outcome of NTP
+#'
+#' @docType data
+#' @keywords datasets
+"NTP_example_rate_expected"
+
+#' Expected outcome of pre-processing NTA_Ar_ext mortality
+#'
+#' @docType data
+#' @keywords datasets
+"NTA_Ar_ext_mortality_expected"
+
 
 
 #' Dixon's outlier test critical Q table
@@ -46,5 +117,9 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @format collembola_juveniles in wide format
+#' @format pvi data
 "pvi_example"
+
+
+
+

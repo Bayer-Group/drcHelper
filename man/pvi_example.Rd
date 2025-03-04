@@ -5,7 +5,7 @@
 \alias{pvi_example}
 \title{Fake data as an example of PVI data}
 \format{
-collembola_juveniles in wide format
+pvi data
 }
 \usage{
 pvi_example

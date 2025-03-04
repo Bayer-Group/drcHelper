@@ -10,6 +10,8 @@ author:
     affiliation: Bayer AG
     affiliation_url: https://bayer.com
     orcid_id: 0000-0002-4042-310X
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Nonparametric Tests
@@ -57,6 +59,48 @@ plot (mu_y,prob_rechazo_stest, type="l", col=2, main="Power",ylab="",xlab="")
 lines(mu_y,prob_rechazo_wilcoxon, type="l", col=4)
 ```
 
+## Power are different
+
+
+```{r}
+library(PMCMRplus)
+## Data set PlantGrowth
+## Global test
+
+prelimPlot1(PlantGrowth %>% mutate(Dose=group,Response=weight))
+kruskalTest(weight ~ group, data = PlantGrowth)
+
+## Conover's many-one comparison test
+## single-step means p-value from multivariate t distribution
+ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "single-step")
+summary(ans)
+
+## Conover's many-one comparison test
+ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "holm")
+summary(ans)
+
+## Dunn's many-one comparison test
+ans <- kwManyOneDunnTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "holm")
+summary(ans)
+
+## Nemenyi's many-one comparison test
+ans <- kwManyOneNdwTest(weight ~ group, data = PlantGrowth,
+                        p.adjust.method = "holm")
+summary(ans)
+
+## Many one U test
+ans <- manyOneUTest(weight ~ group, data = PlantGrowth,
+                        p.adjust.method = "holm")
+summary(ans)
+
+## Chen Test
+ans <- chenTest(weight ~ group, data = PlantGrowth,
+                    p.adjust.method = "holm")
+summary(ans)
+```
 
 
 ## References

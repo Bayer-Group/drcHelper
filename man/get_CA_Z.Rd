@@ -36,6 +36,7 @@ where:
 }
 \examples{
 # Get adjusted values
+data(dat_bcs1)
 adj_vals <- get_RS_adj_val(
   dat_bcs1$tmt,
   dat_bcs1$tank,

@@ -25,9 +25,13 @@ treatment2dose <- function(x){
 #' @export
 #'
 #' @examples  reshape_drcData(collembola_juveniles) ## note collembola_juveniles is fake data.
-reshape_drcData <- function(dat){
-  require(dplyr)
-  dat <- dat %>% pivot_longer(-Replicates,names_to = "Treatment",values_to = "Response")%>%
-    mutate(Dose=treatment2dose(Treatment))%>%filter(!is.na(Response))
+reshape_drcData <- function(dat, replicate_col = "Replicates") {
+  dat <- dat %>%
+    tidyr::pivot_longer(cols = -all_of(replicate_col),
+                 names_to = "Treatment",
+                 values_to = "Response") %>%
+    mutate(Dose = treatment2dose(Treatment)) %>%
+    filter(!is.na(Response))
+
   return(dat)
 }
