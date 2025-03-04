@@ -33,21 +33,13 @@ This function calculates the Rao-Scott adjustment for clustered binary data
 to account for intra-cluster correlation when analyzing dose-response relationships.
 }
 \details{
-The function first aggregates data by treatment group to calculate overall proportions.
+The function is modified based on the function written by Allen Olmstead.
+It first aggregates data by treatment group to calculate overall proportions.
 It then computes the variance within each treatment group accounting for clustering,
 and calculates a design effect (D) as the ratio of cluster-adjusted variance to
 binomial variance. The sample size and affected counts are then adjusted by
 dividing by this design effect.
 }
-\examples{
-# Calculate adjusted values for the fish injury data
-adj_vals <- get_RS_adj_val(
-  dat_bcs1$tmt,
-  dat_bcs1$tank,
-  dat_bcs1$S1 + dat_bcs1$S2 + dat_bcs1$S3,
-  dat_bcs1$total
-)
-}
 \author{
-Originally by Allen Olmstead
+Allen Olmstead
 }

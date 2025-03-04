@@ -9,7 +9,9 @@ prelimPlot3(
   ylab = "Response",
   xlab = "Test Concentration [nominal, mg a.s./L]",
   title = "Measured Variable",
-  a = 1.96
+  a = 1.96,
+  dose_col = "Dose",
+  response_col = "Response"
 )
 }
 \arguments{
@@ -17,11 +19,15 @@ prelimPlot3(
 
 \item{ylab}{A string for the y-axis label. Default is "Response".}
 
-\item{xlab}{A string for the x-axis label. Default is "Test Concentration \link{nominal, mg a.s./L}".}
+\item{xlab}{A string for the x-axis label. Default is \code{"Test Concentration [nominal, mg a.s./L]"}.}
 
 \item{title}{A string for the plot title. Default is "Measured Variable".}
 
 \item{a}{the quantile for corresponding CI for mean. default is qnorm(0.975).}
+
+\item{response_col}{name of the response column. description}
+
+\item{dosecol}{name of the dose column, default being "Dose".  description}
 }
 \value{
 A ggplot object.
@@ -29,3 +35,4 @@ A ggplot object.
 \description{
 This function generates a scatter plot of response against nominal dose.
 }
+\keyword{PrelimnaryAssessments}

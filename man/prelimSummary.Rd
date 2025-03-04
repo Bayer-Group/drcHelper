@@ -4,7 +4,7 @@
 \alias{prelimSummary}
 \title{Preliminary Summary of Dose Response Data}
 \usage{
-prelimSummary(testdata)
+prelimSummary(testdata, dose_col = "Dose", response_col = "Response")
 }
 \arguments{
 \item{testdata}{A data frame containing the dose and response data.}
@@ -15,3 +15,13 @@ A data frame summarizing the mean, standard deviation, percent inhibition, and c
 \description{
 This function calculates the mean response, standard deviation, percent inhibition, and coefficient of variation for each dose level.
 }
+\examples{
+# Sample data frame
+testdata <- data.frame(Dose = c(0, 1, 2, 3, 0, 1, 2, 3),
+                      Response = c(10, 20, 30, 40, 12, 22, 32, 42))
+
+# Create the summary
+summary_result <- prelimSummary(testdata, dose_col = "Dose", response_col = "Response")
+print(summary_result)
+}
+\keyword{PrelimnaryAssessments}

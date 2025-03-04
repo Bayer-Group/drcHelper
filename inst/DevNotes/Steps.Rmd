@@ -12,6 +12,32 @@ devtools::build_readme()
 pkgdown::build_site_github_pages(clean=FALSE)
 ```
 
-- 
+- Git
 
+```
+git push -u origin releases
+```
+
+or
+
+```
+git push --set-upstream origin <your branch name>
+```
+
+
+Create a new branch and push to origin:
+
+```
+git checkout -b <name of branch>
+
+git push -u origin <name of branch>
+```
+
+## Tag
+
+```
+git tag <tag_name>
+git describe
+git push origin <tag_name>
+```
 

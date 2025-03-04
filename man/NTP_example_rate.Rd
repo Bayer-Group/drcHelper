@@ -14,3 +14,4 @@ NTP_example_rate
 Expected processed data from the NTP_example
 }
 \keyword{datasets}
+\keyword{deprecated}

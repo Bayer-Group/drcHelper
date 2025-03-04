@@ -32,6 +32,10 @@ There is no routine procedures in regulatory frameworks for ordinal data analysi
 
 Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively. 
 
+For well-behaving data (full clear dose-response), most approaches will produce very similar results as long as the target endpoint (the test rate or concentration where the average injury is reaching 50% or is medium injury category) is the same. In this article, we will explain how several regression modelling can be applied, focusing on nonlinear regression with sigmoid shaped curve, logistic regression with quasibinomial likelihood, and the conventional proportional odds logistic regression. Other approaches with a different endpoint type are demonstrated as well, including BMD for ordinal data using `bmdordinal`, RSCABS, etc.  
+
+All approaches have its own limitations and need to be treated with caution. For example, for nonlinear model with a normal error assumption behind, issues could occur with inhomogeneous variance, uncertain considerations is critical when the data is over-spread across many categories close to the estimated ER50. I think whichever method to choose, careful evaluation the assumptions of the model and check the model data agreement are always necessary.
+
 ## Ordinal Data in General
 
 From a statistical point view, ordinal data is a type of categorical data where the order matters, but the exact differences or distances between the categories are not defined. For example, survey responses like "satisfied," "neutral," and "dissatisfied", ranking like 1st, 2nd, 3rd, levels of education like high school, bachelor, master. Market research, psychology, health studies, and social sciences often use ordinal data.

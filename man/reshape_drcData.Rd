@@ -4,7 +4,7 @@
 \alias{reshape_drcData}
 \title{Reshape the wide data to long data}
 \usage{
-reshape_drcData(dat)
+reshape_drcData(dat, replicate_col = "Replicates")
 }
 \arguments{
 \item{dat}{data table with Replicate columns and dose groups}

@@ -2,9 +2,24 @@
 % Please edit documentation in R/drc_Helper.R
 \name{mselect.plus}
 \alias{mselect.plus}
+\alias{mselect.ZG}
 \title{added functionality for mselect}
 \usage{
 mselect.plus(
+  object = NULL,
+  fctList = NULL,
+  nested = FALSE,
+  sorted = c("IC", "Res var", "Lack of fit", "no"),
+  linreg = FALSE,
+  icfct = AIC,
+  respCol = "effect",
+  doseCol = "dose",
+  data = NULL,
+  type = "continuous",
+  additionalReliability = c("EFSA")
+)
+
+mselect.ZG(
   object = NULL,
   fctList = NULL,
   nested = FALSE,
@@ -46,8 +61,14 @@ a model comparison object with class drcComp
 }
 \description{
 added functionality for mselect
+
+Deprecated helper function for mselect
+}
+\details{
+Due to old ECxHelper development where mselect.plus is defined as mselect.ZG
 }
 \examples{
 \dontrun{
 }
 }
+\keyword{Deprecated}

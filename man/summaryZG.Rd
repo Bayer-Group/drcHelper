@@ -26,6 +26,6 @@ g <- gl(3,5)
 levels(g) <- c("0", "I", "II")
 
 ## Williams Test
-res <- williamsTest(x ~ g)
+res <- PMCMRplus::williamsTest(x ~ g)
 summaryZG(res) ## return a data frame instead of a list.
 }

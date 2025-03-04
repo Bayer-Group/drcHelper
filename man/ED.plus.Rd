@@ -2,9 +2,20 @@
 % Please edit documentation in R/drc_Helper.R
 \name{ED.plus}
 \alias{ED.plus}
+\alias{ED.ZG}
 \title{Calculating ED following the regulatory ED definition.}
 \usage{
 \method{ED}{plus}(
+  object,
+  respLev,
+  maxEff = TRUE,
+  trend = "Increase",
+  range = "Percentage",
+  CI = c("delta", "inv", "bmd-inv"),
+  ...
+)
+
+\method{ED}{ZG}(
   object,
   respLev,
   maxEff = TRUE,
@@ -34,8 +45,17 @@ Back calculated regulatory ECx
 }
 \description{
 Calculating ED following the regulatory ED definition.
+
+Deprecated helper function for ED calculation
+}
+\details{
+Due to old ECxHelper development where ED.plus is defined as ED.ZG
 }
 \examples{
 \dontrun{
 }
 }
+\seealso{
+\code{\link[=ED.plus]{ED.plus()}} for the public version of usage
+}
+\keyword{Deprecated}

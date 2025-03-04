@@ -10,7 +10,7 @@ calpha.test(x, ...)
 \method{calpha.test}{fisher}(x, ...)
 }
 \arguments{
-\item{x}{The output of the \code{\link{agg_index}} function with
+\item{x}{The output of the \code{\link[epiphy]{agg_index}} function with
 \code{method = "fisher"} as parameter.}
 
 \item{...}{Not yet implemented.}
@@ -58,5 +58,5 @@ Tarone RE. 1979. Testing the goodness of fit of the binomial distribution.
 Biometrika, 66(3): 585-590.
 }
 \seealso{
-\code{\link{chisq.test}}, \code{\link{z.test}}
+\code{\link{chisq.test}}, \code{\link[epiphy]{z.test}}
 }

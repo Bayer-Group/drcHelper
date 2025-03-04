@@ -6,6 +6,8 @@
 \usage{
 prelimPlot1(
   testdata,
+  dose_col = "Dose",
+  response_col = "Response",
   ylab = "Response",
   xlab = "Test Concentration [nominal, mg a.s./L]",
   title = "Measured Variable"
@@ -14,9 +16,13 @@ prelimPlot1(
 \arguments{
 \item{testdata}{A data frame containing the dose and response data.}
 
+\item{dose_col}{name of the dose column, default being "Dose".  description}
+
+\item{response_col}{name of the response column. description}
+
 \item{ylab}{A string for the y-axis label. Default is "Response".}
 
-\item{xlab}{A string for the x-axis label. Default is "Test Concentration \link{nominal, mg a.s./L}".}
+\item{xlab}{A string for the x-axis label. Default is \code{"Test Concentration [nominal, mg a.s./L]"}.}
 
 \item{title}{A string for the plot title. Default is "Measured Variable".}
 }

@@ -19,48 +19,49 @@
 #'   \item{D}{Design effect (ratio of cluster-adjusted variance to binomial variance)}
 #'   \item{n_tilde}{Adjusted sample size accounting for clustering}
 #'   \item{x_tilde}{Adjusted number of affected subjects accounting for clustering}
-#'
-#' @author Originally by Allen Olmstead
+#' @export
+#' @author Allen Olmstead
 #' @details
-#' The function first aggregates data by treatment group to calculate overall proportions.
+#' The function is modified based on the function written by Allen Olmstead.
+#' It first aggregates data by treatment group to calculate overall proportions.
 #' It then computes the variance within each treatment group accounting for clustering,
 #' and calculates a design effect (D) as the ratio of cluster-adjusted variance to
 #' binomial variance. The sample size and affected counts are then adjusted by
 #' dividing by this design effect.
-#'
-#' @examples
-#' # Calculate adjusted values for the fish injury data
-#' adj_vals <- get_RS_adj_val(
-#'   dat_bcs1$tmt,
-#'   dat_bcs1$tank,
-#'   dat_bcs1$S1 + dat_bcs1$S2 + dat_bcs1$S3,
-#'   dat_bcs1$total
-#' )
 get_RS_adj_val <- function(group, replicate, affected, total) {
-  # create data frame from input vectors
+  # Create data frame from input vectors
   dat <- tibble(grp = group, rep = replicate, aff = affected, tot = total)
 
-  # create aggregates by dose levels
-  agg <- group_by(dat, grp) %>%
-    summarize(x = sum(aff), n = sum(tot), m = n()) %>%
-    mutate(p_hat = x/n,
-           b = p_hat*(1 - p_hat)/n)
+  # Create aggregates by dose levels
+  agg <- dat %>%
+    group_by(.data$grp) %>%
+    summarize(x = sum(.data$aff),
+              n = sum(.data$tot),
+              m = n(),
+              .groups = "drop") %>%
+    mutate(p_hat = .data$x / .data$n,
+           b = .data$p_hat * (1 - .data$p_hat) / .data$n)
 
-  # add aggregates to original data frame
-  dat <- left_join(dat, agg, by = "grp") %>%
-    mutate(r2 = (aff - tot*p_hat)^2) # square of residuals
+  # Add aggregates to original data frame
+  dat <- dat %>%
+    left_join(agg, by = "grp") %>%
+    mutate(r2 = (.data$aff - .data$tot * .data$p_hat)^2) # square of residuals
 
-  # calculate subgroup variances
-  subgrp_var <- group_by(dat, grp, m, n) %>%
-    summarize(sum_r2 = sum(r2), .groups = "drop") %>%
-    mutate(v = m*sum_r2/n^2/(m - 1))
+  # Calculate subgroup variances
+  subgrp_var <- dat %>%
+    group_by(.data$grp, m, n) %>%
+    summarize(sum_r2 = sum(.data$r2), .groups = "drop") %>%
+    mutate(v = .data$m * .data$sum_r2 / .data$n^2 / (.data$m - 1))
 
   agg$v <- subgrp_var$v
 
-  # calculate adjusted n and x values
-  mutate(agg, D = ifelse(v/b < 1, 1, v/b),
-         n_tilde = n/D,
-         x_tilde = x/D)
+  # Calculate adjusted n and x values
+  agg <- agg %>%
+    mutate(D = ifelse(.data$v / .data$b < 1, 1, .data$v / .data$b),
+           n_tilde = .data$n / .data$D,
+           x_tilde = .data$x / .data$D)
+
+  return(agg)
 }
 
 
@@ -92,8 +93,10 @@ get_RS_adj_val <- function(group, replicate, affected, total) {
 #' - d_bar is the weighted average of scores
 #' - p_bar is the overall proportion of affected subjects
 #'
+#' @export
 #' @examples
 #' # Get adjusted values
+#' data(dat_bcs1)
 #' adj_vals <- get_RS_adj_val(
 #'   dat_bcs1$tmt,
 #'   dat_bcs1$tank,
@@ -575,7 +578,7 @@ run_all_threshold_tests <- function(data,
 
 #' Printing method for run_all_threshold_tests results
 #'
-#' @param x
+#' @param x an object from run_all_threshold_tests with class RSCABS
 #'
 #' @return printed results from run_all_threshold_tests
 #' @export

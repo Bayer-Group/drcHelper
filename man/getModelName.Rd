@@ -7,7 +7,7 @@
 getModelName(fname = NULL)
 }
 \arguments{
-\item{fname}{}
+\item{fname}{a character string contains the name of the fitted model.}
 }
 \value{
 the model name
