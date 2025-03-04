@@ -6,7 +6,7 @@
 #'
 #' @param testdata A data frame containing the dose and response data.
 #' @param ylab A string for the y-axis label. Default is "Response".
-#' @param xlab A string for the x-axis label. Default is "Test Concentration [nominal, mg a.s./L]".
+#' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
 #' @param dose_col name of the dose column, default being "Dose".  description
 #' @param response_col name of the response column. description
@@ -58,7 +58,7 @@ prelimPlot1 <- function(testdata, dose_col = "Dose", response_col = "Response",
 #'
 #' @param testdata A data frame containing the dose and response data.
 #' @param ylab A string for the y-axis label. Default is "Response".
-#' @param xlab A string for the x-axis label. Default is "Test Concentration [nominal, mg a.s./L]".
+#' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
 #' @param dosecol name of the dose column, default being "Dose".  description
 #' @param response_col name of the response column. description
@@ -95,7 +95,7 @@ prelimPlot2 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
 #'
 #' @param testdata A data frame containing the dose and response data.
 #' @param ylab A string for the y-axis label. Default is "Response".
-#' @param xlab A string for the x-axis label. Default is "Test Concentration [nominal, mg a.s./L]".
+#' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
 #' @param a the quantile for corresponding CI for mean. default is qnorm(0.975).
 #' @param dosecol name of the dose column, default being "Dose".  description

@@ -1,0 +1,102 @@
+## Data Simulation
+
+In this article we illustrate how to simulating dose-response data using specific models from the `drc`, `MCPMod`, and `DoseFinding` packages.
+
+### 1. **Using the `drc` Package**
+
+The `drc` package provides functions for fitting and simulating dose-response curves. Here are a few common models you can simulate:
+
+- **Log-Logistic Model**: A common model for dose-response relationships.
+- **Log-Probit Model**: A common model for dose-response relationships.
+- **Weibull Model**: Another flexible model for dose-response data.
+- **Weibull Model**: Another flexible model for dose-response data.
+
+#### Example Code
+
+```{r}
+# Load necessary library
+library(drc)
+
+# Define parameters for the logistic model
+params <- c(ED50 = 10, slope = 1, upper = 100, lower = 0)
+
+# Simulate dose-response data
+set.seed(123)
+doses <- seq(0, 20, by = 1)
+responses <- drc::rdrm(drc::LL.4(params), newdata = data.frame(dose = doses))
+
+# Create a data frame
+simulated_data <- data.frame(Dose = doses, Response = responses)
+```
+
+### 2. **Using the `MCPMod` Package**
+
+The `MCPMod` package is designed for modeling and testing dose-response relationships using a combination of models. You can simulate data based on specific dose-response models defined in the package.
+
+#### Example Code
+
+```{r eval=FALSE}
+# Load necessary library
+library(MCPMod)
+
+# Define a dose-response model (e.g., Emax model)
+model <- EmaxModel()
+
+# Simulate dose-response data
+set.seed(123)
+doses <- seq(0, 20, by = 2)
+simulated_data <- simulate(model, n = 100, dose = doses)
+
+# The simulated_data will include doses and corresponding responses
+```
+
+### 3. **Using the `DoseFinding` Package**
+
+The `DoseFinding` package provides tools for designing dose-finding studies and includes functions for simulating dose-response data.
+
+#### Example Code
+
+```{r}
+# Load necessary library
+library(DoseFinding)
+
+# Define a logistic dose-response function
+logistic_function <- function(dose, lower = 0, upper = 100, ED50 = 10, slope = 1) {
+  lower + (upper - lower) / (1 + (dose / ED50)^(-slope))
+}
+
+# Simulate dose-response data
+set.seed(123)
+doses <- seq(0, 20, by = 2)
+responses <- logistic_function(doses) + rnorm(length(doses), mean = 0, sd = 5)  # Adding noise
+
+# Create a data frame
+simulated_data <- data.frame(Dose = doses, Response = responses)
+prelimPlot2(simulated_data)
+```
+
+### 4. **Using Custom Models**
+
+You can also simulate dose-response data using custom equations. For example, you can define your own logistic or exponential models and generate data based on those.
+
+#### Example Code for Custom Logistic Model
+
+```{r}
+# Custom logistic function
+custom_logistic <- function(dose, lower = 0, upper = 100, ED50 = 10, slope = 1) {
+  lower + (upper - lower) / (1 + exp(-slope * (dose - ED50)))
+}
+
+# Simulate data
+set.seed(123)
+doses <- seq(0, 20, by = 1)
+responses <- custom_logistic(doses) + rnorm(length(doses), mean = 0, sd = 5)  # Adding noise
+
+# Create a data frame
+simulated_data <- data.frame(Dose = doses, Response = responses)
+prelimPlot2(simulated_data)
+```
+
+### Summary
+
+You can simulate dose-response data using various models from the `drc`, `MCPMod`, and `DoseFinding` packages, or by creating custom models. The choice of model will depend on the specific characteristics of the data you wish to simulate, such as the expected shape of the dose-response curve, the presence of noise, and the desired parameters. Each of the examples provided can be customized further to suit your simulation needs.

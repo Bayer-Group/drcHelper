@@ -7,7 +7,7 @@ Analyis of quantal data typically involves the following steps:
 
 1. Check if both solvent control and negative control present. If yes, check if the two control groups differ using Fisher
 s Exact test. 
-2. 
+2. If there are more than 2 dose groups, determin if a monotonic dose-response is expected. 
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

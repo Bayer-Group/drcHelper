@@ -31,7 +31,7 @@
 #' levels(g) <- c("0", "I", "II")
 #' pavaMean(x,g)
 pavaMean <- function(x,g,alternative = "greater"){
-  require(PMCMRplus)
+  requireNamespace("PMCMRplus", quietly = TRUE)
   alternative <- match.arg(alternative, choices = c("greater", "less"))
   xold <- x
   if (alternative == "less") {
@@ -169,7 +169,7 @@ summaryZG <- function (object, verbose=F,...)
 #' res <- PMCMRplus::williamsTest(x ~ g)
 #' getwilliamRes(res)
 getwilliamRes <- function(william,n=NULL){
-  if(class(william)=="try-error"){
+  if(inherits(william,"class")=="try-error"){
     if(is.null(n)) stop("when the test does not return a valid results, you need to specify
                         the number of hypotheses. ")
     return(rep(NA,n=n))

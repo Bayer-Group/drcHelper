@@ -169,7 +169,7 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
         }
       }
     } else {
-      require(bmd)
+      requireNamespace("bmd", quietly = TRUE)
       # tmp <- lapply(cross2(respLev,modList),function(l){
       #   x <- l[[1]]
       #   y <- l[[2]]
@@ -456,7 +456,7 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
     return(newdata)
   })
   predData$Model <- factor(predData$Model, levels = unique(predData$Model))
-  require(ggplot2)
+  requireNamespace("ggplot2", quietly = TRUE)
   p <- ggplot(ex1, aes_(x = ~conc0, y = as.name(responseName))) +
     geom_ribbon(data = predData, aes_(x = as.name(doseName),
                                       y = ~p, ymin = ~pmin,
@@ -885,4 +885,120 @@ simDRdata <- function(nosim, fct, mpar, xerror, xpar = 1, yerror = "rnorm",
     }
   }
   return(dat)
+}
+
+
+
+#' Simulate Hierarchical Dose-Response Data
+#'
+#' This function simulates dose-response data with a hierarchical structure:
+#' n doses, m tanks per dose, and optionally k individuals per tank, with variance components
+#' at both the tank and individual levels.
+#'
+#' @param n_doses Number of dose levels
+#' @param dose_range Vector of length 2 specifying the min and max dose values
+#' @param m_tanks Number of tanks per dose
+#' @param k_individuals Number of individuals per tank (only used if include_individuals = TRUE)
+#' @param var_tank Variance at the tank level
+#' @param var_individual Variance at the individual level (only used if include_individuals = TRUE)
+#' @param include_individuals Logical, whether to simulate individual-level data (TRUE) or only tank-level data (FALSE)
+#' @param response_function Function that calculates the response given a dose
+#' @param ... Additional parameters to pass to the response_function
+#'
+#' @return A data frame containing the simulated dose-response data
+#' @export
+#'
+#' @examples
+#' # Simulate data with individuals
+#' sim_data_with_individuals <- simulate_dose_response(
+#'   n_doses = 5,
+#'   dose_range = c(0, 20),
+#'   m_tanks = 3,
+#'   include_individuals = TRUE
+#' )
+#'
+#' # Simulate data without individuals (tank-level only)
+#' sim_data_tanks_only <- simulate_dose_response(
+#'   n_doses = 5,
+#'   dose_range = c(0, 20),
+#'   m_tanks = 3,
+#'   include_individuals = FALSE
+#' )
+simulate_dose_response <- function(n_doses,
+                                   dose_range = c(0, 20),
+                                   m_tanks = 3,
+                                   k_individuals = 10,
+                                   var_tank = 4,
+                                   var_individual = 2,
+                                   include_individuals = TRUE,
+                                   response_function = NULL,
+                                   ...) {
+
+  # Set default response function if not provided
+  if (is.null(response_function)) {
+    response_function <- function(dose, lower = 0, upper = 100, ED50 = 10, slope = 1) {
+      lower + (upper - lower) / (1 + exp(-slope * (dose - ED50)))
+    }
+  }
+
+  # Define doses
+  doses <- seq(dose_range[1], dose_range[2], length.out = n_doses)
+
+  if (include_individuals) {
+    # Simulate data with individuals
+
+    # Create a data frame with all combinations of dose, tank, and individual
+    simulated_data <- expand.grid(
+      Dose = doses,
+      Tank = 1:m_tanks,
+      Individual = 1:k_individuals
+    )
+
+    # Calculate the base response for each dose (vectorized)
+    simulated_data$BaseResponse <- response_function(simulated_data$Dose, ...)
+
+    # Generate tank-level random effects (vectorized)
+    # First, create a unique identifier for each dose-tank combination
+    simulated_data$DoseTank <- paste(simulated_data$Dose, simulated_data$Tank, sep = "_")
+    unique_dose_tanks <- unique(simulated_data$DoseTank)
+
+    # Generate tank effects for each unique dose-tank combination
+    tank_effects <- stats::rnorm(length(unique_dose_tanks), mean = 0, sd = sqrt(var_tank))
+    names(tank_effects) <- unique_dose_tanks
+
+    # Add tank effects to the data frame
+    simulated_data$TankEffect <- tank_effects[simulated_data$DoseTank]
+
+    # Generate individual-level random effects (vectorized)
+    simulated_data$IndividualEffect <- stats::rnorm(nrow(simulated_data), mean = 0, sd = sqrt(var_individual))
+
+    # Calculate the final response
+    simulated_data$Response <- simulated_data$BaseResponse + simulated_data$TankEffect + simulated_data$IndividualEffect
+
+    # Clean up the data frame by removing intermediate columns
+    simulated_data <- simulated_data[, c("Dose", "Tank", "Individual", "Response")]
+
+  } else {
+    # Simulate data at tank level only
+
+    # Create a data frame with all combinations of dose and tank
+    simulated_data <- expand.grid(
+      Dose = doses,
+      Tank = 1:m_tanks
+    )
+
+    # Calculate the base response for each dose (vectorized)
+    simulated_data$BaseResponse <- response_function(simulated_data$Dose, ...)
+
+    # Generate tank-level random effects (vectorized)
+    simulated_data$TankEffect <- stats::rnorm(nrow(simulated_data), mean = 0, sd = sqrt(var_tank))
+
+    # Calculate the final response (no individual effects)
+    simulated_data$Response <- simulated_data$BaseResponse + simulated_data$TankEffect
+
+    # Clean up the data frame by removing intermediate columns
+    simulated_data <- simulated_data[, c("Dose", "Tank", "Response")]
+  }
+
+  return(simulated_data)
 }

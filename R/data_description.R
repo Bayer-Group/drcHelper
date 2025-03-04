@@ -12,6 +12,12 @@
 #' @rdname drcHelper_datasets
 "test_cases_data"
 
+#' test_cases_res for validation purpose
+#'
+#' @docType data
+#' @keywords datasets
+#' @rdname drcHelper_datasets
+"test_cases_res"
 
 #' exampleHistData from StatCharrms
 #'
@@ -49,11 +55,6 @@
 #' @rdname drcHelper_datasets
 "dat_noED50"
 
-#' test_cases_data for validation purpose
-#'
-#' @docType data
-#' @keywords datasets
-"test_cases_data"
 
 #' An example dataset from study type OECD 201
 #'

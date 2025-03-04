@@ -7,7 +7,7 @@
 \method{print}{RSCABS}(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{an object from run_all_threshold_tests with class RSCABS}
 }
 \value{
 printed results from run_all_threshold_tests

@@ -27,7 +27,6 @@ Imports:
     isotone,
     multcomp,
     PMCMRplus,
-    bmd,
     dplyr,
     ggplot2,
     scales,
@@ -38,5 +37,7 @@ Imports:
     purrr,
     tidyr,
     rlang,
-    MASS
+    MASS,
+    stringr,
+    tidyselect
 Remotes: DoseResponse/bmd
