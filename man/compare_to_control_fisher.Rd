@@ -11,7 +11,8 @@ compare_to_control_fisher(
   failure_col,
   control_level = NULL,
   alternative = "two.sided",
-  conf.level = 0.95
+  conf.level = 0.95,
+  p.adjust.method = "holm"
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ compare_to_control_fisher(
 \item{alternative}{Direction of the alternative hypothesis ("two.sided", "less", or "greater")}
 
 \item{conf.level}{Confidence level for the returned confidence interval}
+
+\item{p.adjust.method}{p-value adjustment method, passing to the stats function.}
 }
 \value{
 A data frame with factor levels and corresponding p-values

@@ -165,6 +165,7 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
 #' @param control_level The level to use as control (default: first level in the data)
 #' @param alternative Direction of the alternative hypothesis ("two.sided", "less", or "greater")
 #' @param conf.level Confidence level for the returned confidence interval
+#' @param p.adjust.method p-value adjustment method, passing to the stats function.
 #'
 #' @return A data frame with factor levels and corresponding p-values
 #' @export
@@ -188,7 +189,8 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
 compare_to_control_fisher <- function(data, factor_col, success_col, failure_col,
                                       control_level = NULL,
                                       alternative = "two.sided",
-                                      conf.level = 0.95) {
+                                      conf.level = 0.95,
+                                      p.adjust.method = "holm") {
 
   # Validate inputs
   if (!all(c(factor_col, success_col, failure_col) %in% colnames(data))) {
@@ -256,7 +258,7 @@ compare_to_control_fisher <- function(data, factor_col, success_col, failure_col
   }
 
   # Add adjusted p-values
-  fisher_results$p_adjusted <- p.adjust(fisher_results$p_value, method = "holm")
+  fisher_results$p_adjusted <- p.adjust(fisher_results$p_value, method = p.adjust.method)
 
   # Rename the level column to match the input factor column name
   names(fisher_results)[names(fisher_results) == "level"] <- factor_col
