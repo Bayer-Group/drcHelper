@@ -54,7 +54,7 @@ Note that just two groups also work.
 ```{r}
 # Run the function
 result <- compare_to_control_fisher(test_data, "treatment", "survived", "died",
-                                    control_level = "control",p.adjust.methods="holm")
+                                    control_level = "control",p.adjust.method="holm")
 result
 ctab <- create_contingency_table(test_data,"treatment", "survived", "died")
 drcHelper::many_to_one_fisher_test(ctab,ref.group = "treatment_control",p.adjust.method = "holm")
