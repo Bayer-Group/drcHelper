@@ -9,6 +9,7 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+library(tidyverse)
 ```
 
 ```{r setup}
@@ -40,7 +41,7 @@ sim_data_inhomogeneous <- simulate_dose_response(
   include_individuals = TRUE
 )
 
-prelimPlot3(sim_data_inhomogeneous%>% group_by(Dose,Tank)%>%summarise(Response=mean(Response)))
+prelimPlot3(sim_data_inhomogeneous%>% group_by(Dose,Tank)%>%summarise(Response=mean(Response),.groups = "drop"))
 
 ```
 
