@@ -1,8 +1,8 @@
 ---
 title: "Quantal Data"
 resource_files:
-  - ./../assets/quantal_NOEC.png
-  - ./../assets/binomial_tank_effects_visualization.png
+  - article_assets/quantal_NOEC.png
+  - ../assets/binomial_tank_effects_visualization.png
 editor_options: 
   chunk_output_type: console
 ---
@@ -25,7 +25,9 @@ Analysis of quantal data typically involves the following steps as shown in the 
 
 
 ```{r echo=FALSE,out.width="90%"}
-knitr::include_graphics("./../assets/quantal_NOEC.png")
+#| fig.alt: >
+#|   Quantal NOEC Flowchart
+knitr::include_graphics("article_assets/quantal_NOEC.png")
 ```
 
 ## An example dataset
@@ -416,15 +418,18 @@ p4 <- ggplot(tank_effects_df, aes(x = factor(dose), y = effect, color = factor(t
     axis.title = element_text(face = "bold")
   )
 
-# Print plots
-print(p1)
-print(p2)
-print(p3)
-print(p4)
+# # Print plots
+# print(p1)
+# print(p2)
+# print(p3)
+# print(p4)
+library(gridExtra)
+combined_plot <- grid.arrange(p1, p2, p3, p4, ncol = 2)
+combined_plot
 ```
 
 
-```{r eval=FALSE}
+```{r eval=FALSE,echo=FALSE}
 # Arrange all plots in a grid 
 # Requires gridExtra package
 library(gridExtra)

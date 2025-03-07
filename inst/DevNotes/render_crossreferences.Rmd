@@ -1,0 +1,22 @@
+---
+output: 
+  pdf_document: 
+    fig_caption: true
+    keep_tex: false
+---
+
+## Tables
+
+Table \ref{tab:mtcars} shows the first few lines of mtcars. 
+
+```{r, echo=FALSE}
+knitr::kable(head(mtcars), caption="Sample of rows from mtcars. \\label{tab:mtcars}")
+```
+
+## Figures
+
+Figure \ref{fig:mtcars} shows a simple scatter plot.
+
+```{r, echo=FALSE, fig.cap="MPG vs displacement for the mtcars data. \\label{fig:mtcars}"}
+with(mtcars, plot(disp, mpg, pch=16))
+```

@@ -248,4 +248,4 @@ The work is supported by Bayer Environment Effects team members,
 especially by Andreas Solga and Daniela Jans. The Mesocosm colleagues
 Sarah Baumert and Harald Schulz have supported the verification and
 validation with extensive examples and scripts and SAS / VB validated
-calculations.
+calculations. Discussions with CLE stats group members are very helpful. 
