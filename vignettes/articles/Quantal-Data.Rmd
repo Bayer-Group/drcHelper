@@ -23,6 +23,7 @@ library(drcHelper)
 
 Analysis of quantal data typically involves the following steps as shown in the flowchart below:
 
+![Quantal NOEC Flowchart](https://bayer-group.github.io/drcHelper/articles/assets/quantal_NOEC.png)
 
 ```{r echo=FALSE,out.width="90%"}
 #| fig.alt: >
