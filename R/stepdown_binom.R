@@ -354,10 +354,8 @@ print.stepDownTrendBinom <- function(x, ...) {
 #' @param totals Numeric vector of total observations (e.g., total organisms).
 #' @param model A fitted binomial GLM with predictors accounted for. (default is NULL)
 #'
-#' @return
+#' @return a list of dispersion test results
 #' @export
-#'
-#' @examples
 test_overdispersion <- function(successes, totals, model = NULL) {
   if (is.null(model)) {
     # If no model provided, fit a simple binomial GLM
