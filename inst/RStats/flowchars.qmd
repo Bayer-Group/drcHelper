@@ -267,6 +267,8 @@ This example demonstrates how variance decomposition in mixed models can affect 
 
 ## Flowcharts generation
 
+https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings
+From the page above, I could not find a solution to handle sing quote in single quoted strings.
 
 ```{r eval=FALSE}
 # Load necessary library
@@ -280,7 +282,7 @@ digraph flowchart {
   node [shape = box, style = filled, fillcolor = lightblue]
   
   start [label = 'Are both solvent control and \n non-solvent control present?', shape = diamond]
-  compare_controls [label = 'Compare controls using \\n Fisher\\'s Exact Test']
+  compare_controls [label = 'Compare controls using \\n Fisher\"s Exact Test']
   controls_differ [label = 'Do the controls differ?', shape = diamond]
   drop_non_solvent [label = 'Drop non-solvent control from analysis']
   combine_controls [label = 'Combine controls while retaining subgroups']
