@@ -49,7 +49,7 @@
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/Quantal-Data.html">Quantal Data</a></li>
@@ -60,6 +60,7 @@
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -403,6 +404,18 @@ Residuals from ANOVA are presented in a QQ-plot.
 <div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
 </h2>
+<p>The fundamental issue is that passing a normality test with a small
+sample size provides very little evidence that the underlying
+distribution is actually normal. On the other hand, with very large
+sample size, almost any tiny deviation will be flagged as non-normal.
+Therefore, it is rather hard to interpret the normality check results
+meaningfully.</p>
+<p>More importantly, this pre-testing is largely unnecessary since
+common parametric tests like ANOVA and t-tests are robust to moderate
+violations of normality due to the Central Limit Theorem. This
+combination of unreliability in small samples and unnecessary
+verification of assumptions makes normality testing a questionable
+practice in many research contexts.</p>
 <p>For example, mixture of normals (almost-normal in terms of Q-Q plots)
 cannot be detected easily with small sample size (smaller than 1000)
 (taken from this post<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;a href="https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless" class="external-link uri"&gt;https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless&lt;/a&gt;&lt;/p&gt;'><sup>1</sup></a>).</p>

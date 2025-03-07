@@ -64,6 +64,7 @@
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -110,7 +111,7 @@ Gao</h4>
 <h2 id="testing-approaches">Testing Approaches<a class="anchor" aria-label="anchor" href="#testing-approaches"></a>
 </h2>
 <p>Usually for count data, we treat them as continuous and sometimes do
-transformations so that the variance is stablized across the treatment
+transformations so that the variance is stabilized across the treatment
 groups to derive an NOEC. Transformation of data need also careful
 interpretation of the effect size estimation and the corresponding
 confidence intervals. There is also a relatively new approach proposed
@@ -135,15 +136,14 @@ assumptions behind these counting processes are:</p>
 interval</li>
 </ul>
 <p>The key parameter for Poisson distribution is the mean, which is
-actually the rate parameter <span class="math inline">\(\lamda\)</span>.
-Poisson distribution also has this particular mean-variance
-relationship, as in many real-world counting processes, the variability
-(variance) increases with the average count (mean). The Poisson
-distribution naturally captures this through its unique property where
-the mean equals the variance. However, when the assumptions of
-independence or constant rate are violated, or when there’s
-overdispersion (variance exceeding the mean), other distributions like
-the Negative Binomial might be more appropriate.</p>
+actually the rate parameter <span class="math inline">\(\lambda\)</span>. Poisson distribution also has
+this particular mean-variance relationship, as in many real-world
+counting processes, the variability (variance) increases with the
+average count (mean). The Poisson distribution naturally captures this
+through its unique property where the mean equals the variance. However,
+when the assumptions of independence or constant rate are violated, or
+when there’s overdispersion (variance exceeding the mean), other
+distributions like the Negative Binomial might be more appropriate.</p>
 <p>Actually, I would say that Poisson distribution is very often not the
 most appropriate choice for modeling pitfall trap counts or soil core
 counts of soil organisms. Here’s why:</p>
@@ -171,8 +171,9 @@ distribution</li>
 <li>Overdispersion and underdispersion</li>
 </ol>
 <ul>
-<li>Variance in counts typically exceeds the mean. (underdispersion
-could also occure by chance or lots of zeros for certain species)</li>
+<li>Variance in counts typically exceeds the mean. (under-dispersion
+could also occur by chance or lots of zeros or small numbers for certain
+species)</li>
 <li>Clustering behavior leads to more extreme counts than expected under
 Poisson</li>
 <li>Environmental heterogeneity increases variability</li>
@@ -186,10 +187,23 @@ from a common mean with a common variance in the null distribution,
 neither of them could be true in reality.</li>
 </ul>
 <p>More appropriate approaches for modelling might be Negative Binomial
-distribution (handles overdispersion),y zro-inflated models (if many
+distribution (handles overdispersion), zero-inflated models (if many
 zero counts), mixed models (to account for spatial and temporal
 dependencies), spatial point process models (to explicitly account for
-spatial patterns).</p>
+spatial patterns). When the primary goal is determining a NOEC (No
+Observed Effect Concentration), simpler approaches often prove
+sufficient. Traditional methods, such as treating counts as continuous
+data with normal distribution assumptions, appropriate variance
+structure considerations, and suitable data transformations can provide
+robust and reliable conclusions. While more complex models might offer
+additional insights, they may not necessarily improve the practical
+utility of the analysis, particularly for regulatory purposes where
+transparency and reproducibility are crucial.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="additional-notes">Additional Notes<a class="anchor" aria-label="anchor" href="#additional-notes"></a>
+</h2>
 <p>As an example, a Poisson distribution with rate of 100 in time window
 1, a count of 137 is very unlikely coming from this distribution but 120
 could possibly be occuring with 95% confidence level. On the other hand,
@@ -230,7 +244,6 @@ distribution.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">8</span>,mean<span class="op">=</span><span class="fl">4</span>,sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.9772499</span></span></code></pre>
-</div>
 <div class="section level3">
 <h3 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a>
 </h3>

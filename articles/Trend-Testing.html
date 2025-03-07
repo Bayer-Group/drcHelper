@@ -60,6 +60,7 @@
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -156,6 +157,32 @@ monotonicity test.</p>
 <span><span class="co">#&gt;        Test t value Pr(&gt;|t|) Significance</span></span>
 <span><span class="co">#&gt; 1    Linear   11.16  &lt;0.0001          ***</span></span>
 <span><span class="co">#&gt; 2 Quadratic   -0.10   0.9196            .</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="step-down-trend-test">Step-Down Trend Test<a class="anchor" aria-label="anchor" href="#step-down-trend-test"></a>
+</h2>
+<p>A step-down trend test is a sequential testing procedure used to
+identify the lowest dose level at which a significant trend begins. The
+process works as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Start with all dose groups and test for a trend.</li>
+<li>If significant, remove the highest dose group and test again.</li>
+<li>Continue this process until either:
+<ul>
+<li>The test is no longer significant, indicating you’ve found the
+lowest effective dose</li>
+<li>Only two groups remain (typically control and lowest dose)</li>
+</ul>
+</li>
+</ol>
+<p>This approach helps identify the No Observed Effect Concentration
+(NOEC) or Lowest Observed Effect Concentration (LOEC) in dose-response
+studies.</p>
+<p>The function <code><a href="https://rdrr.io/pkg/PMCMRplus/man/stepDownTrendTest.html" class="external-link">PMCMRplus::stepDownTrendTest</a></code> PMCMRplus
+implements this strategy for continuous data using various trend tests.
+For binomial survival data, we’ll need to adapt this approach using the
+Cochran-Armitage test, which is specifically designed for binary
+outcomes across ordered groups.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

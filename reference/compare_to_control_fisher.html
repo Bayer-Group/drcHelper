@@ -43,6 +43,7 @@ to a control level, using counts of success and failure."></head><body>
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
@@ -80,7 +81,8 @@ to a control level, using counts of success and failure.</p>
 <span>  <span class="va">failure_col</span>,</span>
 <span>  control_level <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alternative <span class="op">=</span> <span class="st">"two.sided"</span>,</span>
-<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span></span>
+<span>  conf.level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  p.adjust.method <span class="op">=</span> <span class="st">"holm"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -114,6 +116,10 @@ to a control level, using counts of success and failure.</p>
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
 <dd><p>Confidence level for the returned confidence interval</p></dd>
+
+
+<dt id="arg-p-adjust-method">p.adjust.method<a class="anchor" aria-label="anchor" href="#arg-p-adjust-method"></a></dt>
+<dd><p>p-value adjustment method, passing to the stats function.</p></dd>
 
 </dl></div>
     <div class="section level2">
