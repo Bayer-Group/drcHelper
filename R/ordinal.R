@@ -1,4 +1,6 @@
-## unit testing: test_ordinal.R #######
+## unit testing: test_quantal_categorical.R
+## test_ordinal.R #######
+
 
 
 #' Get the EC50 Estimate from a Model

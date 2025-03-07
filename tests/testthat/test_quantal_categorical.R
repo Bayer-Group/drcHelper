@@ -1,5 +1,149 @@
 ## using BDD testing
 
+describe("create_contingency_table", {
+  library(dplyr)
+  it("correctly creates a contingency table with default settings", {
+    # Create test data
+    test_data <- data.frame(
+      dose = c(0, 0, 1, 1),
+      alive = c(8, 9, 5, 6),
+      dead = c(2, 1, 5, 4)
+    )
+
+    # Expected result with default settings
+    expected <- matrix(c(17, 11, 3, 9), nrow = 2,
+                       dimnames = list(c("dose_0", "dose_1"), c("success", "failure")))
+
+    # Test function
+    result <- create_contingency_table(test_data, "dose", "alive", "dead")
+
+    expect_equal(result, expected)
+  })
+
+  it("correctly creates a contingency table with custom settings", {
+    # Create test data
+    test_data <- data.frame(
+      treatment = c("A", "A", "B", "B"),
+      survived = c(8, 9, 5, 6),
+      died = c(2, 1, 5, 4)
+    )
+
+    # Expected result with custom settings
+    expected <- matrix(c(17, 11, 3, 9), nrow = 2,
+                       dimnames = list(c("group_A", "group_B"), c("survived", "died")))
+
+    # Test function
+    result <- create_contingency_table(
+      test_data,
+      "treatment",
+      "survived",
+      "died",
+      prefix = "group_",
+      col_names = c("survived", "died")
+    )
+
+    expect_equal(result, expected)
+  })
+
+  it("throws an error when specified columns are not in the data", {
+    test_data <- data.frame(
+      dose = c(0, 0, 1, 1),
+      survived = c(8, 9, 5, 6),  # Different column name
+      dead = c(2, 1, 5, 4)
+    )
+
+    expect_error(create_contingency_table(test_data, "dose", "alive", "dead"),
+                 "One or more specified columns not found in the data")
+  })
+
+  it("throws an error when col_names is not of length 2", {
+    test_data <- data.frame(
+      dose = c(0, 0, 1, 1),
+      alive = c(8, 9, 5, 6),
+      dead = c(2, 1, 5, 4)
+    )
+
+    expect_error(create_contingency_table(test_data, "dose", "alive", "dead",
+                                          col_names = c("success")),
+                 "col_names must be a character vector of length 2")
+  })
+})
+
+
+
+
+describe("compare_to_control_fisher", {
+  library(testthat)
+  it("correctly performs Fisher's exact test with specified column names", {
+    # Create test data
+    set.seed(123)
+    test_data <- data.frame(
+      treatment = c(rep("control", 3), rep("low", 3), rep("high", 3)),
+      survived = c(9, 8, 10, 7, 6, 5, 3, 4, 2),
+      died = c(1, 2, 0, 3, 4, 5, 7, 6, 8)
+    )
+
+    # Run the function
+    result <- compare_to_control_fisher(test_data, "treatment", "survived", "died",
+                                        control_level = "control")
+
+    # Check structure
+    expect_s3_class(result, "data.frame")
+    expect_equal(nrow(result), 2)  # Two non-control treatments
+    expect_equal(result$treatment, c("low", "high"))
+    expect_true(all(c("p_value", "odds_ratio", "ci_lower", "ci_upper", "p_adjusted") %in% names(result)))
+
+    # Verify results manually for one treatment
+    level <- "low"
+    control_success <- sum(test_data$survived[test_data$treatment == "control"])
+    control_failure <- sum(test_data$died[test_data$treatment == "control"])
+    test_success <- sum(test_data$survived[test_data$treatment == level])
+    test_failure <- sum(test_data$died[test_data$treatment == level])
+    cont_table <- matrix(c(control_success, control_failure, test_success, test_failure), nrow = 2, byrow = TRUE)
+    manual_test <- fisher.test(cont_table)
+
+    expect_equal(round(result$p_value[result$treatment == level], 4),
+                 round(manual_test$p.value, 4))
+  })
+
+  it("uses the first level as default control if not specified", {
+    test_data <- data.frame(
+      dose = c(0, 0, 1, 1, 2, 2),
+      alive = c(8, 9, 5, 6, 3, 4),
+      dead = c(2, 1, 5, 4, 7, 6)
+    )
+
+    result <- compare_to_control_fisher(test_data, "dose", "alive", "dead")
+    expect_equal(nrow(result), 2)  # Two non-control doses
+    expect_equal(result$dose, c(1, 2))
+  })
+
+  it("throws an error when control level is not in the data", {
+    test_data <- data.frame(
+      dose = c(1, 1, 2, 2),
+      alive = c(8, 9, 5, 6),
+      dead = c(2, 1, 5, 4)
+    )
+
+    expect_error(compare_to_control_fisher(test_data, "dose", "alive", "dead", control_level = 0),
+                 "Control level 0 not found in the data")
+  })
+
+  it("throws an error when specified columns are not in the data", {
+    test_data <- data.frame(
+      dose = c(0, 0, 1, 1),
+      survived = c(8, 9, 5, 6),
+      dead = c(2, 1, 5, 4)
+    )
+
+    expect_error(compare_to_control_fisher(test_data, "dose", "alive", "dead"),
+                 "One or more specified columns not found in the data")
+  })
+})
+
+
+
+
 describe("calcTaronesTest",{
   it("Tarone's Test can be calculated",{
     mymatrix1 <- matrix(c(4,5,5,103),nrow=2,byrow=TRUE)

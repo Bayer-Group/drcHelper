@@ -91,6 +91,8 @@ navbar:
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
       - text: Count Data
         href: articles/Count_Data.html
+      - text: Normality Check
+        href: articles/Normality-Check.html
     validation:
       text: Validation
       menu:

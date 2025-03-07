@@ -47,3 +47,18 @@ result <- monotonicityTest(mock_data, "treatment_var", "response_var")
 result
 ```
 
+
+## Step-Down Trend Test
+
+A step-down trend test is a sequential testing procedure used to identify the lowest dose level at which a significant trend begins. The process works as follows:
+
+1. Start with all dose groups and test for a trend.
+2. If significant, remove the highest dose group and test again.
+3. Continue this process until either:
+   - The test is no longer significant, indicating you've found the lowest effective dose
+   - Only two groups remain (typically control and lowest dose)
+
+This approach helps identify the No Observed Effect Concentration (NOEC) or Lowest Observed Effect Concentration (LOEC) in dose-response studies.
+
+The function `PMCMRplus::stepDownTrendTest` PMCMRplus implements this strategy for continuous data using various trend tests. For binomial survival data, we'll need to adapt this approach using the Cochran-Armitage test, which is specifically designed for binary outcomes across ordered groups.
+

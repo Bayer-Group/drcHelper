@@ -110,6 +110,11 @@ pander::pander(broom::tidy(res), digits = 2)
 
 ## Limitations
 
+The fundamental issue is that passing a normality test with a small sample size provides very little evidence that the underlying distribution is actually normal. On the other hand, with very large sample size, almost any tiny deviation will be flagged as non-normal. Therefore, it is rather hard to interpret the normality check results meaningfully. 
+
+More importantly, this pre-testing is largely unnecessary since common parametric tests like ANOVA and t-tests are robust to moderate violations of normality due to the Central Limit Theorem. This combination of unreliability in small samples and unnecessary verification of assumptions makes normality testing a questionable practice in many research contexts.
+
+
 For example, mixture of normals (almost-normal in terms of Q-Q plots) cannot be detected easily with small sample size (smaller than 1000) (taken from this post^[https://stats.stackexchange.com/questions/2492/is-normality-testing-essentially-useless]).   
 ```{r}
 x <- replicate(
