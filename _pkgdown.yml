@@ -81,6 +81,8 @@ navbar:
         href: articles/Ordinal-Data.html
       - text: Count Data
         href: articles/Count_Data.html
+      - text: Understanding Mixed Models
+        href: articles/LMM-GLMM-and-GAMM.html
       - text: NLS
         href: articles/Examples using NLS.html
       - text: drda
