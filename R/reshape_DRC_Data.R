@@ -20,6 +20,7 @@ treatment2dose <- function(x){
 #' Reshape the wide data to long data
 #'
 #' @param dat data table with Replicate columns and dose groups
+#' @param replicate_col name of the replicate column or columns need to be retained as identifier columns.
 #'
 #' @return long format of the dat
 #' @export
@@ -30,8 +31,8 @@ reshape_drcData <- function(dat, replicate_col = "Replicates") {
     tidyr::pivot_longer(cols = -all_of(replicate_col),
                  names_to = "Treatment",
                  values_to = "Response") %>%
-    mutate(Dose = treatment2dose(Treatment)) %>%
-    filter(!is.na(Response))
+    mutate(Dose = treatment2dose(.data$Treatment)) %>%
+    filter(!is.na(.data$Response))
 
   return(dat)
 }

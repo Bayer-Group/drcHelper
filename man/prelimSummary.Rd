@@ -8,6 +8,10 @@ prelimSummary(testdata, dose_col = "Dose", response_col = "Response")
 }
 \arguments{
 \item{testdata}{A data frame containing the dose and response data.}
+
+\item{dose_col}{name of the dose column, default being "Dose".}
+
+\item{response_col}{name of the response column.}
 }
 \value{
 A data frame summarizing the mean, standard deviation, percent inhibition, and coefficient of variation for each dose.

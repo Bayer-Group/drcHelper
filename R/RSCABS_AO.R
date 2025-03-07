@@ -49,7 +49,7 @@ get_RS_adj_val <- function(group, replicate, affected, total) {
 
   # Calculate subgroup variances
   subgrp_var <- dat %>%
-    group_by(.data$grp, m, n) %>%
+    group_by(.data$grp, .data$m, .data$n) %>%
     summarize(sum_r2 = sum(.data$r2), .groups = "drop") %>%
     mutate(v = .data$m * .data$sum_r2 / .data$n^2 / (.data$m - 1))
 
@@ -185,8 +185,8 @@ run_RSCA <- function(group, replicate, affected, total,correction=0) {
 #' @param treatment_col Name of the column containing treatment groups (default: "tmt")
 #' @param replicate_col Name of the column containing tank/replicate IDs (default: "tank")
 #' @param total_col Name of the column containing total counts (default: "total")
-#' @param direction Character string indicating threshold direction: "greater" for ≥ threshold,
-#'        "less" for ≤ threshold (default: "greater")
+#' @param direction Character string indicating threshold direction: "greater" for \\ge threshold,
+#'        "less" for \\le threshold (default: "greater")
 #' @param alternative Character string specifying the alternative hypothesis:
 #'        "two.sided" (default), "greater" (proportion increases with treatment level),
 #'        or "less" (proportion decreases with treatment level)
@@ -279,7 +279,7 @@ run_threshold_RSCA <- function(data, threshold,
   } else {
     # Less than or equal to threshold
     selected_cols <- score_cols[score_values <= threshold]
-    threshold_label <- paste0("S≤", threshold)
+    threshold_label <- paste0("S\u2264", threshold)
   }
 
   # Calculate affected counts
@@ -388,8 +388,8 @@ run_threshold_RSCA <- function(data, threshold,
 #' @param treatment_col Name of the column containing treatment groups (default: "tmt")
 #' @param replicate_col Name of the column containing tank/replicate IDs (default: "tank")
 #' @param total_col Name of the column containing total counts (default: "total")
-#' @param direction Character string indicating threshold direction: "greater" for ≥ threshold,
-#'        "less" for ≤ threshold (default: "greater")
+#' @param direction Character string indicating threshold direction: "greater" for \\ge threshold,
+#'        "less" for \\le threshold (default: "greater")
 #' @param alternative Character string specifying the alternative hypothesis:
 #'        "two.sided" (default), "greater" (proportion increases with treatment level),
 #'        or "less" (proportion decreases with treatment level)
@@ -549,7 +549,7 @@ run_all_threshold_tests <- function(data,
       threshold_label <- paste0("S", threshold, "+")
     } else {
       selected_cols <- score_cols[score_values <= threshold]
-      threshold_label <- paste0("S≤", threshold)
+      threshold_label <- paste0("S\u2264", threshold)
     }
 
     # Calculate proportions by treatment
@@ -579,11 +579,12 @@ run_all_threshold_tests <- function(data,
 #' Printing method for run_all_threshold_tests results
 #'
 #' @param x an object from run_all_threshold_tests with class RSCABS
+#' @param ...  print generic function has the signature function(x, ...).
 #'
 #' @return printed results from run_all_threshold_tests
+#' @method print RSCABS
 #' @export
-#'
-print.RSCABS <- function(x){
+print.RSCABS <- function(x,...){
   cat("\nresult table: \n\n")
   print(x$results)
   cat("\n Summarized Proportions: \n")
@@ -612,8 +613,8 @@ print.RSCABS <- function(x){
 #' @param score_cols Character vector of column names containing injury scores (default: NULL, auto-detected)
 #' @param replicate_col Name of the column containing tank/replicate IDs (default: "tank")
 #' @param total_col Name of the column containing total counts (default: "total")
-#' @param direction Character string indicating threshold direction: "greater" for ≥ threshold,
-#'        "less" for ≤ threshold (default: "greater")
+#' @param direction Character string indicating threshold direction: "greater" for \\ge threshold,
+#'        "less" for \\le threshold (default: "greater")
 #' @param alternative Character string specifying the alternative hypothesis:
 #'        "two.sided", "greater" (proportion increases with treatment level),
 #'        or "less" (proportion decreases with treatment level) (default: "greater")
@@ -797,10 +798,12 @@ step_down_RSCABS <- function(data,
 #' Print method for StepDownRSCABS objects
 #'
 #' @param x A StepDownRSCABS object
-#' @param ... Additional arguments (not used)
+#' @param printLowest whether to print the lowest treatment level with significant findings.
+#' @param ... Additional arguments (not used) generic for print method.
 #'
 #' @return Invisibly returns the object
 #' @export
+#' @method print StepDownRSCABS
 print.StepDownRSCABS <- function(x, printLowest=FALSE,...) {
   cat("Step-Down RSCABS Analysis\n")
   cat("========================\n\n")
@@ -855,9 +858,9 @@ plot.StepDownRSCABS <- function(x, ...) {
   })
 
   # Create the plot
-  p <- ggplot(plot_data, aes(x = Threshold, y = Step, fill = -log10(P_value))) +
+  p <- ggplot(plot_data, aes(x = .data$Threshold, y = .data$Step, fill = -log10(.data$P_value))) +
     geom_tile(color = "white") +
-    geom_text(aes(label = sprintf("%.4f", round(P_value, 4))), color = "black", size = 3) +
+    geom_text(aes(label = sprintf("%.4f", round(.data$P_value, 4))), color = "black", size = 3) +
     scale_fill_gradient(low = "white", high = "steelblue",
                         name = "-log10(p-value)") +
     scale_y_reverse(breaks = seq_along(step_labels),

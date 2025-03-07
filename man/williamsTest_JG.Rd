@@ -33,5 +33,6 @@ x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
 g <- gl(3,5)
 levels(g) <- c("0", "I", "II")
 PMCMRplus::williamsTest(x ~ g)
-williamsTest_JG(data.frame(treatment_var = g,response_var=x),"response_var","treatment_var",direction="increasing")
+williamsTest_JG(data.frame(treatment_var = g,response_var=x),
+"response_var","treatment_var",direction="increasing")
 }

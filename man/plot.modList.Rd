@@ -5,7 +5,7 @@
 \title{Plot a list of models together.}
 \usage{
 \method{plot}{modList}(
-  modList,
+  x,
   respLev = NULL,
   data = NULL,
   xmin,
@@ -20,7 +20,7 @@
 )
 }
 \arguments{
-\item{modList}{list of drc models.}
+\item{x}{a list of drc models with modList class.}
 
 \item{respLev}{to be calculated ECx levels, for example, c(10,20,50).}
 
@@ -40,6 +40,10 @@ confidence bands}
 
 \item{xbreaks}{breaks in x-axis labeling}
 
+\item{ymin}{minimum of y}
+
+\item{ymax}{max of y}
+
 \item{...}{addition parameters to be passed into plotting functions or
 user input when the use does not want to use the
 data provided in the modList}
@@ -52,5 +56,14 @@ Plot a list of models together.
 }
 \examples{
 \dontrun{
+data("dat_medium")
+dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium$Response[dat_medium$Response < 0] <- 0
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+p <- plot.modList(modList[1:3])
+p
 }
 }

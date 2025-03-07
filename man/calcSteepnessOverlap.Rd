@@ -20,6 +20,8 @@ mod should set to be NULL in this case}
 
 \item{trend}{"Decrease" or "Increase"}
 
+\item{CI}{method to calculate CI, either "inv" (bmd) or "delta" or "fls".}
+
 \item{...}{other parameters that will be passed into ED.plus}
 }
 \value{

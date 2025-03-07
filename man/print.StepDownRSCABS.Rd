@@ -9,7 +9,9 @@
 \arguments{
 \item{x}{A StepDownRSCABS object}
 
-\item{...}{Additional arguments (not used)}
+\item{printLowest}{whether to print the lowest treatment level with significant findings.}
+
+\item{...}{Additional arguments (not used) generic for print method.}
 }
 \value{
 Invisibly returns the object

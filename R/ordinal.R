@@ -6,7 +6,9 @@
 #' This function calculates the EC50 (the dose at which 50% of the maximum effect is observed)
 #' from a fitted model. It supports generalized linear models (GLMs) and generalized linear mixed models (GLMMs).
 #'
-#' @param mod A fitted model object. This can be of class "glm" or "glmmPQL", or other models compatible with the `ED` function.
+#' @param mod A fitted model object. This can be of class "glm" or "glmmPQL",
+#'  or other models compatible with the `ED` function.
+#' @param approximate logical, passing into backCalcSE
 #'
 #' @return A data frame containing the following columns:
 #' \item{EC50}{The estimated EC50 value.}
@@ -44,7 +46,8 @@ getEC50 <- function(mod,approximate = FALSE){
                         upper=exp(res1[1]+1.96*se),se=SE)
     }else{
       res1 <- ED(mod,50,interval="delta")
-      res <- data.frame(EC50=res1[1,"Estimate"],lower=res1[1,"Lower"],upper=res1[1,"Upper"],se=res1[1,"Std. Error"])
+      res <- data.frame(EC50=res1[1,"Estimate"],lower=res1[1,"Lower"],
+                        upper=res1[1,"Upper"],se=res1[1,"Std. Error"])
 
     }
   }
@@ -65,7 +68,8 @@ getEC50 <- function(mod,approximate = FALSE){
 #' @examples
 #' # Assuming `glmm_model` is a fitted glmmPQL model
 #' ## library(MASS)
-#' glmm_model <- MASS::glmmPQL(yt ~ dose,random= ~1 | Obs,family= quasibinomial(link="logit"),data=pvi_example)
+#' glmm_model <- MASS::glmmPQL(yt ~ dose,random= ~1 | Obs,family= quasibinomial(link="logit"),
+#' data=pvi_example)
 #' dose_result <- dose.p.glmmPQL(glmm_model)
 #' print(dose_result)
 #'
@@ -89,7 +93,8 @@ dose.p.glmmPQL <- function(obj,cf=1:2,p=0.5){
 #'
 #' @param se The standard error of the logarithm.
 #' @param mu The mean of the logarithm.
-#' @param approximate Logical. If TRUE, uses an approximation; otherwise, calculates based on the variance of the lognormal distribution.
+#' @param approximate Logical. If TRUE, uses an approximation;
+#' otherwise, calculates based on the variance of the lognormal distribution.
 #'
 #' @return The back-calculated standard error.
 #' @export
@@ -123,6 +128,7 @@ backCalcSE <- function(se,mu,approximate = FALSE){
 #' @param total_col Name of the column containing total counts (default: "total")
 #'
 #' @return A data frame with individual fish records
+#' @importFrom tidyselect all_of
 #' @export
 expand_to_individual_tidy <- function(data, treatment_col = "tmt", replicate_col = "tank",
                                       score_prefix = "S", total_col = "total") {
@@ -156,10 +162,11 @@ expand_to_individual_tidy <- function(data, treatment_col = "tmt", replicate_col
       names_to = "score",
       values_to = "count_weight"  # Use a specific name for the count column
     ) %>%
-    dplyr::filter(count_weight > 0) %>%
+    dplyr::filter(.data$count_weight > 0) %>%
     dplyr::select(tidyselect::all_of(c(treatment_col, replicate_col, "score", "count_weight"))) %>%
-    tidyr::uncount(weights = count_weight) %>%  # Use the specific column name
-    dplyr::arrange(.data[[treatment_col]], .data[[replicate_col]])
+    tidyr::uncount(weights = .data$count_weight) %>%  # Use the specific column name
+    dplyr::arrange(.data[[treatment_col]], .data[[replicate_col]]) %>%
+    dplyr::select(-tidyselect::all_of("count_weight")) ## remove the count-weight column
 
   return(result)
 }

@@ -25,9 +25,9 @@ prelimPlot3(
 
 \item{a}{the quantile for corresponding CI for mean. default is qnorm(0.975).}
 
-\item{response_col}{name of the response column. description}
+\item{dose_col}{name of the dose column, default being "Dose".}
 
-\item{dosecol}{name of the dose column, default being "Dose".  description}
+\item{response_col}{name of the response column.}
 }
 \value{
 A ggplot object.

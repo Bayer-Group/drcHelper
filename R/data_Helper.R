@@ -42,14 +42,15 @@ simplifyTreatment <- function(trt) {
 }
 
 
-#' change from wide format to long format
+#' Change from an expected wide format to long format
 #'
 #' @param widedat data in wide format
-#' @param cnames whether to use the 1st row as the column names,
+#' @param cnames logical,1 or 0, whether to use the 1st row as the column names,
 #' 1 means 1st row need to be converted to headers
-#' @param whether the 1st column is the Replicates column
+#' @param repnames whether the 1st column is the Replicates column
 #'
 #' @return a dataframe in long format
+#' @keywords internal
 #' @examples
 #' # Create a sample wide dataset
 #' widedat <- data.frame(
@@ -75,6 +76,6 @@ wide2long <- function(widedat, cnames = 1, repnames = 1) {
   }
 
   longdat$Response <- as.numeric(longdat$Response)
-  longdat <- longdat |> dplyr::filter(!is.na(Response))
+  longdat <- longdat |> dplyr::filter(!is.na(.data$Response))
   return(longdat)
 }

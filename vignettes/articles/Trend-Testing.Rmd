@@ -13,6 +13,22 @@ knitr::opts_chunk$set(
 library(drcHelper)
 ```
 
+## Background
+
+**What is a trend test**
+
+A trend test is used to detect a monotonic trend across ordered groups. It's particularly useful in dose-response studies to identify whether increasing doses lead to a systematic change in response.
+
+The prerequisite for a trend test is that the relationship is monotonic, either consistently increasing or decreasing. These trend tests are specifically designed to detect trends, making it a bit more powerful than general tests when a trend exists.
+
+The disadvantage is that it does not consider the magnitude of the change across the ordered groups, leading to unexpected identification of significance when there It is also less informative or even give counter-intuitive results if the relationship is not monotonic or if the groups are not naturally ordered.
+
+
+## Some concerns
+
+In lots of the decision flowcharts, step down trend test are performed after a monotonicity test passes, which is logically strange, since monotonicity test itself is also a type of trend test. For example, jonckeehre terpstra test after linear contrast is significant in monotonicity test or quadratic contrast is significant in monotonicity test. 
+
+
 ## Trend Test by Testing Linear and Quadratic Contrasts
 
 Generate mock data for testing

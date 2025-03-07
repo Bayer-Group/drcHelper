@@ -4,10 +4,12 @@
 \alias{print.RSCABS}
 \title{Printing method for run_all_threshold_tests results}
 \usage{
-\method{print}{RSCABS}(x)
+\method{print}{RSCABS}(x, ...)
 }
 \arguments{
 \item{x}{an object from run_all_threshold_tests with class RSCABS}
+
+\item{...}{print generic function has the signature function(x, ...).}
 }
 \value{
 printed results from run_all_threshold_tests

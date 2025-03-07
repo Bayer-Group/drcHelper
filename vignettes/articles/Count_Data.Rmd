@@ -10,11 +10,53 @@ author: "Zhenglei Gao"
 
 ## Testing Approaches
 
-###  Fisher's Exact Test for Count Data
+Usually for count data, we treat them as continuous and sometimes do transformations so that the variance is stablized across the treatment groups to derive an NOEC. Transformation of data need also careful interpretation of the effect size estimation and the corresponding confidence intervals. There is also a relatively new approach proposed called CPCAT. Its application domain is however limited as it is only valid for strictly Poisson data, which is not validated or used in this package.
+
+### Poisson or Non-Poisson?
+
+To understand this, we have to think about what is a Poisson distribution and what this distribution describes. It actually emerges from the basic properties of the natural counting process. For example, when you count the number of customers arriving at a store, the number of defects in manufacturing, the number of rare events in a fixed time period, the number of occurrences in a fixed spatial area. The assumptions behind these counting processes are:
+
+- Events occur independently.
+- Events occur at a constant average rate
+- Events cannot occur exactly simultaneously
+- The probability of an event is proportional to the time interval
+
+The key parameter for Poisson distribution is the mean, which is actually the rate parameter $\lamda$. Poisson distribution also has this particular mean-variance relationship, as in many real-world counting processes, the variability (variance) increases with the average count (mean). The Poisson distribution naturally captures this through its unique property where the mean equals the variance. However, when the assumptions of independence or constant rate are violated, or when there's overdispersion (variance exceeding the mean), other distributions like the Negative Binomial might be more appropriate.
+
+Actually, I would say that Poisson distribution is very often not the most appropriate choice for modeling pitfall trap counts or soil core counts of soil organisms. Here's why:
+
+1. Violation of Independence:
+  - Soil organisms typically show aggregated distributions
+  - Individuals are not randomly distributed but cluster in favorable microhabitats
+  - Social behavior and environmental preferences lead to spatial clustering
+2. Non-constant Rate:
+  - Abundance vary with environmental conditions
+  - Seasonal and daily patterns affect capture or sampling probability
+  - Spatial heterogeneity in habitat quality influences distribution
+3. Overdispersion and underdispersion
+  - Variance in counts typically exceeds the mean. (underdispersion could also occure by chance or lots of zeros for certain species)
+  - Clustering behavior leads to more extreme counts than expected under Poisson
+  - Environmental heterogeneity increases variability
+4. Heterogeneous variance across treatment groups.
+  - Often the approaches assuming Poisson, like CPCAT, also starting from a common mean with a common variance in the null distribution, neither of them could be true in reality.
+
+More appropriate approaches for modelling might be Negative Binomial distribution (handles overdispersion),y zro-inflated models (if many zero counts), mixed models (to account for spatial and temporal dependencies), spatial point process models (to explicitly account for spatial patterns). 
+
+  
+
+As an example, a Poisson distribution with rate of 100 in time window 1, a count of 137 is very unlikely coming from this distribution but 120 could possibly be occuring with 95% confidence level. On the other hand, it would be rare to oberve 120 from a normal distribution with 100 mean and sd 10. Similarly for small numbers, like a mean of 4 and sd of 2, 8 is more likely to be observed from a Poisson but not from a normal distribution. 
 
 ```{r}
+###  Fisher's Exact Test for Count Data
+poisson.test(120, 1,r=100)
+pnorm(120,mean=100,sd=10)
 
+poisson.test(8, 1,r=4)
+pnorm(8,mean=4,sd=2)
 ```
+
+
+
 
 ### Data Transformation
 

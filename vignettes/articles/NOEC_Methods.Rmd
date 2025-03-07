@@ -1,5 +1,5 @@
 ---
-title: "NOEC Calculation"
+title: "NOEC Calculation for Continuous Data"
 description: | 
   General ethods for NOEC calculations for dose-response studies
 date: December 4, 2024
@@ -36,6 +36,11 @@ It is relatively straightforward to calulate and intepret NOEC, and it is widely
 2. The observed responses at the NOEC vary between studies, making it harder to compare studies as ECx values.
 3. NOEC approach does not take the test concentrations as continuous variable, therefore not allow the estimation/prediction of response at any test concentrations.
 4. It is heavily impacted by the sample size and test concentration selections. Poor experimental design may yield high NOEC due to decreased statistical sensitivity, which is not desired in a regulatory context.
+
+
+In this article, we focus on NOEC methods for continuous data, which can also be applied to count data. This can be achieved either by simply treating count data as continuous or by transforming the data to stabilize the variance. 
+
+Continuous data are numerical data that can take any value within a range (e.g., weight, height), while count data are discrete and represent the number of occurrences of an event (e.g., number of species observed in a pitfall). It is hard to determine a distribution of count data in real world. Poisson, negative-binomial are common distributions used to model count data. The Poisson distribution is often used when the mean and variance are equal, while the negative-binomial distribution is used when the data exhibit overdispersion (variance greater than the mean). Many count datasets have more zeros than expected under standard count models, leading to zero-inflated models or hurdle models that account for this excess. Small sample sizes can make it difficult to determine the underlying distribution of the data and can affect the robustness of statistical methods. There are also other challenges like non-constant variance that does not follow a mean variance relationship, issues caused by censoring or truncation, etc. Therefore, transformations, such as logarithmic or square root transformations, are often used to stabilize variance and meet the assumptions of standard statistical tests for continuous data when dealing with non-normal data distributions.
 
 ### Methods for deriving NOEC 
 

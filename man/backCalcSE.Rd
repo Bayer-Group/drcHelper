@@ -11,7 +11,8 @@ backCalcSE(se, mu, approximate = FALSE)
 
 \item{mu}{The mean of the logarithm.}
 
-\item{approximate}{Logical. If TRUE, uses an approximation; otherwise, calculates based on the variance of the lognormal distribution.}
+\item{approximate}{Logical. If TRUE, uses an approximation;
+otherwise, calculates based on the variance of the lognormal distribution.}
 }
 \value{
 The back-calculated standard error.

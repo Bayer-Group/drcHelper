@@ -55,7 +55,7 @@ plot(mod,type="all")
 res <- mselect.plus(mod,fctList = fctList )
 modList <- res$modList
 edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend=datTn$Trend_Yield[1])
-plot.edList(edResTab)
+plot_edList(edResTab)
 resComp <- drcCompare(modRes = res,trend="Decrease")
 ```
 

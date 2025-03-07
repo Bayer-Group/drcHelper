@@ -36,9 +36,9 @@
 
 \item{range}{using Percentage, not used for now.}
 
-\item{...}{other parameters for ED function}
+\item{CI}{methods to calculate the confidence intervals, either "inv", "bmd-inv",(bmd) or "delta" or "fls".}
 
-\item{interval}{methods to calculate the confidence intervals!}
+\item{...}{other parameters for ED function}
 }
 \value{
 Back calculated regulatory ECx
@@ -53,6 +53,15 @@ Due to old ECxHelper development where ED.plus is defined as ED.ZG
 }
 \examples{
 \dontrun{
+data("dat_medium")
+dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium$Response[dat_medium$Response < 0] <- 0
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(10,50),trend="Decrease")
 }
 }
 \seealso{

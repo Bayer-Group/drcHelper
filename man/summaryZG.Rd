@@ -9,6 +9,8 @@ summaryZG(object, verbose = F, ...)
 \arguments{
 \item{object}{William test result object}
 
+\item{verbose}{whether to print intermediate results.}
+
 \item{...}{additional parameters to be passed into the function, placeholder}
 }
 \value{

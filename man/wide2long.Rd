@@ -2,23 +2,23 @@
 % Please edit documentation in R/data_Helper.R
 \name{wide2long}
 \alias{wide2long}
-\title{change from wide format to long format}
+\title{Change from an expected wide format to long format}
 \usage{
 wide2long(widedat, cnames = 1, repnames = 1)
 }
 \arguments{
 \item{widedat}{data in wide format}
 
-\item{cnames}{whether to use the 1st row as the column names,
+\item{cnames}{logical,1 or 0, whether to use the 1st row as the column names,
 1 means 1st row need to be converted to headers}
 
-\item{whether}{the 1st column is the Replicates column}
+\item{repnames}{whether the 1st column is the Replicates column}
 }
 \value{
 a dataframe in long format
 }
 \description{
-change from wide format to long format
+Change from an expected wide format to long format
 }
 \examples{
 # Create a sample wide dataset
@@ -29,3 +29,4 @@ widedat <- data.frame(
 )
 drcHelper:::wide2long(widedat, cnames = FALSE)
 }
+\keyword{internal}

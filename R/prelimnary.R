@@ -8,8 +8,8 @@
 #' @param ylab A string for the y-axis label. Default is "Response".
 #' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
-#' @param dose_col name of the dose column, default being "Dose".  description
-#' @param response_col name of the response column. description
+#' @param dose_col name of the dose column, default being "Dose".
+#' @param response_col name of the response column.
 #' @return A ggplot object.
 #' @import ggplot2
 #' @export
@@ -60,24 +60,24 @@ prelimPlot1 <- function(testdata, dose_col = "Dose", response_col = "Response",
 #' @param ylab A string for the y-axis label. Default is "Response".
 #' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
-#' @param dosecol name of the dose column, default being "Dose".  description
-#' @param response_col name of the response column. description
+#' @param dose_col name of the dose column, default being "Dose".
+#' @param response_col name of the response column.
 #' @return A ggplot object.
 #' @import ggplot2
 #' @import scales
 #' @export
 prelimPlot2 <- function(testdata, ylab = "Response", xlab = "Test Concentration [nominal, mg a.s./L]",
-                        title = "Measured Variable", dosecol = "Dose",response_col="Response") {
+                        title = "Measured Variable", dose_col = "Dose",response_col="Response") {
 
   ilog1p <- function(x) {
     exp(x) - 1
   }
-
+  testdata[[dose_col]] <- as.numeric(as.character(testdata[[dose_col]]))
   # Get unique doses and sort them
-  doses <- sort(unique(testdata[[dosecol]]))
+  doses <- sort(unique(testdata[[dose_col]]))
 
   # Create the plot using ggplot2 with .data pronoun
-  p <- ggplot(testdata, aes(x = .data[[dosecol]], y = .data[[response_col]])) +
+  p <- ggplot(testdata, aes(x = .data[[dose_col]], y = .data[[response_col]])) +
     geom_point() +
     ylab(ylab) +
     xlab(xlab) +
@@ -98,9 +98,8 @@ prelimPlot2 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
 #' @param xlab A string for the x-axis label. Default is `"Test Concentration [nominal, mg a.s./L]"`.
 #' @param title A string for the plot title. Default is "Measured Variable".
 #' @param a the quantile for corresponding CI for mean. default is qnorm(0.975).
-#' @param dosecol name of the dose column, default being "Dose".  description
-#' @param response_col name of the response column. description
-#'
+#' @param dose_col name of the dose column, default being "Dose".
+#' @param response_col name of the response column.
 #' @return A ggplot object.
 #' @import ggplot2
 #' @import dplyr
@@ -116,14 +115,15 @@ prelimPlot3 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
   }
 
   # Create the initial plot
-  p <- prelimPlot1(testdata = testdata, ylab = ylab, xlab = xlab, title = title)
+  p <- prelimPlot1(testdata = testdata, dose_col = dose_col, response_col=response_col,
+                   ylab = ylab, xlab = xlab, title = title)
 
   # Summarize the data
   datsum <- testdata %>%
     group_by(.data[[dose_col]]) %>%
     summarise(mean = mean(.data[[response_col]]),
               SE = sd(.data[[response_col]]) / sqrt(length(.data[[response_col]]))) %>%
-    mutate(Lower = mean - a * SE, Upper = mean + a * SE)
+    mutate(Lower = .data$mean - a * .data$SE, Upper = .data$mean + a * .data$SE)
 
   # Add points and error bars to the plot
   p <- p +
@@ -134,7 +134,7 @@ prelimPlot3 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
                col = "red", size = 3, shape = 24, fill = "pink") +
     geom_errorbar(data = datsum,
                   aes(x = as.numeric(as.factor(.data[[dose_col]])) + 0.15,
-                      y = mean, ymin = Lower, ymax = Upper),
+                      y = mean, ymin = .data$Lower, ymax = .data$Upper),
                   col = "red", position = position_dodge(width = 0.9), width = .1)
 
   return(p)
@@ -146,6 +146,8 @@ prelimPlot3 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
 #' This function calculates the mean response, standard deviation, percent inhibition, and coefficient of variation for each dose level.
 #'
 #' @param testdata A data frame containing the dose and response data.
+#' @param dose_col name of the dose column, default being "Dose".
+#' @param response_col name of the response column.
 #' @return A data frame summarizing the mean, standard deviation, percent inhibition, and coefficient of variation for each dose.
 #' @import dplyr
 #' @keywords PrelimnaryAssessments
@@ -168,8 +170,8 @@ prelimSummary <- function(testdata, dose_col = "Dose", response_col = "Response"
     group_by(.data[[dose_col]]) %>%
     summarise(Mean = mean(.data[[response_col]], na.rm = TRUE),
               SD = sd(.data[[response_col]], na.rm = TRUE)) %>%
-    mutate(`% Inhibition` = -((Mean - ctr0) / ctr0) * 100,
-           CV = SD / Mean * 100)
+    mutate(`% Inhibition` = -((.data$Mean - ctr0) / ctr0) * 100,
+           CV = .data$SD / .data$Mean * 100)
 
   return(sres)
 }

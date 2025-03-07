@@ -9,7 +9,7 @@ prelimPlot2(
   ylab = "Response",
   xlab = "Test Concentration [nominal, mg a.s./L]",
   title = "Measured Variable",
-  dosecol = "Dose",
+  dose_col = "Dose",
   response_col = "Response"
 )
 }
@@ -22,9 +22,9 @@ prelimPlot2(
 
 \item{title}{A string for the plot title. Default is "Measured Variable".}
 
-\item{dosecol}{name of the dose column, default being "Dose".  description}
+\item{dose_col}{name of the dose column, default being "Dose".}
 
-\item{response_col}{name of the response column. description}
+\item{response_col}{name of the response column.}
 }
 \value{
 A ggplot object.

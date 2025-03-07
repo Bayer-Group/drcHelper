@@ -20,6 +20,27 @@ monotonicity table
 The function is adapted from the archived version of StatCharrms developed by
 Joe Swintek et al with CC0 license. It is not updated anymore and included
 for validation purpose. There are other ways to perform a trend test.
+This function tests whether a dose-response relationship follows a monotonic
+trend (consistently increasing or decreasing) by analyzing both linear and
+quadratic components of the relationship.
+}
+\details{
+The test first applies a rank transformation to the response variable using
+the rankTransform function, which implements Blom's method (equivalent to
+SAS PROC RANK with NORMAL=BLOM). Next it creates linear and quadratic
+contrasts using the getLineContrast and getQuadContrast functions. Then it
+fits an ANOVA model using the transformed response variable and extracts
+the summary statistics from the ANOVA model.
+
+Interpretations:
+If only the linear component is significant: Strong evidence for monotonicity.
+If both linear and quadratic components are significant: The relationship is
+monotonic but with curvature. If only the quadratic component is significant:
+The relationship is likely non-monotonic (e.g., U-shaped). If neither
+component is significant: No clear dose-response relationship detected
+
+Note that contrasts<- need to be imported from stats.This is a function
+that is used to set contrasts on factors.
 }
 \examples{
 \dontrun{
@@ -27,10 +48,12 @@ x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
 136, 139, 149, 160, 174)
 g <- gl(3,5)
 levels(g) <- c("0", "I", "II")
-monotonicityTest(data.frame(treatment_var = g,response_var=x), "treatment_var", "response_var")
+monotonicityTest(data.frame(treatment_var = g,response_var=x),
+"treatment_var", "response_var")
 mock_data <- data.frame(
 treatment_var = factor(rep(c("Control", "Dose1", "Dose2", "Dose3"), each = 10)),
-response_var = c(rnorm(10, mean = 5), rnorm(10, mean = 7), rnorm(10, mean = 8), rnorm(10, mean = 10))
+response_var = c(rnorm(10, mean = 5), rnorm(10, mean = 7),
+rnorm(10, mean = 8), rnorm(10, mean = 10))
 )
 monotonicityTest(mock_data, "treatment_var", "response_var")
 }

@@ -69,6 +69,13 @@ Due to old ECxHelper development where mselect.plus is defined as mselect.ZG
 }
 \examples{
 \dontrun{
+data("dat_medium")
+dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium$Response[dat_medium$Response < 0] <- 0
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
 }
 }
 \keyword{Deprecated}

@@ -39,5 +39,7 @@ Imports:
     rlang,
     MASS,
     stringr,
-    tidyselect
+    tidyselect,
+    rstatix,
+    tibble
 Remotes: DoseResponse/bmd

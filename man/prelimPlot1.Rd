@@ -16,9 +16,9 @@ prelimPlot1(
 \arguments{
 \item{testdata}{A data frame containing the dose and response data.}
 
-\item{dose_col}{name of the dose column, default being "Dose".  description}
+\item{dose_col}{name of the dose column, default being "Dose".}
 
-\item{response_col}{name of the response column. description}
+\item{response_col}{name of the response column.}
 
 \item{ylab}{A string for the y-axis label. Default is "Response".}
 

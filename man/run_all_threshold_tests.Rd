@@ -32,8 +32,8 @@ run_all_threshold_tests(
 
 \item{total_col}{Name of the column containing total counts (default: "total")}
 
-\item{direction}{Character string indicating threshold direction: "greater" for ≥ threshold,
-"less" for ≤ threshold (default: "greater")}
+\item{direction}{Character string indicating threshold direction: "greater" for \\ge threshold,
+"less" for \\le threshold (default: "greater")}
 
 \item{alternative}{Character string specifying the alternative hypothesis:
 "two.sided" (default), "greater" (proportion increases with treatment level),

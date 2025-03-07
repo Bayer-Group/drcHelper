@@ -7,7 +7,10 @@
 getEC50(mod, approximate = FALSE)
 }
 \arguments{
-\item{mod}{A fitted model object. This can be of class "glm" or "glmmPQL", or other models compatible with the \code{ED} function.}
+\item{mod}{A fitted model object. This can be of class "glm" or "glmmPQL",
+or other models compatible with the \code{ED} function.}
+
+\item{approximate}{logical, passing into backCalcSE}
 }
 \value{
 A data frame containing the following columns:

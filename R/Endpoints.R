@@ -73,6 +73,7 @@ pavaMean <- function(x,g,alternative = "greater"){
 #' Summary Williams Test results.
 #'
 #' @param object William test result object
+#' @param verbose whether to print intermediate results.
 #' @param ... additional parameters to be passed into the function, placeholder
 #'
 #' @return William test results
@@ -169,7 +170,7 @@ summaryZG <- function (object, verbose=F,...)
 #' res <- PMCMRplus::williamsTest(x ~ g)
 #' getwilliamRes(res)
 getwilliamRes <- function(william,n=NULL){
-  if(inherits(william,"class")=="try-error"){
+  if(inherits(william,"try-error")){
     if(is.null(n)) stop("when the test does not return a valid results, you need to specify
                         the number of hypotheses. ")
     return(rep(NA,n=n))
@@ -290,7 +291,7 @@ contEndpoint <- function(paov,pks,pnormal,phomogeneity,monotonicity,william,dunn
   }else{ ## monotonic
     if(pnormal>0.05 & phomogeneity>0.05){
       ## check if PAVA Problem!
-      if(class(william)!="try-error"){
+      if(!inherits(william,"try-error")){
        # pvals <- as.character(summaryZG(william)$decision)
         #pvals <- as.numeric(plyr::mapvalues(pvals,from=c("accept","reject"),to=c(0.2,0.01)))
         pvals <- william
@@ -312,7 +313,4 @@ contEndpoint <- function(paov,pks,pnormal,phomogeneity,monotonicity,william,dunn
   return(NOEC)
 }
 
-## find / -type f -exec grep -H 'text-to-find-here' {} \;
-## grep -rnw '/path/to/somewhere/' -e 'contEndpoint'
 
-## find . -name "*.Rmd" | xargs -d '\n' grep -i "contEndpoint"

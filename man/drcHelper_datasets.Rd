@@ -4,6 +4,7 @@
 \name{williamsTestLookUpTable}
 \alias{williamsTestLookUpTable}
 \alias{test_cases_data}
+\alias{test_cases_res}
 \alias{dat_shallow}
 \alias{dat_steep}
 \alias{dat_medium}
@@ -13,6 +14,8 @@
 An object of class \code{data.frame} with 119 rows and 19 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 768 rows and 17 columns.
+
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 5950 rows and 15 columns.
 
 An object of class \code{data.frame} with 50 rows and 2 columns.
 
@@ -27,6 +30,8 @@ williamsTestLookUpTable
 
 test_cases_data
 
+test_cases_res
+
 dat_shallow
 
 dat_steep
@@ -39,6 +44,8 @@ dat_noED50
 Williams Test Lookup Table
 
 test_cases_data for validation purpose
+
+test_cases_res for validation purpose
 
 example data with shallow dose-response
 

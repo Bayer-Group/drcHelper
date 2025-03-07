@@ -122,5 +122,21 @@ NULL
 "pvi_example"
 
 
+#' Fake data as an example of PVI data
+#'
+#' @docType data
+#' @keywords datasets
+#' @format pvi data
+"dat_bcs1"
 
 
+#' Data from heavy metal mixture experiments (drcData)
+#'
+#' Data are from a study of the response of the cyanobacterial
+#' self-luminescent metallothionein-based whole-cell biosensor
+#' Synechoccocus elongatus PCC 7942 pBG2120 to binary mixtures of
+#' 6 heavy metals (Zn, Cu, Cd, Ag, Co and Hg).
+#'
+#' @docType data
+#' @keywords datasets
+"metaldata"

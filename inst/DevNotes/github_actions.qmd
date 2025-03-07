@@ -25,8 +25,4 @@ Found the following apparent S3 methods exported but not registered:
     ‘NTA_Ar_ext_mortality_expected’ ‘NTP_example_rate_expected’
     ‘rankTransform’ ‘test_cases_data’ ‘test_cases_res’
     ‘williamsTestLookUpTable’
-  Undocumented data sets:
-    ‘NTA_Ar_ext_mortality_expected’ ‘NTP_example_rate_expected’
-    ‘dat_bcs1’ ‘dat_medium’ ‘dat_noED50’ ‘dat_shallow’ ‘dat_steep’
-    ‘exampleHistData’ ‘metaldata’ ‘test_cases_data’ ‘test_cases_res’
-    ‘williamsTestLookUpTable’
+## Undocumented data sets:

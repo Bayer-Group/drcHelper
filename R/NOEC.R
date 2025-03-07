@@ -1,66 +1,175 @@
 ## Function to calculate NOECs using multiple methods and broomed together
-
-
-
 ## Unit Testing in # FILE: tests/testthat/test_quantal_categorical.R
 
-#' Tarone's Z Test
+
+
+#' Calculate NOEC Using Many-to-one Pairwise Tests
 #'
-#' Tests the goodness of fit of the binomial distribution.
+#' This function calculates the No Observed Effect Concentration (NOEC) from dose response data
+#' using pairwise comparison tests from the rstatix package.
 #'
-#' @param M Counts
-#' @param N Trials
+#' @param data A data frame containing the dose response data
+#' @param response The name of the response variable (unquoted)
+#' @param dose The name of the dose variable (unquoted)
+#' @param control The level of the dose variable to be used as control
+#' @param test The statistical test to use: "t.test" or "wilcox.test"
+#' @param p_adjust_method Method for p-value adjustment for multiple comparisons
+#' @param alternative Direction of the alternative hypothesis: "two.sided", "greater", or "less"
+#' @param alpha Significance level (default: 0.05)
 #'
-#' @return a \code{htest} object
-#'
-#' @author \href{https://stats.stackexchange.com/users/173082/reinstate-monica}{Ben O'Neill}
-#' @references \url{https://stats.stackexchange.com/a/410376/6378} and
-#' R. E. TARONE, Testing the goodness of fit of the binomial distribution, Biometrika, Volume 66, Issue 3, December 1979, Pages 585–590, \url{https://doi.org/10.1093/biomet/66.3.585}
-#' @importFrom stats pnorm
+#' @return A list containing the NOEC value and the full test results
 #' @export
-#' @examples
-#'  #Generate example data
-#' N <- c(30, 32, 40, 28, 29, 35, 30, 34, 31, 39)
-#' M <- c( 9, 10, 22, 15,  8, 19, 16, 19, 15, 10)
-#' Tarone.test(N, M)
-Tarone.test <- function(N, M) {
+#'
+#' @importFrom dplyr mutate filter arrange %>%
+#' @importFrom rlang enquo quo_name .data
+#' @importFrom rstatix t_test wilcox_test
+#' @importFrom stats as.formula setNames
+calculate_noec_rstatix <- function(data, response, dose, control = "0",
+                                   test = c("t.test", "wilcox.test"),
+                                   p_adjust_method = "holm",
+                                   alternative = "two.sided",
+                                   alpha = 0.05) {
 
-  #Check validity of inputs
-  if(!(all(N == as.integer(N)))) { stop("Error: Number of trials should be integers"); }
-  if(min(N) < 1) { stop("Error: Number of trials should be positive"); }
-  if(!(all(M == as.integer(M)))) { stop("Error: Count values should be integers"); }
-  if(min(M) < 0) { stop("Error: Count values cannot be negative"); }
-  if(any(M > N)) { stop("Error: Observed count value exceeds number of trials"); }
+  # Match test argument
+  test <- match.arg(test)
 
-  #Set description of test and data
-  method      <- "Tarone's Z test";
-  data.name   <- paste0(deparse(substitute(M)), " successes from ",
-                        deparse(substitute(N)), " trials");
+  # Capture variable names using rlang
+  response_var <- rlang::enquo(response)
+  dose_var <- rlang::enquo(dose)
+  response_name <- rlang::quo_name(response_var)
+  dose_name <- rlang::quo_name(dose_var)
 
-  #Set null and alternative hypotheses
-  null.value  <- 0;
-  attr(null.value, "names") <- "dispersion parameter";
-  alternative <- "greater";
+  # Ensure dose is a factor
+  if (!is.factor(data[[dose_name]])) {
+    data[[dose_name]] <- as.factor(data[[dose_name]])
+  }
 
-  #Calculate test statistics
-  estimate    <- sum(M)/sum(N);
-  attr(estimate, "names") <- "proportion parameter";
-  S           <- ifelse(estimate == 1, sum(N),
-                        sum((M - N*estimate)^2/(estimate*(1 - estimate))));
-  statistic   <- (S - sum(N))/sqrt(2*sum(N*(N-1)));
-  attr(statistic, "names") <- "z";
+  # Create formula
+  formula_obj <- stats::as.formula(paste(response_name, "~", dose_name))
 
-  #Calculate p-value
-  p.value     <- 2*pnorm(-abs(statistic), 0, 1);
-  attr(p.value, "names") <- NULL;
+  # Run the appropriate test
+  if (test == "t.test") {
+    test_results <- rstatix::t_test(
+      data = data,
+      formula = formula_obj,
+      ref.group = control,
+      p.adjust.method = p_adjust_method,
+      alternative = alternative
+    )
+  } else if (test == "wilcox.test") {
+    test_results <- rstatix::wilcox_test(
+      data = data,
+      formula = formula_obj,
+      ref.group = control,
+      p.adjust.method = p_adjust_method,
+      alternative = alternative
+    )
+  }
 
-  #Create htest object
-  TEST        <- list(method = method, data.name = data.name,
-                      null.value = null.value, alternative = alternative,
-                      estimate = estimate, statistic = statistic, p.value = p.value);
-  class(TEST) <- "htest";
-  TEST;
+  # Extract dose levels and convert to numeric for sorting
+  dose_levels <- levels(data[[dose_name]])
+  numeric_doses <- suppressWarnings(as.numeric(dose_levels))
+
+  # If conversion to numeric was successful, reorder the test results
+  if (!any(is.na(numeric_doses))) {
+    # Create a mapping from dose level to numeric value
+    dose_mapping <- stats::setNames(numeric_doses, dose_levels)
+
+    # Add numeric dose values to test results
+    test_results <- test_results %>%
+      dplyr::mutate(
+        group1_numeric = dose_mapping[.data$group1],
+        group2_numeric = dose_mapping[.data$group2]
+      )
+
+    # Determine which column contains the non-control doses
+    if (all(test_results$group1 == control)) {
+      test_results <- test_results %>%
+        dplyr::mutate(dose_numeric = .data$group2_numeric)
+    } else if (all(test_results$group2 == control)) {
+      test_results <- test_results %>%
+        dplyr::mutate(dose_numeric = .data$group1_numeric)
+    } else {
+      # Mixed case - need to handle both possibilities
+      test_results <- test_results %>%
+        dplyr::mutate(
+          dose_numeric = ifelse(.data$group1 == control,
+                                .data$group2_numeric,
+                                .data$group1_numeric)
+        )
+    }
+
+    # Sort by numeric dose
+    test_results <- test_results %>%
+      dplyr::arrange(.data$dose_numeric)
+  }
+
+  # Find the NOEC (highest dose with p > alpha)
+  significant_results <- test_results %>%
+    dplyr::filter(.data$p.adj <= alpha)
+
+  if (nrow(significant_results) == 0) {
+    # If no significant differences, NOEC is the highest tested dose
+    all_doses <- as.numeric(as.character(unique(data[[dose_name]])))
+    all_doses <- all_doses[!is.na(all_doses) & all_doses != as.numeric(control)]
+
+    if (length(all_doses) > 0) {
+      noec_value <- max(all_doses, na.rm = TRUE)
+      noec_message <- "No significant effects detected at any dose level"
+    } else {
+      noec_value <- NA
+      noec_message <- "No valid dose levels found"
+    }
+  } else {
+    # Get all doses with significant effects
+    significant_doses <- c()
+
+    for (i in 1:nrow(significant_results)) {
+      row <- significant_results[i, ]
+      if (row$group1 == control) {
+        significant_doses <- c(significant_doses, as.character(row$group2))
+      } else {
+        significant_doses <- c(significant_doses, as.character(row$group1))
+      }
+    }
+
+    # Convert to numeric for comparison
+    significant_doses <- suppressWarnings(as.numeric(significant_doses))
+
+    # Get all tested doses
+    all_doses <- suppressWarnings(as.numeric(as.character(unique(data[[dose_name]]))))
+    all_doses <- all_doses[!is.na(all_doses) & all_doses != as.numeric(control)]
+    all_doses <- sort(all_doses)
+
+    # Find the highest non-significant dose
+    non_significant_doses <- all_doses[!all_doses %in% significant_doses]
+
+    if (length(non_significant_doses) == 0) {
+      # If all doses show significant effects
+      noec_value <- as.numeric(control)
+      noec_message <- "All tested doses showed significant effects"
+    } else {
+      noec_value <- max(non_significant_doses)
+      noec_message <- paste("NOEC determined as", noec_value)
+    }
+  }
+
+  # Return both the NOEC value and the full test results
+  return(list(
+    noec = noec_value,
+    noec_message = noec_message,
+    test_results = test_results
+  ))
 }
+
+
+
+
+
+
+
+
+
 
 
 

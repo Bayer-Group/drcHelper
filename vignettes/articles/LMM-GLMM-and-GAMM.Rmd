@@ -5,7 +5,9 @@ title: "Mixed Models"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
@@ -16,6 +18,36 @@ library(drcHelper)
 ## Mixed Models
 
 ## Variance Components
+
+
+## Example
+
+Simualate a dose-response with unequal variances across the dose range. 
+
+```{r}
+# Example with increasing variance by dose
+increasing_var_tank <- c(1, 2, 4, 8, 50)
+increasing_var_individual <- c(0.5, 1, 1.5, 2, 2.5)
+
+# Simulate data with inhomogeneous variance
+sim_data_inhomogeneous <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0, 20),
+  m_tanks = 3,
+  k_individuals = 10,
+  var_tank = increasing_var_tank,
+  var_individual = increasing_var_individual,
+  include_individuals = TRUE
+)
+
+prelimPlot3(sim_data_inhomogeneous%>% group_by(Dose,Tank)%>%summarise(Response=mean(Response)))
+
+```
+
+```{r}
+
+```
+
 
 ## Why Sample Size Requirements Changes?
 

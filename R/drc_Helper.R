@@ -89,9 +89,10 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
                       text = paste0(endpoint, respLev)
   )
   EDdat$Lower <- ifelse(EDdat$Lower > xmin, EDdat$Lower, xmin)
-  p <- p + geom_point(data = EDdat, aes(x = (Estimate), y = Effect), size = 3, col = "red") +
-    geom_text(data = EDdat, aes(x = Estimate + textAjust.x, y = Effect + textAjust.y, label = text), size = textsize, col = "darkgreen") +
-    geom_errorbarh(data = EDdat, aes(x = Estimate, y = Effect, xmin = Lower, xmax = Upper, height = lineheight), lty = 2)
+  p <- p + geom_point(data = EDdat, aes(x = .data$Estimate, y = .data$Effect), size = 3, col = "red") +
+    geom_text(data = EDdat, aes(x = .data$Estimate + textAjust.x, y = .data$Effect + textAjust.y, label = text), size = textsize, col = "darkgreen") +
+    geom_errorbarh(data = EDdat, aes(x = .data$Estimate, y = .data$Effect,
+                                     xmin = .data$Lower, xmax = .data$Upper, height = lineheight), lty = 2)
   return(p)
 }
 
@@ -102,7 +103,7 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #' @param maxEff Not used for now. maximum effect.
 #' @param trend Increase of Decrease, whether the dose response is decreasing or increasing compared control.
 #' @param range using Percentage, not used for now.
-#' @param interval methods to calculate the confidence intervals!
+#' @param CI methods to calculate the confidence intervals, either "inv", "bmd-inv",(bmd) or "delta" or "fls".
 #' @param ... other parameters for ED function
 #'
 #' @return Back calculated regulatory ECx
@@ -111,6 +112,15 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #'
 #' @examples
 #' \dontrun{
+#' data("dat_medium")
+#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium$Response[dat_medium$Response < 0] <- 0
+#' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+#' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+#' res <- mselect.plus(mod,fctList = fctList )
+#' modList <- res$modList
+#' mod <-modList[[1]]
+#' edres <- ED.plus(mod,c(10,50),trend="Decrease")
 #' }
 ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = "Percentage", CI = c("delta", "inv", "bmd-inv"), ...) {
   ## Note that this might not be suitable for models with fixed c or d parameters, where
@@ -214,6 +224,7 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 #' @param fname a character string contains the name of the fitted model.
 #'
 #' @return the model name
+#' @importFrom drc getMeanFunctions
 #' @export
 #'
 #' @examples
@@ -221,7 +232,7 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 #'
 getModelName <- function(fname = NULL) {
   if (any(grepl("EXD", fname))) { ## for now just one character
-    noParm <- stringr::str_split(fname, fixed("."))[[1]][2]
+    noParm <- stringr::str_split(fname, stringr::fixed("."))[[1]][2]
     ModelName <- paste0(noParm, "-parameter exponential decay model")
   } else {
     ModelName <- getMeanFunctions(fname = fname)
@@ -259,6 +270,13 @@ ED.ZG <- ED.plus
 #'
 #' @examples
 #' \dontrun{
+#' data("dat_medium")
+#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium$Response[dat_medium$Response < 0] <- 0
+#' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+#' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+#' res <- mselect.plus(mod,fctList = fctList )
+#' modList <- res$modList
 #' }
 mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
                          sorted = c("IC", "Res var", "Lack of fit", "no"),
@@ -293,7 +311,7 @@ mselect.plus <- function(object = NULL, fctList = NULL, nested = FALSE,
     ## fctList[[length(fctList)+1]] <- mod$fct possbile bug
     fctList[[length(fctList) + 1]] <- object$fct ## not necessary!!
   }
-
+  class(modList) <- "modList"
   Comparison <- plyr::laply(modList, function(tempObj) {
     if (!inherits(tempObj, "try-error")) {
       criteria <- c(logLik(tempObj), icfct(tempObj), drc::modelFit(tempObj)[2, 5])
@@ -380,9 +398,10 @@ print.drcComp <- function(x, ...) {
   NextMethod()
 }
 
+
 #' Plot a list of models together.
 #'
-#' @param modList list of drc models.
+#' @param x a list of drc models with modList class.
 #' @param respLev to be calculated ECx levels, for example, c(10,20,50).
 #' @param data data used to fit the set of models
 #' @param xmin minimum value of xaxis, should be greater than 0 to
@@ -393,6 +412,8 @@ print.drcComp <- function(x, ...) {
 #'  confidence bands
 #' @param plot_respLev logical, whether to add the estimated ECx with CIs
 #' @param xbreaks breaks in x-axis labeling
+#' @param ymin minimum of y
+#' @param ymax max of y
 #' @param ... addition parameters to be passed into plotting functions or
 #' user input when the use does not want to use the
 #' data provided in the modList
@@ -402,11 +423,22 @@ print.drcComp <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
+#' data("dat_medium")
+#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium$Response[dat_medium$Response < 0] <- 0
+#' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+#' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+#' res <- mselect.plus(mod,fctList = fctList )
+#' modList <- res$modList
+#' p <- plot.modList(modList[1:3])
+#' p
 #' }
-plot.modList <- function(modList, respLev = NULL, data = NULL,
+plot.modList <- function(x, respLev = NULL, data = NULL,
                          xmin, xmax, scale = c("logx", "logy", "logxy", "orig"),
                          npts = 100, plot_respLev = FALSE, xbreaks = NULL,
                          ymin = NULL, ymax = NULL, ...) {
+  modList <- x
+  if(!is.list(modList)) modList <- list(modList)
   if (is.null(data)) {
     mod1 <- modList[[1]]
     i <- 1
@@ -487,9 +519,8 @@ plot.modList <- function(modList, respLev = NULL, data = NULL,
 #' @param ... additional parameters
 #'
 #' @return a ggplot object
-#' @export plot.edList
-#'
-plot.edList <- function(edList, fctNames, ...) {
+#' @export plot_edList
+plot_edList <- function(edList, fctNames, ...) {
   if (!is.data.frame(edList)) {
     edResTab <- plyr::ldply(lapply(edList, function(x) {
       x <- as.data.frame(x)
@@ -513,15 +544,16 @@ plot.edList <- function(edList, fctNames, ...) {
   }
   edResTab$Model <- factor(edResTab$Model, levels = unique(edResTab$Model))
   if (is.null(edResTab$Rating)) {
-    plotED <- ggplot(edResTab, aes(x = ED, y = Estimate, col = Model)) +
-      geom_pointrange(aes(ymin = Lower, ymax = Upper),
+    plotED <- ggplot(edResTab, aes(x = .data$ED, y = .data$Estimate, col = .data$Model)) +
+      geom_pointrange(aes(ymin = .data$Lower, ymax = .data$Upper),
                       position = position_dodge(width = 0.4)
       ) #+scale_y_log10()
   } else {
     edResTab$Rating <- factor(edResTab$Rating, levels = c("Excellent", "Good", "Fair", "Poor", "Bad"))
 
-    plotED <- ggplot(edResTab, aes(x = EC, y = Estimate, col = Model, shape = Rating)) +
-      geom_pointrange(aes(ymin = Lower, ymax = Upper),
+    plotED <- ggplot(edResTab, aes(x = .data$EC, y = .data$Estimate,
+                                   col = .data$Model, shape = .data$Rating)) +
+      geom_pointrange(aes(ymin = .data$Lower, ymax = .data$Upper),
                       position = position_dodge(width = 0.4)
       ) #+scale_y_log10()
   }
@@ -534,6 +566,7 @@ plot.edList <- function(edList, fctNames, ...) {
 #' @param obj Calculated ED 10, 20, 50 object if available.
 #' mod should set to be NULL in this case
 #' @param trend "Decrease" or "Increase"
+#' @param CI method to calculate CI, either "inv" (bmd) or "delta" or "fls".
 #' @param ... other parameters that will be passed into ED.plus
 #'
 #' @return a table with certainty of potection level and steepness of the models
@@ -552,7 +585,7 @@ calcSteepnessOverlap <- function(mod = NULL, obj = NULL, trend = "Decrease", CI 
   # |EC$_{10}$ > EC$_{50,low}$                | Low                              | # nolint
   res <- rep(NA, 2)
   if (!is.null(mod) & !inherits(mod, "try-error")) {
-    if (class(mod) == "drc") obj <- try(ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...),silent = TRUE)
+    if (inherits(mod, "drc") ) obj <- try(ED.plus(mod, c(10, 20, 50), trend = trend, CI = CI, ...),silent = TRUE)
     obj <- as.data.frame(obj)
     steep <- obj$Estimate[1] / obj$Estimate[3] # the Ratio between EC 10 and EC 50
     if (!is.na(steep)) {
@@ -888,42 +921,24 @@ simDRdata <- function(nosim, fct, mpar, xerror, xpar = 1, yerror = "rnorm",
 }
 
 
-
-#' Simulate Hierarchical Dose-Response Data
+#' Simulate Hierarchical Dose-Response Data with Inhomogeneous Variance
 #'
 #' This function simulates dose-response data with a hierarchical structure:
 #' n doses, m tanks per dose, and optionally k individuals per tank, with variance components
-#' at both the tank and individual levels.
+#' that can vary by dose level.
 #'
 #' @param n_doses Number of dose levels
 #' @param dose_range Vector of length 2 specifying the min and max dose values
 #' @param m_tanks Number of tanks per dose
 #' @param k_individuals Number of individuals per tank (only used if include_individuals = TRUE)
-#' @param var_tank Variance at the tank level
-#' @param var_individual Variance at the individual level (only used if include_individuals = TRUE)
+#' @param var_tank Variance at the tank level. Can be a single value or a vector of length n_doses.
+#' @param var_individual Variance at the individual level. Can be a single value or a vector of length n_doses.
 #' @param include_individuals Logical, whether to simulate individual-level data (TRUE) or only tank-level data (FALSE)
 #' @param response_function Function that calculates the response given a dose
 #' @param ... Additional parameters to pass to the response_function
 #'
 #' @return A data frame containing the simulated dose-response data
 #' @export
-#'
-#' @examples
-#' # Simulate data with individuals
-#' sim_data_with_individuals <- simulate_dose_response(
-#'   n_doses = 5,
-#'   dose_range = c(0, 20),
-#'   m_tanks = 3,
-#'   include_individuals = TRUE
-#' )
-#'
-#' # Simulate data without individuals (tank-level only)
-#' sim_data_tanks_only <- simulate_dose_response(
-#'   n_doses = 5,
-#'   dose_range = c(0, 20),
-#'   m_tanks = 3,
-#'   include_individuals = FALSE
-#' )
 simulate_dose_response <- function(n_doses,
                                    dose_range = c(0, 20),
                                    m_tanks = 3,
@@ -944,6 +959,28 @@ simulate_dose_response <- function(n_doses,
   # Define doses
   doses <- seq(dose_range[1], dose_range[2], length.out = n_doses)
 
+  # Handle variance parameters
+  # If var_tank is a single value, replicate it for each dose
+  if (length(var_tank) == 1) {
+    var_tank <- rep(var_tank, n_doses)
+  } else if (length(var_tank) != n_doses) {
+    stop("var_tank must be either a single value or a vector of length n_doses")
+  }
+
+  # If var_individual is a single value, replicate it for each dose
+  if (length(var_individual) == 1) {
+    var_individual <- rep(var_individual, n_doses)
+  } else if (length(var_individual) != n_doses) {
+    stop("var_individual must be either a single value or a vector of length n_doses")
+  }
+
+  # Create a lookup table for variances by dose
+  var_lookup <- data.frame(
+    Dose = doses,
+    var_tank = var_tank,
+    var_individual = var_individual
+  )
+
   if (include_individuals) {
     # Simulate data with individuals
 
@@ -957,20 +994,27 @@ simulate_dose_response <- function(n_doses,
     # Calculate the base response for each dose (vectorized)
     simulated_data$BaseResponse <- response_function(simulated_data$Dose, ...)
 
+    # Merge with variance lookup table to get the appropriate variances for each dose
+    simulated_data <- merge(simulated_data, var_lookup, by = "Dose")
+
     # Generate tank-level random effects (vectorized)
-    # First, create a unique identifier for each dose-tank combination
+    # Create a unique identifier for each dose-tank combination
     simulated_data$DoseTank <- paste(simulated_data$Dose, simulated_data$Tank, sep = "_")
-    unique_dose_tanks <- unique(simulated_data$DoseTank)
+    unique_dose_tanks <- unique(simulated_data[, c("DoseTank", "var_tank")])
 
     # Generate tank effects for each unique dose-tank combination
-    tank_effects <- stats::rnorm(length(unique_dose_tanks), mean = 0, sd = sqrt(var_tank))
-    names(tank_effects) <- unique_dose_tanks
+    tank_effects <- sapply(1:nrow(unique_dose_tanks), function(i) {
+      stats::rnorm(1, mean = 0, sd = sqrt(unique_dose_tanks$var_tank[i]))
+    })
+    names(tank_effects) <- unique_dose_tanks$DoseTank
 
     # Add tank effects to the data frame
     simulated_data$TankEffect <- tank_effects[simulated_data$DoseTank]
 
     # Generate individual-level random effects (vectorized)
-    simulated_data$IndividualEffect <- stats::rnorm(nrow(simulated_data), mean = 0, sd = sqrt(var_individual))
+    simulated_data$IndividualEffect <- sapply(1:nrow(simulated_data), function(i) {
+      stats::rnorm(1, mean = 0, sd = sqrt(simulated_data$var_individual[i]))
+    })
 
     # Calculate the final response
     simulated_data$Response <- simulated_data$BaseResponse + simulated_data$TankEffect + simulated_data$IndividualEffect
@@ -990,8 +1034,13 @@ simulate_dose_response <- function(n_doses,
     # Calculate the base response for each dose (vectorized)
     simulated_data$BaseResponse <- response_function(simulated_data$Dose, ...)
 
-    # Generate tank-level random effects (vectorized)
-    simulated_data$TankEffect <- stats::rnorm(nrow(simulated_data), mean = 0, sd = sqrt(var_tank))
+    # Merge with variance lookup table to get the appropriate variances for each dose
+    simulated_data <- merge(simulated_data, var_lookup, by = "Dose")
+
+    # Generate tank-level random effects with dose-specific variance
+    simulated_data$TankEffect <- sapply(1:nrow(simulated_data), function(i) {
+      stats::rnorm(1, mean = 0, sd = sqrt(simulated_data$var_tank[i]))
+    })
 
     # Calculate the final response (no individual effects)
     simulated_data$Response <- simulated_data$BaseResponse + simulated_data$TankEffect

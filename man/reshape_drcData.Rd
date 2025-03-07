@@ -8,6 +8,8 @@ reshape_drcData(dat, replicate_col = "Replicates")
 }
 \arguments{
 \item{dat}{data table with Replicate columns and dose groups}
+
+\item{replicate_col}{name of the replicate column or columns need to be retained as identifier columns.}
 }
 \value{
 long format of the dat

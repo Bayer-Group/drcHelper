@@ -14,7 +14,7 @@ describe("Preliminary Assessment of Dose Response Data", {
   })
 
   it("prelimPlot2 should return a ggplot object with log1p transformation",{
-    p <- prelimPlot2(testdata,dosecol="Dose")
+    p <- prelimPlot2(testdata,dose_col="Dose")
     expect_s3_class(p, "gg")
 
   })
