@@ -109,9 +109,127 @@ Gao</h4>
 <div class="section level2">
 <h2 id="testing-approaches">Testing Approaches<a class="anchor" aria-label="anchor" href="#testing-approaches"></a>
 </h2>
+<p>Usually for count data, we treat them as continuous and sometimes do
+transformations so that the variance is stablized across the treatment
+groups to derive an NOEC. Transformation of data need also careful
+interpretation of the effect size estimation and the corresponding
+confidence intervals. There is also a relatively new approach proposed
+called CPCAT. Its application domain is however limited as it is only
+valid for strictly Poisson data, which is not validated or used in this
+package.</p>
 <div class="section level3">
-<h3 id="fishers-exact-test-for-count-data">Fisher’s Exact Test for Count Data<a class="anchor" aria-label="anchor" href="#fishers-exact-test-for-count-data"></a>
+<h3 id="poisson-or-non-poisson">Poisson or Non-Poisson?<a class="anchor" aria-label="anchor" href="#poisson-or-non-poisson"></a>
 </h3>
+<p>To understand this, we have to think about what is a Poisson
+distribution and what this distribution describes. It actually emerges
+from the basic properties of the natural counting process. For example,
+when you count the number of customers arriving at a store, the number
+of defects in manufacturing, the number of rare events in a fixed time
+period, the number of occurrences in a fixed spatial area. The
+assumptions behind these counting processes are:</p>
+<ul>
+<li>Events occur independently.</li>
+<li>Events occur at a constant average rate</li>
+<li>Events cannot occur exactly simultaneously</li>
+<li>The probability of an event is proportional to the time
+interval</li>
+</ul>
+<p>The key parameter for Poisson distribution is the mean, which is
+actually the rate parameter <span class="math inline">\(\lamda\)</span>.
+Poisson distribution also has this particular mean-variance
+relationship, as in many real-world counting processes, the variability
+(variance) increases with the average count (mean). The Poisson
+distribution naturally captures this through its unique property where
+the mean equals the variance. However, when the assumptions of
+independence or constant rate are violated, or when there’s
+overdispersion (variance exceeding the mean), other distributions like
+the Negative Binomial might be more appropriate.</p>
+<p>Actually, I would say that Poisson distribution is very often not the
+most appropriate choice for modeling pitfall trap counts or soil core
+counts of soil organisms. Here’s why:</p>
+<ol style="list-style-type: decimal">
+<li>Violation of Independence:</li>
+</ol>
+<ul>
+<li>Soil organisms typically show aggregated distributions</li>
+<li>Individuals are not randomly distributed but cluster in favorable
+microhabitats</li>
+<li>Social behavior and environmental preferences lead to spatial
+clustering</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Non-constant Rate:</li>
+</ol>
+<ul>
+<li>Abundance vary with environmental conditions</li>
+<li>Seasonal and daily patterns affect capture or sampling
+probability</li>
+<li>Spatial heterogeneity in habitat quality influences
+distribution</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Overdispersion and underdispersion</li>
+</ol>
+<ul>
+<li>Variance in counts typically exceeds the mean. (underdispersion
+could also occure by chance or lots of zeros for certain species)</li>
+<li>Clustering behavior leads to more extreme counts than expected under
+Poisson</li>
+<li>Environmental heterogeneity increases variability</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Heterogeneous variance across treatment groups.</li>
+</ol>
+<ul>
+<li>Often the approaches assuming Poisson, like CPCAT, also starting
+from a common mean with a common variance in the null distribution,
+neither of them could be true in reality.</li>
+</ul>
+<p>More appropriate approaches for modelling might be Negative Binomial
+distribution (handles overdispersion),y zro-inflated models (if many
+zero counts), mixed models (to account for spatial and temporal
+dependencies), spatial point process models (to explicitly account for
+spatial patterns).</p>
+<p>As an example, a Poisson distribution with rate of 100 in time window
+1, a count of 137 is very unlikely coming from this distribution but 120
+could possibly be occuring with 95% confidence level. On the other hand,
+it would be rare to oberve 120 from a normal distribution with 100 mean
+and sd 10. Similarly for small numbers, like a mean of 4 and sd of 2, 8
+is more likely to be observed from a Poisson but not from a normal
+distribution.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">###  Fisher's Exact Test for Count Data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">##  Exact Poisson test</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## data:  120 time base: 1</span></span>
+<span><span class="co">## number of events = 120, time base = 1, p-value = 0.05088</span></span>
+<span><span class="co">## alternative hypothesis: true event rate is not equal to 100</span></span>
+<span><span class="co">## 95 percent confidence interval:</span></span>
+<span><span class="co">##   99.49193 143.49059</span></span>
+<span><span class="co">## sample estimates:</span></span>
+<span><span class="co">## event rate </span></span>
+<span><span class="co">##        120</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">120</span>,mean<span class="op">=</span><span class="fl">100</span>,sd<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.9772499</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">##  Exact Poisson test</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## data:  8 time base: 1</span></span>
+<span><span class="co">## number of events = 8, time base = 1, p-value = 0.06945</span></span>
+<span><span class="co">## alternative hypothesis: true event rate is not equal to 4</span></span>
+<span><span class="co">## 95 percent confidence interval:</span></span>
+<span><span class="co">##   3.453832 15.763189</span></span>
+<span><span class="co">## sample estimates:</span></span>
+<span><span class="co">## event rate </span></span>
+<span><span class="co">##          8</span></span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">8</span>,mean<span class="op">=</span><span class="fl">4</span>,sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.9772499</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a>

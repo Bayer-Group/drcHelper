@@ -113,16 +113,15 @@ where:</p><ul><li><p>d are the scores (1, 2, 3, ...)</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Get adjusted values</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">dat_bcs1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">adj_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_RS_adj_val.html">get_RS_adj_val</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">tmt</span>,</span></span>
 <span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">tank</span>,</span></span>
 <span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S1</span> <span class="op">+</span> <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S2</span> <span class="op">+</span> <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S3</span>,</span></span>
 <span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">total</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in get_RS_adj_val(dat_bcs1$tmt, dat_bcs1$tank, dat_bcs1$S1 + dat_bcs1$S2 +     dat_bcs1$S3, dat_bcs1$total):</span> could not find function "get_RS_adj_val"</span>
 <span class="r-in"><span><span class="co"># Calculate Z-statistic</span></span></span>
 <span class="r-in"><span><span class="va">Z</span> <span class="op">&lt;-</span> <span class="fu">get_CA_Z</span><span class="op">(</span><span class="va">adj_vals</span><span class="op">$</span><span class="va">x_tilde</span>, <span class="va">adj_vals</span><span class="op">$</span><span class="va">n_tilde</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in get_CA_Z(adj_vals$x_tilde, adj_vals$n_tilde):</span> could not find function "get_CA_Z"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

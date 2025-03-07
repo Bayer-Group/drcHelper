@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>NOEC Calculation • drcHelper</title>
+<title>NOEC Calculation for Continuous Data • drcHelper</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NOEC Calculation">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NOEC Calculation for Continuous Data">
 <meta name="description" content="General ethods for NOEC calculations for dose-response studies
 ">
 <meta property="og:description" content="General ethods for NOEC calculations for dose-response studies
@@ -93,7 +93,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>NOEC Calculation</h1>
+      <h1>NOEC Calculation for Continuous Data</h1>
                         <h4 data-toc-skip class="author">Sarah Baumert,
 Zhenglei Gao</h4>
             
@@ -135,6 +135,29 @@ selections. Poor experimental design may yield high NOEC due to
 decreased statistical sensitivity, which is not desired in a regulatory
 context.</li>
 </ol>
+<p>In this article, we focus on NOEC methods for continuous data, which
+can also be applied to count data. This can be achieved either by simply
+treating count data as continuous or by transforming the data to
+stabilize the variance.</p>
+<p>Continuous data are numerical data that can take any value within a
+range (e.g., weight, height), while count data are discrete and
+represent the number of occurrences of an event (e.g., number of species
+observed in a pitfall). It is hard to determine a distribution of count
+data in real world. Poisson, negative-binomial are common distributions
+used to model count data. The Poisson distribution is often used when
+the mean and variance are equal, while the negative-binomial
+distribution is used when the data exhibit overdispersion (variance
+greater than the mean). Many count datasets have more zeros than
+expected under standard count models, leading to zero-inflated models or
+hurdle models that account for this excess. Small sample sizes can make
+it difficult to determine the underlying distribution of the data and
+can affect the robustness of statistical methods. There are also other
+challenges like non-constant variance that does not follow a mean
+variance relationship, issues caused by censoring or truncation, etc.
+Therefore, transformations, such as logarithmic or square root
+transformations, are often used to stabilize variance and meet the
+assumptions of standard statistical tests for continuous data when
+dealing with non-normal data distributions.</p>
 <div class="section level4">
 <h4 id="methods-for-deriving-noec">Methods for deriving NOEC<a class="anchor" aria-label="anchor" href="#methods-for-deriving-noec"></a>
 </h4>

@@ -101,6 +101,19 @@
 <div class="section level2">
 <h2 id="multiple-comparison-tests">Multiple Comparison Tests<a class="anchor" aria-label="anchor" href="#multiple-comparison-tests"></a>
 </h2>
+<p>In this article we compare the different functions from various
+packages to perform the same task, demonstrating the differences and
+similarities. We implemented a function
+<code>combine_multiple_comparisons</code> for comparing different
+results. This implementation provides a comprehensive set of functions
+for standardizing and combining multiple comparison test results in dose
+response data analysis. The functions handle various test
+implementations and provide consistent output formats for easy
+comparison.</p>
+<p>Note that for trend tests, the null hypotheses are different from
+those many-to-one pairwise comparisons. Direct comparison is not very
+fair. However, the NOEC calculation can be based on both trend tests and
+many-to-one pairwise tests.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: drc</span></span>
@@ -113,13 +126,7 @@
 <span><span class="co">#&gt; Attaching package: 'drc'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gaussian, getInitial</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">PMCMRplus</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'PMCMRplus'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:drc':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     algae</span></span></code></pre></div>
+<span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="dunnetts-test">Dunnett’s Test<a class="anchor" aria-label="anchor" href="#dunnetts-test"></a>
@@ -139,28 +146,27 @@ based on the isotonic regression.</p>
 (only for a=0.05).</p>
 <p>The <code>williamsTest</code> function from
 <strong>PMCMRplus</strong> produces the same results as in
-<code>williamsTest_JG</code></p>
+<code>williamsTest_JG</code> in general. However,
+<code>williamsTest</code> function from <strong>PMCMRplus</strong> use
+multivariate t distribution to calculate p-values.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">106</span>, <span class="fl">114</span>, <span class="fl">116</span>, <span class="fl">127</span>, <span class="fl">145</span>,<span class="fl">110</span>, <span class="fl">125</span>, <span class="fl">143</span>, <span class="fl">148</span>, <span class="fl">151</span>,</span>
 <span><span class="fl">136</span>, <span class="fl">139</span>, <span class="fl">149</span>, <span class="fl">160</span>, <span class="fl">174</span><span class="op">)</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/gl.html" class="external-link">gl</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"I"</span>, <span class="st">"II"</span><span class="op">)</span></span>
-<span><span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/williamsTest.html" class="external-link">williamsTest</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="va">g</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Williams trend test </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data:  x by g </span></span>
-<span><span class="co">#&gt; alternative hypothesis:  greater </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; H0</span></span>
+<span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/williamsTest.html" class="external-link">williamsTest</a></span><span class="op">(</span><span class="va">x</span> <span class="op">~</span> <span class="va">g</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/summaryZG.html">summaryZG</a></span><span class="op">(</span><span class="va">res1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                t'-value df t'-crit decision alpha</span></span>
 <span><span class="co">#&gt; mu1 - ctr &lt;= 0    1.357 12   1.782   accept  0.05</span></span>
 <span><span class="co">#&gt; mu2 - ctr &lt;= 0    2.950 12   1.873   reject  0.05</span></span>
-<span><span class="co">#&gt; ---</span></span>
 <span><span class="fu"><a href="../reference/williamsTest_JG.html">williamsTest_JG</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>treatment_var <span class="op">=</span> <span class="va">g</span>,response_var<span class="op">=</span><span class="va">x</span><span class="op">)</span>,<span class="st">"response_var"</span>,<span class="st">"treatment_var"</span>,direction<span class="op">=</span><span class="st">"increasing"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   treatment_var Y.Tilde    Y0 Se.Diff DF  Will TCrit Signif</span></span>
 <span><span class="co">#&gt; 2            II   151.6 121.6   10.17 12 2.950 1.873      *</span></span>
 <span><span class="co">#&gt; 1             I   135.4 121.6   10.17 12 1.357 1.782      .</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="many-to-one-with-welcht-t-test">Many-to-One with Welch’t t-test<a class="anchor" aria-label="anchor" href="#many-to-one-with-welcht-t-test"></a>
+</h3>
+</div>
 </div>
 <div class="section level2">
 <h2 id="tips">Tips<a class="anchor" aria-label="anchor" href="#tips"></a>
@@ -168,6 +174,13 @@ based on the isotonic regression.</p>
 <p>Note that to install “PMCMRplus” properly under ubuntu (Platform:
 x86_64-pc-linux-gnu), you need probably install libmpfr-dev first.</p>
 <pre><code>sudo apt-get install libmpfr-dev</code></pre>
+</div>
+<div class="section level2">
+<h2 id="other-packages">Other packages<a class="anchor" aria-label="anchor" href="#other-packages"></a>
+</h2>
+<p>In my own analysis, I also use <strong>rstatix</strong> very often,
+as it provide a workflow for tidy evaluations, unlike other
+packages.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

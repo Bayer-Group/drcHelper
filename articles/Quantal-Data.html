@@ -100,21 +100,93 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: drc</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: MASS</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## 'drc' has been loaded.</span></span></code></pre>
-<pre><code><span><span class="co">## Please cite R and 'drc' if used for a publication,</span></span></code></pre>
-<pre><code><span><span class="co">## for references type 'citation()' and 'citation('drc')'.</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Attaching package: 'drc'</span></span></code></pre>
-<pre><code><span><span class="co">## The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     gaussian, getInitial</span></span></code></pre>
+<p>Analyis of quantal data typically involves the following steps as
+shown in the flowchart below:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"./../assets/NOEC_nonMonotonic.png"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="..%2Fassets%2FNOEC_nonMonotonic.png"><!-- --></p>
+<div class="section level2">
+<h2 id="an-example-dataset">An example dataset<a class="anchor" aria-label="anchor" href="#an-example-dataset"></a>
+</h2>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/rstatix/" class="external-link">rstatix</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Generate data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">doses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">reps</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
+<span></span>
+<span><span class="co"># Generate counts with dose-response relationship</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  dose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">doses</span>, each <span class="op">=</span> <span class="va">reps</span><span class="op">)</span>,</span>
+<span>  replicate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">reps</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">doses</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Generate response counts (out of 10 organisms per replicate)</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">alive</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">dose</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.02</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">dead</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="op">-</span> <span class="va">data</span><span class="op">$</span><span class="va">alive</span></span>
+<span></span>
+<span><span class="co"># Reshape for analysis</span></span>
+<span><span class="va">data_long</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">condition</span>, <span class="va">count</span>, <span class="va">alive</span><span class="op">:</span><span class="va">dead</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="fishers-exact-test-comparing-each-dose-to-control">Fisher’s Exact Test (comparing each dose to control)<a class="anchor" aria-label="anchor" href="#fishers-exact-test-comparing-each-dose-to-control"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Fisher's Exact Test (comparing each dose to control)</span></span>
+<span><span class="va">fisher_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, </span>
+<span>                           p_value <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">dose</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">d</span><span class="op">)</span>, <span class="op">]</span></span>
+<span>  <span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">fisher.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">test_data</span><span class="op">$</span><span class="va">alive</span><span class="op">[</span><span class="va">test_data</span><span class="op">$</span><span class="va">dose</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                              <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">test_data</span><span class="op">$</span><span class="va">dead</span><span class="op">[</span><span class="va">test_data</span><span class="op">$</span><span class="va">dose</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                              <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">test_data</span><span class="op">$</span><span class="va">alive</span><span class="op">[</span><span class="va">test_data</span><span class="op">$</span><span class="va">dose</span> <span class="op">==</span> <span class="va">d</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                              <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">test_data</span><span class="op">$</span><span class="va">dead</span><span class="op">[</span><span class="va">test_data</span><span class="op">$</span><span class="va">dose</span> <span class="op">==</span> <span class="va">d</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                            nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">fisher_results</span><span class="op">$</span><span class="va">p_value</span><span class="op">[</span><span class="va">fisher_results</span><span class="op">$</span><span class="va">dose</span> <span class="op">==</span> <span class="va">d</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">$</span><span class="va">p.value</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co">## check against rstatix</span></span>
+<span></span>
+<span><span class="co">## pairwise_fisher_test(,p.adjust.method = "none")</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># CMH test</span></span>
+<span><span class="va">cmh_result</span> <span class="op">&lt;-</span> <span class="va">data_long</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dose</span>, <span class="va">condition</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/mantelhaen.test.html" class="external-link">mantelhaen.test</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Fisher's Exact Test results (comparing each dose to control):"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fisher_results</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"\nCochran-Mantel-Haenszel Test result:"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cmh_result</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Calculate NOEC</span></span>
+<span><span class="va">noec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fisher_results</span><span class="op">$</span><span class="va">dose</span><span class="op">[</span><span class="va">fisher_results</span><span class="op">$</span><span class="va">p_value</span> <span class="op">&gt;</span> <span class="fl">0.05</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="cochran-mantel-haenszel-chi-squared-test-for-count-data">Cochran-Mantel-Haenszel Chi-Squared Test for Count Data<a class="anchor" aria-label="anchor" href="#cochran-mantel-haenszel-chi-squared-test-for-count-data"></a>
+</h3>
+<p>It is an extension of Cochran-Mantel test used for stratified or
+matched categorical data.</p>
+</div>
+<div class="section level3">
+<h3 id="mcnemars-chi-squared-test-for-count-data">McNemar’s Chi-squared Test for Count Data<a class="anchor" aria-label="anchor" href="#mcnemars-chi-squared-test-for-count-data"></a>
+</h3>
+<p>McNemar’s test was not appropriate for NOEC derivation as it’s
+designed for paired observations (before/after measurements).</p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="tarones-test">Tarone’s Test<a class="anchor" aria-label="anchor" href="#tarones-test"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mymatrix1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">5</span>,<span class="fl">103</span><span class="op">)</span>,nrow<span class="op">=</span><span class="fl">2</span>,byrow<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mymatrix1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disease"</span>,<span class="st">"Control"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mymatrix1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Exposure"</span>,<span class="st">"Unexposed"</span><span class="op">)</span></span>
@@ -122,33 +194,33 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mymatrix2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disease"</span>,<span class="st">"Control"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mymatrix2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Exposure"</span>,<span class="st">"Unexposed"</span><span class="op">)</span></span>
 <span><span class="va">mylist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">mymatrix1</span>,<span class="va">mymatrix2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/calcTaronesTest.html">calcTaronesTest</a></span><span class="op">(</span><span class="va">mylist</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Pvalue for Tarone's test = 0.627420741721689"</span></span></code></pre>
-<pre><code><span><span class="co">## $pval</span></span>
-<span><span class="co">## [1] 0.6274207</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $tarone</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Equal-Effects Model (k = 2)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## I^2 (total heterogeneity / total variability):  0.00%</span></span>
-<span><span class="co">## H^2 (total variability / sampling variability): 0.24</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Test for Heterogeneity: </span></span>
-<span><span class="co">## Q(df = 1) = 0.2423, p-val = 0.6225</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Model Results (log scale):</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## estimate      se    zval    pval   ci.lb   ci.ub </span></span>
-<span><span class="co">##   3.1355  0.5741  5.4613  &lt;.0001  2.0102  4.2608 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Model Results (OR scale):</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## estimate   ci.lb    ci.ub </span></span>
-<span><span class="co">##  23.0006  7.4652  70.8663 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Cochran-Mantel-Haenszel Test:    CMH = 36.6043, df = 1, p-val &lt; 0.0001</span></span>
-<span><span class="co">## Tarone's Test for Heterogeneity: X^2 =  0.2356, df = 1, p-val = 0.6274</span></span></code></pre>
+<span><span class="fu"><a href="../reference/calcTaronesTest.html">calcTaronesTest</a></span><span class="op">(</span><span class="va">mylist</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Pvalue for Tarone's test = 0.627420741721689"</span></span>
+<span><span class="co">#&gt; $pval</span></span>
+<span><span class="co">#&gt; [1] 0.6274207</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $tarone</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Equal-Effects Model (k = 2)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; I^2 (total heterogeneity / total variability):  0.00%</span></span>
+<span><span class="co">#&gt; H^2 (total variability / sampling variability): 0.24</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Test for Heterogeneity: </span></span>
+<span><span class="co">#&gt; Q(df = 1) = 0.2423, p-val = 0.6225</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model Results (log scale):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; estimate      se    zval    pval   ci.lb   ci.ub </span></span>
+<span><span class="co">#&gt;   3.1355  0.5741  5.4613  &lt;.0001  2.0102  4.2608 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model Results (OR scale):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; estimate   ci.lb    ci.ub </span></span>
+<span><span class="co">#&gt;  23.0006  7.4652  70.8663 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Cochran-Mantel-Haenszel Test:    CMH = 36.6043, df = 1, p-val &lt; 0.0001</span></span>
+<span><span class="co">#&gt; Tarone's Test for Heterogeneity: X^2 =  0.2356, df = 1, p-val = 0.6274</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="trend-test">Trend Test<a class="anchor" aria-label="anchor" href="#trend-test"></a>

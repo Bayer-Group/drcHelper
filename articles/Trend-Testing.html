@@ -112,6 +112,33 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
 <div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p><strong>What is a trend test</strong></p>
+<p>A trend test is used to detect a monotonic trend across ordered
+groups. It’s particularly useful in dose-response studies to identify
+whether increasing doses lead to a systematic change in response.</p>
+<p>The prerequisite for a trend test is that the relationship is
+monotonic, either consistently increasing or decreasing. These trend
+tests are specifically designed to detect trends, making it a bit more
+powerful than general tests when a trend exists.</p>
+<p>The disadvantage is that it does not consider the magnitude of the
+change across the ordered groups, leading to unexpected identification
+of significance when there It is also less informative or even give
+counter-intuitive results if the relationship is not monotonic or if the
+groups are not naturally ordered.</p>
+</div>
+<div class="section level2">
+<h2 id="some-concerns">Some concerns<a class="anchor" aria-label="anchor" href="#some-concerns"></a>
+</h2>
+<p>In lots of the decision flowcharts, step down trend test are
+performed after a monotonicity test passes, which is logically strange,
+since monotonicity test itself is also a type of trend test. For
+example, jonckeehre terpstra test after linear contrast is significant
+in monotonicity test or quadratic contrast is significant in
+monotonicity test.</p>
+</div>
+<div class="section level2">
 <h2 id="trend-test-by-testing-linear-and-quadratic-contrasts">Trend Test by Testing Linear and Quadratic Contrasts<a class="anchor" aria-label="anchor" href="#trend-test-by-testing-linear-and-quadratic-contrasts"></a>
 </h2>
 <p>Generate mock data for testing</p>
@@ -130,7 +157,8 @@
 <span><span class="co">#&gt; 1    Linear   11.16  &lt;0.0001          ***</span></span>
 <span><span class="co">#&gt; 2 Quadratic   -0.10   0.9196            .</span></span></code></pre></div>
 </div>
-  </main>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

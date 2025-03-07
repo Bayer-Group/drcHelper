@@ -132,7 +132,8 @@ to account for intra-cluster correlation when analyzing dose-response relationsh
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function first aggregates data by treatment group to calculate overall proportions.
+    <p>The function is modified based on the function written by Allen Olmstead.
+It first aggregates data by treatment group to calculate overall proportions.
 It then computes the variance within each treatment group accounting for clustering,
 and calculates a design effect (D) as the ratio of cluster-adjusted variance to
 binomial variance. The sample size and affected counts are then adjusted by
@@ -140,21 +141,9 @@ dividing by this design effect.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Originally by Allen Olmstead</p>
+    <p>Allen Olmstead</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Calculate adjusted values for the fish injury data</span></span></span>
-<span class="r-in"><span><span class="va">adj_vals</span> <span class="op">&lt;-</span> <span class="fu">get_RS_adj_val</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">tmt</span>,</span></span>
-<span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">tank</span>,</span></span>
-<span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S1</span> <span class="op">+</span> <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S2</span> <span class="op">+</span> <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">S3</span>,</span></span>
-<span class="r-in"><span>  <span class="va">dat_bcs1</span><span class="op">$</span><span class="va">total</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in get_RS_adj_val(dat_bcs1$tmt, dat_bcs1$tank, dat_bcs1$S1 + dat_bcs1$S2 +     dat_bcs1$S3, dat_bcs1$total):</span> could not find function "get_RS_adj_val"</span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

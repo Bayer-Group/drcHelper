@@ -112,6 +112,23 @@ derive NOEALs. An alternative is MQJT(Multiquantal Jonckheere–Terpstra),
 which is mentioned in OECD TG 231 for AMA life stage analysis.</p>
 <p>Plant visual injury data has been evaluated qualitatively and it is
 possible to analyze them quantitatively.</p>
+<p>For well-behaving data (full clear dose-response), most approaches
+will produce very similar results as long as the target endpoint (the
+test rate or concentration where the average injury is reaching 50% or
+is medium injury category) is the same. In this article, we will explain
+how several regression modelling can be applied, focusing on nonlinear
+regression with sigmoid shaped curve, logistic regression with
+quasibinomial likelihood, and the conventional proportional odds
+logistic regression. Other approaches with a different endpoint type are
+demonstrated as well, including BMD for ordinal data using
+<code>bmdordinal</code>, RSCABS, etc.</p>
+<p>All approaches have its own limitations and need to be treated with
+caution. For example, for nonlinear model with a normal error assumption
+behind, issues could occur with inhomogeneous variance, uncertain
+considerations is critical when the data is over-spread across many
+categories close to the estimated ER50. I think whichever method to
+choose, careful evaluation the assumptions of the model and check the
+model data agreement are always necessary.</p>
 </div>
 <div class="section level2">
 <h2 id="ordinal-data-in-general">Ordinal Data in General<a class="anchor" aria-label="anchor" href="#ordinal-data-in-general"></a>

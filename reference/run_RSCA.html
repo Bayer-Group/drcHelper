@@ -139,20 +139,20 @@ the trend test.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 10</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   grp       x     n     m p_hat       b       v     D n_tilde x_tilde</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> C         4    14     4 0.286 0.014<span style="text-decoration: underline;">6</span>  0.010<span style="text-decoration: underline;">3</span>   1       14      4   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> C         6    16     4 0.375 0.014<span style="text-decoration: underline;">6</span>  0.005<span style="text-decoration: underline;">21</span>  1       16      6   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> SC       10    16     4 0.625 0.014<span style="text-decoration: underline;">6</span>  0.015<span style="text-decoration: underline;">6</span>   1.07    15      9.38</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> T1        3    16     4 0.188 0.009<span style="text-decoration: underline;">52</span> 0.014<span style="text-decoration: underline;">3</span>   1.50    10.6    1.99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> T2        6    15     4 0.4   0.016   0.009<span style="text-decoration: underline;">01</span>  1       15      6   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> T2        7    16     4 0.438 0.015<span style="text-decoration: underline;">4</span>  0.014<span style="text-decoration: underline;">3</span>   1       16      7   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> T3        8    16     4 0.5   0.015<span style="text-decoration: underline;">6</span>  0.031<span style="text-decoration: underline;">2</span>   2        8      4   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># View Z-statistic</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">Z</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2812915</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.01966517</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculate p-value</span></span></span>
 <span class="r-in"><span><span class="va">p_value</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">Z</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"p-value:"</span>, <span class="va">p_value</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "p-value: 0.778486807493373"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "p-value: 0.984310478271696"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
