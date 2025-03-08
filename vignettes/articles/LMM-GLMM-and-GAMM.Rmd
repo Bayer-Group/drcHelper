@@ -228,4 +228,45 @@ By systematically exploring these patterns through simulation, we can develop gu
 ## Why Sample Size Requirements Changes?
 
 
+## References
 
+- [A cookbook in development](https://schmidtpaul.github.io/MMFAIR/index.html)
+
+
+## Development Notes
+
+For multiple comparison using multcomp, there are several ways to code it in functions:
+
+1. using `do.call`
+
+```{r eval=FALSE}
+ # Create a list for the mcp call
+  mcp_list <- list("Dunnett")
+  names(mcp_list) <- dose_var
+
+  # Set control level if not the first level
+  if (control_level != levels(data[[dose_var]])[1]) {
+    control_idx <- which(levels(data[[dose_var]]) == as.character(control_level))
+    mcp_list$base <- control_idx
+  }
+  
+  dunnett_result <- multcomp::glht(model, linfct = do.call(multcomp::mcp, mcp_list))
+```
+
+2. using ``
+
+```{r eval=FALSE}
+# Create the mcp call as a string and then evaluate it
+  mcp_call_str <- paste0("mcp(", dose_var, " = 'Dunnett')")
+  if (control_level != levels(data[[dose_var]])[1]) {
+    mcp_call_str <- paste0("mcp(", dose_var, " = 'Dunnett', base = ", control_idx, ")")
+  }
+  
+  # Create the glht call as a string and then evaluate it
+  glht_call_str <- paste0("glht(model, linfct = ", mcp_call_str, ")")
+  # Evaluate the call, not sure if we need to add , envir = eval_env to the eval function.
+  dunnett_result <- try(eval(parse(text = glht_call_str)), silent = TRUE)
+```
+
+
+3. Define the contrast matrix `K`, see `drcHelper::dunnet_test` for examples.

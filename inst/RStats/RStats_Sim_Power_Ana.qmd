@@ -1,0 +1,367 @@
+---
+title: "Simulation Based Power Analysis"
+description: | 
+  Collection of Notes on MM
+date: December 4, 2024
+author:
+  - first_name: "Zhenglei"
+    last_name: "Gao"
+    url: https://github.com/Zhenglei-BCS
+    affiliation: Bayer AG
+    affiliation_url: https://bayer.com
+    orcid_id: 0000-0002-4042-310X
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+```
+
+```{r}
+library(drcHelper)
+```
+
+## Simulate Data
+
+```{r}
+# Let's simulate a single dataset with your existing function and examine its properties
+set.seed(123)
+
+# Simulate dose-response data with specific variance components
+sim_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0, 20),
+  m_tanks = 4,
+  k_individuals = 10,
+  var_tank = 6,     # Between-tank variance
+  var_individual = 2,  # Within-tank (individual) variance
+  include_individuals = TRUE,
+  response_function = function(dose) {
+    # Simple linear dose-response with threshold at dose 10
+    ifelse(dose > 10, 5 + 2 * (dose - 10), 5)
+  }
+)
+
+# Calculate theoretical ICC
+theoretical_icc <- 6 / (6 + 2)  # var_tank / (var_tank + var_individual)
+cat("Theoretical ICC:", theoretical_icc, "\n")
+
+# Examine the data structure
+head(sim_data)
+str(sim_data)
+
+# Visualize the data to see the hierarchical structure
+library(ggplot2)
+
+# Plot individual data points with tank means
+ggplot(sim_data, aes(x = factor(Dose), y = Response, color = factor(Tank))) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun = mean, geom = "line", aes(group = factor(Tank))) +
+  labs(title = "Dose-Response Data with Hierarchical Structure",
+       x = "Dose", y = "Response",
+       color = "Tank") +
+  theme_minimal()
+
+# Calculate observed ICC using a mixed model
+library(lme4)
+mixed_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+summary(mixed_model)
+
+# Extract variance components
+vc <- VarCorr(mixed_model)
+tank_var <- as.numeric(vc$Tank)
+residual_var <- attr(vc, "sc")^2
+observed_icc <- tank_var / (tank_var + residual_var)
+cat("Observed ICC:", observed_icc, "\n")
+
+# Aggregate data to tank level
+tank_data <- aggregate(Response ~ Dose + Tank, data = sim_data, FUN = mean)
+head(tank_data)
+
+# Compare individual-level model with tank-level model
+# Individual level (mixed model)
+ind_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+
+# Tank level (regular linear model)
+tank_model <- lm(Response ~ factor(Dose), data = tank_data)
+
+# Compare model summaries
+summary(ind_model)
+summary(tank_model)
+
+# Extract and compare fixed effects
+ind_fixed <- fixef(ind_model)
+tank_fixed <- coef(tank_model)
+```
+
+
+
+Great, let's use the `multcomp` package to perform Dunnett tests on both the individual-level mixed model (`ind_model`) and the tank-level linear model (`tank_model`). I'll extract the results in a standardized format for comparison.
+
+```{r}
+library(multcomp)
+
+
+ind_model1 <- lmer(Response ~ Treatment + (1 | Tank),sim_data) ## homoscedastic errors
+# Apply Dunnett test to mixed model
+ind_dunnett1 <- glht(ind_model1, linfct = mcp(Treatment = "Dunnett"))
+
+summary(ind_dunnett) ## Note in this case all Std. Error are the same. 
+library(nlme)
+gls0 <- gls(Response ~ Treatment, data=sim_data,weights=varIdent(form= ~1|Treatment))
+ind_gls0 <- glht(gls0, linfct = mcp(Treatment = "Dunnett"))
+mod.nlme <- nlme::lme(Response ~ Treatment ,  
+                       random  = ~ 1 | Tank, 
+                       weights = varIdent(form= ~1|Treatment),
+                       data    = sim_data)
+ind_dunnett2 <- glht(mod.nlme, linfct = mcp(Treatment = "Dunnett"))
+summary(ind_dunnett2)   ## Note that standard errors are different for different comparisons.
+# 1. Homoscedastic mixed model (equivalent to your ind_model1)
+result1 <- dunnett_test(
+  data = sim_data,
+  response_var = "Response",
+  dose_var = "Treatment",  # Using your Treatment factor
+  block_var = "Tank",
+  include_random_effect = TRUE,
+  variance_structure = "homoscedastic"
+)
+s1 <- summary(ind_dunnett1)
+result1$results_table$p.value - s1$test$pvalues < attr(result1$results_table$p.value,"error")
+# 2. Heteroscedastic mixed model (equivalent to your mod.nlme)
+result2 <- dunnett_test(
+  data = sim_data,
+  response_var = "Response",
+  dose_var = "Treatment",
+  block_var = "Tank",
+  include_random_effect = TRUE,
+  variance_structure = "heteroscedastic"
+)
+s2 <- summary(ind_dunnett2)
+result2$results_table$p.value - s2$test$pvalues < 1e-05
+result2$results_table$estimate -s2$test$coefficients
+
+result3 <- dunnett_test(
+  data = sim_data,
+  response_var = "Response",
+  dose_var = "Treatment",
+  block_var = "Tank",
+  include_random_effect = FALSE,
+  variance_structure = "heteroscedastic"
+)
+s3 <- summary(ind_gls0)
+result3$results_table$estimate -s3$test$coefficients
+
+plot(gls0,Treatment ~ fitted(.))
+plot(mod.nlme,Treatment ~ fitted(.))
+ind_results <- extract_dunnett_results(ind_dunnett1, "Individual-level Mixed Model")
+
+# Apply Dunnett test to tank-level model
+tank_dunnett <- glht(tank_model, linfct = mcp(factor(Dose) = dunnett_contrasts))
+tank_results <- extract_dunnett_results(tank_dunnett, "Tank-level Linear Model")
+
+# Combine results for comparison
+all_results <- rbind(ind_results, tank_results)
+print(all_results)
+
+# Calculate differences in p-values and estimates between models
+comparison_summary <- merge(
+  ind_results[, c("comparison", "estimate", "p.value")],
+  tank_results[, c("comparison", "estimate", "p.value")],
+  by = "comparison",
+  suffixes = c(".ind", ".tank")
+)
+
+comparison_summary$diff_estimate <- comparison_summary$estimate.ind - comparison_summary$estimate.tank
+comparison_summary$ratio_pvalue <- comparison_summary$p.value.ind / comparison_summary$p.value.tank
+
+print(comparison_summary)
+
+# Visualize the comparison
+library(ggplot2)
+
+# Plot estimates
+ggplot(all_results, aes(x = comparison, y = estimate, color = model)) +
+  geom_point(position = position_dodge(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
+                position = position_dodge(width = 0.3), width = 0.2) +
+  labs(title = "Comparison of Dunnett Test Estimates",
+       x = "Comparison", y = "Estimate") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Plot p-values
+ggplot(all_results, aes(x = comparison, y = p.value, color = model)) +
+  geom_point(position = position_dodge(width = 0.3), size = 3) +
+  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") +
+  scale_y_log10() +
+  labs(title = "Comparison of Dunnett Test p-values",
+       x = "Comparison", y = "p-value (log scale)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Now, let's explore how different variance structures affect the ICC and model results. I'll create a function to simulate data with various variance components and analyze the results:
+
+```{r}
+# Function to analyze the effect of variance structure on ICC and model results
+analyze_variance_structure <- function(var_tank_values, var_ind_values, n_doses = 5, 
+                                      m_tanks = 4, k_individuals = 10) {
+  
+  results <- list()
+  
+  for (vt in var_tank_values) {
+    for (vi in var_ind_values) {
+      # Set seed for reproducibility
+      set.seed(123)
+      
+      # Calculate theoretical ICC
+      theoretical_icc <- vt / (vt + vi)
+      
+      # Simulate data
+      sim_data <- simulate_dose_response(
+        n_doses = n_doses,
+        dose_range = c(0, 20),
+        m_tanks = m_tanks,
+        k_individuals = k_individuals,
+        var_tank = vt,
+        var_individual = vi,
+        include_individuals = TRUE,
+        response_function = function(dose) {
+          # Simple linear dose-response with threshold at dose 10
+          ifelse(dose > 10, 5 + 2 * (dose - 10), 5)
+        }
+      )
+      
+      # Fit models
+      ind_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+      
+      # Aggregate data to tank level
+      tank_data <- aggregate(Response ~ Dose + Tank, data = sim_data, FUN = mean)
+      tank_model <- lm(Response ~ factor(Dose), data = tank_data)
+      
+      # Calculate observed ICC
+      vc <- VarCorr(ind_model)
+      observed_tank_var <- as.numeric(vc$Tank)
+      observed_residual_var <- attr(vc, "sc")^2
+      observed_icc <- observed_tank_var / (observed_tank_var + observed_residual_var)
+      
+      # Perform Dunnett tests
+      dose_levels <- levels(factor(sim_data$Dose))
+      dunnett_contrasts <- contrMat(n = length(dose_levels), type = "Dunnett")
+      
+      ind_dunnett <- glht(ind_model, linfct = mcp(factor(Dose) = dunnett_contrasts))
+      tank_dunnett <- glht(tank_model, linfct = mcp(factor(Dose) = dunnett_contrasts))
+      
+      ind_results <- extract_dunnett_results(ind_dunnett, "Individual-level")
+      tank_results <- extract_dunnett_results(tank_dunnett, "Tank-level")
+      
+      # Store results
+      result_entry <- list(
+        var_tank = vt,
+        var_ind = vi,
+        theoretical_icc = theoretical_icc,
+        observed_icc = observed_icc,
+        observed_tank_var = observed_tank_var,
+        observed_residual_var = observed_residual_var,
+        ind_model_summary = summary(ind_model),
+        tank_model_summary = summary(tank_model),
+        ind_dunnett_results = ind_results,
+        tank_dunnett_results = tank_results
+      )
+      
+      results[[paste(vt, vi, sep = "_")]] <- result_entry
+    }
+  }
+  
+  return(results)
+}
+
+# Define variance values to explore
+var_tank_values <- c(1, 4, 10)
+var_ind_values <- c(1, 4, 10)
+
+# Run the analysis
+variance_analysis <- analyze_variance_structure(var_tank_values, var_ind_values)
+
+# Extract key metrics for comparison
+comparison_df <- data.frame(
+  var_tank = numeric(),
+  var_ind = numeric(),
+  theoretical_icc = numeric(),
+  observed_icc = numeric(),
+  ind_model_dose5_p = numeric(),
+  tank_model_dose5_p = numeric(),
+  ind_model_r2 = numeric(),
+  tank_model_r2 = numeric()
+)
+
+for (name in names(variance_analysis)) {
+  result <- variance_analysis[[name]]
+  
+  # Extract p-value for the highest dose comparison (dose 5 vs control)
+  ind_dose5_p <- result$ind_dunnett_results$p.value[length(result$ind_dunnett_results$p.value)]
+  tank_dose5_p <- result$tank_dunnett_results$p.value[length(result$tank_dunnett_results$p.value)]
+  
+  # Extract R-squared values
+  ind_r2 <- r.squaredGLMM(result$ind_model_summary)[1]  # Marginal R-squared
+  tank_r2 <- summary(result$tank_model_summary)$r.squared
+  
+  comparison_df <- rbind(comparison_df, data.frame(
+    var_tank = result$var_tank,
+    var_ind = result$var_ind,
+    theoretical_icc = result$theoretical_icc,
+    observed_icc = result$observed_icc,
+    ind_model_dose5_p = ind_dose5_p,
+    tank_model_dose5_p = tank_dose5_p,
+    ind_model_r2 = ind_r2,
+    tank_model_r2 = tank_r2
+  ))
+}
+
+# Print the comparison table
+print(comparison_df)
+
+# Visualize the relationship between ICC and model performance
+ggplot(comparison_df, aes(x = theoretical_icc)) +
+  geom_point(aes(y = ind_model_dose5_p, color = "Individual-level p-value"), size = 3) +
+  geom_point(aes(y = tank_model_dose5_p, color = "Tank-level p-value"), size = 3) +
+  geom_line(aes(y = ind_model_dose5_p, color = "Individual-level p-value")) +
+  geom_line(aes(y = tank_model_dose5_p, color = "Tank-level p-value")) +
+  scale_y_log10() +
+  labs(title = "Effect of ICC on p-values",
+       x = "Intraclass Correlation Coefficient (ICC)",
+       y = "p-value (log scale)",
+       color = "Model") +
+  theme_minimal()
+
+# Visualize the relationship between ICC and R-squared
+ggplot(comparison_df, aes(x = theoretical_icc)) +
+  geom_point(aes(y = ind_model_r2, color = "Individual-level R²"), size = 3) +
+  geom_point(aes(y = tank_model_r2, color = "Tank-level R²"), size = 3) +
+  geom_line(aes(y = ind_model_r2, color = "Individual-level R²")) +
+  geom_line(aes(y = tank_model_r2, color = "Tank-level R²")) +
+  labs(title = "Effect of ICC on Model Fit",
+       x = "Intraclass Correlation Coefficient (ICC)",
+       y = "R-squared",
+       color = "Model") +
+  theme_minimal()
+```
+
+This code will:
+1. First perform Dunnett tests on our original simulated data using both individual-level mixed model and tank-level linear model
+2. Then explore how different variance structures affect the ICC and model results
+3. Compare p-values and model fit (R-squared) between individual-level and tank-level models across different ICC values
+
+Would you like me to focus on any specific aspect of this analysis, or would you like me to explain the expected patterns we might observe?
+
+## References
+
+- The Abuse of Power: https://www.tandfonline.com/doi/abs/10.1198/000313001300339897#preview
+- SIMR: power analysis for GLMM https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12504
