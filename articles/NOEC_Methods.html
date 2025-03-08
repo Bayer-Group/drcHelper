@@ -34,11 +34,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/drcHelper.html">Example Helper Functions Usage</a></li>
+    <li><a class="dropdown-item" href="../articles/drcHelper.html">Example ECx Helper Functions Usage</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Example NOEC Helper Functions Usage</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples_drc.html">Using DRC and BMD</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
   </ul>
@@ -51,6 +52,8 @@
     <li><a class="dropdown-item" href="../articles/Limit-Test.html">Limit Test Calculations</a></li>
     <li><a class="dropdown-item" href="../articles/EFSA-Criteria.html">EFSA Criteria and Other Reliability Criteria</a></li>
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
+    <li><a class="dropdown-item" href="../articles/Trend-Testing.html">Trend Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/NOEC_ECx_BMD.html">NOEC ECx and BMD</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -58,13 +61,16 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/Quantal-Data.html">Quantal Data</a></li>
     <li><a class="dropdown-item" href="../articles/Ordinal-Data.html">Ordinal Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_using_drda.html">drda</a></li>
     <li><a class="dropdown-item" href="../articles/TSK_method.html">TSK method</a></li>
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
-    <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
-    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -206,7 +212,7 @@ of results interpretation and should be avoided if possible.</li>
 are derived with different approaches.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"test_cases_data"</span><span class="op">)</span></span>
-<span><span class="va">testdata</span> <span class="op">&lt;-</span> <span class="va">test_cases_data</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">`Test organism`</span> <span class="op">==</span> <span class="st">"Myriophyllum"</span> <span class="op">&amp;</span> <span class="va">Design</span> <span class="op">==</span><span class="st">"NOEC/ECx"</span><span class="op">)</span></span>
+<span><span class="va">testdata</span> <span class="op">&lt;-</span> <span class="va">test_cases_data</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">`Test organism`</span> <span class="op">==</span> <span class="st">"Myriophyllum"</span> <span class="op">&amp;</span> <span class="va">Design</span> <span class="op">==</span><span class="st">"NOEC/ECx"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">testdata</span><span class="op">$</span><span class="va">`Study ID`</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "MOCK0065"</span></span>
 <span><span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">","</span>,<span class="st">"."</span>,<span class="va">testdata</span><span class="op">$</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span></span>
@@ -243,7 +249,7 @@ data.</p>
 <p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
 <p><strong>Basic Summary of the Data</strong></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ctr</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Dose</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ctr</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Dose</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">ctr0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">ctr</span><span class="op">$</span><span class="va">Response</span><span class="op">)</span></span>
 <span><span class="va">sres</span> <span class="op">&lt;-</span> <span class="va">testdata</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>Mean<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span>,SD<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">Response</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>`% Inhibition` <span class="op">=</span> <span class="op">-</span> <span class="op">(</span><span class="op">(</span><span class="va">Mean</span><span class="op">-</span><span class="va">ctr0</span><span class="op">)</span><span class="op">/</span><span class="va">ctr0</span><span class="op">)</span><span class="op">*</span><span class="fl">100</span>, CV<span class="op">=</span><span class="va">SD</span><span class="op">/</span><span class="va">Mean</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span></span>
 <span><span class="va">sres</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
@@ -491,20 +497,63 @@ same.</p>
 <p>NOEC is the lowest tested concentration <code>r</code>doses[2]`.</p>
 </div>
 <div class="section level3">
+<h3 id="nonparametric-tests">Nonparametric Tests<a class="anchor" aria-label="anchor" href="#nonparametric-tests"></a>
+</h3>
+<div class="section level4">
+<h4 id="jonckheere-terpstra-test">Jonckheere-Terpstra test<a class="anchor" aria-label="anchor" href="#jonckheere-terpstra-test"></a>
+</h4>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jonckheere</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/stepDownTrendTest.html" class="external-link">stepDownTrendTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,test <span class="op">=</span> <span class="st">"jonckheereTest"</span>,</span>
+<span>                         alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jonckheere</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Step down Jonckheere-Terpstra test </span></span>
+<span><span class="co">#&gt; data:  Response by Treatment </span></span>
+<span><span class="co">#&gt; alternative hypothesis:  less </span></span>
+<span><span class="co">#&gt; P value adjustment method:  none </span></span>
+<span><span class="co">#&gt; H0</span></span>
+<span><span class="co">#&gt;                           z value     Pr(&lt;z)    </span></span>
+<span><span class="co">#&gt; 0.0448 &gt;= 0                -1.066  0.1432110    </span></span>
+<span><span class="co">#&gt; 0.132 &gt;= 0.0448 &gt;= 0       -2.946  0.0016081  **</span></span>
+<span><span class="co">#&gt; 0.39 &gt;= 0.132 &gt;= ... &gt;= 0  -4.181 1.4491e-05 ***</span></span>
+<span><span class="co">#&gt; 1.15 &gt;= 0.39 &gt;= ... &gt;= 0   -5.150 1.3033e-07 ***</span></span>
+<span><span class="co">#&gt; 3.39 &gt;= 1.15 &gt;= ... &gt;= 0   -5.968 1.2019e-09 ***</span></span>
+<span><span class="co">#&gt; 10 &gt;= 3.39 &gt;= ... &gt;= 0     -6.290 1.5913e-10 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="dunns-test">Dunn’s test<a class="anchor" aria-label="anchor" href="#dunns-test"></a>
+</h4>
+<p>Dunn’s test is not very powerful in general.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span>
+<span><span class="va">dunn</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/kwManyOneDunnTest.html" class="external-link">kwManyOneDunnTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dunn</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 z value     Pr(&lt;z)    </span></span>
+<span><span class="co">#&gt; 0.0448 - 0 &gt;= 0  -0.367 0.77622945    </span></span>
+<span><span class="co">#&gt; 0.132 - 0 &gt;= 0   -1.378 0.30718909    </span></span>
+<span><span class="co">#&gt; 0.39 - 0 &gt;= 0    -2.082 0.08734203   .</span></span>
+<span><span class="co">#&gt; 1.15 - 0 &gt;= 0    -2.786 0.01445234   *</span></span>
+<span><span class="co">#&gt; 3.39 - 0 &gt;= 0    -3.974 0.00021077 ***</span></span>
+<span><span class="co">#&gt; 10 - 0 &gt;= 0      -3.710 0.00062473 ***</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
 <h3 id="dunnetts-tests-with-inhomogenious-variance">Dunnett’s Tests with Inhomogenious Variance<a class="anchor" aria-label="anchor" href="#dunnetts-tests-with-inhomogenious-variance"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inhomo</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">nlme</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">nlme</a></span><span class="op">)</span></span>
 <span><span class="va">gls0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/gls.html" class="external-link">gls</a></span><span class="op">(</span><span class="va">Response</span> <span class="op">~</span> <span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/varIdent.html" class="external-link">varIdent</a></span><span class="op">(</span>form<span class="op">=</span> <span class="op">~</span><span class="fl">1</span><span class="op">|</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="va">Treatment</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Looking at the variances</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gls0</span>,<span class="va">Treatment</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">resid</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,abline<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-17-2.png" width="700"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p><img src="NOEC_Methods_files/figure-html/unnamed-chunk-19-2.png" width="700"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">treat.means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rvlenth.github.io/emmeans/reference/emmeans.html" class="external-link">emmeans</a></span><span class="op">(</span><span class="va">gls0</span>, <span class="op">~</span> <span class="va">Treatment</span><span class="op">)</span></span>
 <span><span class="co">## no adjustment for p-values</span></span>
 <span><span class="co">## contrast(treat.means, adjust="none", method="dunnett", ref = 1)</span></span>
@@ -570,49 +619,6 @@ same.</p>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; (Adjusted p values reported -- holm method)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="nonparametric-tests">Nonparametric Tests<a class="anchor" aria-label="anchor" href="#nonparametric-tests"></a>
-</h3>
-<div class="section level4">
-<h4 id="jonckheere-terpstra-test">Jonckheere-Terpstra test<a class="anchor" aria-label="anchor" href="#jonckheere-terpstra-test"></a>
-</h4>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">jonckheere</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/stepDownTrendTest.html" class="external-link">stepDownTrendTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,test <span class="op">=</span> <span class="st">"jonckheereTest"</span>,</span>
-<span>                         alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">jonckheere</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Step down Jonckheere-Terpstra test </span></span>
-<span><span class="co">#&gt; data:  Response by Treatment </span></span>
-<span><span class="co">#&gt; alternative hypothesis:  less </span></span>
-<span><span class="co">#&gt; P value adjustment method:  none </span></span>
-<span><span class="co">#&gt; H0</span></span>
-<span><span class="co">#&gt;                           z value     Pr(&lt;z)    </span></span>
-<span><span class="co">#&gt; 0.0448 &gt;= 0                -1.066  0.1432110    </span></span>
-<span><span class="co">#&gt; 0.132 &gt;= 0.0448 &gt;= 0       -2.946  0.0016081  **</span></span>
-<span><span class="co">#&gt; 0.39 &gt;= 0.132 &gt;= ... &gt;= 0  -4.181 1.4491e-05 ***</span></span>
-<span><span class="co">#&gt; 1.15 &gt;= 0.39 &gt;= ... &gt;= 0   -5.150 1.3033e-07 ***</span></span>
-<span><span class="co">#&gt; 3.39 &gt;= 1.15 &gt;= ... &gt;= 0   -5.968 1.2019e-09 ***</span></span>
-<span><span class="co">#&gt; 10 &gt;= 3.39 &gt;= ... &gt;= 0     -6.290 1.5913e-10 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="dunns-test">Dunn’s test<a class="anchor" aria-label="anchor" href="#dunns-test"></a>
-</h4>
-<p>Dunn’s test is not very powerful in general.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span><span class="op">)</span></span>
-<span><span class="va">dunn</span> <span class="op">&lt;-</span> <span class="fu">PMCMRplus</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/PMCMRplus/man/kwManyOneDunnTest.html" class="external-link">kwManyOneDunnTest</a></span><span class="op">(</span><span class="va">Response</span><span class="op">~</span><span class="va">Treatment</span>, data<span class="op">=</span><span class="va">testdata</span>,alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">dunn</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                 z value     Pr(&lt;z)    </span></span>
-<span><span class="co">#&gt; 0.0448 - 0 &gt;= 0  -0.367 0.77628979    </span></span>
-<span><span class="co">#&gt; 0.132 - 0 &gt;= 0   -1.378 0.30712086    </span></span>
-<span><span class="co">#&gt; 0.39 - 0 &gt;= 0    -2.082 0.08745722   .</span></span>
-<span><span class="co">#&gt; 1.15 - 0 &gt;= 0    -2.786 0.01442079   *</span></span>
-<span><span class="co">#&gt; 3.39 - 0 &gt;= 0    -3.974 0.00022799 ***</span></span>
-<span><span class="co">#&gt; 10 - 0 &gt;= 0      -3.710 0.00059525 ***</span></span></code></pre></div>
-</div>
 </div>
 <div class="section level2">
 <h2 id="alternative-approaches">Alternative Approaches<a class="anchor" aria-label="anchor" href="#alternative-approaches"></a>

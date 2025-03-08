@@ -3,6 +3,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/LICENSE.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Count_Data.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Dunnetts_Test_for_Data_with_Hierarchical_Structure.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/EFSA-Criteria.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Equivalence-Testing.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Example_Analysis_Workflow.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/LMM-GLMM-and-GAMM.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Limit-Test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/MQJT.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/NOEC_ECx_BMD.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/NOEC_Methods.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Normality-Check.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/articles/Ordinal-Data.html</loc></url>
@@ -60,6 +62,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcCompare.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcHelper-package.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/drcHelper_datasets.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/dunnett_test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/exampleHistData.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/expand_to_individual_simple.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/expand_to_individual_tidy.html</loc></url>
@@ -84,6 +87,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pavaMean.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pipe.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.StepDownRSCABS.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.dunnett_test_result.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot.modList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/plot_edList.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/prelimPlot1.html</loc></url>
@@ -94,6 +98,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.RSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.StepDownRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.drcComp.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.dunnett_test_result.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/print.stepDownTrendBinom.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/pvi_example.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/reference/rankTransform.html</loc></url>

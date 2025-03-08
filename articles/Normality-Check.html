@@ -30,11 +30,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-get-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Get Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-get-started">
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/drcHelper.html">Example Helper Functions Usage</a></li>
+    <li><a class="dropdown-item" href="../articles/drcHelper.html">Example ECx Helper Functions Usage</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Example NOEC Helper Functions Usage</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples_drc.html">Using DRC and BMD</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
   </ul>
@@ -47,6 +48,8 @@
     <li><a class="dropdown-item" href="../articles/Limit-Test.html">Limit Test Calculations</a></li>
     <li><a class="dropdown-item" href="../articles/EFSA-Criteria.html">EFSA Criteria and Other Reliability Criteria</a></li>
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
+    <li><a class="dropdown-item" href="../articles/Trend-Testing.html">Trend Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/NOEC_ECx_BMD.html">NOEC ECx and BMD</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -54,13 +57,16 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/Quantal-Data.html">Quantal Data</a></li>
     <li><a class="dropdown-item" href="../articles/Ordinal-Data.html">Ordinal Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
+    <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
+    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_using_drda.html">drda</a></li>
     <li><a class="dropdown-item" href="../articles/TSK_method.html">TSK method</a></li>
     <li><a class="dropdown-item" href="../articles/MQJT.html">MQJT</a></li>
     <li><a class="dropdown-item" href="../articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html">Fitting A biphasic dose response model</a></li>
-    <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
-    <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -167,6 +173,8 @@ results as extreme as the observed one given the null hypothesis H0
 pre-determined significance level <span class="math inline">\(\alpha\)</span>, the null hypothesis is
 rejected.</p>
 <p>Result Shapiro-Wilk’s test:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">broom</span><span class="fu">::</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">statistic</th>
@@ -179,227 +187,13 @@ rejected.</p>
 <td align="left">Shapiro-Wilk normality test</td>
 </tr></tbody>
 </table>
-<table style="width:72%;" class="table">
-<colgroup>
-<col width="16%">
-<col width="13%">
-<col width="41%">
-</colgroup>
-<thead><tr class="header">
-<th align="center">statistic</th>
-<th align="center">p.value</th>
-<th align="center">method</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td align="center">0.98</td>
-<td align="center">0.85</td>
-<td align="center">Shapiro-Wilk normality test</td>
-</tr></tbody>
-</table>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## pander::pander(broom::tidy(res), digits = 2)</span></span></code></pre></div>
 <div class="figure">
 <img src="Normality-Check_files/figure-html/unnamed-chunk-4-1.png" alt="Residuals from ANOVA are presented in a QQ-plot." width="700"><p class="caption">
 Residuals from ANOVA are presented in a QQ-plot.
 </p>
 </div>
-<pre><code><span><span class="co">#&gt; Warning in tidy.numeric(res): 'tidy.numeric' is deprecated.</span></span>
-<span><span class="co">#&gt; See help("Deprecated")</span></span></code></pre>
-<table class="table">
-<thead><tr class="header">
-<th align="right">x</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">5.119380961390335e-03</td>
-</tr>
-<tr class="even">
-<td align="right">-8.942302088327664e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">4.437427609390338e-03</td>
-</tr>
-<tr class="even">
-<td align="right">-4.132245105531659e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">1.087329062857328e-03</td>
-</tr>
-<tr class="even">
-<td align="right">2.430409560221336e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-8.307800244902463e-04</td>
-</tr>
-<tr class="even">
-<td align="right">3.147753041141760e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">4.748110533174754e-03</td>
-</tr>
-<tr class="even">
-<td align="right">-7.065083549826240e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-9.335937657495144e-03</td>
-</tr>
-<tr class="even">
-<td align="right">2.117108776445956e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">7.296374159730945e-03</td>
-</tr>
-<tr class="even">
-<td align="right">-7.754527868174266e-05</td>
-</tr>
-<tr class="odd">
-<td align="right">-1.363301356487424e-02</td>
-</tr>
-<tr class="even">
-<td align="right">-5.644624777614946e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">8.520909885399955e-03</td>
-</tr>
-<tr class="even">
-<td align="right">1.075672845708925e-02</td>
-</tr>
-<tr class="odd">
-<td align="right">-7.078148143049856e-05</td>
-</tr>
-<tr class="even">
-<td align="right">-1.463273070117024e-04</td>
-</tr>
-<tr class="odd">
-<td align="right">4.897784636842102e-03</td>
-</tr>
-<tr class="even">
-<td align="right">-4.680675848399901e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-1.117198068655623e-03</td>
-</tr>
-<tr class="even">
-<td align="right">3.569829788267379e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-4.084983991003623e-03</td>
-</tr>
-<tr class="even">
-<td align="right">1.632352271391874e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-2.461604601087478e-03</td>
-</tr>
-<tr class="even">
-<td align="right">2.604483915912927e-03</td>
-</tr>
-<tr class="odd">
-<td align="right">-8.564006116546750e-04</td>
-</tr>
-<tr class="even">
-<td align="right">7.135212968292226e-04</td>
-</tr>
-</tbody>
-</table>
-<pre><code><span><span class="co">#&gt; Warning in tidy.numeric(res): 'tidy.numeric' is deprecated.</span></span>
-<span><span class="co">#&gt; See help("Deprecated")</span></span></code></pre>
-<table style="width:15%;" class="table">
-<colgroup><col width="15%"></colgroup>
-<thead><tr class="header">
-<th align="center">x</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="center">0.0051</td>
-</tr>
-<tr class="even">
-<td align="center">-0.0089</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0044</td>
-</tr>
-<tr class="even">
-<td align="center">-0.0041</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0011</td>
-</tr>
-<tr class="even">
-<td align="center">0.0024</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.00083</td>
-</tr>
-<tr class="even">
-<td align="center">0.0031</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0047</td>
-</tr>
-<tr class="even">
-<td align="center">-0.0071</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.0093</td>
-</tr>
-<tr class="even">
-<td align="center">0.0021</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0073</td>
-</tr>
-<tr class="even">
-<td align="center">-7.8e-05</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.014</td>
-</tr>
-<tr class="even">
-<td align="center">-0.0056</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0085</td>
-</tr>
-<tr class="even">
-<td align="center">0.011</td>
-</tr>
-<tr class="odd">
-<td align="center">-7.1e-05</td>
-</tr>
-<tr class="even">
-<td align="center">-0.00015</td>
-</tr>
-<tr class="odd">
-<td align="center">0.0049</td>
-</tr>
-<tr class="even">
-<td align="center">-0.0047</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.0011</td>
-</tr>
-<tr class="even">
-<td align="center">0.0036</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.0041</td>
-</tr>
-<tr class="even">
-<td align="center">0.0016</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.0025</td>
-</tr>
-<tr class="even">
-<td align="center">0.0026</td>
-</tr>
-<tr class="odd">
-<td align="center">-0.00086</td>
-</tr>
-<tr class="even">
-<td align="center">0.00071</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
