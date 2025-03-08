@@ -14,6 +14,13 @@ library(tidyverse)
 library(drcHelper)
 ```
 
+Statistical methods are used to assess the effects of PPPs on
+
+- **Non-Target Plants**: Endpoints may include emergence, growth, and reproduction.
+- **Aquatic Organisms**: such as fish, invertebrates, and algae.
+- **Terrestrial Invertebrates**: such as earthworms, bees, and predatory insects.
+- **Birds and Mammals**: Endpoints may include survival, reproduction, and behavior.
+
 There are a few analysis templates available for certain type of studies in the first release of the accompanied shiny app for V-COP platform.
 
 - EFX-Aquatics: Myriophyllum test (OECD 239)

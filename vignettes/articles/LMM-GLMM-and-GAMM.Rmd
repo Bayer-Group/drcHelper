@@ -17,14 +17,96 @@ library(drcHelper)
 ```
 
 
-
-
 ## Mixed Models
 
 ## Variance Components
 
+We first explore how variance components structure affect the dose-response analysis using the Intraclass Correlation Coefficient (ICC) patterns. 
 
-## Example
+The ICC represents the proportion of total variance attributable to between-tank differences:
+
+
+$$
+\mbox{ICC} = \sigma^2_{between}/(\sigma^2_{between} + \sigma^2_{within})
+$$
+
+## Example 1
+
+```{r}
+# Let's simulate a single dataset with your existing function and examine its properties
+set.seed(123)
+
+# Simulate dose-response data with specific variance components
+sim_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0, 20),
+  m_tanks = 4,
+  k_individuals = 10,
+  var_tank = 6,     # Between-tank variance
+  var_individual = 2,  # Within-tank (individual) variance
+  include_individuals = TRUE,
+  response_function = function(dose) {
+    # Simple linear dose-response with threshold at dose 10
+    ifelse(dose > 10, 5 + 2 * (dose - 10), 5)
+  }
+)
+
+# Calculate theoretical ICC
+theoretical_icc <- 6 / (6 + 2)  # var_tank / (var_tank + var_individual)
+cat("Theoretical ICC:", theoretical_icc, "\n")
+
+# Examine the data structure
+head(sim_data)
+str(sim_data)
+
+# Visualize the data to see the hierarchical structure
+library(ggplot2)
+
+# Plot individual data points with tank means
+ggplot(sim_data, aes(x = factor(Dose), y = Response, color = factor(Tank))) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun = mean, geom = "line", aes(group = factor(Tank))) +
+  labs(title = "Dose-Response Data with Hierarchical Structure",
+       x = "Dose", y = "Response",
+       color = "Tank") +
+  theme_minimal()
+
+# Calculate observed ICC using a mixed model
+library(lme4)
+mixed_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+summary(mixed_model)
+
+# Extract variance components
+vc <- VarCorr(mixed_model)
+tank_var <- as.numeric(vc$Tank)
+residual_var <- attr(vc, "sc")^2
+observed_icc <- tank_var / (tank_var + residual_var)
+cat("Observed ICC:", observed_icc, "\n")
+
+# Aggregate data to tank level
+tank_data <- aggregate(Response ~ Dose + Tank, data = sim_data, FUN = mean)
+head(tank_data)
+
+# Compare individual-level model with tank-level model
+# Individual level (mixed model)
+ind_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+
+# Tank level (regular linear model)
+tank_model <- lm(Response ~ factor(Dose), data = tank_data)
+
+# Compare model summaries
+summary(ind_model)
+summary(tank_model)
+
+# Extract and compare fixed effects
+ind_fixed <- fixef(ind_model)
+tank_fixed <- coef(tank_model)
+cbind(ind_fixed,tank_fixed)
+```
+
+
+## Example 2
 
 Simualate a dose-response with unequal variances across the dose range. 
 
@@ -52,8 +134,139 @@ prelimPlot3(sim_data_inhomogeneous%>% group_by(Dose,Tank)%>%summarise(Response=m
 
 ```
 
+## 
+
+# Expected Patterns in ICC and P-values Based on Variance Structures
+
+## Intraclass Correlation Coefficient (ICC) Patterns
+
+The ICC represents the proportion of total variance attributable to between-tank differences:
+
+
+$$
+\mbox{ICC} = \sigma^2_{between}/(\sigma^2_{between} + \sigma^2_{within})
+$$
+
+Where:
+- $\sigma^2_{between}$ is the between-tank variance (var_tank)
+- $\sigma^2_{within}$ is the within-tank variance (var_individual)
+
+### Expected ICC Patterns:
+
+1. **High between-tank variance, low within-tank variance**:
+   - ICC approaches 1.0
+   - Indicates strong tank effects where individuals within the same tank are highly similar
+   - Example: var_tank = 10, var_individual = 1 $\rightarrow$ ICC $\approx$ 0.91
+
+2. **Low between-tank variance, high within-tank variance**:
+   - ICC approaches 0
+   - Indicates weak tank effects where individuals within the same tank vary substantially
+   - Example: var_tank = 1, var_individual = 10 $\rightarrow$ ICC $\approx$ 0.09
+
+3. **Equal between-tank and within-tank variance**:
+   - ICC = 0.5
+   - Balanced contribution of tank and individual effects
+   - Example: var_tank = 4, var_individual = 4 $\rightarrow$ ICC = 0.5
+
+## P-value Patterns in Relation to Variance Structure
+
+### Individual-Level Mixed Model vs. Tank-Level Aggregated Model:
+
+1. **High ICC Scenarios (strong tank effects)**:
+   - **Tank-level model**: Will perform nearly as well as the individual-level model
+   - **Individual-level model**: Gains little additional power from individual observations
+   - **P-value comparison**: Both models will produce similar p-values
+   - **Efficiency**: Tank-level analysis is more efficient computationally with minimal loss of statistical power
+
+2. **Low ICC Scenarios (weak tank effects)**:
+   - **Tank-level model**: Loses substantial information by aggregating highly variable individuals
+   - **Individual-level model**: Gains significant power from modeling individual observations
+   - **P-value comparison**: Individual-level model will typically produce lower p-values (higher power)
+   - **Efficiency**: Individual-level analysis is worth the computational cost due to increased power
+
+3. **Moderate ICC Scenarios**:
+   - **Trade-off zone**: Balance between computational efficiency and statistical power
+   - **P-value comparison**: Individual-level model generally produces lower p-values, but the advantage diminishes as ICC increases
+
+### Effect of Variance Components on P-values:
+
+1. **Increasing between-tank variance (var_tank)**:
+   - Increases overall variability in the data
+   - Decreases statistical power for detecting dose effects
+   - Increases p-values in both models
+   - Makes tank-level aggregation more reasonable (higher ICC)
+
+2. **Increasing within-tank variance (var_individual)**:
+   - Increases variability at the individual level
+   - Decreases ICC
+   - Makes individual-level modeling more advantageous
+   - Tank-level model p-values will increase more dramatically than individual-level model p-values
+
+3. **Interaction with dose effect size**:
+   - For small effect sizes: Variance structure has a more pronounced impact on p-values
+   - For large effect sizes: Both models may detect significant effects despite variance structure differences
+
+## Practical Implications
+
+1. **When to use tank-level analysis**:
+   - High ICC scenarios (ICC > 0.7)
+   - When computational efficiency is a concern
+   - When the experimental design focuses on tank-level responses
+
+2. **When to use individual-level analysis**:
+   - Low to moderate ICC scenarios (ICC < 0.7)
+   - When maximum statistical power is required
+   - When individual-level covariates are important
+
+3. **Variance heterogeneity across dose levels**:
+   - If variance increases with dose, individual-level models with appropriate variance structures become more important
+   - Tank-level models may be less robust to variance heterogeneity
+
+By systematically exploring these patterns through simulation, we can develop guidelines for choosing the appropriate analysis approach based on the specific variance structure in dose-response studies.
+
 
 ## Why Sample Size Requirements Changes?
 
 
+## References
 
+- [A cookbook in development](https://schmidtpaul.github.io/MMFAIR/index.html)
+
+
+## Development Notes
+
+For multiple comparison using multcomp, there are several ways to code it in functions:
+
+1. using `do.call`
+
+```{r eval=FALSE}
+ # Create a list for the mcp call
+  mcp_list <- list("Dunnett")
+  names(mcp_list) <- dose_var
+
+  # Set control level if not the first level
+  if (control_level != levels(data[[dose_var]])[1]) {
+    control_idx <- which(levels(data[[dose_var]]) == as.character(control_level))
+    mcp_list$base <- control_idx
+  }
+  
+  dunnett_result <- multcomp::glht(model, linfct = do.call(multcomp::mcp, mcp_list))
+```
+
+2. using ``
+
+```{r eval=FALSE}
+# Create the mcp call as a string and then evaluate it
+  mcp_call_str <- paste0("mcp(", dose_var, " = 'Dunnett')")
+  if (control_level != levels(data[[dose_var]])[1]) {
+    mcp_call_str <- paste0("mcp(", dose_var, " = 'Dunnett', base = ", control_idx, ")")
+  }
+  
+  # Create the glht call as a string and then evaluate it
+  glht_call_str <- paste0("glht(model, linfct = ", mcp_call_str, ")")
+  # Evaluate the call, not sure if we need to add , envir = eval_env to the eval function.
+  dunnett_result <- try(eval(parse(text = glht_call_str)), silent = TRUE)
+```
+
+
+3. Define the contrast matrix `K`, see `drcHelper::dunnet_test` for examples.

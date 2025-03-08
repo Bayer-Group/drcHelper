@@ -60,5 +60,7 @@ A step-down trend test is a sequential testing procedure used to identify the lo
 
 This approach helps identify the No Observed Effect Concentration (NOEC) or Lowest Observed Effect Concentration (LOEC) in dose-response studies.
 
-The function `PMCMRplus::stepDownTrendTest` PMCMRplus implements this strategy for continuous data using various trend tests. For binomial survival data, we'll need to adapt this approach using the Cochran-Armitage test, which is specifically designed for binary outcomes across ordered groups.
+The function `PMCMRplus::stepDownTrendTest` PMCMRplus implements this strategy for continuous data using various trend tests. For binomial survival data, we adapt this approach using the Cochran-Armitage test, which is specifically designed for binary outcomes across ordered groups, the function for performing step-down CA is called `drcHelper::stepDownTrendTestBinom`. There is also `drcHelper::step_down_RSCABS` and `drcHelper::stepDownRSCABS` for oridinal data. Please refere to the relevant data page for usage demo and explanations. 
+
+
 

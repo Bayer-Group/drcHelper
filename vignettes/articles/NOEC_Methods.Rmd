@@ -224,28 +224,7 @@ emmeans(m, specs = trt.vs.ctrl ~ Treatment)
 NOEC is the lowest tested concentration `r `doses[2]`. 
 
 
-## Dunnett's Tests with Inhomogenious Variance
 
-```{r}
-inhomo <- require(nlme)
-```
-
-
-```{r eval=inhomo}
-library(nlme)
-gls0 <- gls(Response ~ Treatment, data=testdata,weights=varIdent(form= ~1|Treatment))
-plot(gls0,Treatment ~ fitted(.))
-## Looking at the variances
-plot(gls0,Treatment ~ resid(.),abline=0)
-treat.means <- emmeans(gls0, ~ Treatment)
-## no adjustment for p-values
-## contrast(treat.means, adjust="none", method="dunnett", ref = 1)
-contrast(treat.means, method="dunnett", ref = 1)
-summary(glht(gls0,mcp(Treatment="Dunnett"))) 
-fit <- aov(Response ~ Treatment, data=testdata)
-summary(PMCMRplus::welchManyOneTTest(fit, alternative = "two.sided", p.adjust="holm"))
-summary(glht(gls0,mcp(Treatment="Dunnett")),test = adjusted("holm")) 
-```
 
 
 ## Nonparametric Tests
@@ -269,6 +248,28 @@ dunn <- PMCMRplus::kwManyOneDunnTest(Response~Treatment, data=testdata,alternati
 summary(dunn)
 ```
 
+## Dunnett's Tests with Inhomogenious Variance
+
+```{r}
+inhomo <- require(nlme)
+```
+
+
+```{r eval=inhomo}
+library(nlme)
+gls0 <- gls(Response ~ Treatment, data=testdata,weights=varIdent(form= ~1|Treatment))
+plot(gls0,Treatment ~ fitted(.))
+## Looking at the variances
+plot(gls0,Treatment ~ resid(.),abline=0)
+treat.means <- emmeans(gls0, ~ Treatment)
+## no adjustment for p-values
+## contrast(treat.means, adjust="none", method="dunnett", ref = 1)
+contrast(treat.means, method="dunnett", ref = 1)
+summary(glht(gls0,mcp(Treatment="Dunnett"))) 
+fit <- aov(Response ~ Treatment, data=testdata)
+summary(PMCMRplus::welchManyOneTTest(fit, alternative = "two.sided", p.adjust="holm"))
+summary(glht(gls0,mcp(Treatment="Dunnett")),test = adjusted("holm")) 
+```
 
 # Alternative Approaches
 
