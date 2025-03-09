@@ -28,7 +28,8 @@ articles:
   articles/Trend-Testing: Trend-Testing.html
   articles/TSK_method: TSK_method.html
   articles/Validation_MCP_tests: Validation_MCP_tests.html
-last_built: 2025-03-08T23:52Z
+  articles/Verification_which_JT: Verification_which_JT.html
+last_built: 2025-03-09T10:23Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

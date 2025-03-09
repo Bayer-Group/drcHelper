@@ -35,7 +35,7 @@
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Example ECx Helper Functions Usage</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Example NOEC Helper Functions Usage</h6></li>
+    <li><a class="dropdown-item" href="../articles/Dunnetts_Test_for_Data_with_Hierarchical_Structure.html">Example NOEC Helper Functions Usage</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_drc.html">Using DRC and BMD</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
   </ul>
@@ -73,6 +73,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-validation">
 <li><a class="dropdown-item" href="../articles/System_Testing.html">System Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
@@ -164,52 +165,72 @@ acceptable exposure limits</li>
 <div class="section level3">
 <h3 id="noec">NOEC<a class="anchor" aria-label="anchor" href="#noec"></a>
 </h3>
-<p>– Definition: The highest tested concentration at which no
+<ul>
+<li>Definition: The highest tested concentration at which no
 statistically significant adverse effect is observed relative to the
-control. – Regulatory Role: Historically used as the primary benchmark
-(e.g., for deriving acceptable daily intakes or environmental quality
-standards).</p>
+control.</li>
+<li>Regulatory Role: Historically used as the primary benchmark (e.g.,
+for deriving acceptable daily intakes or environmental quality
+standards).</li>
+</ul>
 <p><strong>Strengths:</strong></p>
-<p>– Straightforward concept and quick to interpret – Familiar to risk
-assessors and historically embedded in many regulatory frameworks</p>
+<ul>
+<li>Straightforward concept and quick to interpret</li>
+<li>Familiar to risk assessors and historically embedded in many
+regulatory frameworks</li>
+</ul>
 <p><strong>Weaknesses:</strong></p>
-<p>– Strongly dependent on the dose spacing and study design – Does not
-provide information on the magnitude of effects or their progression
-along a dose–response curve – Binary interpretation (“effect” vs. “no
-effect”) can oversimplify data – Potentially influenced by low
-statistical power, especially in studies with small sample sizes</p>
+<ul>
+<li>Strongly dependent on the dose spacing and study design</li>
+<li>Does not provide information on the magnitude of effects or their
+progression along a dose–response curve</li>
+<li>Binary interpretation (“effect” vs. “no effect”) can oversimplify
+data</li>
+<li>Potentially influenced by low statistical power, especially in
+studies with small sample sizes</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="ecx-and-bmd">ECx and BMD<a class="anchor" aria-label="anchor" href="#ecx-and-bmd"></a>
 </h3>
-<p>– Definition: The concentration at which a predefined percentage (x)
-of effect (e.g., 10%, 20% reduction in a biological endpoint) is
-observed relative to the control.</p>
-<p>– Regulatory Role: Increasingly used to quantitatively describe the
+<ul>
+<li><p>Definition: The concentration at which a predefined percentage
+(x) of effect (e.g., 10%, 20% reduction in a biological endpoint) is
+observed relative to the control.</p></li>
+<li><p>Regulatory Role: Increasingly used to quantitatively describe the
 magnitude of adverse effects along the dose–response curve and
 considered more informative in deriving species sensitivity
-distributions.</p>
+distributions.</p></li>
+</ul>
 <p><strong>Strengths:</strong></p>
-<p>– Utilizes the full data set by modeling the dose–response
-relationship – Provides a more nuanced and continuous estimate along the
-effect continuum (e.g., EC10 is often seen as protective) – Facilitates
-interpolation and extrapolation within the tested range – Offers the
-possibility to quantify uncertainty via confidence intervals</p>
+<ul>
+<li>Utilizes the full data set by modeling the dose–response
+relationship</li>
+<li>Provides a more nuanced and continuous estimate along the effect
+continuum (e.g., EC10 is often seen as protective)</li>
+<li>Facilitates interpolation and extrapolation within the tested
+range</li>
+<li>Offers the possibility to quantify uncertainty via confidence
+intervals</li>
+</ul>
 <p><strong>Weaknesses:</strong></p>
-<p>– Heavily dependent on the choice and fit of the dose–response model
-– Requires more sophisticated statistical methods and expertise – May be
-sensitive to violations of model assumptions if data quality or
-distribution is suboptimal – In some cases, different models may yield
-different ECx estimates, raising issues of model selection and
-validation</p>
+<ul>
+<li>Heavily dependent on the choice and fit of the dose–response
+model</li>
+<li>Requires more sophisticated statistical methods and expertise</li>
+<li>May be sensitive to violations of model assumptions if data quality
+or distribution is suboptimal</li>
+<li>In some cases, different models may yield different ECx estimates,
+raising issues of model selection and validation</li>
+</ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="methodological-improvements">Methodological Improvements<a class="anchor" aria-label="anchor" href="#methodological-improvements"></a>
 </h2>
-<p>SETAC’s journals (Environmental Toxicology and Chemistry) regularly
-publish papers on methodological improvements in statistical evaluation
-of ecotoxicological studies.</p>
+<p>Papers, scientific opinions, guidance are regularly published on
+methodological improvements in statistical evaluation of
+ecotoxicological studies.</p>
 <ul>
 <li>We advocate for transparent reporting of uncertainties and
 assumptions in model selection or model averaging.</li>

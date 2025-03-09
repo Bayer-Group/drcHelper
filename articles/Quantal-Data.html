@@ -35,7 +35,7 @@
 <li><a class="dropdown-item" href="../articles/Introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/Example_Analysis_Workflow.html">Example Analysis Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/drcHelper.html">Example ECx Helper Functions Usage</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Example NOEC Helper Functions Usage</h6></li>
+    <li><a class="dropdown-item" href="../articles/Dunnetts_Test_for_Data_with_Hierarchical_Structure.html">Example NOEC Helper Functions Usage</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_drc.html">Using DRC and BMD</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_oecd201.html">Example DRC - OECD 201</a></li>
   </ul>
@@ -73,6 +73,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-validation">
 <li><a class="dropdown-item" href="../articles/System_Testing.html">System Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
@@ -109,9 +110,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span></code></pre></div>
 <p>Analysis of quantal data typically involves the following steps as
 shown in the flowchart below:</p>
-<div class="float">
-<img src="https://bayer-group.github.io/drcHelper/articles/assets/quantal_NOEC.png" alt="Quantal NOEC Flowchart"><div class="figcaption">Quantal NOEC Flowchart</div>
-</div>
+<!-- ![Quantal NOEC Flowchart](https://bayer-group.github.io/drcHelper/articles/assets/quantal_NOEC.png) -->
 <p><img src="article_assets%2Fquantal_NOEC.png" alt="Quantal NOEC Flowchart" width="90%"></p>
 <div class="section level2">
 <h2 id="an-example-dataset">An example dataset<a class="anchor" aria-label="anchor" href="#an-example-dataset"></a>
@@ -523,7 +522,6 @@ in package <strong>coin</strong>.</p>
 <span><span class="co">#&gt; 2 2 (1-1,2-2) arrange gtable[layout]</span></span>
 <span><span class="co">#&gt; 3 3 (2-2,1-1) arrange gtable[layout]</span></span>
 <span><span class="co">#&gt; 4 4 (2-2,2-2) arrange gtable[layout]</span></span></code></pre>
-<p><img src="..%2Fassets%2Fbinomial_tank_effects_visualization.png"><!-- --></p>
 <p>The plot on the upper left shows the survival proportions for each
 tank (colored points) at each dose level. The black diamonds represent
 the mean survival proportion at each dose level, and the dashed line
