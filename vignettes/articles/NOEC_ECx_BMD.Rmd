@@ -51,44 +51,44 @@ Current statistical practices typically involve the following steps:
 
 ### NOEC
 
-– Definition: The highest tested concentration at which no statistically significant adverse effect is observed relative to the control.
-– Regulatory Role: Historically used as the primary benchmark (e.g., for deriving acceptable daily intakes or environmental quality standards).
+- Definition: The highest tested concentration at which no statistically significant adverse effect is observed relative to the control.
+- Regulatory Role: Historically used as the primary benchmark (e.g., for deriving acceptable daily intakes or environmental quality standards).
 
 **Strengths:**
 
-– Straightforward concept and quick to interpret
-– Familiar to risk assessors and historically embedded in many regulatory frameworks
+- Straightforward concept and quick to interpret
+- Familiar to risk assessors and historically embedded in many regulatory frameworks
 
 **Weaknesses:**
 
-– Strongly dependent on the dose spacing and study design
-– Does not provide information on the magnitude of effects or their progression along a dose–response curve
-– Binary interpretation ("effect" vs. "no effect") can oversimplify data
-– Potentially influenced by low statistical power, especially in studies with small sample sizes
+- Strongly dependent on the dose spacing and study design
+- Does not provide information on the magnitude of effects or their progression along a dose–response curve
+- Binary interpretation ("effect" vs. "no effect") can oversimplify data
+- Potentially influenced by low statistical power, especially in studies with small sample sizes
 
 ### ECx and BMD
 
-– Definition: The concentration at which a predefined percentage (x) of effect (e.g., 10\%, 20\% reduction in a biological endpoint) is observed relative to the control.
+- Definition: The concentration at which a predefined percentage (x) of effect (e.g., 10\%, 20\% reduction in a biological endpoint) is observed relative to the control.
 
-– Regulatory Role: Increasingly used to quantitatively describe the magnitude of adverse effects along the dose–response curve and considered more informative in deriving species sensitivity distributions.
+- Regulatory Role: Increasingly used to quantitatively describe the magnitude of adverse effects along the dose–response curve and considered more informative in deriving species sensitivity distributions.
 
 **Strengths:**
 
-– Utilizes the full data set by modeling the dose–response relationship
-– Provides a more nuanced and continuous estimate along the effect continuum (e.g., EC10 is often seen as protective)
-– Facilitates interpolation and extrapolation within the tested range
-– Offers the possibility to quantify uncertainty via confidence intervals
+- Utilizes the full data set by modeling the dose–response relationship
+- Provides a more nuanced and continuous estimate along the effect continuum (e.g., EC10 is often seen as protective)
+- Facilitates interpolation and extrapolation within the tested range
+- Offers the possibility to quantify uncertainty via confidence intervals
 
 **Weaknesses:**
 
-– Heavily dependent on the choice and fit of the dose–response model
-– Requires more sophisticated statistical methods and expertise
-– May be sensitive to violations of model assumptions if data quality or distribution is suboptimal
-– In some cases, different models may yield different ECx estimates, raising issues of model selection and validation
+- Heavily dependent on the choice and fit of the dose–response model
+- Requires more sophisticated statistical methods and expertise
+- May be sensitive to violations of model assumptions if data quality or distribution is suboptimal
+- In some cases, different models may yield different ECx estimates, raising issues of model selection and validation
 
 ## Methodological Improvements
 
-SETAC’s journals (Environmental Toxicology and Chemistry) regularly publish papers on methodological improvements in statistical evaluation of ecotoxicological studies.
+Papers, scientific opinions, guidance are regularly published  on methodological improvements in statistical evaluation of ecotoxicological studies.
 
 - We advocate for transparent reporting of uncertainties and assumptions in model selection or model averaging.
 - Integration of Bayesian methods and bootstrap techniques to better quantify uncertainty is emerging in research discussions. 
