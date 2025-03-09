@@ -5,7 +5,9 @@ title: "Study Types and Templates"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 library(tidyverse)
 ```
