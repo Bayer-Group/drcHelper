@@ -55,6 +55,7 @@ navbar:
       - text: Example ECx Helper Functions Usage
         href: articles/drcHelper.html
       - text: Example NOEC Helper Functions Usage
+        href: articles/Dunnetts_Test_for_Data_with_Hierarchical_Structure.html
       - text: Using DRC and BMD
         href: articles/Examples_drc.html
       - text: Example DRC - OECD 201
@@ -107,6 +108,8 @@ navbar:
       menu:
       - text: System Testing
         href: articles/System_Testing.html
+      - text: Which JT test to use
+        href: articles/Verification_which_JT.html
       - text: Study Types and Templates
         href: articles/Test-Guidelines.html
     newissue:

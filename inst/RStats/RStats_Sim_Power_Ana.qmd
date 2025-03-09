@@ -27,6 +27,561 @@ library(tidyverse)
 library(drcHelper)
 ```
 
+
+## Discussion Outcome
+
+Thanks for sharing your `simulate_dose_response` function. This gives me a good starting point for generating dose-response data for testing and power analysis.
+
+Let me now help you develop the `combine_multiple_comparisons` function and refine the existing functions to make them work together seamlessly. I'll also set up a framework for simulation-based power analysis.
+
+First, let's develop the `combine_multiple_comparisons` function:
+
+```{r}
+#' Combine Multiple Comparison Test Results for Dose-Response Analysis
+#'
+#' This function applies various multiple comparison methods to dose-response data
+#' and returns the results in a standardized format for easy comparison.
+#'
+#' @param data A data frame containing the dose-response data
+#' @param response The name of the response variable
+#' @param dose The name of the dose variable
+#' @param group An optional grouping variable name
+#' @param control The dose level to use as control (default: 0)
+#' @param alternative Direction of the alternative hypothesis ("two.sided", "less", or "greater")
+#' @param conf.level Confidence level for intervals
+#' @param methods Vector of method names to apply. Available methods include:
+#'   "Dunnett_multcomp", "Dunnett_DescTools", "Dunnett_PMCMRplus",
+#'   "Williams_PMCMRplus", "Williams_JG", "stepDown_PMCMR"
+#'
+#' @return A tibble containing the combined results from all specified methods
+#' @export
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom stats aov as.formula
+#' @importFrom tibble tibble
+combine_multiple_comparisons <- function(data, response, dose, group = NULL,
+                                        control = 0, alternative = "two.sided",
+                                        conf.level = 0.95,
+                                        methods = c("Dunnett_multcomp", "Williams_PMCMRplus")) {
+  
+  # Check inputs
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data frame")
+  }
+  
+  if (!response %in% names(data)) {
+    stop("'response' variable not found in data")
+  }
+  
+  if (!dose %in% names(data)) {
+    stop("'dose' variable not found in data")
+  }
+  
+  if (!is.null(group) && !group %in% names(data)) {
+    stop("'group' variable not found in data")
+  }
+  
+  # Ensure dose is treated as a factor
+  data[[dose]] <- as.factor(data[[dose]])
+  
+  # Find the control level index
+  dose_levels <- levels(data[[dose]])
+  control_idx <- which(dose_levels == as.character(control))
+  
+  if (length(control_idx) == 0) {
+    stop("Control dose level not found in data")
+  }
+  
+  # Create formula based on whether a grouping variable is provided
+  if (is.null(group)) {
+    formula <- as.formula(paste(response, "~", dose))
+  } else {
+    formula <- as.formula(paste(response, "~", dose, "+", group))
+  }
+  
+  # Fit ANOVA model
+  aov_model <- aov(formula, data = data)
+  
+  # Initialize results list
+  results_list <- list()
+  
+  # Apply each requested method
+  for (method in methods) {
+    if (grepl("^Dunnett", method)) {
+      dunnett_method <- gsub("^Dunnett_", "", method)
+      method_name <- paste0("Dunnett_", dunnett_method)
+      
+      # Apply Dunnett test with the appropriate method
+      result <- broom_dunnett(
+        aov_model, 
+        method = method_name,
+        control = control_idx,
+        alternative = alternative,
+        conf.level = conf.level
+      )
+      
+    } else if (grepl("^Williams", method)) {
+      williams_method <- gsub("^Williams_", "", method)
+      method_name <- paste0("Williams_", williams_method)
+      
+      # Apply Williams test with the appropriate method
+      result <- broom_williams(
+        aov_model, 
+        method = method_name,
+        control = control_idx,
+        alternative = alternative,
+        conf.level = conf.level
+      )
+      
+    } else if (method == "stepDown_PMCMR") {
+      # Apply step-down test from PMCMR package
+      result <- try({
+        sd_test <- PMCMR::stepDownTrendTest(data[[response]], data[[dose]])
+        tibble::tibble(
+          comparison = paste(names(sd_test$p.value), "- control"),
+          estimate = NA_real_,  # Step-down test doesn't provide estimates
+          p.value = sd_test$p.value,
+          conf.low = NA_real_,  # Step-down test doesn't provide confidence intervals
+          conf.high = NA_real_,
+          method = "stepDown_PMCMR"
+        )
+      }, silent = TRUE)
+      
+      if (inherits(result, "try-error")) {
+        warning("Step-down test failed. Error: ", attr(result, "condition")$message)
+        result <- tibble::tibble(
+          comparison = character(),
+          estimate = numeric(),
+          p.value = numeric(),
+          conf.low = numeric(),
+          conf.high = numeric(),
+          method = character()
+        )
+      }
+    } else {
+      warning("Unknown method: ", method)
+      next
+    }
+    
+    # Add to results list
+    results_list[[method]] <- result
+  }
+  
+  # Combine all results
+  combined_results <- dplyr::bind_rows(results_list)
+  
+  # Add dose information to make results more interpretable
+  combined_results <- combined_results %>%
+    dplyr::mutate(
+      dose_level = sub(".*?([0-9.]+).*", "\\1", comparison),
+      control_level = as.character(control)
+    )
+  
+  return(combined_results)
+}
+```
+
+Now, let's add the `williamsTest_JG` function that was referenced in your `broom_williams` function:
+
+```{r}
+#' Williams Test Implementation (Jones-Graul Method)
+#'
+#' This function implements the Williams test for monotonic dose-response relationships
+#' using the Jones-Graul method.
+#'
+#' @param x An object of class formula, aov, lm, or a data frame or matrix
+#' @param ... Additional arguments passed to methods
+#'
+#' @return A data frame with standardized output columns
+#' @export
+williamsTest_JG <- function(x, ...) {
+  UseMethod("williamsTest_JG")
+}
+
+#' @export
+williamsTest_JG.formula <- function(formula, data, ...) {
+  model <- aov(formula, data = data)
+  williamsTest_JG(model, ...)
+}
+
+#' @export
+williamsTest_JG.aov <- function(x, control = 1, alternative = c("greater", "less", "two.sided"),
+                               conf.level = 0.95, ...) {
+  alternative <- match.arg(alternative)
+  
+  # Extract data from the model
+  model_data <- model.frame(x)
+  response_var <- model_data[, 1]
+  factor_var <- model_data[, 2]
+  
+  # Get group means and sample sizes
+  group_means <- tapply(response_var, factor_var, mean)
+  group_sizes <- tapply(response_var, factor_var, length)
+  
+  # Get residual variance from ANOVA
+  residual_var <- summary(x)[[1]]["Residuals", "Mean Sq"]
+  
+  # Number of groups
+  k <- length(group_means)
+  
+  if (control < 1 || control > k) {
+    stop("Control group index must be between 1 and k")
+  }
+  
+  # Calculate isotonic means (step-down approach)
+  isotonic_means <- numeric(k)
+  isotonic_means[control] <- group_means[control]
+  
+  # For doses higher than control
+  if (control < k) {
+    for (i in (control + 1):k) {
+      # Pool means if current mean is less than previous isotonic mean
+      if (i == control + 1) {
+        isotonic_means[i] <- max(group_means[i], group_means[control])
+      } else {
+        isotonic_means[i] <- max(group_means[i], isotonic_means[i - 1])
+      }
+    }
+  }
+  
+  # For doses lower than control (if any)
+  if (control > 1) {
+    for (i in (control - 1):1) {
+      # Pool means if current mean is greater than next isotonic mean
+      if (i == control - 1) {
+        isotonic_means[i] <- min(group_means[i], group_means[control])
+      } else {
+        isotonic_means[i] <- min(group_means[i], isotonic_means[i + 1])
+      }
+    }
+  }
+  
+  # Calculate test statistics
+  t_stats <- numeric(k - 1)
+  comparisons <- character(k - 1)
+  estimates <- numeric(k - 1)
+  p_values <- numeric(k - 1)
+  conf_low <- numeric(k - 1)
+  conf_high <- numeric(k - 1)
+  
+  idx <- 1
+  for (i in setdiff(1:k, control)) {
+    # Calculate contrast weights
+    weights <- rep(0, k)
+    weights[control] <- -1
+    weights[i] <- 1
+    
+    # Calculate contrast
+    contrast <- sum(weights * isotonic_means)
+    
+    # Calculate standard error
+    se <- sqrt(residual_var * sum(weights^2 / group_sizes))
+    
+    # Calculate t-statistic
+    t_stat <- contrast / se
+    t_stats[idx] <- t_stat
+    
+    # Calculate p-value based on alternative
+    if (alternative == "two.sided") {
+      p_value <- 2 * pt(-abs(t_stat), df = x$df.residual)
+    } else if (alternative == "greater") {
+      p_value <- pt(-t_stat, df = x$df.residual)
+    } else {
+      p_value <- pt(t_stat, df = x$df.residual)
+    }
+    
+    # Calculate confidence intervals
+    t_crit <- qt(1 - (1 - conf.level) / 2, df = x$df.residual)
+    margin <- t_crit * se
+    
+    # Store results
+    group_levels <- levels(factor_var)
+    comparisons[idx] <- paste(group_levels[i], "-", group_levels[control])
+    estimates[idx] <- contrast
+    p_values[idx] <- p_value
+    conf_low[idx] <- contrast - margin
+    conf_high[idx] <- contrast + margin
+    
+    idx <- idx + 1
+  }
+  
+  # Create result data frame
+  result <- tibble::tibble(
+    comparison = comparisons,
+    estimate = estimates,
+    p.value = p_values,
+    conf.low = conf_low,
+    conf.high = conf_high,
+    method = "Williams_JG"
+  )
+  
+  return(result)
+}
+
+#' @export
+williamsTest_JG.default <- function(x, g, control = 1, ...) {
+  # Convert to formula interface
+  df <- data.frame(response = x, group = factor(g))
+  williamsTest_JG(response ~ group, data = df, control = control, ...)
+}
+```
+
+Now, let's create a function for simulation-based power analysis:
+
+```{r}
+#' Perform Simulation-Based Power Analysis for Dose-Response Tests
+#'
+#' This function conducts a simulation-based power analysis for various multiple
+#' comparison methods in dose-response analysis.
+#'
+#' @param n_sims Number of simulations to run
+#' @param n_doses Number of dose levels
+#' @param dose_range Vector of length 2 specifying the min and max dose values
+#' @param m_tanks Number of tanks per dose
+#' @param k_individuals Number of individuals per tank
+#' @param var_tank Variance at the tank level
+#' @param var_individual Variance at the individual level
+#' @param response_function Function that calculates the response given a dose
+#' @param alpha Significance level for hypothesis tests
+#' @param methods Vector of method names to compare
+#' @param include_individuals Whether to simulate individual-level data
+#' @param ... Additional parameters passed to response_function
+#'
+#' @return A tibble containing power analysis results for each method and dose level
+#' @export
+#'
+#' @importFrom dplyr bind_rows group_by summarize
+#' @importFrom purrr map_dfr
+#' @importFrom tibble tibble
+power_analysis_dose_response <- function(n_sims = 100,
+                                        n_doses = 5,
+                                        dose_range = c(0, 20),
+                                        m_tanks = 3,
+                                        k_individuals = 10,
+                                        var_tank = 4,
+                                        var_individual = 2,
+                                        response_function = NULL,
+                                        alpha = 0.05,
+                                        methods = c("Dunnett_multcomp", "Williams_PMCMRplus"),
+                                        include_individuals = TRUE,
+                                        ...) {
+  
+  # Set default response function if not provided
+  if (is.null(response_function)) {
+    response_function <- function(dose, lower = 0, upper = 100, ED50 = 10, slope = 1) {
+      lower + (upper - lower) / (1 + exp(-slope * (dose - ED50)))
+    }
+  }
+  
+  # Function to run a single simulation
+  run_simulation <- function(sim_id) {
+    # Generate data
+    sim_data <- simulate_dose_response(
+      n_doses = n_doses,
+      dose_range = dose_range,
+      m_tanks = m_tanks,
+      k_individuals = k_individuals,
+      var_tank = var_tank,
+      var_individual = var_individual,
+      include_individuals = include_individuals,
+      response_function = response_function,
+      ...
+    )
+    
+    # If we have individual-level data, aggregate to tank level
+    if (include_individuals) {
+      sim_data <- sim_data %>%
+        dplyr::group_by(Dose, Tank) %>%
+        dplyr::summarize(Response = mean(Response), .groups = "drop")
+    }
+    
+    # Run multiple comparison tests
+    test_results <- try({
+      combine_multiple_comparisons(
+        data = sim_data,
+        response = "Response",
+        dose = "Dose",
+        control = min(sim_data$Dose),
+        alternative = "two.sided",
+        conf.level = 1 - alpha,
+        methods = methods
+      )
+    }, silent = TRUE)
+    
+    if (inherits(test_results, "try-error")) {
+      warning("Error in simulation ", sim_id, ": ", attr(test_results, "condition")$message)
+      return(NULL)
+    }
+    
+    # Add simulation ID
+    test_results$simulation <- sim_id
+    
+    return(test_results)
+  }
+  
+  # Run all simulations
+  message("Running ", n_sims, " simulations...")
+  all_results <- purrr::map_dfr(1:n_sims, run_simulation)
+  
+  # Calculate power for each method and dose level
+  if (nrow(all_results) > 0) {
+    power_results <- all_results %>%
+      dplyr::group_by(method, comparison) %>%
+      dplyr::summarize(
+        n_significant = sum(p.value < alpha, na.rm = TRUE),
+        n_tests = sum(!is.na(p.value)),
+        power = n_significant / n_tests,
+        mean_estimate = mean(estimate, na.rm = TRUE),
+        sd_estimate = sd(estimate, na.rm = TRUE),
+        .groups = "drop"
+      )
+    
+    return(power_results)
+  } else {
+    warning("No valid results from simulations")
+    return(tibble::tibble(
+      method = character(),
+      comparison = character(),
+      n_significant = integer(),
+      n_tests = integer(),
+      power = numeric(),
+      mean_estimate = numeric(),
+      sd_estimate = numeric()
+    ))
+  }
+}
+```
+
+Let's also create a visualization function to help interpret the power analysis results:
+
+```{r}
+#' Visualize Power Analysis Results for Dose-Response Tests
+#'
+#' This function creates visualizations of power analysis results from
+#' multiple comparison methods in dose-response analysis.
+#'
+#' @param power_results A tibble containing power analysis results from power_analysis_dose_response
+#' @param plot_type Type of plot to create: "power" (default), "estimates", or "both"
+#' @param arrange_by How to arrange facets: "method" (default) or "dose"
+#'
+#' @return A ggplot2 object
+#' @export
+#'
+#' @importFrom ggplot2 ggplot aes geom_point geom_line facet_wrap theme_minimal labs
+#' @importFrom dplyr mutate
+#' @importFrom tidyr extract
+visualize_power_analysis <- function(power_results, 
+                                    plot_type = c("power", "estimates", "both"),
+                                    arrange_by = c("method", "dose")) {
+  
+  plot_type <- match.arg(plot_type)
+  arrange_by <- match.arg(arrange_by)
+  
+  # Extract dose levels from comparison strings
+  power_results <- power_results %>%
+    tidyr::extract(comparison, 
+                  into = c("dose_level", "control_level"),
+                  regex = "([0-9.]+) - ([0-9.]+)",
+                  remove = FALSE,
+                  convert = TRUE)
+  
+  if (plot_type == "power" || plot_type == "both") {
+    # Create power plot
+    power_plot <- ggplot2::ggplot(power_results, ggplot2::aes(x = dose_level, y = power, color = method)) +
+      ggplot2::geom_point() +
+      ggplot2::geom_line() +
+      ggplot2::geom_hline(yintercept = 0.8, linetype = "dashed", color = "gray50") +
+      ggplot2::theme_minimal() +
+      ggplot2::labs(
+        title = "Power Analysis for Dose-Response Tests",
+        x = "Dose Level",
+        y = "Statistical Power",
+        color = "Test Method"
+      )
+    
+    if (arrange_by == "method") {
+      power_plot <- power_plot + ggplot2::facet_wrap(~ method)
+    } else {
+      power_plot <- power_plot + ggplot2::facet_wrap(~ dose_level)
+    }
+  }
+  
+  if (plot_type == "estimates" || plot_type == "both") {
+    # Create estimates plot
+    estimates_plot <- ggplot2::ggplot(power_results, 
+                                     ggplot2::aes(x = dose_level, y = mean_estimate, color = method)) +
+      ggplot2::geom_point() +
+      ggplot2::geom_errorbar(ggplot2::aes(ymin = mean_estimate - sd_estimate, 
+                                         ymax = mean_estimate + sd_estimate), width = 0.2) +
+      ggplot2::theme_minimal() +
+      ggplot2::labs(
+        title = "Effect Estimates for Dose-Response Tests",
+        x = "Dose Level",
+        y = "Mean Effect Estimate",
+        color = "Test Method"
+      )
+    
+    if (arrange_by == "method") {
+      estimates_plot <- estimates_plot + ggplot2::facet_wrap(~ method)
+    } else {
+      estimates_plot <- estimates_plot + ggplot2::facet_wrap(~ dose_level)
+    }
+  }
+  
+  # Return appropriate plot(s)
+  if (plot_type == "power") {
+    return(power_plot)
+  } else if (plot_type == "estimates") {
+    return(estimates_plot)
+  } else {
+    return(list(power = power_plot, estimates = estimates_plot))
+  }
+}
+```
+
+Now let's create a simple example to demonstrate how these functions work together:
+
+```{r}
+#' @examples
+#' # Define a dose-response function with a threshold effect at dose 5
+#' threshold_response <- function(dose, threshold = 5, effect_size = 20) {
+#'   ifelse(dose > threshold, effect_size, 0)
+#' }
+#' 
+#' # Run a small power analysis
+#' power_results <- power_analysis_dose_response(
+#'   n_sims = 50,
+#'   n_doses = 5,
+#'   dose_range = c(0, 10),
+#'   m_tanks = 3,
+#'   k_individuals = 8,
+#'   var_tank = 5,
+#'   var_individual = 2,
+#'   response_function = threshold_response,
+#'   threshold = 5,
+#'   effect_size = 15,
+#'   methods = c("Dunnett_multcomp", "Williams_PMCMRplus", "stepDown_PMCMR")
+#' )
+#' 
+#' # Visualize the results
+#' visualize_power_analysis(power_results, plot_type = "both")
+```
+
+These functions should provide a solid foundation for your dose-response analysis package. The `combine_multiple_comparisons` function integrates the results from various testing approaches, and the `power_analysis_dose_response` function allows you to compare the statistical power of these methods through simulation.
+
+Let me know if you'd like me to modify any aspects of these functions or if you need additional functionality!
+
+
+
+
+
+
+
+
+
+
+
+
 ## Simulate Data
 
 ```{r}

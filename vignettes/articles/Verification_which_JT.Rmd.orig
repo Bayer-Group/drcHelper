@@ -1,0 +1,86 @@
+---
+title: "Verification: Which Jonckeere Terpstra Test to Use"
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = TRUE,
+  warning=FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+
+```{r}
+
+library(tidyverse)
+```
+
+## Summary
+
+`JtTest` from `npordtests` are doing the same as in `cor.test` with method being "kendall". Both function actually performs a kendall test and treat the dose column as numeric. On the other hand `PMCMRplus::jonckheereTest` and `DescTools::JonckheereTerpstraTest` do similar things.
+
+
+## Data from Jonckheere (1954)
+
+```{r}
+data(jdata)
+
+prelimPlot3(jdata,dose_col = "X",response_col = "Y")
+
+dunnett_test(jdata,"Y","X",include_random_effect = FALSE)
+```
+
+
+```{r}
+library(npordtests)
+res1 <- JtTest(Y~X,jdata)
+res1$p.value *2
+```
+
+```{r}
+res2 <- DescTools::JonckheereTerpstraTest(Y~X,jdata)
+res2
+res2$statistic == res1$statistic
+```
+
+
+```{r}
+res3 <- PMCMRplus::jonckheereTest(Y~X,jdata)
+res3$statistic=res2$statistic
+res3$p.value -  res2$p.value
+
+```
+
+
+```{r}
+res4 <- cor.test(as.numeric(jdata$X),as.numeric(jdata$Y),method="kendall")
+res4$statistic
+res4$p.value
+```
+
+
+
+```{r}
+data(lehmann)
+res <- JtTest(Values~Group,lehmann)
+res4$p.value - 2*res1$p.value
+```
+
+
+## Data from Lehmann (1975)
+
+```{r}
+data("lehmann")
+DescTools::JonckheereTerpstraTest(Values~Group,lehmann)
+PMCMRplus::jonckheereTest(Values~Group,lehmann)
+```
+
