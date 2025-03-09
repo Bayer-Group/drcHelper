@@ -2,7 +2,7 @@
 title: "Quantal Data"
 resource_files:
   - article_assets/quantal_NOEC.png
-  - ../assets/binomial_tank_effects_visualization.png
+  - article_assets/binomial_tank_effects_visualization.png
 editor_options: 
   chunk_output_type: console
 ---
@@ -23,7 +23,7 @@ library(drcHelper)
 
 Analysis of quantal data typically involves the following steps as shown in the flowchart below:
 
-![Quantal NOEC Flowchart](https://bayer-group.github.io/drcHelper/articles/assets/quantal_NOEC.png)
+<!-- ![Quantal NOEC Flowchart](https://bayer-group.github.io/drcHelper/articles/assets/quantal_NOEC.png) -->
 
 ```{r echo=FALSE,out.width="90%"}
 #| fig.alt: >
@@ -439,7 +439,7 @@ ggsave("binomial_tank_effects_visualization.png", combined_plot, width = 12, hei
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE,eval=FALSE,include=FALSE}
 knitr::include_graphics("./../assets/binomial_tank_effects_visualization.png")
 ```
 

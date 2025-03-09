@@ -12,17 +12,14 @@ r_build_args: --no-build-vignettes --no-manual --no-resave-data
 r_check_args: --no-build-vignettes --no-manual
 ```
 
-R buidling warnings:
 
-Found the following apparent S3 methods exported but not registered:
-     ED.plus ED.ZG plot.edList plot.modList
-   See section ‘Registering S3 methods’ in the ‘Writing R Extensions’
-   manual.
+## external images
 
-  Undocumented code objects:
-    ‘dat_bcs1’ ‘dat_medium’ ‘dat_noED50’ ‘dat_shallow’ ‘dat_steep’
-    ‘exampleHistData’ ‘getLineContrast’ ‘getQuadContrast’ ‘metaldata’
-    ‘NTA_Ar_ext_mortality_expected’ ‘NTP_example_rate_expected’
-    ‘rankTransform’ ‘test_cases_data’ ‘test_cases_res’
-    ‘williamsTestLookUpTable’
-## Undocumented data sets:
+The second way does not work!
+
+```
+resource_files:
+  - article_assets/quantal_NOEC.png
+  - ../assets/binomial_tank_effects_visualization.png
+```
+
