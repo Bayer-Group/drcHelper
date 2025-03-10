@@ -20,6 +20,8 @@
 #' @param alpha Significance level for determining NOEC (default = 0.05)
 #' @param conf_level Confidence level for intervals (default = 0.95)
 #' @param return_model Logical, whether to return the fitted model object (default = FALSE)
+#' @param alternative a character string specifying the alternative hypothesis, must be
+#' one of '"two.sided"' (default), '"greater"' or '"less"'.
 #'
 #' @return A list containing the Dunnett test results, NOEC value, and optionally the model object
 #' @export
@@ -38,7 +40,8 @@ dunnett_test <- function(data,
                          variance_structure = c("homoscedastic", "heteroscedastic"),
                          alpha = 0.05,
                          conf_level = 0.95,
-                         return_model = FALSE) {
+                         return_model = FALSE,
+                         alternative = c("two.sided", "greater", "less")) {
 
   # Input validation
   if (!is.data.frame(data)) {
@@ -71,7 +74,7 @@ dunnett_test <- function(data,
 
   # Match variance structure argument
   variance_structure <- match.arg(variance_structure)
-
+  alternative <- match.arg(alternative)
   # Check if block variable exists when random effects are requested
   if (include_random_effect && !block_var %in% names(data)) {
     stop(paste("Block/tank variable", block_var, "not found in data"))
@@ -133,6 +136,7 @@ dunnett_test <- function(data,
     }
 
     dunnett_args$linfct <- mc_call
+    dunnett_args$alternative <- alternative
     dunnett_result <- do.call(multcomp::glht, dunnett_args)
 
   } else if (inherits(model, "gls")) {
@@ -166,7 +170,7 @@ dunnett_test <- function(data,
     rownames(K) <- row_names
 
     # Create the contrast
-    linfct <- multcomp::glht(model, linfct = K)
+    linfct <- multcomp::glht(model, linfct = K, alternative = alternative)
     dunnett_result <- linfct
   }
 

@@ -17,7 +17,8 @@ lmm_dunnett_homo <- function(data, alpha = 0.05, alternative = "less") {
     include_random_effect = TRUE,
     variance_structure = "homoscedastic",
     alpha = alpha,
-    return_model = TRUE
+    return_model = TRUE,
+    alternative = alternative
   )
 
   # Extract results
@@ -57,7 +58,8 @@ lmm_dunnett_hetero <- function(data, alpha = 0.05, alternative = "less") {
     include_random_effect = TRUE,
     variance_structure = "heteroscedastic",
     alpha = alpha,
-    return_model = TRUE
+    return_model = TRUE,
+    alternative = alternative
   )
 
   # Extract results
@@ -99,7 +101,8 @@ lm_dunnett_agg <- function(data, alpha = 0.05, alternative = "less") {
     include_random_effect = FALSE,
     variance_structure = "homoscedastic",
     alpha = alpha,
-    return_model = TRUE
+    return_model = TRUE,
+    alternative = alternative
   )
 
   # Extract results
@@ -141,7 +144,8 @@ gls_dunnett_agg <- function(data, alpha = 0.05, alternative = "less") {
     include_random_effect = FALSE,
     variance_structure = "heteroscedastic",
     alpha = alpha,
-    return_model = TRUE
+    return_model = TRUE,
+    alternative = alternative
   )
 
   # Extract results

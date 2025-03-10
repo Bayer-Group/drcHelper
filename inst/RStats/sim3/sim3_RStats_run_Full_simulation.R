@@ -70,7 +70,7 @@ param_grid_1 <- expand.grid(
   stringsAsFactors = FALSE
 )
 nrow(param_grid_1)
-36*5
+36*5 ## 180 scenarios, 4 non-control, ,
 param_grid <- dplyr::cross_join(param_grid_1,variance_table)
 dim(param_grid)
 full_results <- run_multiple_simulations_with_logging(
@@ -81,50 +81,52 @@ full_results <- run_multiple_simulations_with_logging(
 saveRDS(full_results,file="sim3_full_results.rds")
 ## Save the output into an R data object.
 
-
+########################################################################
 plotit <- FALSE
 if(plotit){
+  # Plot results for different scenarios
   full_results <- dplyr::left_join(param_grid,sim3_full_results)
+  design_effect <- full_results %>% group_by(max_effect,response_type,Dose_Level) %>%
+    reframe(neffect=length(unique(Expected_Response)), Reduction = paste0(100-Expected_Response[1],"%"))
   library(ggplot2)
+  library(tidyverse)
   theme_set(theme_bw())
-  ggplot(full_results%>% dplyr::filter(m_tanks==4, k_individuals==6, max_effect==5),aes(x=ICC,y=Power,color=Method))+ geom_point()+
-    facet_grid(response_type ~ Dose_Level,scales = "free") +
-    geom_line()+
-    geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
-    theme(legend.position = "bottom")+ ggplot2::scale_color_viridis_d(direction = 1)
-  ggsave("SimPower_4_tank_6_ind_5_effect.png",dpi=300, width = 6,height =5)
+  # ggplot(full_results%>% dplyr::filter(m_tanks==4, k_individuals==6, max_effect==5),aes(x=ICC,y=Power,color=Method))+ geom_point()+
+  #   facet_grid(response_type ~ Dose_Level,scales = "free") +
+  #   geom_line()+
+  #   geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+  #   theme(legend.position = "bottom")+ ggplot2::scale_color_viridis_d(direction = 1)
 
-  ggplot(full_results%>% dplyr::filter(m_tanks==4, k_individuals==6, max_effect==20),aes(x=ICC,y=Power,color=Method))+ geom_point()+
-    facet_grid(response_type ~ Dose_Level,scales = "free") +
-    geom_line()+
-    geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
-    theme(legend.position = "bottom")+ ggplot2::scale_color_viridis_d(direction = 1)
-  ggsave("SimPower_4_tank_6_ind_20_effect.png",dpi=300, width = 6,height =5)
+  for(max_effect0 in c(5,20)){
+    for(k_individuals0 in c(3,6,10)){
+      ggplot(full_results%>% dplyr::filter(m_tanks==4, k_individuals==k_individuals0, max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point()+
+        facet_grid(response_type ~ Dose_Level,scales = "free") +
+        geom_line()+
+        geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+        theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+        ggthemes::scale_color_solarized()+ggtitle(paste0("4 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
+        geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
+      ggsave(paste0("SimPower_4_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
+    }
+
+  }
+
+  for(max_effect0 in c(5,20)){
+    for(k_individuals0 in c(3,6,10)){
+      ggplot(full_results%>% dplyr::filter(m_tanks==6, k_individuals==k_individuals0, max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point()+
+        facet_grid(response_type ~ Dose_Level,scales = "free") +
+        geom_line()+
+        geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+        theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+        ggthemes::scale_color_solarized()+ggtitle(paste0("6 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
+        geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
+      ggsave(paste0("SimPower_6_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
+    }
+
+  }
 
 
-# Plot results for different scenarios
-ggplot2::ggplot(full_results %>% dplyr::filter(Method!="Wilcoxon",max_effect==5,m_tanks==6,k_individuals==3),
-                ggplot2::aes(x = Dose, y = Power, color = Method, group = Method)) +
-  ggplot2::geom_line() +
-  ggplot2::geom_point() +
-  ggplot2::facet_grid(response_type ~ var_tank + var_individual,
-                     labeller = ggplot2::labeller(max_effect = function(x) paste("Effect Size:", x))) +
-  ggplot2::theme_minimal() + ggplot2::scale_color_viridis_d(direction = 1)+
-  ggplot2::labs(title = paste("Power Analysis Across Scenarios:", "max_effect =", 5,", m_tanks =",4))
-
-ggplot2::ggplot(full_results %>% dplyr::filter(max_effect==20,m_tanks==4), ggplot2::aes(x = Dose, y = Power, color = Method, group = Method)) +
-  ggplot2::geom_line() +
-  ggplot2::geom_point() +
-  ggplot2::facet_grid(response_type ~ var_tank,
-                      labeller = ggplot2::labeller(effect_size = function(x) paste("Effect Size:", x))) +
-  ggplot2::theme_bw() +
-  ggplot2::labs(title = paste("Power Analysis Across Scenarios:", "max_effect =", 20,", m_tanks =",4))
 
 
-# ggplot2::ggplot(full_results %>% dplyr::filter(max_effect==20,m_tanks==4) %>% dplyr::filter(response_type =="oscillating"),
-#                 ggplot2::aes(x = Expected_Response, y = Power, color = Method, group = Method)
-#                 )+ggplot2::geom_point() +
-#   ggplot2::facet_grid(Dose_Level ~ var_tank,
-#                       labeller = ggplot2::labeller(max_effect = function(x) paste("Effect Size:", x))) +
-#   ggplot2::theme_bw()
+
 }

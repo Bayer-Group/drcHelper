@@ -14,7 +14,8 @@ dunnett_test(
   variance_structure = c("homoscedastic", "heteroscedastic"),
   alpha = 0.05,
   conf_level = 0.95,
-  return_model = FALSE
+  return_model = FALSE,
+  alternative = c("two.sided", "greater", "less")
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ dunnett_test(
 \item{conf_level}{Confidence level for intervals (default = 0.95)}
 
 \item{return_model}{Logical, whether to return the fitted model object (default = FALSE)}
+
+\item{alternative}{a character string specifying the alternative hypothesis, must be
+one of '"two.sided"' (default), '"greater"' or '"less"'.}
 }
 \value{
 A list containing the Dunnett test results, NOEC value, and optionally the model object

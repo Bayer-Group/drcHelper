@@ -76,6 +76,7 @@ visualize_response_patterns <- function(n_doses = 5,
 }
 
 
+library(drcHelper)
 # Visualize different response patterns
 response_patterns <- visualize_response_patterns(
   n_doses = 5,
@@ -95,7 +96,7 @@ response_patterns
 # Example of using the oscillating response function directly
 doses <- seq(0, 20, length.out = 5)
 freq <- 1
-responses <- oscillating_response(doses, max_effect = 20, frequency = freq)
+responses <- oscillating_response(doses, max_effect = 10, frequency = freq)
 
 # Create a data frame to visualize
 example_data <- data.frame(

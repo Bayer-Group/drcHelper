@@ -1,8 +1,7 @@
 library(parallel)
 library(doParallel)
 library(drcHelper)
-source("~/Projects/drcHelper/inst/RStats/RStats_broom_tests.R")
-source("~/Projects/drcHelper/R/wiiliams_JT.R")
+source("~/Projects/drcHelper/inst/RStats/RStats_wrapper_tests.R")
 source("~/Projects/drcHelper/inst/RStats/RStats_Sim_Engine.R")
 # Define test methods to compare
 test_methods <- list(
@@ -55,6 +54,13 @@ small_sim <- run_power_simulation(
 plot_power_results(small_sim)
 
 # Run a simulation with oscillating response
+
+test_methods_o <- list(
+  "LMM_Homo" = lmm_dunnett_homo,
+  "LM_Homo" = lm_dunnett_agg,
+  "Williams" = williams_test,
+  "Jonckheere" = jonckheere_test,
+)
 oscillating_sim <- run_power_simulation(
   n_sim = 10,
   n_doses = 5,
@@ -65,7 +71,7 @@ oscillating_sim <- run_power_simulation(
   var_individual = 2,
   max_effect = 20,
   response_type = "oscillating",  # New response type
-  test_methods = test_methods,
+  test_methods = test_methods_o,
   alternative = "less",  # For oscillating patterns, two-sided tests are appropriate
   n_cores = 3
 )
