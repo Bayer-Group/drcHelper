@@ -80,7 +80,7 @@ run_multiple_simulations_with_logging <- function(param_grid, test_methods, n_si
     }, error = function(e) {
       error_msg <- conditionMessage(e)
       log_message(paste("ERROR in simulation", i, ":", error_msg), log_file = log_file)
-
+      ## if exists cl, do we need to close? close inside the function.
       # Save checkpoint even if there's an error
       saveRDS(list(results_list = results_list, next_idx = i),
               file = checkpoint_file)
@@ -116,7 +116,7 @@ run_multiple_simulations_with_logging <- function(param_grid, test_methods, n_si
 
 
 
-# Example of incremental saving during simulation
+# Incremental saving during simulation
 run_multiple_simulations_with_checkpoints <- function(param_grid, test_methods, n_sim = 1000,
                                                       n_cores = parallel::detectCores() - 1,
                                                       seed = 123,
@@ -283,6 +283,9 @@ run_power_simulation <- function(n_sim = 100,
   }
 
   # Set up parallel backend
+  if (exists("cl")) {
+    try(parallel::stopCluster(cl), silent = TRUE)
+  }
   cl <- parallel::makeCluster(n_cores)
   doParallel::registerDoParallel(cl)
 

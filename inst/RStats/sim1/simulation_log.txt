@@ -1,0 +1,358 @@
+[2025-03-10 00:11:21] Starting multiple simulations with 32 parameter combinations 
+[2025-03-10 00:11:21] Using 95 CPU cores 
+[2025-03-10 00:11:21] No checkpoint found, starting from beginning 
+[2025-03-10 00:11:21] Start time: 2025-03-10 00:11:21 
+[2025-03-10 00:11:21] Starting simulation 1 of 32 
+[2025-03-10 00:11:21] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:11:21] Starting simulation with 1000 iterations 
+[2025-03-10 00:12:35] Parallel processing completed 
+[2025-03-10 00:12:35] Simulation completed 
+[2025-03-10 00:12:35] Completed simulation 1 in 1.24 minutes 
+[2025-03-10 00:12:35] Estimated remaining time: 38.3 minutes (0.6 hours) 
+[2025-03-10 00:12:35] Starting simulation 2 of 32 
+[2025-03-10 00:12:35] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:12:35] Starting simulation with 1000 iterations 
+[2025-03-10 00:13:46] Parallel processing completed 
+[2025-03-10 00:13:46] Simulation completed 
+[2025-03-10 00:13:46] Completed simulation 2 in 1.18 minutes 
+[2025-03-10 00:13:46] Estimated remaining time: 36.2 minutes (0.6 hours) 
+[2025-03-10 00:13:46] Starting simulation 3 of 32 
+[2025-03-10 00:13:46] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:13:46] Starting simulation with 1000 iterations 
+[2025-03-10 00:14:58] Parallel processing completed 
+[2025-03-10 00:14:58] Simulation completed 
+[2025-03-10 00:14:58] Completed simulation 3 in 1.19 minutes 
+[2025-03-10 00:14:58] Estimated remaining time: 34.9 minutes (0.6 hours) 
+[2025-03-10 00:14:58] Starting simulation 4 of 32 
+[2025-03-10 00:14:58] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:14:58] Starting simulation with 1000 iterations 
+[2025-03-10 00:16:08] Parallel processing completed 
+[2025-03-10 00:16:08] Simulation completed 
+[2025-03-10 00:16:08] Completed simulation 4 in 1.17 minutes 
+[2025-03-10 00:16:08] Estimated remaining time: 33.4 minutes (0.6 hours) 
+[2025-03-10 00:16:08] Starting simulation 5 of 32 
+[2025-03-10 00:16:08] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:16:08] Starting simulation with 1000 iterations 
+[2025-03-10 00:17:19] Parallel processing completed 
+[2025-03-10 00:17:19] Simulation completed 
+[2025-03-10 00:17:19] Completed simulation 5 in 1.19 minutes 
+[2025-03-10 00:17:19] Estimated remaining time: 32.2 minutes (0.5 hours) 
+[2025-03-10 00:17:19] Starting simulation 6 of 32 
+[2025-03-10 00:17:19] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:17:19] Starting simulation with 1000 iterations 
+[2025-03-10 00:18:30] Parallel processing completed 
+[2025-03-10 00:18:30] Simulation completed 
+[2025-03-10 00:18:30] Completed simulation 6 in 1.18 minutes 
+[2025-03-10 00:18:30] Estimated remaining time: 30.9 minutes (0.5 hours) 
+[2025-03-10 00:18:30] Starting simulation 7 of 32 
+[2025-03-10 00:18:30] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:18:30] Starting simulation with 1000 iterations 
+[2025-03-10 00:19:41] Parallel processing completed 
+[2025-03-10 00:19:41] Simulation completed 
+[2025-03-10 00:19:41] Completed simulation 7 in 1.18 minutes 
+[2025-03-10 00:19:41] Estimated remaining time: 29.7 minutes (0.5 hours) 
+[2025-03-10 00:19:41] Starting simulation 8 of 32 
+[2025-03-10 00:19:41] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:19:41] Starting simulation with 1000 iterations 
+[2025-03-10 00:20:53] Parallel processing completed 
+[2025-03-10 00:20:53] Simulation completed 
+[2025-03-10 00:20:53] Completed simulation 8 in 1.20 minutes 
+[2025-03-10 00:20:53] Estimated remaining time: 28.6 minutes (0.5 hours) 
+[2025-03-10 00:20:53] Starting simulation 9 of 32 
+[2025-03-10 00:20:53] Parameters: response_type = none , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:20:53] Starting simulation with 1000 iterations 
+[2025-03-10 00:22:07] Parallel processing completed 
+[2025-03-10 00:22:07] Simulation completed 
+[2025-03-10 00:22:07] Completed simulation 9 in 1.23 minutes 
+[2025-03-10 00:22:07] Estimated remaining time: 27.5 minutes (0.5 hours) 
+[2025-03-10 00:22:07] Starting simulation 10 of 32 
+[2025-03-10 00:22:07] Parameters: response_type = none , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:22:07] Starting simulation with 1000 iterations 
+[2025-03-10 00:23:18] Parallel processing completed 
+[2025-03-10 00:23:18] Simulation completed 
+[2025-03-10 00:23:18] Completed simulation 10 in 1.19 minutes 
+[2025-03-10 00:23:18] Estimated remaining time: 26.3 minutes (0.4 hours) 
+[2025-03-10 00:23:18] Starting simulation 11 of 32 
+[2025-03-10 00:23:18] Parameters: response_type = none , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:23:19] Starting simulation with 1000 iterations 
+[2025-03-10 00:24:31] Parallel processing completed 
+[2025-03-10 00:24:31] Simulation completed 
+[2025-03-10 00:24:31] Completed simulation 11 in 1.21 minutes 
+[2025-03-10 00:24:31] Estimated remaining time: 25.1 minutes (0.4 hours) 
+[2025-03-10 00:24:31] Starting simulation 12 of 32 
+[2025-03-10 00:24:31] Parameters: response_type = none , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:24:31] Starting simulation with 1000 iterations 
+[2025-03-10 00:25:42] Parallel processing completed 
+[2025-03-10 00:25:42] Simulation completed 
+[2025-03-10 00:25:42] Completed simulation 12 in 1.19 minutes 
+[2025-03-10 00:25:42] Estimated remaining time: 23.9 minutes (0.4 hours) 
+[2025-03-10 00:25:42] Starting simulation 13 of 32 
+[2025-03-10 00:25:42] Parameters: response_type = none , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:25:42] Starting simulation with 1000 iterations 
+[2025-03-10 00:26:55] Parallel processing completed 
+[2025-03-10 00:26:55] Simulation completed 
+[2025-03-10 00:26:55] Completed simulation 13 in 1.20 minutes 
+[2025-03-10 00:26:55] Estimated remaining time: 22.7 minutes (0.4 hours) 
+[2025-03-10 00:26:55] Starting simulation 14 of 32 
+[2025-03-10 00:26:55] Parameters: response_type = none , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:26:55] Starting simulation with 1000 iterations 
+[2025-03-10 00:28:07] Parallel processing completed 
+[2025-03-10 00:28:07] Simulation completed 
+[2025-03-10 00:28:07] Completed simulation 14 in 1.20 minutes 
+[2025-03-10 00:28:07] Estimated remaining time: 21.6 minutes (0.4 hours) 
+[2025-03-10 00:28:07] Starting simulation 15 of 32 
+[2025-03-10 00:28:07] Parameters: response_type = none , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:28:07] Starting simulation with 1000 iterations 
+[2025-03-10 00:29:19] Parallel processing completed 
+[2025-03-10 00:29:19] Simulation completed 
+[2025-03-10 00:29:19] Completed simulation 15 in 1.20 minutes 
+[2025-03-10 00:29:19] Estimated remaining time: 20.4 minutes (0.3 hours) 
+[2025-03-10 00:29:19] Starting simulation 16 of 32 
+[2025-03-10 00:29:19] Parameters: response_type = none , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:29:19] Starting simulation with 1000 iterations 
+[2025-03-10 00:30:30] Parallel processing completed 
+[2025-03-10 00:30:31] Simulation completed 
+[2025-03-10 00:30:31] Completed simulation 16 in 1.19 minutes 
+[2025-03-10 00:30:31] Estimated remaining time: 19.2 minutes (0.3 hours) 
+[2025-03-10 00:30:31] Starting simulation 17 of 32 
+[2025-03-10 00:30:31] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:30:31] Starting simulation with 1000 iterations 
+[2025-03-10 00:31:43] Parallel processing completed 
+[2025-03-10 00:31:44] Simulation completed 
+[2025-03-10 00:31:44] Completed simulation 17 in 1.22 minutes 
+[2025-03-10 00:31:44] Estimated remaining time: 18.0 minutes (0.3 hours) 
+[2025-03-10 00:31:44] Starting simulation 18 of 32 
+[2025-03-10 00:31:44] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:31:44] Starting simulation with 1000 iterations 
+[2025-03-10 00:32:55] Parallel processing completed 
+[2025-03-10 00:32:55] Simulation completed 
+[2025-03-10 00:32:56] Completed simulation 18 in 1.20 minutes 
+[2025-03-10 00:32:56] Estimated remaining time: 16.8 minutes (0.3 hours) 
+[2025-03-10 00:32:56] Starting simulation 19 of 32 
+[2025-03-10 00:32:56] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:32:56] Starting simulation with 1000 iterations 
+[2025-03-10 00:34:08] Parallel processing completed 
+[2025-03-10 00:34:08] Simulation completed 
+[2025-03-10 00:34:08] Completed simulation 19 in 1.21 minutes 
+[2025-03-10 00:34:08] Estimated remaining time: 15.6 minutes (0.3 hours) 
+[2025-03-10 00:34:08] Starting simulation 20 of 32 
+[2025-03-10 00:34:08] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:34:08] Starting simulation with 1000 iterations 
+[2025-03-10 00:35:20] Parallel processing completed 
+[2025-03-10 00:35:20] Simulation completed 
+[2025-03-10 00:35:20] Completed simulation 20 in 1.19 minutes 
+[2025-03-10 00:35:20] Estimated remaining time: 14.4 minutes (0.2 hours) 
+[2025-03-10 00:35:20] Starting simulation 21 of 32 
+[2025-03-10 00:35:20] Parameters: response_type = threshold , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:35:20] Starting simulation with 1000 iterations 
+[2025-03-10 00:36:33] Parallel processing completed 
+[2025-03-10 00:36:33] Simulation completed 
+[2025-03-10 00:36:33] Completed simulation 21 in 1.21 minutes 
+[2025-03-10 00:36:33] Estimated remaining time: 13.2 minutes (0.2 hours) 
+[2025-03-10 00:36:33] Starting simulation 22 of 32 
+[2025-03-10 00:36:33] Parameters: response_type = threshold , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:36:33] Starting simulation with 1000 iterations 
+[2025-03-10 00:37:45] Parallel processing completed 
+[2025-03-10 00:37:45] Simulation completed 
+[2025-03-10 00:37:45] Completed simulation 22 in 1.20 minutes 
+[2025-03-10 00:37:45] Estimated remaining time: 12.0 minutes (0.2 hours) 
+[2025-03-10 00:37:45] Starting simulation 23 of 32 
+[2025-03-10 00:37:45] Parameters: response_type = threshold , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:37:45] Starting simulation with 1000 iterations 
+[2025-03-10 00:38:57] Parallel processing completed 
+[2025-03-10 00:38:57] Simulation completed 
+[2025-03-10 00:38:57] Completed simulation 23 in 1.21 minutes 
+[2025-03-10 00:38:57] Estimated remaining time: 10.8 minutes (0.2 hours) 
+[2025-03-10 00:38:57] Starting simulation 24 of 32 
+[2025-03-10 00:38:57] Parameters: response_type = threshold , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:38:57] Starting simulation with 1000 iterations 
+[2025-03-10 00:40:09] Parallel processing completed 
+[2025-03-10 00:40:09] Simulation completed 
+[2025-03-10 00:40:09] Completed simulation 24 in 1.20 minutes 
+[2025-03-10 00:40:10] Estimated remaining time: 9.6 minutes (0.2 hours) 
+[2025-03-10 00:40:10] Starting simulation 25 of 32 
+[2025-03-10 00:40:10] Parameters: response_type = oscillating , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:40:10] Starting simulation with 1000 iterations 
+[2025-03-10 00:41:22] Parallel processing completed 
+[2025-03-10 00:41:22] Simulation completed 
+[2025-03-10 00:41:22] Completed simulation 25 in 1.21 minutes 
+[2025-03-10 00:41:22] Estimated remaining time: 8.4 minutes (0.1 hours) 
+[2025-03-10 00:41:22] Starting simulation 26 of 32 
+[2025-03-10 00:41:22] Parameters: response_type = oscillating , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:41:22] Starting simulation with 1000 iterations 
+[2025-03-10 00:42:33] Parallel processing completed 
+[2025-03-10 00:42:33] Simulation completed 
+[2025-03-10 00:42:33] Completed simulation 26 in 1.18 minutes 
+[2025-03-10 00:42:33] Estimated remaining time: 7.2 minutes (0.1 hours) 
+[2025-03-10 00:42:33] Starting simulation 27 of 32 
+[2025-03-10 00:42:33] Parameters: response_type = oscillating , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:42:33] Starting simulation with 1000 iterations 
+[2025-03-10 00:43:45] Parallel processing completed 
+[2025-03-10 00:43:45] Simulation completed 
+[2025-03-10 00:43:45] Completed simulation 27 in 1.21 minutes 
+[2025-03-10 00:43:45] Estimated remaining time: 6.0 minutes (0.1 hours) 
+[2025-03-10 00:43:45] Starting simulation 28 of 32 
+[2025-03-10 00:43:45] Parameters: response_type = oscillating , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:43:45] Starting simulation with 1000 iterations 
+[2025-03-10 00:44:57] Parallel processing completed 
+[2025-03-10 00:44:57] Simulation completed 
+[2025-03-10 00:44:57] Completed simulation 28 in 1.19 minutes 
+[2025-03-10 00:44:57] Estimated remaining time: 4.8 minutes (0.1 hours) 
+[2025-03-10 00:44:57] Starting simulation 29 of 32 
+[2025-03-10 00:44:57] Parameters: response_type = oscillating , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:44:57] Starting simulation with 1000 iterations 
+[2025-03-10 00:46:10] Parallel processing completed 
+[2025-03-10 00:46:10] Simulation completed 
+[2025-03-10 00:46:10] Completed simulation 29 in 1.22 minutes 
+[2025-03-10 00:46:10] Estimated remaining time: 3.6 minutes (0.1 hours) 
+[2025-03-10 00:46:10] Starting simulation 30 of 32 
+[2025-03-10 00:46:10] Parameters: response_type = oscillating , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 2 
+[2025-03-10 00:46:10] Starting simulation with 1000 iterations 
+[2025-03-10 00:47:22] Parallel processing completed 
+[2025-03-10 00:47:22] Simulation completed 
+[2025-03-10 00:47:22] Completed simulation 30 in 1.20 minutes 
+[2025-03-10 00:47:22] Estimated remaining time: 2.4 minutes (0.0 hours) 
+[2025-03-10 00:47:22] Starting simulation 31 of 32 
+[2025-03-10 00:47:22] Parameters: response_type = oscillating , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:47:22] Starting simulation with 1000 iterations 
+[2025-03-10 00:48:34] Parallel processing completed 
+[2025-03-10 00:48:34] Simulation completed 
+[2025-03-10 00:48:34] Completed simulation 31 in 1.20 minutes 
+[2025-03-10 00:48:34] Estimated remaining time: 1.2 minutes (0.0 hours) 
+[2025-03-10 00:48:34] Starting simulation 32 of 32 
+[2025-03-10 00:48:34] Parameters: response_type = oscillating , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 2 
+[2025-03-10 00:48:34] Starting simulation with 1000 iterations 
+[2025-03-10 00:49:46] Parallel processing completed 
+[2025-03-10 00:49:46] Simulation completed 
+[2025-03-10 00:49:46] Completed simulation 32 in 1.19 minutes 
+[2025-03-10 00:49:46] All simulations completed in 0.64 hours 
+[2025-03-10 00:49:46] Final results contain 1024 rows 
+[2025-03-10 02:21:56] Starting multiple simulations with 288 parameter combinations 
+[2025-03-10 02:21:56] Using 95 CPU cores 
+[2025-03-10 02:21:56] Resuming from checkpoint at index 33 
+[2025-03-10 02:21:56] Start time: 2025-03-10 02:21:56 
+[2025-03-10 02:21:56] Starting simulation 33 of 288 
+[2025-03-10 02:21:56] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 6 , k_individuals = 6 , var_tank = 4 , var_individual = 6 
+[2025-03-10 02:21:57] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:22] ERROR in simulation 33 : object 'test_methods' not found 
+[2025-03-10 02:22:22] Estimated remaining time: 107.2 minutes (1.8 hours) 
+[2025-03-10 02:22:22] Starting simulation 34 of 288 
+[2025-03-10 02:22:22] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 6 
+[2025-03-10 02:22:22] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:30] ERROR in simulation 34 : all connections are in use 
+[2025-03-10 02:22:31] Estimated remaining time: 72.6 minutes (1.2 hours) 
+[2025-03-10 02:22:31] Starting simulation 35 of 288 
+[2025-03-10 02:22:31] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 6 
+[2025-03-10 02:22:31] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:36] ERROR in simulation 35 : all connections are in use 
+[2025-03-10 02:22:36] Estimated remaining time: 55.6 minutes (0.9 hours) 
+[2025-03-10 02:22:36] Starting simulation 36 of 288 
+[2025-03-10 02:22:36] Parameters: response_type = decreasing , max_effect = 5 , m_tanks = 6 , k_individuals = 10 , var_tank = 4 , var_individual = 6 
+[2025-03-10 02:22:36] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:40] ERROR in simulation 36 : all connections are in use 
+[2025-03-10 02:22:40] Estimated remaining time: 45.9 minutes (0.8 hours) 
+[2025-03-10 02:22:40] Starting simulation 37 of 288 
+[2025-03-10 02:22:40] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 3 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:40] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:43] ERROR in simulation 37 : all connections are in use 
+[2025-03-10 02:22:44] Estimated remaining time: 39.7 minutes (0.7 hours) 
+[2025-03-10 02:22:44] Starting simulation 38 of 288 
+[2025-03-10 02:22:44] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 3 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:44] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:47] ERROR in simulation 38 : all connections are in use 
+[2025-03-10 02:22:48] Estimated remaining time: 35.5 minutes (0.6 hours) 
+[2025-03-10 02:22:48] Starting simulation 39 of 288 
+[2025-03-10 02:22:48] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 3 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:48] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:51] ERROR in simulation 39 : all connections are in use 
+[2025-03-10 02:22:51] Estimated remaining time: 32.5 minutes (0.5 hours) 
+[2025-03-10 02:22:51] Starting simulation 40 of 288 
+[2025-03-10 02:22:51] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 6 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:51] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:54] ERROR in simulation 40 : all connections are in use 
+[2025-03-10 02:22:55] Estimated remaining time: 30.2 minutes (0.5 hours) 
+[2025-03-10 02:22:55] Starting simulation 41 of 288 
+[2025-03-10 02:22:55] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 6 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:55] Starting simulation with 1000 iterations 
+[2025-03-10 02:22:58] ERROR in simulation 41 : all connections are in use 
+[2025-03-10 02:22:58] Estimated remaining time: 28.1 minutes (0.5 hours) 
+[2025-03-10 02:22:58] Starting simulation 42 of 288 
+[2025-03-10 02:22:58] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 6 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:22:58] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:00] ERROR in simulation 42 : all connections are in use 
+[2025-03-10 02:23:01] Estimated remaining time: 26.5 minutes (0.4 hours) 
+[2025-03-10 02:23:01] Starting simulation 43 of 288 
+[2025-03-10 02:23:01] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:23:01] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:04] ERROR in simulation 43 : all connections are in use 
+[2025-03-10 02:23:04] Estimated remaining time: 25.1 minutes (0.4 hours) 
+[2025-03-10 02:23:04] Starting simulation 44 of 288 
+[2025-03-10 02:23:04] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:23:04] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:07] ERROR in simulation 44 : all connections are in use 
+[2025-03-10 02:23:07] Estimated remaining time: 24.0 minutes (0.4 hours) 
+[2025-03-10 02:23:07] Starting simulation 45 of 288 
+[2025-03-10 02:23:07] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 10 , var_tank = 2 , var_individual = 4 
+[2025-03-10 02:23:07] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:10] ERROR in simulation 45 : all connections are in use 
+[2025-03-10 02:23:11] Estimated remaining time: 23.1 minutes (0.4 hours) 
+[2025-03-10 02:23:11] Starting simulation 46 of 288 
+[2025-03-10 02:23:11] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 3 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:11] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:14] ERROR in simulation 46 : all connections are in use 
+[2025-03-10 02:23:14] Estimated remaining time: 22.4 minutes (0.4 hours) 
+[2025-03-10 02:23:14] Starting simulation 47 of 288 
+[2025-03-10 02:23:14] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 3 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:14] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:18] ERROR in simulation 47 : all connections are in use 
+[2025-03-10 02:23:18] Estimated remaining time: 21.9 minutes (0.4 hours) 
+[2025-03-10 02:23:18] Starting simulation 48 of 288 
+[2025-03-10 02:23:18] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 3 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:18] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:21] ERROR in simulation 48 : all connections are in use 
+[2025-03-10 02:23:22] Estimated remaining time: 21.3 minutes (0.4 hours) 
+[2025-03-10 02:23:22] Starting simulation 49 of 288 
+[2025-03-10 02:23:22] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 6 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:22] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:24] ERROR in simulation 49 : all connections are in use 
+[2025-03-10 02:23:24] Estimated remaining time: 20.6 minutes (0.3 hours) 
+[2025-03-10 02:23:24] Starting simulation 50 of 288 
+[2025-03-10 02:23:24] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 6 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:24] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:27] ERROR in simulation 50 : all connections are in use 
+[2025-03-10 02:23:28] Estimated remaining time: 20.1 minutes (0.3 hours) 
+[2025-03-10 02:23:28] Starting simulation 51 of 288 
+[2025-03-10 02:23:28] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 6 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:28] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:30] ERROR in simulation 51 : all connections are in use 
+[2025-03-10 02:23:31] Estimated remaining time: 19.6 minutes (0.3 hours) 
+[2025-03-10 02:23:31] Starting simulation 52 of 288 
+[2025-03-10 02:23:31] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:31] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:48] Starting multiple simulations with 288 parameter combinations 
+[2025-03-10 02:23:48] Using 95 CPU cores 
+[2025-03-10 02:23:48] Resuming from checkpoint at index 51 
+[2025-03-10 02:23:48] Start time: 2025-03-10 02:23:48 
+[2025-03-10 02:23:48] Starting simulation 51 of 288 
+[2025-03-10 02:23:48] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 6 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:48] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:54] ERROR in simulation 51 : all connections are in use 
+[2025-03-10 02:23:54] Estimated remaining time: 24.8 minutes (0.4 hours) 
+[2025-03-10 02:23:54] Starting simulation 52 of 288 
+[2025-03-10 02:23:54] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 10 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:54] Starting simulation with 1000 iterations 
+[2025-03-10 02:23:58] ERROR in simulation 52 : all connections are in use 
+[2025-03-10 02:23:58] Estimated remaining time: 20.2 minutes (0.3 hours) 
+[2025-03-10 02:23:58] Starting simulation 53 of 288 
+[2025-03-10 02:23:58] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 5 , k_individuals = 10 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:23:58] Starting simulation with 1000 iterations 
+[2025-03-10 02:24:02] ERROR in simulation 53 : all connections are in use 
+[2025-03-10 02:24:02] Estimated remaining time: 18.7 minutes (0.3 hours) 
+[2025-03-10 02:24:02] Starting simulation 54 of 288 
+[2025-03-10 02:24:02] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 6 , k_individuals = 10 , var_tank = 4 , var_individual = 4 
+[2025-03-10 02:24:02] Starting simulation with 1000 iterations 
+[2025-03-10 02:24:05] ERROR in simulation 54 : all connections are in use 
+[2025-03-10 02:24:06] Estimated remaining time: 17.5 minutes (0.3 hours) 
+[2025-03-10 02:24:06] Starting simulation 55 of 288 
+[2025-03-10 02:24:06] Parameters: response_type = decreasing , max_effect = 20 , m_tanks = 4 , k_individuals = 3 , var_tank = 2 , var_individual = 6 
+[2025-03-10 02:24:06] Starting simulation with 1000 iterations 
