@@ -13,6 +13,7 @@
 #' @importFrom dplyr group_by summarize ungroup
 #' @importFrom rlang sym
 #' @export
+#' @keywords helper_functions
 #'
 #' @examples
 #' # Generate example data
@@ -87,6 +88,7 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
 #' @importFrom purrr map
 #' @importFrom rstatix adjust_pvalue add_significance fisher_test
 #' @export
+#' @concept NOEC
 #'
 #' @examples \dontrun{
 #' # Create contingency table
@@ -170,6 +172,7 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
 #' @return A data frame with factor levels and corresponding p-values
 #' @export
 #' @importFrom stats p.adjust
+#' @concept NOEC
 #'
 #' @examples
 #' # Generate example data

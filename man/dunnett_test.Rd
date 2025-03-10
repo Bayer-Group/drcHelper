@@ -46,3 +46,4 @@ A list containing the Dunnett test results, NOEC value, and optionally the model
 This function performs Dunnett's test for comparing multiple treatment levels to a control
 using various model specifications, including options for random effects and variance structures.
 }
+\concept{NOEC}

@@ -45,3 +45,4 @@ data <- data.frame(
 create_contingency_table(data, "dose", "alive", "dead")
 
 }
+\keyword{helper_functions}

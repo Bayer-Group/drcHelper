@@ -14,3 +14,4 @@
 \description{
 Plot method for dunnett_test_result objects
 }
+\concept{NOEC}

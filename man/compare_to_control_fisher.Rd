@@ -55,3 +55,4 @@ data$dead <- 10 - data$alive
 compare_to_control_fisher(data, "dose", "alive", "dead", control_level = 0)
 
 }
+\concept{NOEC}

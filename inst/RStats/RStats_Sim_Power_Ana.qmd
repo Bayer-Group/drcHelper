@@ -28,6 +28,61 @@ library(drcHelper)
 ```
 
 
+```{r}
+source("~/Projects/drcHelper/inst/RStats/RStats_broom_tests.R")
+source("~/Projects/drcHelper/R/wiiliams_JT.R")
+
+# Generate example data
+set.seed(123)
+test_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0, 20),
+  m_tanks = 3,
+  k_individuals = 10,
+  var_tank = 4,
+  var_individual = 2,
+  include_individuals = TRUE,
+  response_function = function(dose) 100 - dose * 2  # Decreasing trend
+)
+# Plot individual data points with tank means
+ggplot(test_data, aes(x = factor(Dose), y = Response, color = factor(Tank))) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun = mean, geom = "line", aes(group = factor(Tank))) +
+  labs(title = "Dose-Response Data with Hierarchical Structure",
+       x = "Dose", y = "Response",
+       color = "Tank") +
+  theme_minimal()
+agg_data <- stats::aggregate(Response ~ Dose + Tank, data = test_data, FUN = mean)
+# Ensure Dose is a factor
+agg_data$Dose <- as.factor(agg_data$Dose)
+prelimPlot3(agg_data)
+# Run different tests
+result_lmm_homo <- lmm_dunnett_homo(test_data, alternative = "less")
+result_lmm_hetero <- lmm_dunnett_hetero(test_data, alternative = "less")
+result_lm_hetero <- gls_dunnett_agg(test_data, alternative = "less")
+result_lm_homo <- lm_dunnett_agg(test_data, alternative = "less")
+result_williams <- williams_test(test_data, alternative = "less")
+result_jt <- jonckheere_test(test_data, alternative = "less")
+result_wilcox <- manyone_wilcox_test(test_data,alternative ="greater",p.adjust.method="holm")
+result_dunn <- manyone_dunns_test(test_data,alternative ="less",p.adjust.method="holm")
+# Compare p-values
+
+P_Values = data.frame(lmm_homo= result_lmm_homo$p_values, 
+                      lmm_hetero= result_lmm_hetero$p_values,
+                      lm_homo = result_lm_homo$p_values,
+                      lm_hetero = result_lm_hetero$p_values,
+                      williams=result_williams$p_values,
+                      Jonckheere_Terpstra = result_jt$p_values,
+                      dunn = result_dunn$p_values,
+                      wilcox = result_wilcox$p_values
+                      )
+
+```
+
+
+
+
 ## Discussion Outcome
 
 Thanks for sharing your `simulate_dose_response` function. This gives me a good starting point for generating dose-response data for testing and power analysis.

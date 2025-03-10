@@ -37,3 +37,4 @@ ctable <- create_contingency_table(data)
 many_to_one_fisher_test(ctable, ref.group = "dose_0")
 }
 }
+\concept{NOEC}

@@ -28,6 +28,7 @@
 #' @importFrom lme4 lmer
 #' @importFrom nlme gls lme varIdent
 #' @importFrom stats as.formula
+#' @concept NOEC
 dunnett_test <- function(data,
                          response_var = "Response",
                          dose_var = "Dose",
@@ -254,6 +255,7 @@ dunnett_test <- function(data,
 #' @param ... Additional arguments passed to print methods
 #'
 #' @export
+#' @concept NOEC
 print.dunnett_test_result <- function(x, ...) {
   cat("Dunnett Test Results\n")
   cat("-------------------\n")
@@ -275,6 +277,7 @@ print.dunnett_test_result <- function(x, ...) {
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_errorbar theme_minimal labs geom_hline
 #' @export
+#' @concept NOEC
 plot.dunnett_test_result <- function(x, ...) {
   # Extract data for plotting
   plot_data <- x$results_table

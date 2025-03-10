@@ -23,3 +23,8 @@ resource_files:
   - ../assets/binomial_tank_effects_visualization.png
 ```
 
+
+
+Example how to organize the webiste:
+
+https://github.com/r-lib/pkgdown/blob/main/pkgdown/_pkgdown.yml
