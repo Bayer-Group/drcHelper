@@ -85,10 +85,13 @@ lmm_dunnett_hetero <- function(data, alpha = 0.05, alternative = "less") {
 #' @param data Data frame with columns: Response, Dose, Tank
 #' @param alpha Significance level
 #' @param alternative Direction of alternative hypothesis ("less" or "greater")
+#' @param notAgged Whether the input data is already aggregated to tank level data
 #' @return Standardized test results
-lm_dunnett_agg <- function(data, alpha = 0.05, alternative = "less") {
+lm_dunnett_agg <- function(data, alpha = 0.05, alternative = "less", notAgged = TRUE) {
   # Aggregate data by tank
-  agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean)
+  if(notAgged) agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean) else{
+    agg_data <- data
+  }
 
   # Ensure Dose is a factor
   agg_data$Dose <- as.factor(agg_data$Dose)
@@ -128,10 +131,13 @@ lm_dunnett_agg <- function(data, alpha = 0.05, alternative = "less") {
 #' @param data Data frame with columns: Response, Dose, Tank
 #' @param alpha Significance level
 #' @param alternative Direction of alternative hypothesis ("less" or "greater")
+#' @param notAgged Whether the input data is already aggregated to tank level data
 #' @return Standardized test results
-gls_dunnett_agg <- function(data, alpha = 0.05, alternative = "less") {
+gls_dunnett_agg <- function(data, alpha = 0.05, alternative = "less",notAgged = TRUE) {
   # Aggregate data by tank
-  agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean)
+  if(notAgged) agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean) else{
+    agg_data <- data
+  }
 
   # Ensure Dose is a factor
   agg_data$Dose <- as.factor(agg_data$Dose)
@@ -385,3 +391,107 @@ manyone_wilcox_test <- function(data, alpha = 0.05, alternative = "less",p.adjus
 
   return(result)
 }
+
+
+
+
+
+
+#' Wrapper for LM with Dunnett Test on aggregated data
+#'
+#' @param data Data frame with columns: Response, Dose, Tank
+#' @param alpha Significance level
+#' @param alternative Direction of alternative hypothesis ("less" or "greater")
+#' @param notAgged Whether the input data is already aggregated to tank level data
+#' @return Standardized test results
+lm_dunnett_agg_simple <- function(data, alpha = 0.05, alternative = "less") {
+  # Aggregate data by tank
+  #if(notAgged) agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean) else{
+    agg_data <- data
+  #}
+
+  # Ensure Dose is a factor
+  agg_data$Dose <- as.factor(agg_data$Dose)
+
+  # Run test
+  test_result <- drcHelper::dunnett_test(
+    data = agg_data,
+    response_var = "Response",
+    dose_var = "Dose",
+    include_random_effect = FALSE,
+    variance_structure = "homoscedastic",
+    alpha = alpha,
+    return_model = TRUE,
+    alternative = alternative
+  )
+
+  # Extract results
+  result <- list(
+    method = "LM Dunnett (Aggregated)",
+    p_values = test_result$results_table$p.value,
+    estimates = test_result$results_table$estimate,
+    significant = test_result$results_table$significant,
+    test_statistic = test_result$results_table$statistic,
+    comparisons = test_result$results_table$comparison,
+    model = test_result$model,
+    additional_info = list(
+      noec = test_result$noec,
+      model_type = test_result$model_type
+    )
+  )
+
+  return(result)
+}
+
+
+
+
+
+
+
+#' Wrapper for GLS with Dunnett Test on aggregated data
+#'
+#' @param data Data frame with columns: Response, Dose, Tank
+#' @param alpha Significance level
+#' @param alternative Direction of alternative hypothesis ("less" or "greater")
+#' @param notAgged Whether the input data is already aggregated to tank level data
+#' @return Standardized test results
+gls_dunnett_agg_simple <- function(data, alpha = 0.05, alternative = "less") {
+  # Aggregate data by tank
+ #if(notAgged) agg_data <- stats::aggregate(Response ~ Dose + Tank, data = data, FUN = mean) else{
+    agg_data <- data
+  #}
+
+  # Ensure Dose is a factor
+  agg_data$Dose <- as.factor(agg_data$Dose)
+
+  # Run test
+  test_result <- drcHelper::dunnett_test(
+    data = agg_data,
+    response_var = "Response",
+    dose_var = "Dose",
+    include_random_effect = FALSE,
+    variance_structure = "heteroscedastic",
+    alpha = alpha,
+    return_model = TRUE,
+    alternative = alternative
+  )
+
+  # Extract results
+  result <- list(
+    method = "GLS Dunnett (Aggregated)",
+    p_values = test_result$results_table$p.value,
+    estimates = test_result$results_table$estimate,
+    significant = test_result$results_table$significant,
+    test_statistic = test_result$results_table$statistic,
+    comparisons = test_result$results_table$comparison,
+    model = test_result$model,
+    additional_info = list(
+      noec = test_result$noec,
+      model_type = test_result$model_type
+    )
+  )
+
+  return(result)
+}
+

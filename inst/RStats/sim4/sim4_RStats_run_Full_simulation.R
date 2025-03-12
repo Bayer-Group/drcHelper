@@ -136,26 +136,13 @@ if(plotit){
         geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
         theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
         ggthemes::scale_color_solarized()+ggtitle(paste0("4 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
-        geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
+        geom_text(data=design_effect_temp%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
       ggsave(paste0("SimPower_",m_tank0, "_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
     }
 
     }
   }
 
-  for(max_effect0 in c(5,20)){
-    for(k_individuals0 in c(3,6,10)){
-      ggplot(full_results%>% dplyr::filter(m_tanks==6, k_individuals==k_individuals0, max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point()+
-        facet_grid(response_type ~ Dose_Level,scales = "free") +
-        geom_line()+
-        geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
-        theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
-        ggthemes::scale_color_solarized()+ggtitle(paste0("6 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
-        geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
-      ggsave(paste0("SimPower_6_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
-    }
-
-  }
 
 
 

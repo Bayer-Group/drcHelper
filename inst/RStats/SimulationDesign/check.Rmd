@@ -1,0 +1,68 @@
+---
+title: "Response and Variance Pattern Functions"
+author: "Statistical Analysis"
+date: "`r Sys.Date()`"
+output: 
+  word_document:
+---
+
+## Response Pattern Equations
+
+The response function $R(d)$ is defined differently for each pattern type:
+
+### Decreasing Response
+$$R(d) = 100 - \left(\frac{d}{d_{max}}\right) \cdot E_{max}$$
+
+### Non-monotonic Response
+$$R(d) = 100 - E_{max}\left(1 - \left(\frac{d - d_{mid}}{d_{mid}}\right)^2\right)$$
+
+### Threshold Response
+$$
+R(d) = \begin{cases}
+100 & \text{if } d < d_{threshold} \\[2ex]
+100 - \left(\frac{d - d_{threshold}}{d_{max} - d_{threshold}}\right) \cdot E_{max} & \text{if } d \geq d_{threshold}
+\end{cases}
+$$
+
+### Oscillating Response
+$$R(d) = 100 + E_{max}\sin(2\pi f d)$$
+
+### No Response
+$$R(d) = 100$$
+
+Where:
+
+- $d$ is the dose
+- $d_{max}$ is the maximum dose
+- $d_{mid}$ is the mean of the dose range
+- $E_{max}$ is the maximum effect
+- $f$ is the frequency (set to 1)
+- $d_{threshold}$ is the threshold dose
+
+## Variance Pattern Equations
+
+The variance $\sigma^2(i)$ at dose level $i$ is defined as follows:
+
+### Homogeneous Variance
+$$\sigma^2(i) = \sigma^2_b$$
+
+### Increasing Variance
+$$\sigma^2(i) = \sigma^2_b \cdot \left(0.5 + \frac{1.5(i-1)}{n-1}\right)$$
+
+### Decreasing Variance
+$$\sigma^2(i) = \sigma^2_b \cdot \left(2 - \frac{1.5(i-1)}{n-1}\right)$$
+
+### V-shaped Variance
+$$
+\sigma^2(i) = \begin{cases}
+\sigma^2_b \cdot \left(2 - \frac{i-1}{\lceil n/2 \rceil-1}\right) & \text{if } i \leq \lceil n/2 \rceil \\[2ex]
+\sigma^2_b \cdot \left(1 + \frac{i-\lceil n/2 \rceil}{n-\lceil n/2 \rceil}\right) & \text{if } i > \lceil n/2 \rceil
+\end{cases}
+$$
+
+Where:
+
+- $i$ is the dose level index (1 to n)
+- $n$ is the number of dose levels
+- $\sigma^2_b$ is the base variance (default = 4)
+- $\lceil n/2 \rceil$ represents the ceiling of n/2 (mid-point)
