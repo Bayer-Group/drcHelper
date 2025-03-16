@@ -339,18 +339,23 @@ plot_hetero_variance_results <- function(results) {
 }
 
 # Function to visualize the variance patterns
-plot_variance_patterns <- function(n_doses = 5, base_variance = 4) {
+plot_variance_patterns <- function(n_doses = 5, base_variance = 4, dose_range=NULL) {
   # Generate variance patterns
   patterns <- names(variance_patterns)
   
   # Create data frame for plotting
   plot_data <- data.frame(
     Dose_Level = rep(1:n_doses, length(patterns)),
+    
     Variance = unlist(lapply(patterns, function(p) {
       variance_patterns[[p]](n_doses, base_variance)
     })),
     Pattern = rep(patterns, each = n_doses)
   )
+  if(!is.null(dose_range)) {
+    x <- seq(dose_range[1],dose_range[2],length=n_doses)
+    plot_data$Dose_Level <- factor(as.character(x),levels=x)
+  }
   
   # Create plot
   ggplot2::ggplot(plot_data, ggplot2::aes(x = Dose_Level, y = Variance, color = Pattern, group = Pattern)) +

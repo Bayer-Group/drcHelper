@@ -626,3 +626,4 @@ p_drc_qb <- ggplot(df_all, aes(x=x, y=y)) +
 - Agresti, A. (2002) Categorical Data Analysis, Second Edition. Hoboken, New Jersey: John Wiley & Sons, Inc.
 - Harrell, F. E, (2001) Regression Modeling Strategies. New York: Springer-Verlag.
 - http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/
+- Chuang-Stein G, Agresti A. A review of tests for detecting a monotone dose-response relationship with ordinal response data. Stat Med. 1997 Nov 30;16(22):2599-618. doi: 10.1002/(sici)1097-0258(19971130)16:22<2599::aid-sim734>3.0.co;2-9. PMID: 9403959.

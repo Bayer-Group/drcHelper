@@ -73,16 +73,58 @@ nrow(param_grid_hetero)
 param_grid_hetero <- param_grid_hetero %>% dplyr::filter(max_effect == 5 | (max_effect == 20 & response_type !="none"))
 
 
-sim5_results <- run_multiple_hetero_simulations(param_grid=param_grid_hetero,
-                                                test_methods=tank_level_methods,
-                                                n_sim = 1000,
-                                                n_cores = parallel::detectCores() - 1,
-                                                seed = 123)
-
-## sim5_results <- plyr::ldply(hetero_simulation_checkpoint$results_list)
-
-saveRDS(sim5_results,file="sim5_results.rds")
+# sim5_results <- run_multiple_hetero_simulations(param_grid=param_grid_hetero,
+#                                                 test_methods=tank_level_methods,
+#                                                 n_sim = 1000,
+#                                                 n_cores = parallel::detectCores() - 1,
+#                                                 seed = 123)
+#
+# ## sim5_results <- plyr::ldply(hetero_simulation_checkpoint$results_list)
+#
+# saveRDS(sim5_results,file="sim5_results.rds")
 ## Save the output into an R data object.
+
+sim5_results <- readRDS("~/Projects/drcHelper/inst/RStats/sim5/sim5_results.rds")
+sim5_results$Method[sim5_results$Method=="GLS_Hetero"] <- "LM_Hetero"
+sim5_wide_res <- sim5_results %>% tidyr::pivot_wider(names_from = Method,values_from = Power)
+
+sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>%summarise(nHetero = sum(LM_Hetero>=LM_Homo),n0=length(LM_Homo)) %>% mutate(pnHetero=nHetero/n0)
+sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% filter(LM_Hetero - LM_Homo>0)
+sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% filter(LM_Hetero > LM_Homo) %>% filter(m_tanks ==6, max_effect==5)
+sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% mutate (pdiff= LM_Hetero - LM_Homo) ->tmp
+
+
+sim5_wide_res %>% dplyr::filter(response_type=="none")%>% summarise(npJ1= sum(Jonckheere>0.1)/length(Jonckheere),
+                                                                    npJ2= sum(Jonckheere>0.05)/length(Jonckheere),
+                                                                    npW1= sum(Williams>0.1)/length(Jonckheere),
+                                                                    npW2= sum(Williams>0.05)/length(Jonckheere),
+                                                                    npHeter= sum(LM_Hetero>0.05)/length(Jonckheere),
+                                                                    npHomo= sum(LM_Homo>0.05)/length(Jonckheere)
+                                                                    )
+
+sim5_wide_res %>% dplyr::filter(Expected_Response==100)%>% summarise(npJ1= sum(Jonckheere>0.1)/length(Jonckheere),
+                                                                    npJ2= sum(Jonckheere>0.05)/length(Jonckheere),
+                                                                    npW1= sum(Williams>0.1)/length(Jonckheere),
+                                                                    npW2= sum(Williams>0.05)/length(Jonckheere),
+                                                                    npHeter= sum(LM_Hetero>0.05)/length(Jonckheere),
+                                                                    npHomo= sum(LM_Homo>0.05)/length(Jonckheere)
+)
+
+
+
+out <- sim5_wide_res %>% group_by(Expected_Response) %>% nest() %>% mutate(power_summary=map(data,function(x){
+  out <- data.frame(stat=c("Min","Q1","Mean","Median","Q3","Max"))
+  out1 <- x %>% reframe(LM_Homo = summary(LM_Homo),
+                        LM_Hetero = summary(LM_Hetero),
+                        Jonckheere = summary(Jonckheere),
+                        Williams = summary(Williams),
+                        Dunns = summary(Dunns)
+  )
+  cbind(out,out1)
+
+})) %>% dplyr::select(-data) %>% unnest(c(power_summary))
+
+out
 
 ########################################################################
 plotit <- FALSE

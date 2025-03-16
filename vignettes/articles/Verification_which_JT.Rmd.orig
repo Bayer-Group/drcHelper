@@ -26,6 +26,8 @@ library(tidyverse)
 
 ## Summary
 
+Jonckheere's test and Kendall's tau) are closely related. In some software implementations, the two test produce identical p-values.
+
 `JtTest` from `npordtests` are doing the same as in `cor.test` with method being "kendall". Both function actually performs a kendall test and treat the dose column as numeric. On the other hand `PMCMRplus::jonckheereTest` and `DescTools::JonckheereTerpstraTest` do similar things.
 
 

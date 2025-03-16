@@ -1,4 +1,4 @@
-setwd("~/Projects/drcHelper/inst/RStats/check_osci/")
+setwd("~/Projects/drcHelper/inst/RStats/check_sim/")
 library(parallel)
 library(doParallel)
 library(drcHelper)
@@ -10,26 +10,49 @@ closeAllConnections()
 gc()  # Force garbage collection
 # Run a simulation with oscillating response
 
-test_methods_o <- list(
-  "LMM_Homo" = lmm_dunnett_homo,
-  "LM_Homo" = lm_dunnett_agg,
+tank_level_methods <- list(
+  "LM_Homo" = lm_dunnett_agg_simple,
+  "LM_Hetero" = gls_dunnett_agg_simple,
   "Williams" = williams_test,
   "Jonckheere" = jonckheere_test
 )
-none_sim <- run_power_simulation(
-  n_sim = 100,
-  n_doses = 5,
-  dose_range = c(0, 20),
-  m_tanks = 4,
-  k_individuals = 6,
-  var_tank = 4,
-  var_individual = 2,
-  max_effect = 20,
-  response_type = "none",  # New response type
-  test_methods = test_methods_o,
-  alternative = "less",  # For oscillating patterns, two-sided tests are appropriate
-  n_cores = 6
+
+
+
+
+# Parameter grid for heterogeneous variance question
+param_grid_hetero <- expand.grid(
+  n_doses = 7,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4,6),
+  variance_pattern = c(2,2,2,2,10,4),
+  max_effect = c(0),  # Null and moderate effect
+  response_type = c("none"),  # Focus on null and decreasing
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
 )
+
+nrow(param_grid_hetero)
+
+test_hetero_sim <- run_hetero_variance_simulation(
+  n_sim = 10,  # Small number for testing
+  n_doses = 5,
+  m_tanks = 3,
+  variance_pattern = c(2,2,2,2,10,4),
+  max_effect = 5,
+  response_type = "decreasing",
+  test_methods = tank_level_methods,
+  n_cores = parallel::detectCores() - 1
+)
+
+sim5_results <- run_multiple_hetero_simulations(param_grid=param_grid_hetero,
+                                                test_methods=tank_level_methods,
+                                                n_sim = 1000,
+                                                n_cores = parallel::detectCores() - 1,
+                                                seed = 123)
+
 plotit <- FALSE
 if(plotit){
   none_sim <- get("none_sim",env=RStats_check_none_results)

@@ -1,0 +1,88 @@
+## 3.	METHODS
+### 3.1.	3.1 A motivating example: when flowcharts mislead us
+
+We begin with a real data example that illustrates a critical limitation under current statistical practices. While visual inspection of the data clearly suggests where the NOEC should be, following the standard decision flowchart leads to using the step-down Jonckheere-Terpstra test, which paradoxically concludes a NOEC that would have been the LOEC with a more suitable test. To further demonstrate this limitation, we show how manipulating a single data point that increases variance at the apparent NOEC and actually strengthens the visible decreasing trend, yet the step-down JT test still fails to identify significant differences at the original LOEC level. We then conduct two small simulations to show this is not a single case but a real issue. This example motivates our subsequent systematic investigation through simulation studies.
+
+### 3.2.	Simulation study design: understanding test performance across varioous scenarios
+
+We conducted a simulation study to evaluate statistical methods for analyzing hierarchical dose-response data. The study addressed two primary objectives: (1) to assess how variance component relationships influence the relative performance of mixed-effects models versus tank-level aggregated analyses, and (2) to compare the performance of different tests, especially trend tests in decision flowcharts under various dose-response patterns and variance patterns. (3) to compare standard Dunnett procedure and Welch type Dunnett 
+
+Dose-response patterns were simulated according to the functional forms below and are illustrated in Figure 1
+
+The response function R(d) is defined as follows:
+
+For decreasing response:
+R(d) = 100 - (d/d_max) × E_max
+
+For non-monotonic response:
+R(d) = 100 - E_max × (1 - ((d - d_mid)/d_mid)²)
+
+For threshold response:
+R(d) = 100                                                    if d < d_threshold
+R(d) = 100 - ((d - d_threshold)/(d_max - d_threshold)) × E_max   if d ≥ d_threshold
+
+For oscillating response:
+R(d) = 100 + E_max × sin(2πfd)
+
+For no response:
+R(d) = 100
+
+Where:
+- d is the dose
+- d_max is the maximum dose
+- d_mid is the mean of the dose range
+- E_max is the maximum effect
+- f is the frequency (set to 1)
+- d_threshold is the threshold dose
+
+The non-monotonic (quadratic) and oscillating patters are useful for well different methods handle non-monotonic patterns where the response both increases and decreases across the dose range. It's particularly challenging for trend tests that assume monotonicity. 
+
+
+The variance σ²(i) at dose level i is defined as follows:
+
+For homogeneous variance:
+σ²(i) = σ²_b
+
+For increasing variance:
+σ²(i) = σ²_b × (0.5 + 1.5(i-1)/(n-1))
+
+For decreasing variance:
+σ²(i) = σ²_b × (2 - 1.5(i-1)/(n-1))
+
+For v-shaped variance:
+σ²(i) = σ²_b × (2 - (i-1)/⌈n/2⌉-1)     for i ≤ ⌈n/2⌉
+σ²(i) = σ²_b × (1 + (i-⌈n/2⌉)/(n-⌈n/2⌉))   for i > ⌈n/2⌉
+
+Where:
+- i is the dose level index (1 to n)
+- n is the number of dose levels
+- σ²_b is the base variance (default = 4)
+- ⌈n/2⌉ represents the ceiling of n/2 (mid-point)
+
+
+The simulation design: 
+
+The maximum effect size, defined as the highest percent reduction from control, ranged from 5% to 20%. The experimental design comprised tanks (n = 4, 5, or 6) with nested individuals (n = 3, 6, or 10 per tank). An additional scenario with 10 tanks and single individuals was also evaluated to examine the extreme case of maximum replication at the tank level.
+
+To ensure comparability across methods, we implemented one-sided tests throughout, as some procedures (Williams’ test and step-down trend tests) are inherently one-sided. The simulation investigated various combinations of between-tank (var_tank) and within-tank (var_individual) variances to determine:
+
+-	The statistical power of mixed-effects models using individual-level data
+-	The power of fixed-effects models using tank-level aggregated data
+-	The dependence of these relationships on the number of individuals per tank
+- Type I error control under the null scenario (no dose-response relationship)
+- Statistical power under different dose-response patterns and maximum effect sizes
+- Sensitivity to detect various effect magnitudes
+
+
+For both power and type I error assessement, we conducted 1000 iterations per scenario. However, we are aware that for stable estimate of the type I error, more iterations (5,000 to 10,000) are preferred. 
+Based on the simulation results, recommendations can be given which test performs better in which condition; should mixed models be used for its power or fixed models be used for simplicity and interpretability; should welch type Dunnett be used when there is inhomogeneity. We used holm's adjustment for p-values in multipe comparison procedures, which is less conservative compared to bonferroni adjustment.  
+
+We compare the differences in power performance through simulation studies, demonstrating the power gains from changing to more generally applicable tests and raising the question of whether such changes are worthwhile.
+
+Through our simulation studies, we examine the power gains achieved by moving toward more generally applicable tests. However, we deliberately pose a crucial question: are these potential power improvements worth the added complexity and possible reduction in transparency? This question reflects the ongoing tension in regulatory ecotoxicology between statistical sophistication and practical implementation.
+
+
+
+
+
+

@@ -86,7 +86,7 @@ response_patterns <- visualize_response_patterns(
 )
 
 # Display the plot
-response_patterns
+p1 <- response_patterns
 
 
 
