@@ -84,5 +84,112 @@ Through our simulation studies, we examine the power gains achieved by moving to
 
 
 
+# Edits
+
+## RESULTS
 
 
+
+### 4.2.1 Type I Error Control and Statistical Power Under Homogeneous Variance
+
+Our first set of simulations examined how different statistical methods perform under ideal conditions with homogeneous variance across dose levels. This baseline assessment reveals fundamental differences in method reliability before introducing the additional challenge of heterogeneous variance.
+
+#### Type I Error Control
+
+We first examined Type I error rates under the null case where no true effect exists (expected response = 100 across all dose levels). Table 3 reveals important differences in how various methods control false positive rates:
+
+- **Mixed model approaches (LMM)**: Both standard and Welch-type Dunnett tests applied to individual-level data showed concerning Type I error inflation, averaging around 14% (nearly triple the nominal 5% level). This inflation occurs despite these models theoretically accounting for the hierarchical data structure.
+
+- **Linear model approaches (LM)**: Dunnett tests based on standard linear models fitted to aggregated tank mean data maintained better Type I error control, with rates close to the nominal 5% level.
+
+- **Trend tests**: The Jonckheere-Terpstra test showed acceptable average Type I error (4.9%), but with concerning variability (ranging from 0% to 76.6%) across scenarios. Similarly, Williams' test showed variable behavior, with Type I error rates ranging from 0.9% to 100%.
+
+These findings highlight a crucial point for practitioners: methods that appear appropriate based on average performance may still exhibit problematic behavior in specific scenarios.
+
+#### Power to Detect Small Effects
+
+For small effects (5% reduction from control), we observed substantial differences in test performance:
+
+- **Mixed model approaches** showed superior power (averaging 98%) compared to linear models applied to tank means (80-83%).
+
+- **The Welch-type Dunnett test** consistently outperformed the standard Dunnett test in power across all scenarios, even under homogeneous variance conditions where its additional complexity might seem unnecessary.
+
+- **Trend tests** showed variable performance depending on the dose-response pattern. For monotonic patterns, they offered superior power for small effects. However, as Figure 3 (top row) demonstrates, Williams' test falsely identified the Dose_4 with 0% reduction as significantly different from control in 35.7%-86.8% of cases when the maximum effect was 5%.
+
+#### Power to Detect Larger Effects
+
+For larger effects (10% reduction or greater), these differences diminished:
+
+- All Dunnett procedures achieved maximum power (100%), regardless of whether they were applied to individual or tank-level data.
+
+- Trend tests maintained their pattern-dependent performance, with Williams' test reaching 100% power for monotonic patterns but continuing to show false positives for non-monotonic patterns (Figure 4, top row).
+
+
+## 5. DISCUSSION AND RECOMMENDATIONS
+
+Statistical analysis in regulatory ecotoxicology serves a fundamentally different purpose than in exploratory research. While research might prioritize detecting novel effects, regulatory testing requires methods that perform reliably across diverse scenarios, balancing sensitivity with rigorous error control. Our findings demonstrate that this balance is not achieved by mechanically following decision flowcharts or defaulting to supposedly "conservative" approaches. Instead, it requires thoughtful selection of robust methods, careful data visualization, and integration of statistical results with biological understanding.
+
+### 5.1 Key Findings from Simulation Studies
+
+Our analysis revealed several important limitations in current statistical practices:
+
+**Decision flowcharts can lead to inappropriate test selection.** While flowcharts provide valuable guidance, following them mechanically without considering data characteristics can lead to misleading conclusions. As our motivating example demonstrated, the step-down Jonckheere-Terpstra test failed to detect clear effects that were visually evident and identified by more robust approaches.
+
+**Commonly recommended tests have specific, often overlooked limitations.** The step-down Jonckheere-Terpstra test, frequently recommended for non-normal data, requires similar shapes and variances across groups—an assumption often violated in ecotoxicological studies. Our simulations showed this test's power varied dramatically depending on effect location and variance patterns, with power dropping from 86.4% to 56.1% when variance increased at the dose level where effects occurred.
+
+**Mixed models show concerning Type I error inflation with small samples.** Despite their theoretical advantages for hierarchical data, linear mixed models applied to individual-level data showed Type I error rates around 14%—nearly triple the nominal 5% level. This finding challenges the assumption that more complex models necessarily provide more reliable inference, particularly with the small sample sizes typical in regulatory ecotoxicology.
+
+**Trend tests can miss important patterns in non-monotonic relationships.** Our simulations demonstrated that Williams' test falsely identified doses with 0% reduction as significantly different from control in up to 86.8% of cases with non-monotonic patterns. This highlights the danger of assuming monotonicity without careful data examination.
+
+**Welch-type Dunnett tests consistently outperform standard approaches.** Across both homogeneous and heterogeneous variance conditions, the Welch-type Dunnett test maintained appropriate error control while providing comparable or superior power to detect true effects. It outperformed the standard Dunnett test in 89.6% of cases where a true reduction existed.
+
+
+### 5.2 Practical Recommendations for Regulatory Ecotoxicology
+
+Based on our findings, we offer the following practical recommendations for improving statistical analysis in regulatory ecotoxicology:
+
+#### Statistical Method Selection
+
+1. **Adopt robust approaches by default.** Use Welch-type Dunnett tests rather than relying on variance homogeneity pretests to determine whether to use standard Dunnett or non-parametric alternatives. This approach provides reliable performance across diverse conditions.
+
+2. **Consider the biological plausibility of dose-response patterns.** Before applying trend tests that assume monotonicity, carefully examine data for potential non-monotonic patterns that these tests might miss.
+
+3. **Be cautious with mixed models for small studies.** Despite their theoretical appeal, mixed models can show inflated Type I error rates with the small sample sizes typical in ecotoxicology. Tank-level analyses often provide more reliable inference in these cases.
+
+#### Data Visualization and Exploration
+
+4. **Begin every analysis with thorough data visualization.** Plot the raw data, examine variance patterns across dose levels, and look for potential outliers or unexpected patterns before conducting formal tests.
+
+5. **Perform sanity checks on statistical results.** When statistical conclusions contradict clear visual patterns (as in our motivating example), investigate further rather than accepting the statistical result uncritically.
+
+6. **Present confidence intervals alongside p-values.** This provides information about both the magnitude of effects and the precision of estimates, offering more context than significance testing alone.
+
+#### Study Design Considerations
+
+7. **Account for hierarchical data structure in the design phase.** Consider power analysis for relevant effect sizes according to the planned statistical analysis and ensure adequate replication at both individual and tank levels.
+
+8. **Document variance patterns from similar studies.** This information can inform future designs and help anticipate potential challenges in analysis.
+
+#### Documentation and Transparency
+
+9. **Clearly document statistical methods and decision processes.** Provide justification for any deviation from standard decision flowcharts, explicit statements about model assumptions, and comprehensive uncertainty analysis.
+
+10. **Share raw data when possible.** This enables others to verify results and potentially apply alternative analytical approaches.
+
+### 5.3 Future Directions for Method Development and Validation
+
+While our study addresses several key challenges in ecotoxicological statistics, important questions remain for future research:
+
+**Robust approaches for small samples and heterogeneous variance.** Further investigation is needed on methods like sandwich variance estimators for multiple contrast tests that remain reliable under challenging conditions common in ecotoxicology.
+
+**Characterization of real data patterns.** A systematic analysis of historical control data could reveal typical variance components in hierarchical designs, common patterns of heterogeneous variance, and biologically relevant effect sizes. This would enable more realistic simulation studies and better-informed statistical choices.
+
+**Integration of Bayesian approaches.** Bayesian methods offer promising ways to incorporate historical control data and expert knowledge, potentially increasing the sensitivity and reliability of regulatory testing.
+
+**Public repository for benchmark data and methods.** We propose establishing a shared resource where researchers can access real ecotoxicological datasets, validated statistical approaches, and standardized simulation frameworks. This would facilitate method comparison, validation, and continuous improvement of statistical practices.
+
+### 5.4 Concluding Remarks
+
+No single statistical test performs optimally across all scenarios encountered in ecotoxicology. The goal should not be to maximize power for specific conditions but to develop reliable approaches that perform well across the range of conditions encountered in practice. Our findings challenge several common practices: the mechanical use of decision flowcharts, the assumption that non-parametric tests solve heterogeneous variance problems, and the belief that more complex models necessarily provide better inference.
+
+By combining robust statistical methods with careful data visualization and biological understanding, we can significantly improve the reliability and transparency of regulatory ecotoxicology. This integrated approach—rather than reliance on any single statistical technique—will ultimately lead to more informed and defensible environmental risk assessments.

@@ -90,7 +90,7 @@ sim5_wide_res <- sim5_results %>% tidyr::pivot_wider(names_from = Method,values_
 
 sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>%summarise(nHetero = sum(LM_Hetero>=LM_Homo),n0=length(LM_Homo)) %>% mutate(pnHetero=nHetero/n0)
 sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% filter(LM_Hetero - LM_Homo>0)
-sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% filter(LM_Hetero > LM_Homo) %>% filter(m_tanks ==6, max_effect==5)
+sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% filter(LM_Hetero < LM_Homo) %>% filter(m_tanks ==6, max_effect==5,response_type =="threshold")
 sim5_wide_res %>% dplyr::filter(Expected_Response<100)%>% mutate (pdiff= LM_Hetero - LM_Homo) ->tmp
 
 

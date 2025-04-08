@@ -1,0 +1,77 @@
+---
+title: "Aquatic ED Assays"
+editor_options: 
+  chunk_output_type: console
+---
+
+We focus on ED assessment for non-mammalian vertebrates (fish and amphibians) here.
+
+# XETA (Xenopus embryonic thyroid assay)
+
+OECD 248
+
+## Validity Criteria
+
+- A statistically significant induction of fluorescence should be measured between the test medium control group and the T3 control group. The mean fluorescence of the T3 group should be at least 20% higher than mean of fluorescence of the test medium control group. 
+- A statistically significant induction of fluorescence of at least 70% should be present between the T4 control group and the test medium control.
+- The coefficient of variation of the fluorescence intensity measured for the test medium control should not exceed 30%. 
+- The initial pH of the exposure solutions should be between 6.5 and 8.5 for each renewal. 
+- The mortality should not exceed 10% in each control group. 
+- The percentage of malformed organisms should not exceed 10% in each control group.
+
+
+## Recommendations
+
+- test duration: 72 h
+- test temperature: 21°C
+
+## Decision logic 
+
+To link the increase in fluorescence to an endocrine mechanism.
+
+- an increase $>$ 12% in the unspiked mode needs to be observed to conclude that the test substance is thyroid active. 
+- an increase >12% in the spiked mode needs to be observed to conclude that the test substance is thyroid active.
+
+
+
+## Trimming
+
+Trimming is done usually to stablize variance. Analysis with and without trimming can both be presented to understand the sensitivity to trimming.
+
+
+# AMA
+
+TG: OECD 231; U.S. EPA OPPTS 890.1100
+
+## Validity
+
+- For any given treatment (including controls), mortality cannot exceed 10%. 
+- For any given replicate, mortality cannot exceed three tadpoles, otherwise the replicate is considered compromised. 
+- At least two treatment levels, with all four uncompromised replicates, should be available for analysis. 
+- At least two treatment levels without overt toxicity should be available for analysis. 
+- Mortality of no more than two tadpoles/replicate in control group can occur.
+
+## Recommended Analylsis:
+
+- Data of the continuous quantitative endpoints (HHL, nHHL, SVL, wet weight) with a monotone dose-response were analysed with the Jonckheere-Terpstra test applied to the replicate medians.
+- For non-monotone dose-response relationships data were analysed with the Dunnet’s test applied to the replicate means.
+- Median Development Stage: multi-quantile Jonckheere-Terpstra trend test
+
+# FISTRA
+
+- Short-term reproduction assay with fathead minnow (Pimephales promelas)
+- TG: OECD 229 (2012); OCSPP 890.1350 (2009)
+
+# Statisstical Analysis 
+
+## Softwares
+
+1. ToxRat (3.3.0): 
+    - Welch's t-test after Bonferroni-Holm with heterogeneuous variance
+    - Bonferroni-Median-test (Dunn's test?) 
+2. R 
+    - xereda
+
+## Notes
+
+

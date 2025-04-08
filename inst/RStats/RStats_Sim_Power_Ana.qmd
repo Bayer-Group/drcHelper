@@ -43,10 +43,104 @@ ggsave("Figure_1_respnse_variance_pattern.png",dpi = 300,width = 7.5,height = 4)
 ```
 
 
-## Outcome Discussion
+## Simplified Version
 
 
+**TITLE**
 
+The Role of Statistical Power in Context: Implications for Regulatory Practices
+
+**AUTHORS and AFFILIATIONS**
+
+Zhenglei Gao¹, Ludwig A. Hothorn², John W. Green³
+
+1. Bayer AG, Alfred-Nobel-Straße 50, 40789 Monheim am Rhein, Germany
+2. 31867 Lauenau, Germany
+3. John W Green Ecostatistical Consulting LLC, Newark, DE, USA
+
+**ABSTRACT**
+
+Regulatory risk assessment in ecotoxicology relies heavily on statistical endpoints such as No Observed Effect Concentrations (NOECs) and Effective Concentrations (ECxs). Current practices, as outlined in OECD guidelines, typically employ decision flowcharts to guide statistical analysis. While these flowcharts aim to ensure appropriate test selection, our analysis reveals critical limitations when applied to real ecotoxicological data, especially with heterogeneous variances and small sample sizes. Through simulation studies and practical examples, we demonstrate that commonly recommended approaches can produce misleading results under realistic conditions. Our findings show that robust methods, particularly Welch-type Dunnett tests, consistently outperform standard approaches. We propose practical improvements to current guidelines, including prioritizing robust statistical methods, incorporating visual inspections and sanity checks, and establishing a public repository for benchmark data and methods. These recommendations aim to enhance the reliability and transparency of statistical analyses in regulatory ecotoxicology, ultimately improving the quality of environmental risk assessments.
+
+**KEYWORDS**
+
+Decision flowchart, power analysis, robust method.
+
+**INTRODUCTION**
+
+Regulatory risk assessment critically relies on statistical endpoints derived from ecotoxicological studies. Two key measures—NOECs and ECxs—serve as fundamental inputs for regulatory decision-making. The reliability of these endpoints depends on both sound experimental design and appropriate statistical analysis procedures.
+
+Recent shifts in regulatory ecotoxicology favor ECx values over NOECs due to their detailed representation of chemical effects. However, NOEC remains relevant due to its simplicity and historical use. Both measures require robust statistical methods to ensure effectiveness.
+
+Decision flowcharts are commonly used to standardize the analysis of ecotoxicological data. These flowcharts guide analysts through pretests assessing monotonicity, normality, and variance homogeneity, leading to the selection of specific statistical tests. While they aim to avoid low power tests, their main purpose is to identify appropriate methods across a range of conditions, rather than maximizing statistical power for specific datasets.
+
+Statistical analysis in regulatory contexts has different goals compared to traditional research. Regulatory testing requires methods that perform reliably across various scenarios, even if they are not optimal in every case. This is crucial when dealing with real ecotoxicological data, which often exhibit challenging characteristics like heterogeneous variances and small sample sizes.
+
+This paper advocates for a holistic approach to statistical analysis in regulatory ecotoxicology, addressing current challenges through several aspects. We present both real and synthetic data examples to illustrate how standard decision flowcharts can lead to inconsistent or unreliable results. We provide a comprehensive power comparison of various statistical approaches, identifying robust methods that perform reliably across diverse scenarios. Finally, we offer practical advice for improving statistical analysis, emphasizing that reliance on p-values alone is insufficient.
+
+**METHODS**
+
+**A Motivating Example: When Flowcharts Mislead Us**
+
+We begin with a real data example illustrating a critical limitation in current statistical practices. Visual inspection clearly suggests where the NOEC should be, but following the standard decision flowchart leads to using the step-down Jonckheere-Terpstra test, which paradoxically concludes a NOEC that would have been the LOEC with a more suitable test.
+
+**Simulation Study Design: Understanding Test Performance Across Scenarios**
+
+We designed a comprehensive simulation study addressing key questions about variance relationships, test performance under various dose-response patterns, and the advantages of robust approaches like Welch-type Dunnett tests. Our simulations reflect common and challenging scenarios encountered in ecotoxicology.
+
+**RESULTS**
+
+**Performance Under Homogeneous Variance**
+
+Our simulation study reveals insights about the performance of different statistical approaches under homogeneous variance conditions. Mixed models show concerning Type I error inflation, highlighting a practical limitation despite their theoretical advantages. The Welch-type Dunnett test consistently outperforms the standard Dunnett test in power across all scenarios, even under homogeneous conditions.
+
+**Performance Under Heterogeneous Variance**
+
+Introducing heterogeneous variance into our simulations reveals compelling evidence for choosing robust statistical approaches. The Welch-type Dunnett test outperforms the standard Dunnett test in most cases, challenging the common practice of defaulting to standard procedures.
+
+**DISCUSSION AND RECOMMENDATIONS**
+
+In considering statistical approaches for regulatory ecotoxicology, statistical methods should focus on accurate pattern detection and reliable inference, rather than maximizing power at any cost. Complex models might offer additional insights but don't necessarily improve practical utility, particularly in regulatory contexts where transparency and reproducibility are crucial.
+
+**Key Findings**
+
+Our analysis highlights limitations in current statistical practices. Decision flowcharts can lead to inappropriate test selection if followed mechanically. The step-down Jonckheere-Terpstra test requires assumptions frequently violated in practice. Mixed models show concerning Type I error inflation with small sample sizes. Trend tests can miss important patterns in non-monotonic dose-response relationships.
+
+Promising solutions include the Welch-type Dunnett test, which performs consistently under both homogeneous and inhomogeneous variance conditions. Visual inspection of data patterns often reveals important features missed by formal testing alone.
+
+**Practical Recommendations**
+
+We advocate for the adoption of robust approaches to avoid inappropriate test selection resulting from pre-tests in decision flowcharts. Statistical analysis should begin with comprehensive data visualization, examining dose-response patterns, checking variance patterns, and considering the biological relevance of observed effects. Study design should account for hierarchical data structure and plan for adequate replication. Clear documentation of statistical methods, model assumptions, and uncertainty analysis is crucial for transparent and reproducible risk assessments.
+
+**Future Directions**
+
+Regulatory ecotoxicology would benefit from using robust methods for small sample sizes and inhomogeneous variance. Establishing a public database to examine the suitability of approaches and improve understanding is recommended.
+
+**Concluding Remarks**
+
+No single test performs optimally across all scenarios. Our findings support a move toward more robust and holistic analysis strategies. We advocate for using alternative robust approaches when deviations from decision charts are necessary and stress the importance of conducting sanity checks, such as visual inspections of model fit and data, following analyses to ensure the validity of results.
+
+By illustrating the potential pitfalls in the use of decision flowcharts, we aim to raise awareness that all approaches have pros and cons in different data situations and expert judgment is necessary. There are robust alternatives available, such as the Welch-type Dunnett test. We also aim to contribute to improved experimental design and more reliable data generation and analysis for regulatory purposes.
+
+**REFERENCES**
+
+[Include references as provided in the original draft]
+
+**CRediT authorship contribution statement**
+
+Zhenglei Gao: Conceptualization; Methodology; Writing - original draft; formal analysis. Ludwig A. Hothorn: Conceptualization; Methodology; Writing - review and editing. John W. Green: Conceptualization; Writing - review and editing.
+
+**Acknowledgements**
+
+We express our gratitude to Pernille Thorbek, Emily Scorgie, Xiaoyi Sopko, Stefan Kimmel, Stefan Kroder, and Marysia Tobor-Kaplon for their inspiration and insightful discussions. Additionally, we thank Markus Ebeling, Andreas Solga, Gregor Ernst, Allen Olmstead, Luke Settles, Maria Renner, and Anja Gladbach for their questions related to study data and specific statistical approaches.
+
+**Declaration of Competing Interest**
+
+Zhenglei Gao is an employee of Bayer, a manufacturer of pesticides and pharmaceutical products.
+
+---
+
+I have simplified the language and structure to improve clarity and logical flow. Please let me know if there are specific areas you would like further refined or if additional details are needed.
 
 
 ## References
