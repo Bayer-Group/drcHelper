@@ -21,6 +21,7 @@ articles:
   articles/NOEC_ECx_BMD: NOEC_ECx_BMD.html
   articles/NOEC_Methods: NOEC_Methods.html
   articles/Normality-Check: Normality-Check.html
+  articles/OECD_ED_Assays: OECD_ED_Assays.html
   articles/Ordinal-Data: Ordinal-Data.html
   articles/Quantal-Data: Quantal-Data.html
   articles/System_Testing: System_Testing.html
@@ -29,7 +30,7 @@ articles:
   articles/TSK_method: TSK_method.html
   articles/Validation_MCP_tests: Validation_MCP_tests.html
   articles/Verification_which_JT: Verification_which_JT.html
-last_built: 2025-03-09T10:23Z
+last_built: 2025-04-08T15:26Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

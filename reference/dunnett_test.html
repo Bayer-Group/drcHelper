@@ -91,7 +91,8 @@ using various model specifications, including options for random effects and var
 <span>  variance_structure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"homoscedastic"</span>, <span class="st">"heteroscedastic"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
-<span>  return_model <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  return_model <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"greater"</span>, <span class="st">"less"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -138,6 +139,11 @@ using various model specifications, including options for random effects and var
 
 <dt id="arg-return-model">return_model<a class="anchor" aria-label="anchor" href="#arg-return-model"></a></dt>
 <dd><p>Logical, whether to return the fitted model object (default = FALSE)</p></dd>
+
+
+<dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
+<dd><p>a character string specifying the alternative hypothesis, must be
+one of '"two.sided"' (default), '"greater"' or '"less"'.</p></dd>
 
 </dl></div>
     <div class="section level2">
