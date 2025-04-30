@@ -1,4 +1,4 @@
-## Not used in GLP calc, but to be integrated into the package in future
+## Not used in GLP calc, but to be integrated into the validated package in future
 
 ## Brooming the different test results together so that they can be compared
 
