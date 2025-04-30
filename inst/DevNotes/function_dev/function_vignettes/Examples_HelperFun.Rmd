@@ -1,0 +1,42 @@
+---
+title: "Examples using some small helper functions"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r}
+# Create example data
+set.seed(123)
+test_data <- data.frame(
+  dose = factor(rep(c(0, 1, 5, 10), each = 5)),
+  response = c(rnorm(5, 100, 10), rnorm(5, 90, 10),
+               rnorm(5, 80, 10), rnorm(5, 70, 10))
+)
+#'
+# Apply Williams test
+result <- broom_williams(response ~ dose, data = test_data)
+print(result)
+
+result <- broom_williams(response ~ dose, data = test_data, method = "Williams_JG")
+print(result)
+```
+
+
+```{r}
+# Apply Williams test
+result <- broom_dunnett(response ~ dose, data = test_data,method = "Dunnett_multcomp")
+print(result)
+
+result <- broom_dunnett(response ~ dose, data = test_data,method = "Dunnett_DescTools")
+print(result)
+
+result <- broom_dunnett(response ~ dose, data = test_data,method = "Dunnett_PMCMRplus")
+print(result)
+```
+

@@ -1,3 +1,5 @@
+## Not used in GLP calc, but to be integrated into the package in future
+
 ## Brooming the different test results together so that they can be compared
 
 #' Standardize Williams Test Results
@@ -41,19 +43,61 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
 
   if (method == "Williams_PMCMRplus") {
     williams_result <- try({
+      if (inherits(x, "formula")) {
+        model_data <- list(...)$data
+        if (is.null(model_data)) {
+          model_data <- environment(x)
+        }
+        aov_model <- aov(x, data = model_data)
+      } else if (inherits(x, c("aov", "lm"))) {
+        aov_model <- x
+      } else {
+        stop("x must be a formula, aov, or lm object for Dunnett_multcomp method")
+      }
+
+      # Extract the factor name from the formula
+      if (inherits(x, "formula")) {
+        terms <- terms(x)
+        factor_name <- attr(terms, "term.labels")[1]
+      } else {
+        factor_name <- names(aov_model$xlevels)[1]
+      }
+
+      # Get control level
+      control <- list(...)$control
+      if (!is.null(control)) {
+        ## control <- 1  # Default to first level
+        stop("Please make sure control is the first level of the dose group")
+      }
+
+      # Create contrast matrix for Dunnett
+      contrasts_call <- call("mcp")
+      ##contrasts_call[[2]] <- as.name(factor_name)
+      contrasts_call[[2]] <- "Dunnett"
+      names(contrasts_call)[2] <- factor_name
+      ##contrasts_call$base <- control
+
+
+      dunnett_contrasts <- eval(contrasts_call)
+
+      # Run the test
+      glht_result <- multcomp::glht(aov_model, linfct = dunnett_contrasts)
+      summary_result <- summary(glht_result)
+
       wt <- PMCMRplus::williamsTest(x, ...)
 
       # Extract summary information
-      wt_summary <- summary(wt)
-      comparisons <- names(wt_summary$p.value)
-
+      wt_summary <- summaryZG(wt)
+      comparisons <- rownames(wt_summary)
+      comparisons <- paste(names(summary_result$test$coefficients), ifelse(wt$alternative == "greater", " <= 0", " >= 0"))
       # Create standardized output
       result <- tibble::tibble(
         comparison = comparisons,
-        estimate = wt_summary$estimate,
-        p.value = wt_summary$p.value,
-        conf.low = wt_summary$confint[, 1],
-        conf.high = wt_summary$confint[, 2],
+        estimate = summary_result$test$coefficients,
+        `t'-stat` = summary_result$test$tstat,
+        `t'-crit` = wt_summary$`t'-crit`,
+        decision = wt_summary$decision,
+
         method = "Williams_PMCMRplus"
       )
 
@@ -61,13 +105,42 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
     }, silent = TRUE)
   } else if (method == "Williams_JG") {
     williams_result <- try({
-      wt <- drcHelper::williamsTest_JG(x, ...)
+      ##browser()
+      # For multcomp, we need to create an aov model first
+      if (inherits(x, "formula")) {
+        model_data <- list(...)$data
+        if (is.null(model_data)) {
+          model_data <- environment(x)
+        }
+        terms <- terms(x)
+        factor_name <- attr(terms, "term.labels")[1]
+        resp_name <- rownames(attr(terms, "factors"))[1]
+      }
+      if(is.null(list(...)$direction) || list(...)$direction == "decreasing"){
+        ## direction is decreasing
+        direction  <- "decreasing"
+        comparisons <- paste(wt$dose,"- 0 >= 0")
+      }else{
+        direction <- "increasing"
+        comparisons <- paste(wt$dose,"- 0 <= 0")
+      }
+
+      wt <- drcHelper::williamsTest_JG(df=model_data,resp=resp_name, trt = factor_name, direction = direction)
+      wt <- wt1[rev(seq_len(nrow(wt))), , drop = FALSE]
 
       # Assuming williamsTest_JG returns a data frame with standardized columns
       # If not, you'll need to transform its output to match the standard format
-      wt$method <- "Williams_JG"
+      result <- tibble::tibble(
+        comparison = comparisons,
+        estimate = wt$Y.Tilde - wt$Y0,
+        `t'-stat` = wt$Will,
+        `t'-crit` = wt$TCrit,
+        decision = ifelse(wt$Signif =="*", "reject","accept"),
 
-      wt
+        method = "Williams_StatCharrms"
+      )
+
+      result
     }, silent = TRUE)
   }
 
@@ -96,7 +169,7 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
 #' @param method Character string specifying which implementation of Dunnett test to use:
 #'        "Dunnett_multcomp" (default) for multcomp implementation,
 #'        "Dunnett_DescTools" for DescTools implementation, or
-#'        "Dunnett_PMCMRplus" for PMCMRplus implementation.
+#'        "Dunnett_PMCMRplus" for PMCMRplus implementation, do not use this one in general as it does not return complete information.
 #' @param ... Additional arguments passed to the underlying test functions.
 #'
 #' @return A data frame with standardized test results containing:
@@ -122,16 +195,16 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
       dt <- PMCMRplus::dunnettTest(x, ...)
 
       # Extract summary information
-      dt_summary <- summary(dt)
-      comparisons <- names(dt_summary$p.value)
+      dt_summary <- summaryZG_dunnett(dt)
+      comparisons <- rownames(dt_summary)
 
       # Create standardized output
       tibble::tibble(
         comparison = comparisons,
-        estimate = dt_summary$estimate,
-        p.value = dt_summary$p.value,
-        conf.low = dt_summary$confint[, 1],
-        conf.high = dt_summary$confint[, 2],
+        estimate = NA,
+        p.value = dt_summary$`Pr(>|t|)`,
+        conf.low = NA,
+        conf.high = NA,
         method = "Dunnett_PMCMRplus"
       )
     }, silent = TRUE)
@@ -149,12 +222,14 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
         comparison = rownames(dt),
         estimate = dt[, "diff"],
         p.value = dt[, "pval"],
-        conf.low = dt[, "lwr"],
-        conf.high = dt[, "upr"],
+        std.error = NA,
+        conf.low = dt[, "lwr.ci"],
+        conf.high = dt[, "upr.ci"],
         method = "Dunnett_DescTools"
       )
     }, silent = TRUE)
   } else if (method == "Dunnett_multcomp") {
+    ##browser()
     result <- try({
       # For multcomp, we need to create an aov model first
       if (inherits(x, "formula")) {
@@ -179,16 +254,17 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
 
       # Get control level
       control <- list(...)$control
-      if (is.null(control)) {
-        control <- 1  # Default to first level
+      if (!is.null(control)) {
+        ## control <- 1  # Default to first level
+        stop("Please make sure control is the first level of the dose group")
       }
 
       # Create contrast matrix for Dunnett
       contrasts_call <- call("mcp")
-      contrasts_call[[2]] <- as.name(factor_name)
-      contrasts_call[[3]] <- "Dunnett"
-      names(contrasts_call)[3] <- factor_name
-      contrasts_call$base <- control
+      ##contrasts_call[[2]] <- as.name(factor_name)
+      contrasts_call[[2]] <- "Dunnett"
+      names(contrasts_call)[2] <- factor_name
+      ##contrasts_call$base <- control
 
 
       dunnett_contrasts <- eval(contrasts_call)
@@ -200,9 +276,10 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
 
       # Create standardized output
       tibble::tibble(
-        comparison = names(summary_result$test$pvalues),
+        comparison = names(summary_result$test$coefficients),
         estimate = summary_result$test$coefficients,
         p.value = summary_result$test$pvalues,
+        std.error = summary_result$test$sigma,
         conf.low = conf_int$confint[, "lwr"],
         conf.high = conf_int$confint[, "upr"],
         method = "Dunnett_multcomp"
@@ -216,6 +293,7 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
       comparison = character(),
       estimate = numeric(),
       p.value = numeric(),
+      std.error = numeric(),
       conf.low = numeric(),
       conf.high = numeric(),
       method = character()
@@ -225,3 +303,58 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
   return(result)
 }
 
+
+summaryZG_dunnett <- function (object, ...)
+{
+  OK <- inherits(object, c("PMCMR"))
+  if (!OK)
+    stop("Not an object of class PMCMR")
+  if (!is.matrix(object$statistic))
+    stop("Matrix object$statistic not found.")
+  pval <- as.numeric(object$p.value)
+  stat <- as.numeric(object$statistic)
+  grp1 <- as.numeric(c(col(object$p.value)))
+  cnam <- colnames(object$p.value)
+  grp2 <- as.numeric(c(row(object$p.value)))
+  rnam <- rownames(object$p.value)
+  STAT <- object$dist
+  if (!is.null(object$alternative)) {
+    if (object$alternative == "less") {
+      H0 <- paste(rnam[grp2], "-", cnam[grp1], ">=", "0")
+      PVAL <- paste("Pr(<", STAT, ")", sep = "")
+    }
+    else if (object$alternative == "greater") {
+      H0 <- paste(rnam[grp2], "-", cnam[grp1], "<=", "0")
+      PVAL <- paste("Pr(>", STAT, ")", sep = "")
+    }
+    else {
+      H0 <- paste(rnam[grp2], "-", cnam[grp1], "==", "0")
+      PVAL <- paste("Pr(>|", STAT, "|)", sep = "")
+    }
+  }
+  else {
+    H0 <- paste(rnam[grp2], "-", cnam[grp1], "==", "0")
+    PVAL <- paste("Pr(>|", STAT, "|)", sep = "")
+  }
+  STAT2 <- paste0(STAT, " value")
+  OK <- !is.na(pval)
+  message("\n\tPairwise comparisons using ", object$method,
+          "\n")
+  message("data: ", object$data.name)
+  if (!is.null(object$alternative)) {
+    message("alternative hypothesis: ", object$alternative)
+  }
+  message("P value adjustment method: ", object$p.adjust.method)
+  symp <- symnum(pval[OK], corr = FALSE, cutpoints = c(0, 0.001,
+                                                       0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".",
+                                                                                        " "))
+  xdf <- data.frame(statistic = round(stat[OK], 3), p.value = format.pval(pval[OK]),
+                    symp)
+  rownames(xdf) <- H0[OK]
+  names(xdf) <- c(STAT2, PVAL, "")
+  message("H0")
+  print(xdf)
+  message("---")
+  message("Signif. codes: ", attr(symp, "legend"))
+  invisible(xdf)
+}

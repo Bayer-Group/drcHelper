@@ -1,3 +1,6 @@
+## Used only in research paper, to be integrated into the package
+
+
 #' Conduct Dunnett Test with Various Model Specifications
 #'
 #' This function performs Dunnett's test for comparing multiple treatment levels to a control
