@@ -115,7 +115,7 @@ result1 <- dunnett_test(
   data = sim_data,
   response_var = "Response",
   dose_var = "Treatment",  # Using your Treatment factor
-  block_var = "Tank",
+  tank_var = "Tank",
   include_random_effect = TRUE,
   variance_structure = "homoscedastic"
 )
@@ -141,7 +141,7 @@ result2 <- dunnett_test(
   data = sim_data,
   response_var = "Response",
   dose_var = "Treatment",
-  block_var = "Tank",
+  tank_var = "Tank",
   include_random_effect = FALSE,
   variance_structure = "heteroscedastic"
 )
@@ -176,7 +176,7 @@ result3 <- dunnett_test(
   data = tank_data,
   response_var = "Response",
   dose_var = "Treatment",
-  block_var = "Tank",
+  tank_var = "Tank",
   include_random_effect = FALSE,
   variance_structure = "homoscedastic"
 )
@@ -197,7 +197,7 @@ result4 <- dunnett_test(
   data = tank_data,
   response_var = "Response",
   dose_var = "Treatment",
-  block_var = NULL,
+  tank_var = NULL,
   include_random_effect = FALSE,
   variance_structure = "heteroscedastic"
 )
