@@ -8,7 +8,7 @@ dunnett_test(
   data,
   response_var = "Response",
   dose_var = "Dose",
-  block_var = "Tank",
+  tank_var = "Tank",
   control_level = NULL,
   include_random_effect = TRUE,
   variance_structure = c("homoscedastic", "heteroscedastic"),
@@ -25,7 +25,7 @@ dunnett_test(
 
 \item{dose_var}{Name of the dose/treatment variable column}
 
-\item{block_var}{Name of the blocking/tank variable column (optional)}
+\item{tank_var}{Name of the blocking/tank variable column (optional)}
 
 \item{control_level}{The level of dose_var to use as control (default is minimum dose)}
 

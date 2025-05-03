@@ -1,0 +1,203 @@
+
+
+
+Just as Luke pointed out, "the hardest things to spot are those in plain sight...".
+
+
+I actually used it as a block effect since my simulated data has same tank names or numbers for every concentration group. I have been arguing with Changjian that the replicate number in PVI data should not be used as a block effect, but I did exactly the things I am arguing against. Fortunately I asked help from my stats team and Luke identified the issue.
+
+
+
+"/home/sagemaker-user/Projects/drcHelper/inst/RStats/sim7"    
+
+
+
+
+
+```{r}
+
+library(janitor)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(stringr)
+
+library(ggplot2)
+theme_set(theme_bw())
+
+library(lme4)
+library(emmeans)
+library(multcomp)
+library(broom)
+library(pbkrtest) # for KR df
+library(lmerTest)
+
+conflicted::conflicts_prefer(dplyr::select,
+                             lmerTest::lmer)
+
+# data  --------------
+ex <- readRDS("/home/sagemaker-user/Projects/drcHelper/inst/RStats/sim7/example_type1error_data.rds") |>
+  clean_names() |>
+  arrange(dose, tank, individual) |>
+  mutate(across(c(dose, tank, individual),
+                as.factor))
+
+# write.csv(ex, "example_type1error_data.csv", row.names = FALSE)
+
+d <- crossing(
+  model = c("lm", "lmm"),
+  dunnett_pkg = c("emmeans", "multcomp"),
+  data = list(ex)
+) |>
+  mutate(
+    fit = map2(
+      model, data,
+      \(x, y)
+        if (x == "lm") {
+          lm(response ~ dose,
+             data = y |>
+               group_by(dose, tank) |>
+               summarize(across(response, mean),
+                         .groups = "drop"))
+        } else {
+          lmer(response ~ dose + (1 | tank:dose),
+               data = y)
+        }
+    ),
+    anova_tbl = map2(
+      model, fit,
+      \(x, y) if (x == "lm") {
+        anova(y)
+      } else {
+        anova(y, ddf = "Kenward-Roger")
+      }
+    ),
+    # lsmeans = map(
+    #   fit,
+    #   \(x) emmeans(object = x,
+    #                specs = "dose",
+    #                lmer.df = "kenward-roger")
+    # ),
+    comp = map2(
+      dunnett_pkg, fit,
+      \(x, y)
+      if (x == "emmeans") {
+        emmeans(object = y,
+                specs = "dose",
+                lmer.df = "kenward-roger") |>
+          contrast(method = "dunnett")
+      } else {
+        glht(model = y,
+             linfct = mcp(dose = "Dunnett"))
+      }
+    )
+  )
+
+
+# Dunnett test comparisons
+# - `emmeans` and `multcomp` generally agree; slight differences likely due to emmeans approximation
+#     https://stats.stackexchange.com/questions/631129/multicomp-package-and-emmeans-package-produce-different-adjust-pvalues-for-dunne
+# - lm and lmer give different results
+comparisons <- d |>
+  select(model, dunnett_pkg, comp) |>
+  mutate(across(comp, \(x) map(x, tidy))) |>
+  unnest(cols = comp) |>
+  mutate(contrast = str_remove_all(contrast, "dose"),
+         method = paste0(model, "_", dunnett_pkg))
+
+comparisons |>
+  ggplot(aes(x = adj.p.value, y = method)) +
+  facet_wrap(~ contrast) +
+  geom_point()
+comparisons |>
+  select(contrast, method, adj.p.value) |>
+  pivot_wider(names_from = method,
+              values_from = adj.p.value)
+
+
+# anova comparisons
+d |>
+  distinct(model, anova_tbl) |>
+  mutate(across(anova_tbl, \(x) map(x, tidy))) |>
+  unnest(cols = anova_tbl)
+
+
+```
+
+
+
+
+```sas
+proc import datafile="example_type1error_data.csv" out=d dbms=csv replace;
+getnames=yes;
+run;
+
+title2 'raw data';
+proc print data=d;
+run;
+
+
+title2 'nested tank effect';
+proc mixed data=d plots(only)=(studentpanel(conditional)) order=data;
+  class dose tank individual;
+  model response = dose / ddfm=kr outp=out residual;
+  random tank(dose);
+  lsmeans dose / diff=control('0') adjust=dunnett cl alpha=0.05;
+  ods output diffs=lmm_diffs tests3=lmm_ftests lsmeans=lmm_lsmeans covparms=lmm_vc;
+run;
+
+
+title2 'tank effect as block';
+proc mixed data=d plots(only)=(studentpanel(conditional)) order=data;
+  class dose tank individual;
+  model response = dose / ddfm=kr outp=out residual;
+  random tank;
+  lsmeans dose / diff=control('0') adjust=dunnett cl alpha=0.05;
+  ods output diffs=lmm_diffs2 tests3=lmm_ftests2 lsmeans=lmm_lsmeans2 covparms=lmm_vc2;
+run;
+
+
+
+```
+
+
+## Additional Check:
+
+- nested effect or single rf. 
+
+
+
+```{r}
+ex <- ex |> mutate(rf=interaction(dose,tank)) %>% mutate(tank1=interaction(dose,tank))
+mod1 <- lmer(response ~ dose + (1 | tank:dose),
+               data = ex)
+mod2 <- lmer(response ~ dose + (1 | rf),
+               data = ex)
+mod3 <- lmer(response ~ dose + (1 | dose:tank),
+               data = ex)
+mod4 <- lmer(response ~ dose + (1 | dose:tank1),
+               data = ex)
+library(nlme)
+mod5 <- lme(response ~ dose, random= ~ 1 | rf,
+               data = ex)
+
+## Although the results are the same, it is not we wanted to have two parts of random effects
+
+# Random effects:
+#  Formula: ~1 | dose
+#         (Intercept)
+# StdDev:    1.562029
+# 
+#  Formula: ~1 | tank %in% dose
+#         (Intercept) Residual
+# StdDev:    1.999467  2.86963
+
+mod5 <- lme(response ~ dose, random= ~ 1 | dose/tank,
+               data = ex)
+summary(mod1)
+summary(mod2)
+summary(mod3)
+summary(mod4)
+```
+
+

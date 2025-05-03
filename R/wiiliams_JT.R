@@ -1,3 +1,7 @@
+## Used only here, to be integrated into the package
+##./inst/RStats/RStats_wrapper_tests.R:  comparisons <- getComparison(test_result)
+##./inst/RStats/RStats_wrapper_tests.R:  comparisons <- getComparison(test_result,test="many-to-one")
+
 ## Internal helper functions
 #'@export
 getComparison <- function(object,test=c("trend","many-to-one")){

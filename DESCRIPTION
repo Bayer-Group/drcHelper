@@ -1,6 +1,6 @@
 Package: drcHelper
 Title: Collection and verification of helper functions for dose-response analysis
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
     person("Zhenglei", "Gao",  email="zhenglei.gao@bayer.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4042-310X")),

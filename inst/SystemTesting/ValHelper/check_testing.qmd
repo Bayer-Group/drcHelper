@@ -1,0 +1,40 @@
+## List all functions in the package.
+
+
+```{r}
+library(pacman)
+```
+
+
+```{r}
+p_funs(drcHelper)  # exported
+p_funs(drcHelper, TRUE)  # includes non-exported
+```
+
+## List all function that missing the unit testing
+
+```{r}
+library(covr)
+coverage <- package_coverage(".")
+
+report(coverage)
+## report(coverage,file = "./temp/coverage_report.html")
+class(coverage)  # Should include "coverage"
+#html_report(coverage, file = "coverage_report.html")
+zero_coverage(coverage)
+```
+
+```{r}
+# Extract coverage data
+coverage_data <- as.data.frame(coverage)
+
+# Find functions with zero coverage
+no_coverage <- coverage_data[coverage_data$value == 0, ]
+
+# Display functions without test coverage
+no_coverage_functions <- unique(no_coverage$functions)
+print(no_coverage_functions)
+coverage_data[coverage_data$value > 0, ]
+```
+
+
