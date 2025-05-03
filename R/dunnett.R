@@ -15,7 +15,7 @@
 #' @param data A data frame containing the dose-response data
 #' @param response_var Name of the response variable column
 #' @param dose_var Name of the dose/treatment variable column
-#' @param block_var Name of the blocking/tank variable column (optional)
+#' @param tank_var Name of the blocking/tank variable column (optional)
 #' @param control_level The level of dose_var to use as control (default is minimum dose)
 #' @param include_random_effect Logical, whether to include random effects for blocks/tanks
 #' @param variance_structure Character, specifying the variance structure:
@@ -37,7 +37,7 @@
 dunnett_test <- function(data,
                          response_var = "Response",
                          dose_var = "Dose",
-                         block_var = "Tank",
+                         tank_var = "Tank",
                          control_level = NULL,
                          include_random_effect = TRUE,
                          variance_structure = c("homoscedastic", "heteroscedastic"),
@@ -79,8 +79,8 @@ dunnett_test <- function(data,
   variance_structure <- match.arg(variance_structure)
   alternative <- match.arg(alternative)
   # Check if block variable exists when random effects are requested
-  if (include_random_effect && !block_var %in% names(data)) {
-    stop(paste("Block/tank variable", block_var, "not found in data"))
+  if (include_random_effect && !tank_var %in% names(data)) {
+    stop(paste("Block/tank variable", tank_var, "not found in data"))
   }
 
   # Create formula strings
@@ -89,11 +89,15 @@ dunnett_test <- function(data,
 
   # Fit the appropriate model based on specifications
   if (include_random_effect) {
+    ## We need the tank dose interaction or nesting!
+
+    data[[tank_var]] <- interaction(data[[tank_var]],data[[dose_var]]) ## always add the interaction to avoid using tank as blocking effect.
+
     if (variance_structure == "homoscedastic") {
       # Mixed model with homoscedastic errors
       message("Fitting mixed model with homoscedastic errors")
       model <- lme4::lmer(
-        as.formula(paste(fixed_formula_str, "+ (1|", block_var, ")")),
+        as.formula(paste(fixed_formula_str, "+ (1|", tank_var, ")")),
         data = data
       )
     } else {
@@ -101,7 +105,7 @@ dunnett_test <- function(data,
       message("Fitting mixed model with heteroscedastic errors")
       model <- nlme::lme(
         fixed = fixed_formula,
-        random = as.formula(paste("~ 1 |", block_var)),
+        random = as.formula(paste("~ 1 |", tank_var)),
         weights = nlme::varIdent(form = as.formula(paste("~ 1 |", dose_var))),
         data = data
       )

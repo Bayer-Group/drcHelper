@@ -17,7 +17,7 @@ or an object of class 'aov' or 'lm'.}
 \item{method}{Character string specifying which implementation of Dunnett test to use:
 "Dunnett_multcomp" (default) for multcomp implementation,
 "Dunnett_DescTools" for DescTools implementation, or
-"Dunnett_PMCMRplus" for PMCMRplus implementation.}
+"Dunnett_PMCMRplus" for PMCMRplus implementation, do not use this one in general as it does not return complete information.}
 
 \item{...}{Additional arguments passed to the underlying test functions.}
 }

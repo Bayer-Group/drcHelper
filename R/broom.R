@@ -103,9 +103,10 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
 
       result
     }, silent = TRUE)
-  } else if (method == "Williams_JG") {
+  }
+  if (method == "Williams_JG") {
     williams_result <- try({
-      ##browser()
+      ## browser()
       # For multcomp, we need to create an aov model first
       if (inherits(x, "formula")) {
         model_data <- list(...)$data
@@ -119,14 +120,22 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
       if(is.null(list(...)$direction) || list(...)$direction == "decreasing"){
         ## direction is decreasing
         direction  <- "decreasing"
-        comparisons <- paste(wt$dose,"- 0 >= 0")
+
       }else{
         direction <- "increasing"
-        comparisons <- paste(wt$dose,"- 0 <= 0")
+
       }
 
       wt <- drcHelper::williamsTest_JG(df=model_data,resp=resp_name, trt = factor_name, direction = direction)
-      wt <- wt1[rev(seq_len(nrow(wt))), , drop = FALSE]
+      if(is.null(list(...)$direction) || list(...)$direction == "decreasing"){
+
+        comparisons <- paste(wt$dose,"- 0 >= 0")
+      }else{
+
+        comparisons <- paste(wt$dose,"- 0 <= 0")
+      }
+
+      wt <- wt[rev(seq_len(nrow(wt))), , drop = FALSE]
 
       # Assuming williamsTest_JG returns a data frame with standardized columns
       # If not, you'll need to transform its output to match the standard format

@@ -7,6 +7,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(drcHelper)
 ```
 
 
@@ -20,7 +21,7 @@ test_data <- data.frame(
 )
 #'
 # Apply Williams test
-result <- broom_williams(response ~ dose, data = test_data)
+result <- broom_williams(response ~ dose, data = test_data,method="Williams_PMCMRplus")
 print(result)
 
 result <- broom_williams(response ~ dose, data = test_data, method = "Williams_JG")
