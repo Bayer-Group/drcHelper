@@ -12,9 +12,12 @@ knitr::opts_chunk$set(
 library(drcHelper)
 ```
 
+
+Note that for Dunnett's test, an already implemented function is `drcHelper::dunnett_test`, which includes the option to use random effect, different variance structures, different alternatives. For the broom_* functions, they are in testing phases and intended to be used for comparison purposes. 
+
 ## Williams' Test
 
-Note that PMCMRplus does not produce correct t-statistics in the version "1.9.12" (mayber also in other versions), therefore we replace the t-statistics using the ones calculated by multcomp. 
+Note that PMCMRplus does not produce correct t-statistics in the version "1.9.12" (maybe also in other versions), therefore we replace the t-statistics using the ones calculated by multcomp. 
 
 ```{r}
 # Create example data

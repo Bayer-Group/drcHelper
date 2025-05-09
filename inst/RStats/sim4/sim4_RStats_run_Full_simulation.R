@@ -166,5 +166,6 @@ if(plotit){
           geom_text(data=design_effect_temp%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
         ggsave(paste0("SimPower_",m_tank0, "_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
       }
+    }
 
 }

@@ -1,0 +1,49 @@
+[2025-05-09 16:36:34] Starting multiple simulations with 210 parameter combinations 
+[2025-05-09 16:36:34] Using 71 CPU cores 
+[2025-05-09 16:36:34] No checkpoint found, starting from beginning 
+[2025-05-09 16:36:34] Start time: 2025-05-09 16:36:34 
+[2025-05-09 16:36:34] Starting simulation 1 of 210 
+[2025-05-09 16:36:34] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 3 , var_tank = 1 , var_individual = 9 
+[2025-05-09 16:36:34] Starting simulation with 1000 iterations 
+[2025-05-09 16:37:24] Parallel processing completed 
+[2025-05-09 16:37:24] Simulation completed 
+[2025-05-09 16:37:24] Completed simulation 1 in 0.84 minutes 
+[2025-05-09 16:37:24] Estimated remaining time: 175.4 minutes (2.9 hours) 
+[2025-05-09 16:37:24] Starting simulation 2 of 210 
+[2025-05-09 16:37:24] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 3 , var_tank = 3 , var_individual = 7 
+[2025-05-09 16:37:24] Starting simulation with 1000 iterations 
+[2025-05-09 16:38:14] Parallel processing completed 
+[2025-05-09 16:38:14] Simulation completed 
+[2025-05-09 16:38:15] Completed simulation 2 in 0.83 minutes 
+[2025-05-09 16:38:15] Estimated remaining time: 174.1 minutes (2.9 hours) 
+[2025-05-09 16:38:15] Starting simulation 3 of 210 
+[2025-05-09 16:38:15] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 3 , var_tank = 5 , var_individual = 5 
+[2025-05-09 16:38:15] Starting simulation with 1000 iterations 
+[2025-05-09 16:39:03] Parallel processing completed 
+[2025-05-09 16:39:04] Simulation completed 
+[2025-05-09 16:39:04] Completed simulation 3 in 0.82 minutes 
+[2025-05-09 16:39:04] Estimated remaining time: 171.9 minutes (2.9 hours) 
+[2025-05-09 16:39:04] Starting simulation 4 of 210 
+[2025-05-09 16:39:04] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 3 , var_tank = 7 , var_individual = 3 
+[2025-05-09 16:39:04] Starting simulation with 1000 iterations 
+[2025-05-09 16:39:53] Parallel processing completed 
+[2025-05-09 16:39:53] Simulation completed 
+[2025-05-09 16:39:53] Completed simulation 4 in 0.83 minutes 
+[2025-05-09 16:39:53] Estimated remaining time: 170.9 minutes (2.8 hours) 
+[2025-05-09 16:39:53] Starting simulation 5 of 210 
+[2025-05-09 16:39:53] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 4 , k_individuals = 3 , var_tank = 9 , var_individual = 1 
+[2025-05-09 16:39:53] Starting simulation with 1000 iterations 
+[2025-05-09 16:40:42] Parallel processing completed 
+[2025-05-09 16:40:42] Simulation completed 
+[2025-05-09 16:40:42] Completed simulation 5 in 0.82 minutes 
+[2025-05-09 16:40:42] Estimated remaining time: 169.7 minutes (2.8 hours) 
+[2025-05-09 16:40:43] Starting simulation 6 of 210 
+[2025-05-09 16:40:43] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 6 , k_individuals = 3 , var_tank = 1 , var_individual = 9 
+[2025-05-09 16:40:43] Starting simulation with 1000 iterations 
+[2025-05-09 16:41:31] Parallel processing completed 
+[2025-05-09 16:41:31] Simulation completed 
+[2025-05-09 16:41:31] Completed simulation 6 in 0.80 minutes 
+[2025-05-09 16:41:31] Estimated remaining time: 168.1 minutes (2.8 hours) 
+[2025-05-09 16:41:31] Starting simulation 7 of 210 
+[2025-05-09 16:41:31] Parameters: response_type = threshold , max_effect = 5 , m_tanks = 6 , k_individuals = 3 , var_tank = 3 , var_individual = 7 
+[2025-05-09 16:41:31] Starting simulation with 1000 iterations 
