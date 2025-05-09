@@ -1,0 +1,64 @@
+- Build and Check
+
+Clean and Rebuild
+
+```{r}
+devtools::clean_dll()
+devtools::load_all()
+devtools::document()
+```
+
+
+- Build ReadMe GitHub page
+
+```{r}
+devtools::build_readme()
+```
+
+- Build documentation site
+
+```{r}
+pkgdown::build_site_github_pages(clean=FALSE)
+```
+
+- Git
+
+```
+git push -u origin releases
+```
+
+or
+
+```
+git push --set-upstream origin <your branch name>
+```
+
+
+Create a new branch and push to origin:
+
+```
+git checkout -b <name of branch>
+
+git push -u origin <name of branch>
+```
+
+## Tag
+
+```
+git tag <tag_name>
+git describe
+git push origin <tag_name>
+```
+
+## Find a string
+```
+find / -type f -exec grep -H 'text-to-find-here' {} \;
+grep -rnw '/path/to/somewhere/' -e 'contEndpoint'
+
+find . -name "*.Rmd" | xargs -d '\n' grep -i "contEndpoint"
+# Navigate to your package directory
+cd path/to/drcHelper
+
+# Search for "plot.edList" in all R files
+grep -r "plot.edList" --include="*.R" .
+```

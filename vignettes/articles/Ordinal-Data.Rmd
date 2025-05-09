@@ -1,0 +1,629 @@
+---
+title: "Example Ordinal Data Analysis"
+author: Zhenglei Gao
+editor_options: 
+  chunk_output_type: console
+output:
+  html_document:
+    code_folding: show
+pkgdown:
+  as_is: true
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+library(tidyverse)
+```
+
+
+```{r setup}
+library(drcHelper)
+
+```
+
+## Background
+
+There is no routine procedures in regulatory frameworks for ordinal data analysis yet. For histopathological data, it is recommended to use RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to derive NOEALs. An alternative is MQJT(Multiquantal Jonckheere–Terpstra), which is mentioned in OECD TG 231 for AMA life stage analysis.
+
+Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively. 
+
+For well-behaving data (full clear dose-response), most approaches will produce very similar results as long as the target endpoint (the test rate or concentration where the average injury is reaching 50% or is medium injury category) is the same. In this article, we will explain how several regression modelling can be applied, focusing on nonlinear regression with sigmoid shaped curve, logistic regression with quasibinomial likelihood, and the conventional proportional odds logistic regression. Other approaches with a different endpoint type are demonstrated as well, including BMD for ordinal data using `bmdordinal`, RSCABS, etc.  
+
+All approaches have its own limitations and need to be treated with caution. For example, for nonlinear model with a normal error assumption behind, issues could occur with inhomogeneous variance, uncertain considerations is critical when the data is over-spread across many categories close to the estimated ER50. I think whichever method to choose, careful evaluation the assumptions of the model and check the model data agreement are always necessary.
+
+## Ordinal Data in General
+
+From a statistical point view, ordinal data is a type of categorical data where the order matters, but the exact differences or distances between the categories are not defined. For example, survey responses like "satisfied," "neutral," and "dissatisfied", ranking like 1st, 2nd, 3rd, levels of education like high school, bachelor, master. Market research, psychology, health studies, and social sciences often use ordinal data.
+
+Since ordinal data doesn't assume equal intervals, non-parametric methods are often used. Medians rather than means are often the basis of comparisons. Chi-Square test can be used to determine if there is a significant association between two categorical variables. Spearman's Rank Correlation and Kendall's tau are correlation measures that can assess the strength and direction of association between two ranked variables.
+
+Ordinal Regression is a somewhat complex method that can predict outcomes based on ordinal data. It helps understand how different factors influence rankings and the transition between the ordered categories.
+
+- Proportional Odds Model: Coefficient (slopes) remains constant across all categories. 
+- Continuation Ratio Model: Model cumulative odds ratios.
+- Adjacent Categories Model: useful when neighboring categories influence each other. 
+
+Due to the limited information and potentially unequal intervals, it requires a clear understanding of its subtleties and complexities, and careful attentions when implementing regression modelling. 
+
+
+In the ecotoxicology area, histopathology assessment and visual injury data are ranked categorical data. We focus on the plant visual injury data (PVI). 
+
+## Type of Endpoints
+
+Depending on how the response variables and the independent variables are treated, different types of endpoints can be derived.
+
+If the independent variable is treated as a factor or categorical, then the No Observed Effect Concentration (NOEC) regarding a specific injury level can be derived by treating the response as ordinal. Alternatively, a NOEC can be calculated by treating the response as continuous, using either direct hypothesis testing or post hoc testing after regression modeling. Conversely, if the independent variable is treated as continuous, endpoints such as ECx or Benchmark Dose (BMDx) regarding a specific injury level (with the response treated as ordinal) or regarding the average injury level (with the response treated as continuous) can be calculated.
+
+
+## Data Characteristics
+
+The systematic error or bias that can occur during the assessment of Plant Visual Injury (PVI) data is beyond the scope of this discussion. Here, we focus solely on the analysis approaches. 
+
+## Limitations
+
+Each method makes its own assumptions and has inherent limitations. For example, the Rao-Scott Cochran-Armitage by slice (RSCABS) method cannot handle too many categories effectively. Ordinal regression can be complex when determining an Effective Rate (ER50) or Effective Concentration (EC50). Additionally, treating the response as continuous (from 0 to 1 or from 0 to 100%) may lead to issues with heterogeneous variance.
+
+
+
+
+## Regression Approaches with Continuous x 
+
+The most natural approach would be using conventional ordinal regression modelling to derive an ER50. However, this approach is not routinely applied in regulatory ecotoxicology, the interpretation including the assumption behind is a bit more complex. To derive an ER50, specific function and optimization need to be defined for this purpose. Confidence intervals need to be derived from bootstrap method and take longer time in calculation. We only use this approach in comparison with the more commonly or easily applied modelling approaches. 
+
+When transforming the ordinal variable into percentages or proportions, it is also possible to model them as continuous data or using logitic regression with quasibinomial assumptions. The two approaches produce similar results when the data is behaving truly like a dose-response with over-dispersed binomial distributions.
+
+
+```{r}
+library(drcHelper)
+```
+
+
+The data is artificial and with full dose-response relationship observed with true ER50=12.18.
+
+```{r class.source = 'fold-hide'}
+dattab_new <- pvi_example ## use the example PVI data in the drcHelper package
+## Note that yy2 is transformed by increment of 90/5 = 16. 
+dattab_new$y0 <- factor(dattab_new$y0,ordered = T)
+```
+
+
+```{r}
+
+ftable(xtabs(~ y0 + dose, data = dattab_new)) ##%>% gt::gt() ## as.data.frame(.) %>% knitr::kable(.,digits = 3)
+```
+
+
+```{r}
+
+
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2)) %>% knitr::kable(.,digits = 3)
+
+dattab_new %>% group_by(dose) %>% summarise(n=n(),meany=mean(yt),meanyy=mean(yy)) %>% knitr::kable(.,digits = 3)
+```
+
+
+```{r}
+ggplot(dattab_new,aes(x = dose, y=yt))+geom_point() +  geom_smooth(method="glm", method.args=list(family="quasibinomial"), formula="y ~ log(x)",
+                       se =TRUE, linewidth=1.5)
+```
+
+```{r}
+library(drc)
+mod_drc  <- drm(yy2 ~ dose, data = dattab_new, fct = LL.2())
+summary(mod_drc)
+ED(mod_drc, c(50), interval = "delta")
+suppressWarnings({
+plot(mod_drc, type = "all",main="log-logistic + normal, ER50= 12.74", broken = TRUE)
+plot(mod_drc, broken = TRUE, type="confidence", add=TRUE)
+})
+```
+
+### Putting quasi-binomial and normal fit together
+
+```{r class.source = 'fold-hide'}
+library(drc)
+predictCIglm <- function(mod,dat,newdata=NULL){
+ if(is.null(newdata)){
+    preddata <- with(dat, data.frame(x = seq(min(x), max(x), length = 100)))
+ }else predata <- newdata
+  preds <- predict(mod, newdata = preddata, type = "link", se.fit = TRUE)
+  critval <- 1.96 ## approx 95% CI qnorm(0.975)
+  upr <- preds$fit + (critval * preds$se.fit)
+  lwr <- preds$fit - (critval * preds$se.fit)
+  fit <- preds$fit
+  fit2 <- mod$family$linkinv(fit)
+  upr2 <- mod$family$linkinv(upr)
+  lwr2 <- mod$family$linkinv(lwr)
+  preddata$Prediction <- fit2 
+  preddata$Lower <- lwr2 
+  preddata$Upper <- upr2 
+  return(preddata)
+}
+
+
+preddrc <- function(mod,dat,newdata=NULL){
+ if(is.null(newdata)){
+    preddata <- with(dat, data.frame(x = seq(min(x), max(x), length = 100)))
+ }else predata <- newdata
+ preds <- predict(mod,newdata=preddata,interval="confidence")
+ preddata <- cbind(preddata,preds)
+ return(preddata)
+}
+modelall <- function(dat,addbeta = FALSE){
+  mod1 <- glm(y~log(x),data=dat,family = "quasibinomial")
+  mod2 <- drm(y~x,fct=LL.2(),data=dat)
+ 
+  ## mod3 <- MASS::glmmPQL(y ~ log(x),random=~1|x,family="quasibinomial",data=dat) 
+  ## Estimation the same as quasibinomial without random effects, uncertainty estimation wider. 
+  ## mod3 <- lme4::glmer(y ~ log(x)+ (1|x),family="binomial",data=dat) ## dose not work without sample size.
+  # mod4 <- betareg::betareg(y ~ log(x),link="logit",data=dat)
+  # y3<- predict(mod3,newdata=data.frame(x=dat$x),type="response")
+  y1 <- predictCIglm(mod1,dat=dat)
+  y1$model <- "quasibinomial"
+
+  y2 <- preddrc(mod2,dat = dat)
+  y2$model <- "drc LL.2"
+  preddata <- rbind(y1,y2)
+  
+  ec1 <- getEC50(mod1)
+  ec2 <- getEC50(mod2)
+  ec50 <- data.frame(rbind(ec1,ec2),model=c("quasibinomial","drc LL.2"))
+  
+  if(addbeta) {
+    mod3 <- gam(y ~ log(x), family=betar(link="logit"), data=dat)
+    y3 <- predictCIglm(mod3,dat=dat)
+    y3$model <- "beta"
+    preddata <- rbind(preddata,y3)
+    ec3 <- getEC50(mod3)
+    ec50 <- rbind(ec50,data.frame(ec3,model=c("beta")))
+  }
+  #ec4 <- uniroot(function(x) predict(mod4, newdata = data.frame(x=x)) - 0.5,lower = 1, upper = 80)$root
+  ## 19.55968 beta regression does not perform better than binomial or quasi-binomial regression!
+  
+  return(list(ec50=ec50,predata=preddata))
+}
+modelallbeta <- function(dat){
+  modelall(dat,addbeta=TRUE)
+}
+```
+
+
+
+```{r warning=FALSE}
+dattab_new <- dattab_new %>% mutate(y=yy,x=dose)%>%as.data.frame(.)
+suppressWarnings({modres <- modelall(dattab_new)})
+predres <- modres[[2]]
+knitr::kable(rbind(modres[[1]]%>%mutate(TrueEC50 = 12.18),data.frame(EC50=12.15856,lower=10.16505,upper=15.09790,se=NA,model="ordinal regression", TrueEC50 =12.18)),digits=3)
+p_drc_qb <- ggplot(dattab_new, aes(x=dose, y=yt)) +geom_point(alpha=0.1)+ geom_point(aes(x=dose, y=yy),col="green")+
+                #scale_color_viridis_d()+scale_fill_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_ribbon(data=predres,aes(x=x,y=Prediction,ymin=Lower,ymax=Upper,col=model,fill=model),alpha=0.2)+geom_line(data=predres,aes(x=x,y=Prediction,col=model))+
+        xlab("Concentration") + 
+        ylab("% Injury / 100")
+p_drc_qb
+```
+
+
+#### On the GoF
+
+Normally we could test lack of fit for continuous data by comparing the model fit with ANOVA model, which should achieve the least square estimation. Changjian proposed to use the prediction intervals from the models to estimate the frequency table that would usually be a product of conventional ordinal regression, followed by a chi-square test. 
+
+The common goodness of fit tests and measures for logistic regression include deviance or likelihood ratio test, the Hosmer-Lemeshow Test, the pseudo R-squared measures, residual analysis, and classification/frequency tables.
+
+
+#### Additional Thoughts
+
+Thinking about (quasi)-binomial type modelling and data-generation process, it is possible to assume when you see level B injury, you had many independent binary yes/no outcomes (conditional on the observed covariate values for each replicate or experiment unit) for each injury level or for an arbitrary number of categories, the proportion of yes answer is then the average injury. The probabilities of each binary outcome are the same, which may mismatch the observed data rather badly. 
+
+Beta regression can be used to model proportions too, however, 0 and 1's need to be specifically handled.  
+
+### Using Conventional Ordinal Regression Approaches
+
+Ordinal regression approaches works well in terms of prediction but would need a specific function to calculate ER50. $\sum p_i Y_{ij}$ would be the average injury level. Here we achieved by the steps below:
+
+1. We fit an ordinal regression model using polr with your ordinal response data.
+2. Define the expected Response Function: The key to solving this problem is calculating the expected response at any dose:
+  - We calculate the probability of being in each category at a given dose
+  - We multiply these probabilities by the corresponding injury percentages (0%, 10%, 30%, 50%, 70%, 90%, 100%)
+  - The sum gives us the expected injury percentage at that dose
+3. Finding EC50: We search through a range of doses to find where the expected injury percentage is closest to 50%. Alternatively, we could define an objective function and use optimization to find the dose, which could be more precise than the grid search approach. 
+4. Bootstrap Confidence Intervals:
+    - We resample the data with replacement 1000 times
+    - For each bootstrap sample, we calculate the EC50
+    - The 2.5th and 97.5th percentiles of these bootstrap EC50 values form our 95% confidence interval
+
+
+This approach provides a robust estimate of the EC50 with confidence intervals that account for the uncertainty in your data and model. The bootstrap method is particularly valuable here because it doesn't require assumptions about the distribution of the EC50 estimator.
+
+
+The proportional odds model can be interpreted in terms of probabilities of transitions and also in terms of covariate-specific cumulative probabilities. The latter is a bit easier to understand. Ordinal regression can be conducted using MASS::polr function or the function provided in GLMcat, which is an R package that encompasses lots of models specified in a similar way: (ratio, cdf, design: parallel or complete).
+
+```{r}
+## fit ordered logit model and store results 'm'
+dattab_new $y0 <- factor(dattab_new$y0, levels = c("0","A","B","C","D","E","F"),ordered = TRUE)
+
+m <- MASS::polr(y0 ~ log(dose), data = dattab_new, Hess=TRUE)
+summary(m)
+# Extract the coefficients and thresholds
+coefficients <- coef(m)
+thresholds <- m$zeta
+
+# Define a function to calculate the expected response category at any given dose
+expected_response <- function(log_dose, coefficients, thresholds) {
+  # Calculate probabilities for each category
+  probabilities <- sapply(1:length(thresholds), function(i) {
+    plogis(thresholds[i] - coefficients * log_dose)
+  })
+  
+  # Convert to category probabilities
+  probabilities <- c(probabilities, 1) - c(0, probabilities)
+  
+  # Define the injury percentage for each category
+  categories <- c(0, 10, 30, 50, 70, 90, 100)
+  
+  # Calculate expected value (weighted average)
+  expected_value <- sum(probabilities * categories)
+  return(expected_value)
+}
+
+# Find the dose where the expected response is closest to 50%
+log_doses <- seq(log(0.1), log(100), length.out = 1000)
+responses <- sapply(log_doses, expected_response, 
+                   coefficients = coefficients["log(dose)"], 
+                   thresholds = thresholds)
+closest_index <- which.min(abs(responses - 50))
+dose_ec50 <- exp(log_doses[closest_index])
+
+# Print the EC50 value
+print(dose_ec50)
+```
+
+or we could find the EC50 by an optimization
+
+```{r}
+# Define the objective function to minimize (distance from 50%)
+objective_function <- function(log_dose) {
+  abs(expected_response(log_dose, coefficients["log(dose)"], thresholds) - 50)
+}
+
+# Use optimization to find the EC50
+result <- optimize(objective_function, interval = c(log(0.1), log(100)))
+dose_ec50 <- exp(result$minimum)
+
+# Print the EC50 value and the corresponding expected response
+print(paste("EC50:", round(dose_ec50, 4)))
+print(paste("Expected response at EC50:", 
+            round(expected_response(result$minimum, coefficients["log(dose)"], thresholds), 4)))
+```
+
+
+Note that when implementing the bootstrap approach, some bootstrap samples are causing separation problems in the ordinal regression model, which is common when resampling from smaller datasets. Therefore, a robust solution here is given to gracefully handle this issue.
+
+```{r}
+# Define the function to calculate EC50 for a bootstrap sample with error handling
+calculate_ec50 <- function(data) {
+  # Try to fit the model, return NA if it fails
+  m_boot <- try(polr(y0 ~ log(dose), data = data, Hess = TRUE), silent = TRUE)
+  if (inherits(m_boot, "try-error")) return(NA)
+  
+  coefficients <- coef(m_boot)
+  thresholds <- m_boot$zeta
+  
+  # Define objective function to minimize
+  objective_function <- function(log_dose) {
+    abs(expected_response(log_dose, coefficients["log(dose)"], thresholds) - 50)
+  }
+  
+  # Try to optimize, return NA if it fails
+  result <- try(optimize(objective_function, interval = c(log(0.1), log(100))), silent = TRUE)
+  if (inherits(result, "try-error")) return(NA)
+  
+  dose_ec50 <- exp(result$minimum)
+  return(dose_ec50)
+}
+
+# Bootstrap resampling with error handling
+set.seed(123)
+n_bootstrap <- 1000
+bootstrap_ec50 <- replicate(n_bootstrap, {
+  # Sample with replacement
+  sample_indices <- sample(1:nrow(dattab_new), replace = TRUE)
+  bootstrap_sample <- dattab_new[sample_indices, ]
+  
+  # Calculate EC50 for this sample
+  calculate_ec50(bootstrap_sample)
+})
+
+# Remove NA values from bootstrap results
+bootstrap_ec50 <- na.omit(bootstrap_ec50)
+valid_samples <- length(bootstrap_ec50)
+
+# Calculate point estimate using original data rather than as the mean of bootstrap estimates, which is more statistically sound.
+ec50_point <- calculate_ec50(dattab_new)
+# Calculate confidence intervals
+ec50_ci <- quantile(bootstrap_ec50, c(0.025, 0.975))
+
+# Print the results
+print(paste("EC50:", round(ec50_point, 4)))
+print(paste("95% Confidence Interval:", round(ec50_ci[1], 4), "-", round(ec50_ci[2], 4)))
+## Reporting Valid Samples: how many bootstrap samples were valid, which helps assess the reliability of the confidence interval.
+print(paste("Based on", valid_samples, "valid bootstrap samples out of", n_bootstrap))
+```
+
+
+
+
+
+### Additional understanding of the ordinal regression model
+
+```{r class.source = 'fold-hide'}
+ctable <- coef(summary(m))
+
+## At ER50, the cumulative probability probability of the response being in a higher category is close to 1.
+plogis(ctable[,1] + ctable[,2]*log(12.18))
+## calculate and store p values
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+
+## combined table
+(ctable <- cbind(ctable, "p value" = p))
+
+(ci <- confint(m)) ## profiled CI
+
+exp(cbind(coef(m),t(ci)))
+## OR and CI
+exp(cbind(OR = coef(m), ci))
+
+newdat <- data.frame(dose = unique(dattab_new$dose)) %>% mutate(logdose = log(dose))
+(phat <- predict(object = m, newdat, type="p"))
+
+phat %>% knitr::kable(.,digits = 3)
+
+library(GLMcat)
+
+dattab_new <- dattab_new %>% mutate(logdose = log(dose))
+mod_ref_log_c <- glmcat(formula = y0 ~ logdose, ratio = "reference", cdf = "logistic", data = as.data.frame(dattab_new),ref="0",parallel = F)
+summary(mod_ref_log_c)
+(phat <- predict(object = mod_ref_log_c, newdat, type="prob"))
+phat %>% knitr::kable(.,digits = 3)
+
+## (phat <- predict(object = mod_ref_log_c, newdat, type="linear.predictor"))
+
+mod_cum_logis <- glmcat(formula = y0 ~ logdose, ratio = "cumulative", cdf = "logistic", data = as.data.frame(dattab_new),parallel = TRUE)
+summary(mod_cum_logis)
+
+(phat <- predict(object = mod_cum_logis, newdat, type="prob"))
+phat %>% knitr::kable(.,digits = 3)
+```
+
+### Other understanding of the dataset
+
+In principle, ordinal regression is treating the ranked categorical as several binomial for each category. Note that how the intercept of `0|A` is -1.386294e+00. 
+
+```{r}
+fit0 <- MASS::polr(y0 ~  1,
+                      data = dattab_new,
+                      Hess= T)
+fit0
+## Note that 
+
+#source("https://github.com/rwnahhas/RMPH_Resources/raw/main/Functions_rmph.R")
+ilogit <- function(x) exp(x)/(1+exp(x))
+ilogit(fit0$zeta)
+
+
+sf <- function(y) {
+  c('Y>=1' = qlogis(mean(y >= 1)),
+    'Y>=2' = qlogis(mean(y >= 2)),
+    'Y>=3' = qlogis(mean(y >= 3)),
+    'Y>=4' = qlogis(mean(y >= 4)),
+    'Y>=5' = qlogis(mean(y >= 5)),
+    'Y>=6' = qlogis(mean(y >= 6))
+    )
+}
+library(Hmisc)
+(s <- with(dattab_new,summary(as.numeric(y0) ~ (dose), fun=sf)))
+
+
+mod2 <- glm(I(as.numeric(y0) >= 2) ~ factor(dose), family="binomial", data = dattab_new)
+predict.glm(mod2,data.frame(dose=2))
+predict.glm(mod2,data.frame(dose=4))
+mod3 <- glm(I(as.numeric(y0) >= 3) ~ factor(dose), family="binomial", data = dattab_new)
+predict.glm(mod3,data.frame(dose=2))
+glm(I(as.numeric(y0) >= 4) ~ factor(dose), family="binomial", data = dattab_new)
+
+```
+
+
+### log-logistic with quasi-binomial: replicate effects
+
+Original study design is CRD. However, it was argued to treat it as RCBD with blocking effect coming from the replicate numbering. We can compare the result differences. 
+
+
+```{r warning=FALSE,message=FALSE}
+mod <- glm(yy2~log(dose),data = dattab_new,family = quasibinomial)
+summary(mod)
+ER50 <- exp(-coef(mod)[1]/coef(mod)[2])
+ER50
+getEC50(mod)
+pred <- predict(mod,newdata = dattab_new,type = "response")
+dattab_new$pred <- pred
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2),meanEst=mean(pred)) %>% knitr::kable(.,digits = 3)
+
+## Consider Replicate effect
+modr <- MASS::glmmPQL(yy2~ log(dose),random=~1|rep,family="quasibinomial",data=dattab_new)
+ER50 <- exp(-coef(modr)[1]/coef(modr)[2])
+exp(-modr$coefficients$fixed[1]/ modr$coefficients$fixed[2])
+summary(modr)
+getEC50(modr)
+pred <- predict(modr,newdata = dattab_new,type = "response")
+dattab_new$predr <- pred
+dattab_new %>% group_by(y0) %>% summarise(n=n(),meany=mean(yt),meanyy2=mean(yy2),meanEst=mean(pred),meanEstR=mean(predr)) %>% knitr::kable(.,digits = 3)
+```
+
+
+Note that glmer and glmmPQL (based on lme from the nlme pacakge) differs in terms of parameter estimation algorithm and nlme is not optimized for dealing with crossed random effects, which are associated with a sparse design matrix. See more in the book from Pinheiro & Bates.[^1] 
+
+
+### DRM Ordinal
+
+```{r}
+library(drc)
+library(bmd)
+dat_ord <- dattab_new %>% group_by(y0,dose) %>% summarise(n=n()) %>% ungroup() %>% pivot_wider(names_from = y0,values_from = n)
+dat_ord <- dat_ord %>% mutate(across(c(`0`,`A`,`B`,`C`,`D`,`E`,`F`),~ifelse(is.na(.),0,.))) %>% mutate(total=rowSums(across(c(`0`,`A`,`B`,`C`,`D`,`E`,`F`))))
+mod_ord <- drmOrdinal(levels = unique(dattab_new$y0),  weights="total",dose = "dose", data = dat_ord, fct = LL.2())
+plot(mod_ord) # uses ggplot
+
+bmdOrdinal(mod_ord, bmr = 0.5, backgType = "modelBased", def = "excess")
+
+```
+
+
+## RSCABS, MQJT and other testing approaches
+
+Details about RSCABS approach you can find [here](https://bayer-group.github.io/drcHelper/articles/Example_RSCABS.html). 
+
+Current implementation used Rao-Scott correction always, exact CA test is not possible, potential inflated type-I error in slices with very low occurences. High resolution of scoring system (many categories) could be less powerful due to the violation of monotonicity. 
+
+MQJT is another alternative procedure and the simplest solution would be using the standard JT test on Q50 alone. Jonckheere-test by slices on the proportions (JTBS) can also be applied similarly as RSCABS. 
+
+Non-parametric Dunnett or Williams type procedure (F. Konietschke and L. A. Hothorn Stat. Biopharm. Res., 2012, 4, 14–27) could be used follwed by regression modelling with independent variable treated as factors. 
+
+All these testing approaches are targeting at a NOEC at a certain injury level. By default, these testing approaches actually treat the test rates or concentrations in the study as categorical variable, losing the continuous property and therefore an ER50 cannot be directly calculated. However, the NOEC at the medium injury level is comparable to ER50, which will always be smaller than ER50. 
+
+## Simulation Study
+
+Simulation studies show that glm with quasibinomial and nonlinear log-logistic with normal perfom similarly when there are limited dose groups. When we observe the full dose-response curve, quasibinomial is less flexible in adapting to the data. 
+
+### Data generated using the logistic CDF. 
+
+
+
+The data is generated using the cumulative function for logistic distribution. Note that the logistic function is just an inverse logit ($\log(p/(1-p))$) function in R. The code is modified based on [this blog post](https://www.r-bloggers.com/2016/01/s-shaped-data-smoothing-with-quasibinomial-distribution-2/). 
+$$F(x;\mu,s) = \frac{1}{2} + \frac{1}{2} \tanh((x-\mu)/2s) = \frac{1}{1+e^{-(x-\mu)/s}}$$
+
+where,  $\tanh(x) = \frac{\sinh(x)}{\cosh(x)} = \frac{e^x - e^{-x}}{e^x + e^{-x}}$, is the [hyperbolic tangent function](https://en.wikipedia.org/wiki/Hyperbolic_functions) that maps real numbers to the range between -1 and 1. 
+
+Quantile of the CDF is then $\mu+s\log(\frac{p}{1-p})$, therefore, the EC50 should be $\mu$ or $\exp(\mu)$.
+
+Random noises are added afterwards to the logistic distribution CDF.
+
+We simulate $n$ studies over concentration $x$, denoted, $X_{1}, X_{2}, …, X_{n}$ for $k$ study $X=(x_{1}, x_{2}, …, x_{k})$, where $k$ is the number of different studies with different $\mu$ and $\sigma$. 
+
+Let’s say there are $k=6$ study groups with the following parameter sets, $\mu = \{9,2,3,5,7,5\}$  and $s=\{2,2,4,3,4,2\}$
+
+
+
+```{r class.source = 'fold-hide'}
+generate_logit_cdf <- function(mu, s, 
+                               sigma_y=0.1, 
+                               x=seq(-5,20,0.1)) {
+  x_ms <- (x-mu)/s
+  y    <- 0.5 + 0.5 * tanh(x_ms)  
+  y    <- abs(y + rnorm(length(x), 0, sigma_y))
+  ix   <- which(y>=1.0)
+  if(length(ix)>=1) { 
+    y[ix] <- 1.0
+  }
+  return(y)
+}
+tanh(0)
+set.seed(424242)
+x      <- seq(-5,15,0.025) 
+mu_vec <- c(1,2,3,5,7,8)   # 6 Studies
+idx <- sapply(mu_vec,function(mu) which(x==mu))  ## we just need to know which index to find the ER50
+s_vec  <- c(2,2,4,3,4,2)
+# Synthetic Study ID
+studies_df<- mapply(generate_logit_cdf, 
+                              mu_vec, 
+                              s_vec, 
+                              MoreArgs = list(x=x))
+# Give them names
+colnames(studies_df) <- c("Study1", "Study2", "Study3", "Study4", "Study5", "Study6")
+  
+dim(studies_df)
+```
+
+```{r fig.width=8,fig.height=5}
+library(ggplot2)
+theme_set(theme_bw())
+library(tidyverse)
+df_all <- tidyr::pivot_longer(data.frame(x=(1:length(x))/10,studies_df),cols=2:7)
+true_ec50 <- ((1:length(x))/10)[idx]
+colnames(df_all) <- c("x", "study", "y")
+df_all$study <- as.factor(df_all$study)
+
+p_quasibinomial<- ggplot(df_all, aes(x=x, y=y, color=study)) +
+        geom_point(alpha=0.2)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="glm", method.args=list(family="quasibinomial"), formula="y ~ log(x)",
+                       se =TRUE, size=1.5) +
+        xlab("Concentration") + 
+        ylab("% Injury / 100") + ggtitle("Quasibinomial Fit")
+
+p_quasibinomial#+scale_x_log10()
+
+p_quasibinomial +facet_wrap(~study)
+```
+
+Nonlinear log-logistic modelling with normal errors seem to be more flexible in dealing with very different curve shapes. It also fits the data generation process in this case. 
+
+```{r}
+library(drc)
+p_drc<- ggplot(df_all, aes(x=x, y=y, color=study)) +
+        geom_point(alpha=0.2)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="drm", method.args=list(fct=LL.2()), formula="y ~ x",
+                       se = FALSE, size=1.5) +
+        xlab("Concentration") + 
+        ylab("% Injury / 100") + ggtitle("DRC nonlinear normal fit")
+p_drc#+scale_x_log10()
+
+p_drc + facet_wrap(~study)
+
+```
+
+```{r class.source = 'fold-hide'}
+df_nested <- df_all %>% group_by(study) %>% nest()
+dfres <- df_nested %>% mutate(modres=map(data,modelall))
+ec50 <- dfres %>% mutate(ec50=modres[[1]][1]) %>% dplyr::select(-c(data,modres)) %>% unnest(cols=c(ec50)) %>% ungroup() %>% mutate(TrueEC50 = rep(true_ec50,each=2))
+knitr::kable(ec50)
+```
+
+```{r class.source = 'fold-hide'}
+predres <- dfres %>% mutate(preds=modres[[1]][2]) %>% dplyr::select(-c(data,modres)) %>% unnest(cols=c(preds)) %>% ungroup()
+p_drc_qb <- ggplot(df_all, aes(x=x, y=y)) +
+        geom_point(alpha=0.1)  +
+        scale_color_viridis_d()+
+        # scale_color_brewer(palette = "Reds") + 
+        # #geom_smooth(method="loess", se = FALSE, size=1.5) +
+        geom_smooth(aes(group=study),method="drm", method.args=list(fct=LL.2()), formula="y~x",
+                       se = FALSE, size=1.5,col=scales::hue_pal()(2)[1]) +
+                       geom_smooth(aes(group=study),method="glm", method.args=list(family="quasibinomial"), formula="y~log(x)",
+                       se = FALSE, size=1.5,lty=3,col=scales::hue_pal()(2)[2])+
+        xlab("Concentration") + 
+        ylab("% Injury / 100")  + facet_wrap(~study)
+ p_drc_qb + geom_hline(yintercept=0.5,col="purple") + geom_vline(data=ec50,aes(xintercept=TrueEC50),col="purple")+ geom_ribbon(data=predres,aes(x=x,ymin=Lower,ymax=Upper,y=Prediction,fill=model),alpha=0.3) + ggtitle("drc and quasibinomial fit with CI") + geom_vline(data=ec50,aes(xintercept=EC50,col=model))
+```
+
+
+
+
+## References
+
+- Agresti, A. (2002) Categorical Data Analysis, Second Edition. Hoboken, New Jersey: John Wiley & Sons, Inc.
+- Harrell, F. E, (2001) Regression Modeling Strategies. New York: Springer-Verlag.
+- http://www.sthda.com/english/articles/32-r-graphics-essentials/132-plot-grouped-data-box-plot-bar-plot-and-more/
+- Chuang-Stein G, Agresti A. A review of tests for detecting a monotone dose-response relationship with ordinal response data. Stat Med. 1997 Nov 30;16(22):2599-618. doi: 10.1002/(sici)1097-0258(19971130)16:22<2599::aid-sim734>3.0.co;2-9. PMID: 9403959.

@@ -1,0 +1,160 @@
+---
+title: "Verification: Which Jonckeere Terpstra Test to Use"
+editor_options:
+  chunk_output_type: console
+---
+
+
+
+
+```r
+library(drcHelper)
+```
+
+
+
+```r
+
+library(tidyverse)
+```
+
+## Summary
+
+Jonckheere's test and Kendall's tau) are closely related. In some software implementations, the two test produce identical p-values.
+
+`JtTest` from `npordtests` are doing the same as in `cor.test` with method being "kendall". Both function actually performs a kendall test and treat the dose column as numeric. On the other hand `PMCMRplus::jonckheereTest` and `DescTools::JonckheereTerpstraTest` do similar things.
+
+
+## Data from Jonckheere (1954)
+
+
+```r
+data(jdata)
+
+prelimPlot3(jdata,dose_col = "X",response_col = "Y")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```r
+
+dunnett_test(jdata,"Y","X",include_random_effect = FALSE)
+#> Dunnett Test Results
+#> -------------------
+#> Model type: Fixed model with homoscedastic errors 
+#> Control level: 1 
+#> Alpha level: 0.05 
+#> 
+#> Results Table:
+#>  comparison estimate std.error statistic   p.value  conf.low conf.high significant
+#>       2 - 1    15.50  34.05051 0.4552061 0.9401315 -75.78264  106.7826       FALSE
+#>       3 - 1    39.75  34.05051 1.1673833 0.5307511 -51.53264  131.0326       FALSE
+#>       4 - 1    60.25  34.05051 1.7694300 0.2322884 -31.03264  151.5326       FALSE
+#> 
+#> NOEC Determination:
+#> No significant effects detected at any dose. NOEC is at or above the highest tested dose.
+```
+
+
+
+```r
+library(npordtests)
+res1 <- JtTest(Y~X,jdata)
+#> --------------------------------------------------------- 
+#>   Test : Jonckheere-Terpstra Test 
+#>   data : Y and X 
+#> 
+#>   Statistic = 71 
+#>   Mean = 48 
+#>   Variance = 114.6667 
+#>   Z = 2.147876 
+#>   Asymp. p-value = 0.0158618 
+#> 
+#>   Result : Null hypothesis is rejected. 
+#> ---------------------------------------------------------
+res1$p.value *2
+#> [1] 0.03172359
+```
+
+
+```r
+res2 <- DescTools::JonckheereTerpstraTest(Y~X,jdata)
+res2
+#> 
+#> 	Jonckheere-Terpstra test
+#> 
+#> data:  Y by X
+#> JT = 71, p-value = 0.03368
+#> alternative hypothesis: two.sided
+res2$statistic == res1$statistic
+#>   JT 
+#> TRUE
+```
+
+
+
+```r
+res3 <- PMCMRplus::jonckheereTest(Y~X,jdata)
+res3$statistic=res2$statistic
+res3$p.value -  res2$p.value
+#> [1] -0.001960184
+```
+
+
+
+```r
+res4 <- cor.test(as.numeric(jdata$X),as.numeric(jdata$Y),method="kendall")
+res4$statistic
+#>        z 
+#> 2.147876
+res4$p.value
+#> [1] 0.03172359
+```
+
+
+
+
+```r
+data(lehmann)
+res <- JtTest(Values~Group,lehmann)
+#> --------------------------------------------------------- 
+#>   Test : Jonckheere-Terpstra Test 
+#>   data : Values and Group 
+#> 
+#>   Statistic = 1159 
+#>   Mean = 857.5 
+#>   Variance = 9305.917 
+#>   Z = 3.125415 
+#>   Asymp. p-value = 0.0008877709 
+#> 
+#>   Result : Null hypothesis is rejected. 
+#> ---------------------------------------------------------
+res4$p.value - 2*res1$p.value
+#> [1] 1.387779e-17
+```
+
+
+## Data from Lehmann (1975)
+
+
+```r
+data("lehmann")
+DescTools::JonckheereTerpstraTest(Values~Group,lehmann)
+#> 
+#> 	Jonckheere-Terpstra test
+#> 
+#> data:  Values by Group
+#> JT = 1159, p-value = 0.001776
+#> alternative hypothesis: two.sided
+PMCMRplus::jonckheereTest(Values~Group,lehmann)
+#> 
+#> 	Jonckheere-Terpstra test
+#> 
+#> data:  Values by Group
+#> z = 3.1337, p-value = 0.001726
+#> alternative hypothesis: two.sided
+#> sample estimates:
+#>   JT 
+#> 1159
+```
+

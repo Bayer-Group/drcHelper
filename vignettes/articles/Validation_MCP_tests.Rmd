@@ -1,0 +1,74 @@
+---
+title: "Verification and Validation of NOEC Derivation by MCP"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Multiple Comparison Tests
+
+In this article we compare the different functions from various packages to perform the same task, demonstrating the differences and similarities. We implemented a function `combine_multiple_comparisons` for comparing different results. This implementation provides a comprehensive set of functions for standardizing and combining multiple comparison test results in dose response data analysis. The functions handle various test implementations and provide consistent output formats for easy comparison.
+
+Note that for trend tests, the null hypotheses are different from those many-to-one pairwise comparisons. Direct comparison is not very fair. However, the NOEC calculation can be based on both trend tests and many-to-one pairwise tests. 
+
+```{r setup}
+library(drcHelper)
+```
+
+
+
+
+## Dunnett's Test
+
+`glht` pulls its P-values out of a multivariate t distribution. mvtnorm::pmvt is called with the observed t statistics and correlation matrix (actual code here). DescTools::DunnettTest does roughly the same. emmeans uses a close approximation to the Dunnett adjustment. 
+
+```{r}
+
+```
+
+
+
+
+## Williams' Test
+
+PMCMRplus::williamsTest produces more accurate results since it is based on the isotonic regression.
+
+Both functions use tabulated critical values provided by Williams (only for a=0.05). 
+
+The `williamsTest` function from **PMCMRplus** produces the same results as in `williamsTest_JG` in general. However, `williamsTest` function from **PMCMRplus** use multivariate t distribution to calculate p-values. 
+
+```{r}
+x <- c(106, 114, 116, 127, 145,110, 125, 143, 148, 151,
+136, 139, 149, 160, 174)
+g <- gl(3,5)
+levels(g) <- c("0", "I", "II")
+res1 <- PMCMRplus::williamsTest(x ~ g)
+summaryZG(res1)
+williamsTest_JG(data.frame(treatment_var = g,response_var=x),"response_var","treatment_var",direction="increasing")
+
+```
+
+### Many-to-One with Welch't t-test
+
+```{r}
+
+```
+
+
+## Tips
+
+Note that to install "PMCMRplus" properly under ubuntu (Platform: x86_64-pc-linux-gnu), you need probably install libmpfr-dev first. 
+
+```
+sudo apt-get install libmpfr-dev
+```
+
+## Other packages
+
+In my own analysis, I also use **rstatix** very often, as it provide a workflow for tidy evaluations, unlike other packages. 
+
+

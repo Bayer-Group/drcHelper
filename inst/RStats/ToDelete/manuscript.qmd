@@ -1,0 +1,335 @@
+---
+title: "Simulation Based Power Analysis"
+description: | 
+  Collection of Notes on MM
+date: December 4, 2024
+author:
+  - first_name: "Zhenglei"
+    last_name: "Gao"
+    url: https://github.com/Zhenglei-BCS
+    affiliation: Bayer AG
+    affiliation_url: https://bayer.com
+    orcid_id: 0000-0002-4042-310X
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+library(tidyverse)
+```
+
+```{r}
+library(drcHelper)
+```
+
+
+## Abstract
+
+Regulatory risk assessment in ecotoxicology relies heavily on statistical endpoints such as No Observed Effect Concentrations (NOECs) and Effective Concentrations (ECxs). Current practices, as outlined in OECD 54 and related guidelines, typically employ decision flowcharts to guide statistical analysis. The flowcharts for NOEC calculations use pretests for normality and variance homogeneity to select appropriate statistical tests from pre-defined options, including Williams, Dunnett, step-down Jonckheere-Terpstra, and other tests. While these flowcharts aim to ensure appropriate test selection, our analysis reveals critical limitations in their application to real ecotoxicological data, particularly when dealing with heterogeneous variances and small sample sizes. Through simulation studies and practical data examples, we demonstrate that commonly recommended approaches, including nonparametric tests, can produce misleading results under realistic conditions. Our findings show that robust methods, particularly Welch-type Dunnett tests, consistently outperform standard approaches when handling heterogeneous variances. Importantly, we emphasize that the goal of statistical analysis should not be to maximize test power for specific data characteristics, but rather to ensure reliable inference across diverse experimental conditions. We propose practical improvements to current guidelines, including: (1) prioritizing robust statistical methods that perform reliably under various conditions, (2) incorporating visual inspections and comprehensive sanity checks, and (3) establishing a public repository for benchmark data and methods. These recommendations aim to enhance the reliability and transparency of statistical analyses in regulatory ecotoxicology, ultimately improving the quality of environmental risk assessments.
+
+**KEYWORDS**
+Decision flowchart, power analysis, robust method.
+
+
+## 1.	INTRODUCTION
+Regulatory risk assessment relies critically on statistical endpoints derived from ecotoxicological experimental studies. Two key measures - No Observed Effect Concentrations (NOECs) and Effective Concentrations (ECx, at which x% reduction or inhibition relative to control is reached) - serve as fundamental inputs for regulatory decision-making. The reliability of these endpoints depends heavily on both sound experimental design and appropriate, fit-for-purpose statistical analysis procedures. 
+
+Modern regulatory ecotoxicology has witnessed significant changes, moving away from relying solely on NOEC (No Observed Effect Concentration), which treats test concentrations as categorical variables. Instead, there's a growing preference for using ECx values, derived from detailed dose-response models (note that throughout this paper, we use the terms 'dose-response' and 'concentration-response' interchangeably) that consider test concentrations as continuous variables. This transition reflects the limitations of NOEC, such as its sensitivity to study design and low resolution, and is supported by regulatory guidance from organizations like OECD, as well as ongoing research published in peer-reviewed journals such as Laskowski(1995) and Erickson et al. (2020)).  While ECx offers a more detailed, continuous representation of chemical effects, NOEC remains relevant and valuable because of its simplicity and historical data generation and use. Regulatory frameworks are adapting to incorporate both measures, which means that both NOEC and ECx require robust statistical methods to ensure their effectiveness.
+
+Decision flowcharts serve as standardized tools for analyzing ecotoxicological data. Examples of decision flowchart can be found in OECD 54 (2006), various OECD test guidelines (TG) such as in Annex 6 of TG 222 (2016) and Annex 8 of TG 229 (2012), and publications like Green et al. (2024). These flowcharts guide analysts and practitioners through a series of pretests assessing monotonicity, normality and variance homogeneity, leading to the selection of specific statistical tests from a set of pre-defined options (e.g., Williams, Dunnett, step-down Jonckheere-Terpstra tests). For example, trend tests are prescribed when monotonicity is confirmed; nonparametric tests are suggested when inhomogeneous variances or non-normality are identified. These flowcharts aim to avoid the use of low power tests by considering the characteristics of the data at hand. However, their main purpose is to identify appropriate methods for endpoints with generally perceived characteristics across a range of conditions, rather than maximizing statistical power for specific datasets. 
+
+It's important to note that statistical analysis in regulatory contexts has different goals compared to traditional research. While research might seek to maximize statistical power for specific conditions, regulatory testing requires methods that perform reliably across various scenarios, even if they are not optimal in every case. This becomes particularly important when dealing with real ecotoxicological data, which frequently exhibit challenging characteristics such as heterogeneous variances and small sample sizes. Under these conditions, commonly recommended approaches - including some nonparametric tests and trend tests - may yield misleading results, even if they show high power under ideal conditions.
+
+This paper advocates for a holistic approach to statistical analysis in regulatory ecotoxicology, addressing current challenges through several aspects. First, we present both real and synthetic data examples to illustrate how standard decision flowcharts can lead to inconsistent or unreliable results under real-world conditions.  Second, we provide a comprehensive power comparison of various statistical approaches, identifying robust methods that perform reliably across diverse scenarios. Finally, we offer practical advice for improving statistical analysis in regulatory ecotoxicology, emphasizing that reliance on p-values alone is insufficient. 
+
+ In many cases, simple visual inspection of the data can reveal patterns or problems that challenge the validity of standard analysis approaches. By combining robust statistical methods with detailed data visualization and sanity checks, statistical analysis will be more reliable and transparent for regulatory decision-making.
+
+
+## 2.	Current statistical practices in Ecotoxicology
+### 2.1.	Statistical terms and their context in risk assessment
+Understanding statistical practices in ecotoxicology requires careful attention to terminology, particularly where statistical and risk assessment contexts differ. This distinction is crucial for proper interpretation and application of statistical methods in regulatory settings.
+
+A key example is the term "conservative", which carries different meanings in statistics versus risk assessment. While being "conservative" in risk assessment means taking extra precautions to protect human and environmental safety, a conservative statistical test strictly controls Type I error rates (false positives) and requires stronger evidence to reject the null hypothesis. 
+
+Similarly, the relationship between statistical power and test liberality needs careful consideration. It is also crucial to understand that a powerful test is not necessarily a liberal test, and vice versa. Optimal statistical methods should achieve high power while maintaining appropriate Type I error control. For example, Fisher's Least Significant Difference (LSD) test might appear "powerful" but actually achieves this through inflated false positive rates. It is the most “liberal” post hoc tests after ANOVA, making it unsuitable for regulatory purposes where reliability is crucial. Similarly, Chi-square tests without Yates’ continuity correction for small sample sizes and the Cochran-Armitage test without Rao-Scott correction for clustered data can lead to increased liberalism and more prone to Type I error. This trade-off between power and Type I error control requires careful consideration in ecotoxicological studies, where both false positives and false negatives can significantly impact environmental protection and regulation.
+
+This creates an interesting contrast: "conservative" in risk assessment is achieved by accounting for worst-case scenarios and maintaining safety margins to protect environmental systems. For that purpose, we desire a powerfult test that can detect potential effects that could be of biological or ecological concern when they exist. However, this does not mean we want to use a “conservative” test, nor a “liberal” test. The conservativeness in risk assessment is not achieved by manipulating the statistical methods. Statistical methods should aim for giving correct understanding of the pattern in the data, making statistical judgements with confidence. 
+### 2.2.	Experimental design and pwer analysis: a holistic perspective
+Experimental design in ecotoxicology represents a complex interplay between statistical requirements, practical constraints, and regulatory guidelines. While traditional statistical approaches emphasize power analysis for sample size determination, ecotoxicological studies often follow standardized OECD guidelines that incorporate pre-validated design elements. 
+
+Many OECD test guidelines include power analyses in their annexes, providing a foundation for standard designs. These guidelines represent carefully validated combinations of experimental design and statistical analysis methods. A critical yet often overlooked point is that these validations are specific to the prescribed statistical approaches - changing the statistical analysis method after the fact can invalidate the design's carefully established properties. For example, a design optimized for ANOVA-based approaches might not maintain its power or reliability when analyzed with alternative methods, even if those methods appear more sophisticated. This is one of the reasons that we could not shift completely towards ECx. 
+
+The interconnection between design and analysis has important implications. Switching statistical methods after data generation requires careful examination of whether the original design remains appropriate. Sometimes it actually can characterize the pattern in the data more precisely and the inference therefore more reliable. Other times, power calculations and sample size determinations may need to be completely reconsidered. The validity status of the study could be compromised. 
+
+In current regulatory practice, Minimum Detectable Difference (MDD) is frequently used as a retrospective assessment of study sensitivity or power that could have been achieved. This regulatory MDD should not be confused with the minimum detectable effect size in statistical power analysis - while the latter is a prospective calculation used in study design to determine required sample sizes for detecting specific effects, regulatory MDD is a retrospective measure derived from completed studies. While the retrospective MDD approach is common, it's important to understand its relationship to other statistical measures. MDD is essentially a transformation of confidence intervals and provides somewhat more information than p-values alone, but less than the full information contained in confidence intervals. Confidence intervals show both the estimated effect size and the precision of that estimate; MDD offers an interpretation of what effect size could have been detected, but loses some nuance; p-values provide the least information, merely indicating whether an effect exceeds a threshold under certain null assumptions. 
+
+This paper primarily focuses on statistical testing methods for NOEC calculation commonly used in regulatory frameworks, but it's worth noting that experimental design can vary substantially when concentrating on ECx values. In such cases, the main challenge is optimizing dose settings for various candidate models, using the best estimates of model parameters while considering practical feasibility and robustness across different dose-response patterns.  Designing experiments considering both NOEC and ECx, as discussed in the literature such as Multiple Comparison Procedures-Modelling or MCP-Mod approach,  is beyond the scope of this review. These studies demand unique design optimization strategies. (Pinheiro et al., 2006)
+### 2.3.	Strength and limitations of decision flowcharts
+Decision flowcharts serve as essential tools in regulatory ecotoxicology, providing standardized approaches for statistical analysis. Their primary strengths lie in simplifying complex decision processes, enabling consistent analysis across studies, and making statistical procedures accessible to non-statisticians. When properly used, these flowcharts help ensure that analyses follow accepted regulatory guidelines while maintaining scientific rigor.
+
+However, as OECD 54 astutely notes, "The flowcharts and methodology presented indicate preliminary assessment of data to help guide the analysis... The preliminary assessment can be through formal tests or informed by expert judgment or some combination of the two... These charts provide guidance, but sound statistical judgment will sometimes lead to departures from the flowcharts." This balanced perspective highlights a crucial point: flowcharts should guide, not replace, careful statistical thinking and data examination.
+
+Several limitations of flowcharts become apparent when examining their practical application. Pretest-based decision making can lead to different analysis paths for similar data due to arbitrary thresholds, like choosing 0.01 vs. 0.05 for normality tests. Edge cases, where p-values are close to these thresholds, create uncertainty in selecting the right test, and the effect of multiple pretests on overall error rates is often ignored.
+
+Misunderstandings about test requirements, such as those of the Jonckheere-Terpstra test—which requires similar shapes and variability across groups—can lead to poor choices. Visual checks of these assumptions are crucial but are frequently skipped when following flowcharts mechanically. Furthermore, different tests recommended by flowcharts can have varying power properties. As shown by Green et al. (2018), these tests are not equivalent, and choosing the wrong test can significantly affect study conclusions.
+
+Trend test limitations are also notable. Bauer (1997) demonstrated that tests assuming monotone dose-response relationships can fail if this assumption is wrong, while Davis and Svendsgaard (1990) pointed out that non-monotonic responses might be more common than previously thought. Visual inspection of dose-response patterns is key to identifying these issues.
+
+Flowcharts often operate under the binary tree, suggesting that all relevant factors and scenarios have been considered, which is rarely the case in real-world data analysis. This rigidity can limit the flexibility needed for exploratory data analysis or when unexpected findings arise. An often-criticized point is that count data is handled as continuous data in standard flowcharts used in this field. Another example is the step-down Jonckheere-Terpstra test, often suggested in flowcharts, can be too sensitive to slight decreasing trends, less effective with larger sample sizes but not obvious trend, unsuitable when group distributions differ in shape or variability, and suboptimal for non-linear dose-response patterns. Another important aspect is rank based nonparametric test commonly recommended in the right branch of the tree do not consider the magnitude of differences. For example, the two-sample Wilcoxon rank sum test yields the same test statistic and p-values whencomparing samples of 1, 2, 3, 4 and 5, 6, 7, 8, or samples of 1/100, 2/100, 3/100, 4/100 and 5, 6, 7, 8. The ranking remains unaffected by the magnitude of difference between sample means, whereas parametric tests account for this in their test statistics. These limitations show the need for a more comprehensive approach. Instead of strictly following flowcharts, analysis should include careful visual examination of data, checking test assumptions with plots and exploratory analysis, considering robust approaches, integrating biological insights with statistical results, and evaluating effect sizes and confidence intervals.  Recent methodological developments in the field offer promising alternatives and refinements to address these limitations, as we discuss in the following section.
+### 2.4.	Suggested methodological improvements
+To address some of the limitations of current statistical practices, several promising approaches have emerged, each comes with its own set of challenges and trade-offs that warrant careful consideration.
+
+Generalized Linear (Mixed) Models (GL(M)Ms) provide an appealing framework for handling various data distributions and complex study designs ( Szöcs and Schäfer in 2015, ), though careful attention must be paid to their assumptions and implementation in regulatory contexts, especially in terms of the type I error control. 
+
+For count data, normal distribution assumption is questionable, and the Closure Principle Computational Approach Test (CPCAT) is proposed by Lehmann et al. (2016), using the closed procedure by Rom et. al. (1994), which is theoretically designed to be powerful while controlling the family-wise error rate.  However, the requirement for strict Poisson distribution adherence simply doesn't align with the reality of ecotoxicological count data, where over-dispersion, under-dispersion, non-independence, inhomogeneous variance without a pattern, and small sample size are common challenges. We find its valid use under regulatory context rather limited.
+
+We believe that integrating multiple approaches often provides more reliable conclusions than relying on a single method. For example, Jaki and Hothorn's (2013) demonstration of combining Dunnett and Williams tests shows how complementary methods can strengthen our inference. This principle of methodological integration reflects a growing recognition that complex ecological data often require multiple analytical perspectives.
+
+There is also growing recognition of the need to integrate stat-of-the-art statistical principles into consideration, for example, address model uncertainty though model averaging, incorporate prior knowledge via Bayesian approaches, etc.  Fisher and Fox proposed to use the no significant effect concentration (NSEC) as an alternative to NOEC, under both frequentist and Bayesian frameworks (2023). The NSEC approach combines both the continuous modelling used by ECx calculation and the no statistically significant difference hypothesis testing framework of NOEC determination. We find its independence from test concentration settings is particularly valuable 
+
+While these methodological improvements offer significant advantages in specific situations, their implementation in regulatory contexts requires careful consideration. The need for standardization and validation within existing regulatory frameworks cannot be overlooked, and we must balance statistical sophistication with transparency and interpretability. As our field continues to evolve, there is a clear need for robust methodologies that can accommodate both the complexities of ecological data and the practical requirements of regulatory frameworks.
+
+
+
+## METHODS
+
+### A motivating example: when flowcharts mislead us
+We begin with a real data example that illustrates a critical limitation under current statistical practices. While visual inspection of the data clearly suggests where the NOEC should be, following the standard decision flowchart leads to using the step-down Jonckheere-Terpstra test, which paradoxically concludes a NOEC that would have been the LOEC with a more suitable test. To further demonstrate this limitation, we show how manipulating a single data point that increases variance at the apparent NOEC and actually strengthens the visible decreasing trend, yet the step-down JT test still fails to identify significant differences at the original LOEC level. We then conduct two small simulations to show this is not a single case but a real issue. This example motivates our subsequent systematic investigation through simulation studies.
+
+### Simulation study design: understanding test performance across varioous scenarios
+
+We designed a comprehensive simulation study addressing three key questions: 
+1.  How do variance patterns in hierachical dose-response designs affect the performance of mixed-effects models using individual data versus simpler tank-level analyses? 
+2.  How reliable are different tests, especially trend tests recommended in decision flowcharts under various dose-response and variance patterns? 
+3. What advantages do robust approaches, such as Welch-type Dunnett tests, offer compared to standard procedures?
+
+We selected several dose-response patterns that reflect both common and challenging scenarios encountered in ecotoxicology:
+
+The response function R(d) is defined differently for each type:
+
+For decreasing response:
+R(d) = 100 - (d/d_max) × E_max
+
+For non-monotonic response:
+R(d) = 100 - E_max × (1 - ((d - d_mid)/d_mid)²)
+
+For threshold response:
+R(d) = 100                                                    if d < d_threshold
+R(d) = 100 - ((d - d_threshold)/(d_max - d_threshold)) × E_max   if d ≥ d_threshold
+
+For oscillating response:
+R(d) = 100 + E_max × sin(2πfd)
+
+For no response:
+R(d) = 100
+
+Where:
+- d is the dose
+- d_max is the maximum dose
+- d_mid is the mean of the dose range
+- E_max is the maximum effect
+- f is the frequency (set to 1)
+- d_threshold is the threshold dose
+
+
+Dose-response patterns were simulated according to the above functional forms as illustrated in Figure 1(A). The non-monotonic and oscillating patterns particularly challenge trend tests that assume  monotonicity, a common assumption that our earlier example showed can be problematic.
+
+Similarly, our variance patterns reflect real-world complexities:
+The variance σ^2 (i) at dose level i is defined as follows:
+
+For homogeneous variance:
+σ²(i) = σ²_b
+
+For increasing variance:
+σ²(i) = σ²_b × (0.5 + 1.5(i-1)/(n-1))
+
+For decreasing variance:
+σ²(i) = σ²_b × (2 - 1.5(i-1)/(n-1))
+
+For v-shaped variance:
+σ²(i) = σ²_b × (2 - (i-1)/⌈n/2⌉-1)     for i ≤ ⌈n/2⌉
+σ²(i) = σ²_b × (1 + (i-⌈n/2⌉)/(n-⌈n/2⌉))   for i > ⌈n/2⌉
+
+Where:
+- i is the dose level index (1 to n)
+- n is the number of dose levels
+- σ²_b is the base variance (default = 4)
+- ⌈n/2⌉ represents the ceiling of n/2 (mid-point)
+
+
+These variance patterns, as illustrated in Figure 1(B), reflect common challenges in ecotoxicological studies, where homogeneous variance is often assumed but rarely achieved in practice.
+
+ 
+Figure 1: Example Simulation scenarios for dose-response and variance patterns. (A) Expected response patterns showing different effect types: monotonic decrease, non-monotonic response with recovery, threshold response, and oscillating pattern. Maximum effect size shown is 20%. (B) Four variance patterns examined: homogeneous (constant), increasing, decreasing, and V-shaped variance across dose levels. Base variance = 4.
+The experimental design comprised tank replications (n = 4, 5, or 6) with nested individuals (n = 3, 6, or 10 per tank). The maximum effect size, defined as the highest percent reduction from control, ranged from 5% to 20%. An additional scenario with 10 tank replicates and single individuals was also evaluated to examine the extreme case of maximum replication at the tank level.
+
+The experimental design comprised tank replications (n = 4, 5, or 6) with nested individuals (n = 3, 6, or 10 per tank). The maximum effect size, defined as the highest percent reduction from control, ranged from 5% to 20%. An additional scenario with 10 tank replicates and single individuals was also evaluated to examine the extreme case of maximum replication at the tank level.
+
+We implemented one-sided tests throughout to ensure fair comparisons, as some procedures (Williams' test and step-down trend tests) are inherently one-sided. For multiple comparisons, we employed Holm's correction (Holm, 1979), which offers a less conservative approach than the traditional Bonferroni method while still maintaining proper Type I error control. While we conducted 1,000 iterations per scenario for power analysis, we acknowledge that more stable Type I error estimates would require 5,000 to 10,000 iterations.
+
+Through this systematic evaluation on power and type I error control, we aim to provide practical recommendations on:
+
+-	When mixed models offer meaningful advantages over simpler approaches
+-	Whether robust methods like Welch-type Dunnett tests should become standard practice
+-	How to balance statistical power against practical constraints
+
+Through our simulation studies, we examine the power gains achieved by switching to more complex models or more powerful trend tests. However, we also pose a crucial question: are these potential power improvements worth the added complexity and possible reduction in interpretability and transparency? 
+
+
+## 4. RESULTS
+
+### 4.1. A motivating example: trend test fails when there is a trend
+
+Our investigation begins with a motivating example that reveals a common misconception about trend tests and nonparametric tests in ecotoxicology. Figure 1 shows an example dataset where ollowing standard decision flowcharts leads to a counterintuitive and potentially misleading conclusion. Visual inspection clearly suggests a NOEC of 0.05, the commonly recommended step-down Jonckheere-Terpstra test followed by a significant variance homogeneity test estimates it at 0.16 - a three-fold difference that could significantly impact regulatory decisions.
+
+This discrepancy stems from a widespread misunderstanding about non-parametric tests. Many practitioners believe these tests are "assumption-free" alternatives when data violate parametric assumptions. However, as our example demonstrates, the Jonckheere-Terpstra test actually requires similar variance patterns across groups - an assumption rarely checked in practice. In contrast, the robust Welch-type Dunnett test incorporating the observed inhomogenious variance correctly identifies the NOEC at 0.05 as shown in Table 1.
+
+ 
+Figure 2: An example dataset demonstrating limitations of trend tests and standard decision flowcharts. Points show measurements at each concentration level. Despite clear visual evidence of effects starting at 0.05 concentration, the step-down Jonckheere-Terpstra test prescribed by standard flowcharts fails to detect this effect, instead identifying NOEC at 0.16. This illustrates how trend tests can produce misleading results under heterogeneous variance conditions.
+
+Table 1: Comparison of Welch-type Dunnett and step-down Jonckheere-Terpstra test results for the example dataset. Note how the JT test fails to detect significant differences at concentrations where effects are visually apparent.
+
+Contrast	Estimate	Welch-type Dunnett	Step down JT
+		std.error	adj.p.value	
+0.0015 - Control	0.004	0.002	1.000	0.103
+0.004 - Control	0.003	0.001	1.000	0.004
+0.016 - Control	0.002	0.001	1.000	0.011
+0.05 - Control	-0.001	0.001	0.734	0.376
+0.16 - Control	-0.029	0.004	0.000	0.263
+0.5 - Control	-0.048	0.002	0.000	0.006
+
+To further illustrate this limitation, we manipulated the data by changing a single minimum value at the 0.05 concentration to 0.02, increasing variance at the apparent NOEC. Counter to intuition, this change that visually strengthens the decreasing trend actually weakens the statistical evidence according to the Jonckheere-Terpstra test - the p-value at 0.16 increases from 0.263 to 0.45. This result starkly demonstrates how this test can fail precisely when we need it most.
+
+To verify these findings weren't merely an artifact of our specific example, we conducted targeted simulations using threshold response patterns with six test concentrations plus control, using four replicates per concentration. Our simulation revealed concerning patterns in the Jonckheere-Terpstra test's performance under inhomogeneous variance:
+
+-	When a 5% reduction occurs at the highest dose with relatively low variance (Run #1), the test performs reasonably well (86.4% power)
+-	However, when the same 5% reduction occurs at the second-highest dose with a higher variance (Run #2), power drops dramatically to 56.1%
+-	This power loss occurs despite stronger overall effects in the second scenario (10% reduction at the highest dose) and in the third scenario where the variance is large at the NOEC. 
+
+Table 2: Simulation results demonstrating how the Jonckheere-Terpstra test's power varies dramatically depending on effect location and variance patterns.
+
+Simulation 	Dose Level	Expected Response	Reduction %	Variance	Power
+Run #1
+Variance pattern:
+c(2,2,2,2,2,10,4)	Dose 5	97.5	2.5%	10	0.293
+	Dose 6	95.0	5%	4	0.864
+Run #2
+Variance pattern:
+c(2,2,2,2,2,10,4)	Dose 5	95.0	5%	10	0.561
+	Dose 6	90.0	10%	4	0.981
+Run #3
+Variance pattern:
+c(2,2,2,2,10,4,4)	Dose 5	95.0	5%	4	0.610
+	Dose 6	90.0	10%	4	0.993
+
+These results highlight a crucial limitation of the step down Jonckheere-Terpstra test: the test's performance depends not just on effect size, but on effect location and variance patterns. Note that the original Jonckheere-Terpstra test is a trend test against ordered alternatives, which means the Null hypothesis are strictly linearly increasing or decreasing. Only when the shape and variance are similar across test concentrations, it can be interpreted as a test for differences in medians. 
+
+### 4.2.	Simulation-based power comparison
+
+#### 4.2.1.	Performance under homogeneous variance pattern
+
+Our comprehensive simulation study reveals several crucial insights about the performance of different statistical approaches under homogeneous variance conditions. We present key findings here, with full results available in supplementary materials.
+
+Table 1 summarizes part of the simulation results across various dose-response shapes with the expected response at 100, 95 and 90, corresponding to 0%, 5% and 10% reduction relative control. 
+
+We first examine Type I error control under the null case where no true effect exists (expected response = 100 = control throughout). These results reveal important differences in how various methods control false positive rates. Standard or Welch type Dunnett test base on Linear mixed models (LMM) applied to individual level data, while showing superior power for detecting small effects (below 5% reduction), come with a concerning cost: Type I error inflation around 14%, nearly triple the nominal 5% level. In contrast, Dunnett tests based on standard linear models (LM) fitted to aggregated tank mean data maintain better Type I error control but with some loss of power for small effects. This difference becomes less important with larger effects (10-20% reduction), where all Dunnett procedures achieve maximum power. 
+
+While mixed models are theoretically the "correct" approach for analysing hierarchical data, as they account for the nested structure of individuals within tanks, our simulation reveals an important practical limitation: Type I error inflation. This finding might seem counterintuitive - shouldn't using all available data with the correct error structure lead to better results?
+
+The explanation lies in the asymptotic nature of mixed models. These models rely on large-sample theory for accurate inference, but typical ecotoxicological studies have relatively few tanks (often 4-6 per concentration). With such limited level-2 units, variance components become difficult to estimate accurately and degree of freedom estimation becomes tricky, potentially leading to underestimated standard errors and inflated Type I error rates. It is possible that Satterthwaite/Kenward-Roger corrections might help, which needs further investigation. 
+
+A particularly intriguing finding emerges regarding the Welch-type Dunnett test: it consistently outperforms the standard Dunnett test in power across all scenarios, even under homogeneous variance conditions. This unexpected result suggests that the robustness of the Welch procedure, even in situations where its additional complexity might seem unnecessary. 
+
+The Jonckheere test presents a different challenge: while its mean Type I error rate (4.9%) appears acceptable, the wide range of observed values (0% to 76.6%) suggests unstable performance. Similarly, Williams’ test shows variable behaviour, with Type I error rates ranging from 0.9% to 100%. These findings highlight a crucial point for practitioners: methods that appear appropriate based on average performance may still exhibit problematic behaviour in specific scenarios. 
+ 
+Table 3: Simulation based FWER and power comparison for various testing approaches. LMM_Homo: Standard Dunnett test with mixed model for individual level data; LMM_Hetero; Welch type Dunnett test with mixed model for individual level data;  LM_Homo: Standard Dunnett test with linear model (Anova) for aggregated tank level data; LM_Hetero; Welch type Dunnett test with mixed model for aggregated tank level data; Jonckheere: Step-down Jonckheere-Terpstra test for aggregated tank level data; Williams: Williams’ test for aggregated tank level data
+Expected_Response	stat	LMM_Homo	LMM_Hetero	LM_Homo	LM_Hetero	Jonckheere	Williams
+100 
+(0% reduction)
+	Min	0.024	0.024	0.009	0.020	0.000	0.009
+	Q1	0.064	0.066	0.014	0.029	0.014	0.021
+	Mean	0.136	0.140	0.016	0.032	0.049	0.044
+	Median	0.141	0.144	0.017	0.033	0.108	0.243
+	Q3	0.205	0.207	0.019	0.036	0.057	0.356
+	Max	0.315	0.314	0.026	0.049	0.766	1.000
+95 
+(5% reduction)
+	Min	0.879	0.866	0.502	0.574	0.624	0.238
+	Q1	0.954	0.954	0.699	0.746	0.806	0.448
+	Mean	0.980	0.979	0.803	0.831	0.895	0.676
+	Median	0.969	0.968	0.792	0.828	0.877	0.662
+	Q3	0.993	0.993	0.919	0.934	0.964	0.878
+	Max	1.000	1.000	1.000	1.000	1.000	1.000
+90
+(10% reduction)
+	Min	0.999	0.999	0.977	0.983	0.805	0.996
+	Q1	1.000	1.000	0.998	0.999	0.826	1.000
+	Mean	1.000	1.000	1.000	1.000	0.893	1.000
+	Median	1.000	1.000	0.997	0.998	0.891	0.999
+	Q3	1.000	1.000	1.000	1.000	0.957	1.000
+	Max	1.000	1.000	1.000	1.000	0.969	1.000
+
+Figure 3 and Figure 4 give a detailed illustration of the simulation-based power comparison across several scenarios. The middle row in  Figure 3 shows the type I error inflation of Dunnett procedures based on LMM. When there is expected reduction, Dunnett test results based on LMM consistently shows higher power in detecting small effect sizes below 5%. For larger effect sizes (10% to 20%), all Dunnett procedures, either based on LMM fitted to individual or LM fitted to tank mean data reach the same power of 1. 
+
+The relationship between power and variance component decomposition (measured by ICC - Intraclass Correlation Coefficient) shows consistent patterns across most tests: as ICC increases, power generally decreases when true effects exist. However, Dunn's test shows an interesting exception: while following this pattern for small effects (5% reduction), it exhibits the opposite relationship for non-monotonic responses with larger effects (20% reduction).
+ 
+In general, with aggregated tank mean data, the two trend tests (Williams' and step-down Jonckheere-Terpstra) show distinct advantages and limitations. They offer superior power for small effects with monotonic response patterns.  Their advantage diminishes with larger effects or increased sample sizes (see figures and tables in supplemental information).  In the non-monotonic response scenario (Figure 3 top row), Williams’ test falsely identified the Dose_4 with 0% reduction as significantly less than control for 35.7% - 86.8% of cases when maximum effect is 5%. This percentage reaches 100% when the maximum effect is 20% (Figure 4 top row). Step-down Jonckheere-Terpstra test holds the nominal alpha level at Dose_4 with 0% effect in the non-monotonic pattern. However, considering that it is used as a stepdown procedure, the test will stop and output the highest dose level as NOEC, which misses the important response pattern at the lower dose levels in the data. In case of oscillating dose-response pattern, Step-down Jonckheere-Terpstra test identified the 0% effect at Dose_4 as significant for about 46% of the time, regardless of the ICC value.  With maximum effect size being 5%, Step-down Jonckheere-Terpstra is 80% more powerful than Williams’ test across all dose levels with expected reduction, whereas with maximum effect size being 20%, Williams’ test is having a power of 1, same as all Dunnett tests, always greater than Step-down Jonckheere-Terpstra results, which has an up to 17.3% lower power of identifying the effects at Dose_3 under all response patterns with effect sizes greater or equal to 10%. 
+
+Figure 3: Simulation based statistical power comparison of seven methods under non-monotonic, none, and threshold response patterns (Design: 4 tanks with 6 individuals in each, maximum effect = 5%).  Top row: non-monotonic response pattern; Middle row: no effect (Type I error); Bottom row: threshold response pattern. Lines show power across different ICC values for seven statistical methods. Note how mixed model approaches (LMM) show inflated Type I error rates in the no-effect scenario, trend tests exhibits concerning behaviours under nonmonotonic responses. 
+ 
+Figure 4: Simulation based statistical power comparison of seven methods under non-monotonic, none, and threshold response patterns (Design: 4 tanks with 6 individuals in each, maximum effect = 20%). This comparison shows how larger effect sizes impact relative performance of different statistical methods. Note increased power across all methods compared to 5% effect scenarios (Figure 3), though important differences in method performance remain, particularly for non-monotonic and oscillating patterns.
+
+#### 4.2.2.	Performance under inhomogeneous variance pattern
+
+Our analysis of test performance under heterogeneous variance - a common situation in real ecotoxicological studies - revealed several critical insights.
+
+First, the standard Dunnett test shows notable power loss under specific conditions with heterogeneous variance. This finding, in combination with the superioty of Welch type Dunnet under homogenious conditions in a hierarhical design, challenges the common practice of defaulting to standard Dunnett procedures. 
+
+Second, trend tests continued to show concerning behavior under heterogeneous variance. Both the Jonckheere-Terpstra and Williams' tests exhibit Type I error inflation to different degrees. In the no dose-response scenario, 70% of cases using Jonckheere-Terpstra tests exceed the nominal 0.05 level; 24% of cases using Williams' test exceed this threshold. Both trend tests maintained an alpha level of 0.1. This inflation becomes even more pronounced at dose levels with no reduction in other dose-response patterns. 
+
+Most importantly, the Welch-type Dunnett test consistently outperformed other approaches, maintaining both power and appropriate error control across diverse variance patterns. It outperforms the standard Dunnett test in 89.6% of cases where a true reduction exists. One example  simulation with 6 tanks, threshold response, and 5% maximum effect (Figure 5) reveal the few scenarios where standard Dunnett maintains a slight advantage - when variances reach 8 in increasing and v-shaped variance patterns or at variance of 12 in v-shaped patterns. However, even in these cases, the standard Dunnett's power advantage is rather modest compared to the substantial power losses (up to 13.7%) it suffers under other conditions.
+
+ 
+Figure 5: Method performance under different variance patterns with threshold response (6 tanks, 5% maximum effect). Each row shows a different variance pattern: decreasing, homogeneous, increasing, and V-shaped. Numbers above panels show actual variance values at each dose level. Note how Welch-type methods (LM_Hetero) maintain consistent performance across variance patterns while other methods show more variable results.
+
+
+## 5.	Discussion and Recommendations
+In considering statistical approaches for regulatory ecotoxicology, we must remember several fundamental principles. First, statistical methods should focus primarily on accurate pattern detection and reliable inference, rather than maximizing power at any cost. This connects to a crucial distinction in terminology: while "conservative" in risk assessment refers to the overall framework of using safety margins and worst-case scenarios, statistical conservatism about Type I error control serves a different purpose. These approaches complement rather than conflict with each other.
+
+Furthermore, our findings highlight an important practical consideration: while more complex models might offer additional insights, they don't necessarily improve the practical utility of the analysis, particularly in regulatory contexts where transparency and reproducibility are crucial. For instance, although mixed models theoretically make better use of all available data, their implementation with small sample sizes can lead to less reliable inference than simpler approaches. The key is to balance statistical sophistication with practical needs—often, a well-implemented simple approach can be more valuable than a more complex model that might require more complex assumption validation and introduce unnecessary uncertainty in interpretation.
+
+### 5.1.	Key Findings
+Our analysis has highlighted important limitations in current statistical practices. Decision flowcharts, while providing valuable guidance, can occasionally lead to inappropriate test selection if followed mechanically.
+
+The step-down Jonckheere-Terpstra test, often recommended for non-normal data, requires similar shapes and variances across groups—an assumption frequently violated and ignored in analysis. Mixed models, despite their theoretical advantages for hierarchical data, show concerning Type I error inflation. It's a reminder that theoretical optimality doesn't always translate to practical superiority, especially with small sample sizes typical in regulatory ecotoxicology. Additionally, trend tests can miss important patterns in non-monotonic dose-response relationships.
+
+Despite these challenges, our investigation has identified promising solutions. The Welch-type Dunnett test performs consistently compared to the standard Dunnett test, under both homogeneous and inhomogeneous variance conditions. 
+
+Visual inspection of data patterns often reveals important features that might be missed by formal testing alone. Therefore, a holistic approach often provides more reliable conclusions than relying on any single test approach.
+
+### 5.2.	Practical recommendations
+
+Base on both practical data examples and simulation study results, we advocate for the adoption of robust approaches to avoid inappropriate test selection resulting from the pre-tests in the decision flowcharts. Delacre et al. (2017) have proposed that psychologists should by default use Welch’s t-test instead of Student’s t-test or the two-step procedure (first performing Levene's test, then deciding which test to use), despite the latter's marginally better power when equal variance assumption is true. In line with his recommendations, we suggest adopting the more robust Welch type Dunnett test with unequal variance assumptions by default rather than the current practice of using standard Dunnet test and switch to non-parametric tests when variance homogeneity assumption is violated. 
+
+More generally, statistical analysis should begin with thorough data visualization and exploratory data analysis, followed by choosing an appropriate method, careful examination of  model or test assumptions and model fit afterwards. Confidence intervals to evaluate effect sizes and uncertainty should always be presented. The objective measures from statistical analysis, such as statistical significance or non-significance, must be interpreted within a broader biological and ecological context to assess relevance. Study design is also crucial. Account for hierarchical data structure in the design phase, consider power analysis fore relevant effect sizes according to the planned statistical analysis and plan for adequate replication at both individual and tank levels. Clear documentation of the chosen statistical method, justification for deviation from standard decision flowcharts, model assumptions, and uncertainty analysis is crucial for transparent and reproducible risk assessments. Document variance patterns from similar studies could help inform future designs.
+
+Automated statistical software has undoubtedly increased efficiency, but it also carries risks. Sanity checks, including visual inspection of data, diagnostic plots, and careful interpretation of outputs, are essential. Automation should be a tool to assist, not replace, the expert judgment of the statisticians and ecotoxicologists.
+### 5.3.	Future direction
+Many efforts have been directed to address the non-normal issue. However, small sample size and inhomogeneous variance pattern are two additional important issues. Robust approaches, such as using sandwich variance estimators (Herberich, 2010) for multiple contrast test (Jaki, 2013) that is resilient against variance heterogeneity in balanced and unbalanced designs should be further investigated.  
+
+Synthetically generated data does not tell us the real data pattern nor the biologically relevant difference that should have been detected. For example, what is the variance among historical controls? What are the typical variance components in a hierarchical design for a certain type of study? What are the possible relevant adverse effect sizes and what do you observe in studies?  Are there specific patterns of unequal variances you've observed in your data? There are also other guidance recommending Bayesian approaches and using historical control data to inform the concurrent study.  These are calling for a public data base and methods repository to examine the suitability of approaches, establishing an appropriate prior belief, improve our understanding on the ecotoxicological endpoints.  
+
+### 5.4.	Concluding remarks
+It's crucial to recognize no single test performs optimally across all scenarios and no single statistical approach can address all challenges in ecotoxicological data analysis. The key is not to find the most powerful test for each specific scenario but rather to develop reliable approaches that perform well across the range of conditions encountered in practice. By illustrating the potential pitfalls in the use of decision flowcharts, we aim to raise awareness that all approaches have pros and cons in different data situations. Ecotoxicological data is often not homoscedastic, and non-parametric tests do not solve the inhomogeneous variance problem as many flowcharts indicate or as many practitioners perceive. We advocate for using alternative robust approaches when deviations from decision charts are necessary and stress the importance of conducting sanity checks, such as visual inspections of model fit and data, following analyses to ensure the validity of results.
+
+By underscoring the importance of understanding the trade-offs between good experimental design, statistical power, and robust analysis techniques in ecotoxicology, we aim to contribute to improved experimental design and more reliable data generation and analysis for regulatory purposes. 
+
+Furthermore, we propose the establishment of a public repository for data and benchmark methods to promote transparency and collaboration within the field. 
+
+By combining robust statistical methods with careful data visualization and biological understanding, we can improve the reliability and transparency of decision making based on regulatory ecotoxicology studies.
+

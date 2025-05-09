@@ -1,0 +1,169 @@
+---
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  warning = F,
+  message = F
+)
+```
+
+# drcHelper
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+The goal of **drcHelper** is to assist with routine dose-response analysis by providing a collection of helper functions and standalone functions that are generic and may be useful beyond our organization.
+
+As part of the GLP stat pilot project, this package serves as a cornerstone for the second use case, EFX Statistics. It will streamline GLP statistical analyses for various dose-response studies and test assays within our registration data package. This ensures that the analyses remain current, state-of-the-art, and flexible enough to adapt to new regulatory requirements while complying with GLP standards.
+
+The package also includes test cases and examples to help the regulatory statistical community understand the reasons behind different outcomes. For instance, point estimations and p-values may vary depending on the parties involved, the functions used, or the packages selected. It aims to promote a harmonized understanding of methodologies and provide a foundation for standardized practices in the regulatory statistics field for plant protection product registration. Additionally, it is hoped that this project will contribute to the ongoing OECD 54 revision process.
+
+Some of the functions are adapted from archived packages or single functions of a bigger package so that the loaded namespace is not too big for small calculations. Some of the functions are included for testing and validation purposes. All third-party code with a different license are specified in the relevant source files with the license name and the relevant copyright texts.
+
+This package is open source, and any contributions or improvements, especially on the documentation side,  are welcome. 
+
+*Please note that the documentation website for this package is currently under development. Some articles are still placeholders, and many more are on the way. However, the ongoing development of the website does not impact the usage of this R package. *
+
+## Installation
+
+You can install the development version of drcHelper from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("Bayer-Group/drcHelper")
+```
+
+or 
+
+``` r
+# install.packages("pak")
+pak::pak("Bayer-Group/drcHelper")
+```
+
+## Example
+
+## Data Overview
+
+## Preliminary Summary
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+library(tidyverse)
+```
+
+
+```{r setup}
+library(drcHelper)
+
+```
+
+```{r}
+data("dat_medium")
+dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose))) 
+dat_medium$Response[dat_medium$Response < 0] <- 0
+prelimPlot3(dat_medium)
+prelimSummary(dat_medium) %>% knitr::kable(.,digits = 3)
+```
+
+## Fitting multiple models and rank them.
+
+```{r}
+mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
+fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
+# plot(mod,type="all")
+res <- mselect.plus(mod,fctList = fctList )
+modList <- res$modList
+res$Comparison
+
+drcCompare(modRes=res)
+```
+
+
+```{r}
+library(purrr)
+edResTab <- mselect.ED(modList = modList,respLev = c(10,20,50),trend="Decrease",CI="inv")
+edResTab
+```
+
+
+## Plot multiple models together
+
+```{r}
+p <- plot.modList(modList[1:3])
+p
+```
+
+
+## Adding ECx and ECx CI's to the plots
+
+```{r}
+p1 <- plot.modList(modList[1])
+addECxCI(p1,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
+                     textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+ ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
+## addECxCI(p)
+```
+
+## Report ECx
+
+```{r}
+resED <- t(edResTab[1:3, c(2,4,5,6)])
+colnames(resED) <- paste("EC", c(10,20,50))
+knitr::kable(resED,caption = "Response Variable at day N",digits = 3)
+```
+**Calculate specific ECx:  **
+```{r}
+mod <-modList[[1]]
+edres <- ED.plus(mod,c(5,10,20,50),trend="Decrease")
+edres%>%knitr::kable(.,digits = 3)
+```
+
+
+## Model Output
+
+```{r}
+modsum <- summary(mod)
+knitr::kable(coef(modsum),digits = 3)
+```
+
+
+## ToDo
+
+- [ ] Develop all test cases for NOEC functions
+- [ ] Prepare the templates and standard outputs for all . 
+- [ ] Update the documentation. 
+
+## Contribution Notes
+
+- Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the `gh pr create` command. 
+
+```
+gh pr create --title "Title of the pull request" --body "Description of the pull request"
+gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+```
+To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository if extra packages are needed and you don's want to add those to the workflow. An example is given below.
+
+```r
+knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",fi)
+```
+## Acknowledgements
+
+The work is supported by Bayer Environment Effects team members, especially by Andreas Solga and Daniela Jans. The Mesocosm colleagues Sarah Baumert and Harald Schulz have supported the verification and validation with extensive examples and scripts and SAS / VB validated calculations. Discussions with the Bayer RS-stats group, ecotox stats core group and members of the CLE stats group regarding current practices and statistical principles have been extremely helpful.  
+
+

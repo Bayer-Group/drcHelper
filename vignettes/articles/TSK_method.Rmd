@@ -1,0 +1,78 @@
+---
+title: " Spearman-Karber method"
+---
+
+## Backaground
+
+Spearman-Karber method is still in use in regulatory Ecotox endpoints derivation. A more common approach would be derive a EC50 from interpolation by a smoothing line. 
+
+## Method 
+
+Two commonly used methods for calculating 50% endpoint using serial dilutions are Spearman-Karber method and Reed and Muench method.
+
+The original paper written by Kärber was published in 1931 and is in German [Kärber, G. Archiv f. experiment. Pathol. u. Pharmakol (1931) 162: 480-483 doi:10.1007/BF01863914].
+
+### Reed and Muench method
+
+log10 50% end point dilution = log10 of dilution showing a mortality next above 50% - (difference of logarithms × logarithm of dilution factor).
+
+Generally, the following formula is used to calculate “difference of logarithms” (difference of logarithms is also known as “proportionate distance” or “interpolated value”): Difference of logarithms = [(mortality at dilution next above 50%)-50%]/[(mortality next above 50%)-(mortality next below 50%)].
+
+### Spearman-Karber method
+
+log10 50% end point dilution = $- (x_0 - d/2 + d \sum r_i/n_i)$
+
+$x_0$ = log10 of the reciprocal of the highest dilution (lowest concentration) at which all animals are positive;
+
+$d$ = log10 of the dilution factor;
+
+$n_i$ = number of animals used in each individual dilution (after discounting accidental deaths);
+
+$r_i$ = number of positive animals (out of $n_i$).
+
+Summation is started at dilution $x_0$.
+
+Newly proposed method
+Formula 1:
+
+log10 50% end point dilution = -[(total number of animals died/number of animals inoculated per dilution) + 0.5] × log dilution factor.
+
+Formula 2 (if any accidental death occurred):
+
+log10 50% end point dilution = -(total death score + 0.5) × log dilution factor.
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Some Notes
+
+`tsk` function comes from the R package. Since it is a single function without dependencies, it is bundled into this helper package for the purpose of validation and verification. 
+
+
+The original goal of this R package was to replicate the results of a DOS program that used to be provided by the EPA to perform the trimmed Spearman-Karber method. The list "expected" contains the results of that DOS program run on the data from Hamilton et al. Some of these are NA because the EPA program didn't return a result. The EPA program uses a confidence of 2*pnorm(2)-1=0.9544997 (that is, exactly two sigmas on both sides).
+
+```{r}
+## install.packages("isotone")
+## devtools::install_github(repo="brsr/tsk")
+
+library(drcHelper)
+## library(tsk)
+tsk(c(1, 10, 100, 1000), 20, c(0, 3, 17, 20))
+
+data(hamilton)
+
+
+```
+
+## References
+
+- https://www.cureffi.org/2015/09/20/the-math-behind-spearman-karber-analysis/
+- Hamilton, M. A.; Russo, R. C.; Thurston, R. V. Trimmed Spearman-Karber Method for Estimating Median Lethal Concentrations in Toxicity Bioassays. Enviro. Sci. Tech. 1977, 11 (7), 714-719. http://dx.doi.org/10.1021/es60130a004
+
+- Ibid, 1978, 12 (4), 417. http://dx.doi.org/10.1021/es60140a017

@@ -1,0 +1,107 @@
+---
+title: "NOEC, ECx, BMD, etc."
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## Current Statistical Practices
+
+Current statistical practices typically involve the following steps: 
+
+1. Design Experimental Study (according to corresponding test guideline)
+    - Define endpoints (survival, growth, reproduction, etc.) 
+    - Identify concentration range and replication
+
+2. Data Acquisition \& Quality Check 
+    - Randomization and controls 
+    - Data integrity, outliers, missing values
+
+3. Exploratory Data Analysis     
+    - Plot response vs. dose 
+    - Assess data distribution and variance homogeneity
+
+4. NOEC Determination  
+   - Apply ANOVA/multiple comparisons (e.g., Dunnett's) or sequential tests.  
+   - Identify highest dose without significant difference
+
+5. Dose–Response Modeling and ECx Calculation 
+    - Fit a model (e.g., logistic, probit, Weibull) to the data
+    - Evaluate goodness-of-fit, possible data transformations
+    - Derive ECx values (EC10, EC20, etc.) using the fitted model
+    - Estimations and predictions if needed
+
+6. Uncertainty & Sensitivity Analysis
+    - Confidence intervals for NOEC and ECx values
+    - Comparison of model-based ECx estimates versus NOEC
+
+7. Regulatory Risk Assessment
+    - Use NOEC or ECx values along with safety factors to define acceptable exposure limits
+
+
+### NOEC
+
+- Definition: The highest tested concentration at which no statistically significant adverse effect is observed relative to the control.
+- Regulatory Role: Historically used as the primary benchmark (e.g., for deriving acceptable daily intakes or environmental quality standards).
+
+**Strengths:**
+
+- Straightforward concept and quick to interpret
+- Familiar to risk assessors and historically embedded in many regulatory frameworks
+
+**Weaknesses:**
+
+- Strongly dependent on the dose spacing and study design
+- Does not provide information on the magnitude of effects or their progression along a dose–response curve
+- Binary interpretation ("effect" vs. "no effect") can oversimplify data
+- Potentially influenced by low statistical power, especially in studies with small sample sizes
+
+### ECx and BMD
+
+- Definition: The concentration at which a predefined percentage (x) of effect (e.g., 10\%, 20\% reduction in a biological endpoint) is observed relative to the control.
+
+- Regulatory Role: Increasingly used to quantitatively describe the magnitude of adverse effects along the dose–response curve and considered more informative in deriving species sensitivity distributions.
+
+**Strengths:**
+
+- Utilizes the full data set by modeling the dose–response relationship
+- Provides a more nuanced and continuous estimate along the effect continuum (e.g., EC10 is often seen as protective)
+- Facilitates interpolation and extrapolation within the tested range
+- Offers the possibility to quantify uncertainty via confidence intervals
+
+**Weaknesses:**
+
+- Heavily dependent on the choice and fit of the dose–response model
+- Requires more sophisticated statistical methods and expertise
+- May be sensitive to violations of model assumptions if data quality or distribution is suboptimal
+- In some cases, different models may yield different ECx estimates, raising issues of model selection and validation
+
+## Methodological Improvements
+
+Papers, scientific opinions, guidance are regularly published  on methodological improvements in statistical evaluation of ecotoxicological studies.
+
+- We advocate for transparent reporting of uncertainties and assumptions in model selection or model averaging.
+- Integration of Bayesian methods and bootstrap techniques to better quantify uncertainty is emerging in research discussions. 
+- Model averaging.
+
+
+
+## References
+
+- U.S. Environmental Protection Agency (EPA). EPA Guidelines for Ecological Risk Assessment – available on the EPA website. URL: https://www.epa.gov/risk
+
+- EFSA (2013) Guidance on the environmental risk assessment of plant protection products.
+
+- OECD Guidelines for the Testing of Chemicals detail several standardized tests for ecotoxicity and discuss both NOEC and model-based endpoints.
+URL: https://www.oecd-ilibrary.org/environment/oecd-guidelines-for-the-testing-of-chemicals
+

@@ -1,0 +1,220 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\hypertarget{dose-response-generating-function}{%
+\section{Dose-response generating
+function}\label{dose-response-generating-function}}
+
+\hypertarget{latex}{%
+\subsection{Latex}\label{latex}}
+
+\begin{align*}
+\text{Response}(d) = \begin{cases}
+100 - \left(\frac{d}{d_{max}}\right) \cdot E_{max} & \text{decreasing} \\[2ex]
+100 - E_{max}\left(1 - \left(\frac{d - d_{mid}}{d_{mid}}\right)^2\right) & \text{non-monotonic} \\[2ex]
+\begin{cases}
+100 & \text{if } d < d_{threshold} \\
+100 - \left(\frac{d - d_{threshold}}{d_{max} - d_{threshold}}\right) \cdot E_{max} & \text{if } d \geq d_{threshold}
+\end{cases} & \text{threshold} \\[2ex]
+100 + E_{max}\sin(2\pi f d) & \text{oscillating} \\[2ex]
+100 & \text{none}
+\end{cases}
+\end{align*}
+
+\hypertarget{markdown}{%
+\subsection{Markdown}\label{markdown}}
+
+The response function R(d) is defined as follows:
+
+For decreasing response: R(d) = 100 - (d/d\_max) × E\_max
+
+For non-monotonic response: R(d) = 100 - E\_max × (1 - ((d -
+d\_mid)/d\_mid)²)
+
+For threshold response: R(d) = 100 if d \textless{} d\_threshold R(d) =
+100 - ((d - d\_threshold)/(d\_max - d\_threshold)) × E\_max if d ≥
+d\_threshold
+
+For oscillating response: R(d) = 100 + E\_max × sin(2πfd)
+
+For no response: R(d) = 100
+
+Where: - d is the dose - d\_max is the maximum dose - d\_mid is the mean
+of the dose range - E\_max is the maximum effect - f is the frequency
+(set to 1) - d\_threshold is the threshold dose
+
+\hypertarget{variance-pattern-generation}{%
+\section{Variance Pattern
+Generation}\label{variance-pattern-generation}}
+
+\begin{align*}
+\sigma^2(i) = \begin{cases}
+\sigma^2_b & \text{homogeneous} \\[2ex]
+\sigma^2_b \cdot \left(0.5 + \frac{1.5(i-1)}{n-1}\right) & \text{increasing} \\[2ex]
+\sigma^2_b \cdot \left(2 - \frac{1.5(i-1)}{n-1}\right) & \text{decreasing} \\[2ex]
+\sigma^2_b \cdot \begin{cases}
+2 - \frac{i-1}{\lceil n/2 \rceil-1} & \text{if } i \leq \lceil n/2 \rceil \\[1ex]
+1 + \frac{i-\lceil n/2 \rceil}{n-\lceil n/2 \rceil} & \text{if } i > \lceil n/2 \rceil
+\end{cases} & \text{v-shaped}
+\end{cases}
+\end{align*}
+
+The variance σ²(i) at dose level i is defined as follows:
+
+For homogeneous variance: σ²(i) = σ²\_b
+
+For increasing variance: σ²(i) = σ²\_b × (0.5 + 1.5(i-1)/(n-1))
+
+For decreasing variance: σ²(i) = σ²\_b × (2 - 1.5(i-1)/(n-1))
+
+For v-shaped variance: σ²(i) = σ²\_b × (2 - (i-1)/⌈n/2⌉-1) for i ≤ ⌈n/2⌉
+σ²(i) = σ²\_b × (1 + (i-⌈n/2⌉)/(n-⌈n/2⌉)) for i \textgreater{} ⌈n/2⌉
+
+Where: - i is the dose level index (1 to n) - n is the number of dose
+levels - σ²\_b is the base variance (default = 4) - ⌈n/2⌉ represents the
+ceiling of n/2 (mid-point)
+
+\textbf{Markdown Version:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{The variance σ²(i) at dose level i is defined as follows:}
+
+\NormalTok{For homogeneous variance:}
+\NormalTok{σ²(i) = σ²\_b}
+
+\NormalTok{For increasing variance:}
+\NormalTok{σ²(i) = σ²\_b × (0.5 + 1.5(i{-}1)/(n{-}1))}
+
+\NormalTok{For decreasing variance:}
+\NormalTok{σ²(i) = σ²\_b × (2 {-} 1.5(i{-}1)/(n{-}1))}
+
+\NormalTok{For v{-}shaped variance:}
+\NormalTok{σ²(i) = σ²\_b × (2 {-} (i{-}1)/⌈n/2⌉{-}1)     for i ≤ ⌈n/2⌉}
+\NormalTok{σ²(i) = σ²\_b × (1 + (i{-}⌈n/2⌉)/(n{-}⌈n/2⌉))   for i \textgreater{} ⌈n/2⌉}
+
+\NormalTok{Where:}
+\SpecialStringTok{{-} }\NormalTok{i is the dose level index (1 to n)}
+\SpecialStringTok{{-} }\NormalTok{n is the number of dose levels}
+\SpecialStringTok{{-} }\NormalTok{σ²\_b is the base variance (default = 4)}
+\SpecialStringTok{{-} }\NormalTok{⌈n/2⌉ represents the ceiling of n/2 (mid{-}point)}
+\end{Highlighting}
+\end{Shaded}
+
+These expressions describe how the variance changes across dose levels
+for each variance pattern: - Homogeneous: Constant variance across all
+doses - Increasing: Linear increase from 0.5×base\_var to 2×base\_var -
+Decreasing: Linear decrease from 2×base\_var to 0.5×base\_var -
+V-shaped: Decreases to base\_var at the midpoint, then increases back to
+2×base\_var
+
+Note that the actual implementation uses \texttt{seq()} for smooth
+transitions, but these formulas represent the mathematical relationship
+between dose level and variance.
+
+\end{document}

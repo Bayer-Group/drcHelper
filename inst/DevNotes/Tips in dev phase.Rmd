@@ -1,0 +1,72 @@
+
+
+## Using box package to explicitly load modules and packages
+
+To load a namespace in R, you can use the box package, which provides a modern and modular approach to package management.
+
+https://klmr.me/box/
+
+```r
+box::use(
+    purrr,                          # 1
+    tbl = tibble,                   # 2
+    dplyr = dplyr[filter, select],  # 3
+    stats[st_filter = filter, ...]  # 4
+)
+```
+
+
+## Reuse code snippets
+
+https://www.garrickadenbuie.com/blog/dry-vignette-and-readme/
+
+
+
+
+## vetr
+When you write functions that operate on S3 or unclassed objects you can either trust that your inputs will be structured as expected, or tediously check that they are.
+
+vetr takes the tedium out of structure verification so that you can trust, but verify. It lets you express structural requirements declaratively with templates, and it auto-generates human-friendly error messages as needed.
+
+https://github.com/brodieG/vetr
+
+## Building the site pages
+
+```{r}
+pkgdown::build_site_github_pages()
+```
+
+
+
+## Using Github actions
+
+- https://speakerdeck.com/jimhester/github-actions-for-r
+
+Use a Github package
+
+
+```
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Install remotes
+        run: |
+          Rscript -e "install.packages('remotes', repos='https://ftp.belnet.be/mirror/CRAN')"
+
+      - name: Install gyro from Github
+        run: |
+          Rscript -e "remotes::install_github('stla/gyro')"
+
+      - uses: r-lib/actions/check-r-package@v2
+```
+
+
+## ‘Novartis/tidymodules’: 
+
+**tidymodules** offers a robust framework for developing ‘Shiny’ modules based on R6 classes which should facilitates inter-modules communication.
+
+https://opensource.nibr.com/tidymodules/
+

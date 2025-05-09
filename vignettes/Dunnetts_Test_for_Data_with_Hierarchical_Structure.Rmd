@@ -1,0 +1,218 @@
+---
+title: "Dunnett's Test for Data with Hierarchical Structure"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dunnetts_Test_for_Data_with_Hierarchical_Structure}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 7
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(nlme)
+library(lme4)
+library(multcomp)
+```
+
+**drcHelper** provides a wrapper function `dunnett_test` to use the `multcomp` package to perform Dunnett tests on both the mixed model for individual data (`ind_model`) and the tank-level linear model for aggregated data (`tank_model`).
+
+First we simulate a dataset with log-logistic dose-response. 
+
+```{r}
+# Let's simulate a single dataset and examine its properties
+set.seed(123)
+
+# Simulate dose-response data with specific variance components
+sim_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0, 20),
+  m_tanks = 4,
+  k_individuals = 10,
+  var_tank = 6,     # Between-tank variance
+  var_individual = 2,  # Within-tank (individual) variance
+  include_individuals = TRUE,
+  response_function = function(dose) {
+    # Simple linear dose-response with threshold at dose 10
+    ifelse(dose > 10, 5 + 2 * (dose - 10), 5)
+  }
+)
+
+# Calculate theoretical ICC
+theoretical_icc <- 6 / (6 + 2)  # var_tank / (var_tank + var_individual)
+cat("Theoretical ICC:", theoretical_icc, "\n")
+
+# Examine the data structure
+head(sim_data)
+str(sim_data)
+
+# Visualize the data to see the hierarchical structure
+library(ggplot2)
+
+# Plot individual data points with tank means
+ggplot(sim_data, aes(x = factor(Dose), y = Response, color = factor(Tank))) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun = mean, geom = "line", aes(group = factor(Tank))) +
+  labs(title = "Dose-Response Data with Hierarchical Structure",
+       x = "Dose", y = "Response",
+       color = "Tank") +
+  theme_minimal()
+
+# Calculate observed ICC using a mixed model
+library(lme4)
+mixed_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+summary(mixed_model)
+
+# Extract variance components
+vc <- VarCorr(mixed_model)
+tank_var <- as.numeric(vc$Tank)
+residual_var <- attr(vc, "sc")^2
+observed_icc <- tank_var / (tank_var + residual_var)
+cat("Observed ICC:", observed_icc, "\n")
+
+# Aggregate data to tank level
+tank_data <- aggregate(Response ~ Dose + Tank, data = sim_data, FUN = mean)
+head(tank_data)
+
+# Compare individual-level model with tank-level model
+# Individual level (mixed model)
+ind_model <- lmer(Response ~ factor(Dose) + (1|Tank), data = sim_data)
+
+# Tank level (regular linear model)
+tank_model <- lm(Response ~ factor(Dose), data = tank_data)
+
+# Compare model summaries
+summary(ind_model)
+summary(tank_model)
+
+# Extract and compare fixed effects
+ind_fixed <- fixef(ind_model)
+tank_fixed <- coef(tank_model)
+```
+
+
+## Perform Dunnett Test for Different type of Models
+
+
+### Homoscedastic mixed model 
+
+```{r}
+# 1. Homoscedastic mixed model (equivalent to ind_model1)
+sim_data$Treatment <- factor(sim_data$Dose)
+result1 <- dunnett_test(
+  data = sim_data,
+  response_var = "Response",
+  dose_var = "Treatment",  # Using your Treatment factor
+  tank_var = "Tank",
+  include_random_effect = TRUE,
+  variance_structure = "homoscedastic"
+)
+result1
+```
+
+This is equivalent to 
+
+```{r}
+ind_model1 <- lmer(Response ~ Treatment + (1 | Tank),sim_data) ## homoscedastic errors
+# Apply Dunnett test to mixed model
+ind_dunnett1 <- glht(ind_model1, linfct = mcp(Treatment = "Dunnett"))
+
+s1 <- summary(ind_dunnett1)
+result1$results_table$p.value - s1$test$pvalues < 1e-04
+```
+
+### Heteroscedastic mixed model
+
+```{r}
+# 2. Heteroscedastic mixed model (equivalent to  mod.nlme)
+result2 <- dunnett_test(
+  data = sim_data,
+  response_var = "Response",
+  dose_var = "Treatment",
+  tank_var = "Tank",
+  include_random_effect = FALSE,
+  variance_structure = "heteroscedastic"
+)
+
+
+result2
+```
+
+
+
+
+```{r}
+mod.nlme <- nlme::lme(Response ~ Treatment ,  
+                       random  = ~ 1 | Tank, 
+                       weights = varIdent(form= ~1|Treatment),
+                       data    = sim_data)
+ind_dunnett2 <- glht(mod.nlme, linfct = mcp(Treatment = "Dunnett"))
+s2 <- summary(ind_dunnett2)
+result2$results_table$p.value - s2$test$pvalues < 1e-05
+result2$results_table$estimate -s2$test$coefficients
+```
+
+
+
+### Homoscedastic fixed effect model 
+
+
+```{r}
+# Tank level (regular linear model)
+tank_data$Treatment <- factor(tank_data$Dose)
+result3 <- dunnett_test(
+  data = tank_data,
+  response_var = "Response",
+  dose_var = "Treatment",
+  tank_var = "Tank",
+  include_random_effect = FALSE,
+  variance_structure = "homoscedastic"
+)
+result3
+```
+
+This is equivalent to:
+
+```{r}
+# Tank level (regular linear model)
+tank_model <- lm(Response ~ Treatment, data = tank_data)
+summary(glht(tank_model,linfct = mcp(Treatment="Dunnett")))
+```
+
+### Heteroscedastic fixed effect model 
+```{r}
+result4 <- dunnett_test(
+  data = tank_data,
+  response_var = "Response",
+  dose_var = "Treatment",
+  tank_var = NULL,
+  include_random_effect = FALSE,
+  variance_structure = "heteroscedastic"
+)
+result4
+```
+
+This is equivalent to: 
+
+```{r}
+library(nlme)
+gls0 <- gls(Response ~ Treatment, data=tank_data,weights=varIdent(form= ~1|Treatment))
+ind_gls0 <- glht(gls0, linfct = mcp(Treatment = "Dunnett"))
+
+s4 <- summary(ind_gls0)
+result4$results_table$estimate -s4$test$coefficients
+result4$results_table$p.value - s4$test$pvalues < 1e-05
+```
+

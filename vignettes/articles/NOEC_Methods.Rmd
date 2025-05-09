@@ -1,0 +1,305 @@
+---
+title: "NOEC Calculation for Continuous Data"
+description: | 
+  General ethods for NOEC calculations for dose-response studies
+date: December 4, 2024
+author: "Sarah Baumert, Zhenglei Gao"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",  
+  warning = FALSE,
+  message = FALSE
+)
+## library(dplyr)
+library(tidyverse)
+```
+
+```{r setup}
+library(drcHelper)
+
+```
+
+
+## NOEC in General
+
+The NOEC (No Observed Effect Concentration) is a critical value in ecotoxicology, representing the highest concentration of a substance that does not produce a statistically significant effect on the test organisms compared to a control group. The concept has various names, including NOER(No Observed Effect Rate), NOEDD(No Observed Effect Daily Dose), NOAEL(No Observed Adverse Effect Level), and so on. It is an important metric for determining safe exposure levels for chemicals and assessing their potential risks to human health and the environment.
+
+It is relatively straightforward to calulate and intepret NOEC, and it is widely used and accepted in the regulatory world. However, it is also criticized for its limitations:
+
+1. It focuses only on the single concentration without statistically significant adverse effects that was tested in the study, potentially overlooking the information in the complete dose-response study.
+2. The observed responses at the NOEC vary between studies, making it harder to compare studies as ECx values.
+3. NOEC approach does not take the test concentrations as continuous variable, therefore not allow the estimation/prediction of response at any test concentrations.
+4. It is heavily impacted by the sample size and test concentration selections. Poor experimental design may yield high NOEC due to decreased statistical sensitivity, which is not desired in a regulatory context.
+
+
+In this article, we focus on NOEC methods for continuous data, which can also be applied to count data. This can be achieved either by simply treating count data as continuous or by transforming the data to stabilize the variance. For quantal data, please go to [Quantal Data](https://bayer-group.github.io/drcHelper/articles/Quantal-Data.html) for more information.
+
+Continuous data are numerical data that can take any value within a range (e.g., weight, height), while count data are discrete and represent the number of occurrences of an event (e.g., number of species observed in a pitfall). It is hard to determine a distribution of count data in real world. Poisson, negative-binomial are common distributions used to model count data. The Poisson distribution is often used when the mean and variance are equal, while the negative-binomial distribution is used when the data exhibit overdispersion (variance greater than the mean). Many count datasets have more zeros than expected under standard count models, leading to zero-inflated models or hurdle models that account for this excess. Small sample sizes can make it difficult to determine the underlying distribution of the data and can affect the robustness of statistical methods. There are also other challenges like non-constant variance that does not follow a mean variance relationship, issues caused by censoring or truncation, etc. Therefore, transformations, such as logarithmic or square root transformations, are often used to stabilize variance and meet the assumptions of standard statistical tests for continuous data when dealing with non-normal data distributions.
+
+### Methods for deriving NOEC 
+
+1. Dunnett's Test: used to compare multiple treatment groups against a control group while controlling for Type I error, 
+2. Step-Down Williams' test: used to identify a significant trend.
+3. Non-parametric tests: like Dunn's test after Kruskal-Wallis test or step-down Jonckheere-Terpstra trend test.
+
+
+Williams' test and Dunnett's test are both commonly used parametric methods used for NOEC calculations. Williams' test assumes that the data is monotonic, meaning that the response variable consistently increases or decreases across the levels of the independent variable. This assumption is crucial for the validity of the test results. In contrast, Dunnett's test does not require the data to be monotonic. This flexibility allows it to be applied in a wider range of situations. When the data does meet the monotonicity assumption, Williams' test tends to have a bit greater statistical power compared to Dunnett's test. This means that Williams' test is more likely to detect a true effect when one exists, leading to fewer Type II errors (failing to reject a false null hypothesis). However, in situations where the data is not monotonic, Dunnett's test is more appropriate. While it may have slightly less power when the data is monotonic, its robustness in handling non-monotonic data makes it a valuable tool in statistical analysis.
+
+### Dealing with inhomogenous variance
+
+There are several ways to deal with inhomogeneous variances. 
+
+1. Welch's ANOVA (an adaptation of ANOVA that dose not assume equal variance) followed by Dunnett's test with inhomogeneous variances.
+2. Robust statistical techniques such as sandwich standard error estimations.
+3. Bootstrapping can be used to estimate confidence intervals for NOEC without relying on normality assumptions.
+4. Applying data transformations can stablize variances and meet the assumptions of parametric tests. However, this  increases the complexity of results interpretation  and should be avoided if possible.
+
+
+Below we use a mock Myriophyllum study to illustrate how the NOECs are derived with different approaches. 
+
+```{r}
+data("test_cases_data")
+testdata <- test_cases_data%>% filter(`Test organism` == "Myriophyllum" & Design =="NOEC/ECx")
+unique(testdata$`Study ID`)
+testdata$Dose <- as.numeric(gsub(",",".",testdata$Dose))
+metainfo <- testdata[1,]
+design <- ifelse(metainfo$Design=="Limit","limit test", "full dose response study")
+nconc <- length(unique(testdata$Dose))
+# endpoints <- unique(testdata$Endpoint)
+# obsVar <- unique(testdata$`Measurement Variable`)
+endpoints <- unique(testdata[,c("Endpoint","Measurement Variable","Time")])
+str_endpoints <- apply(endpoints,1,function(x) paste(x[1], "of",x[2], "at",x[3]))
+concunit <- metainfo$Unit
+conctype <- metainfo$`Concentration type`
+```
+
+The test is a `r design` for test organism `r metainfo[,"Test organism"]`. There are `r nconc` test concentrations. The interested endpoint is `r paste(str_endpoints,collapse = ",")` in this mock study data.
+
+**Visualize the data**
+
+```{r}
+#log1p <- function(x) log(x+1)
+ilog1p <- function(x) {
+  exp(x) - 1
+}
+theme_set(theme_bw())
+theme_update(plot.title = 
+element_text(hjust = 0.5))
+ggplot(testdata,aes(x=as.character(Dose),y=Response))+geom_point() + ylab("Growth Rate") + xlab(paste0("Test Concentration [",conctype,", ",concunit,"]"))+ggtitle("Total Shoot Length")
+doses <- unique(testdata$Dose)
+ratios <- sapply(2:(length(doses) - 1), function(i) doses[i + 1] / doses[i])
+## note that the factor between the doses is around 2.95.
+
+ggplot(testdata,aes(x=Dose,y=Response))+geom_point() + ylab("Growth Rate") + xlab(paste0("Test Concentration [",conctype,", ",concunit,"]"))+ggtitle("Total Shoot Length")+scale_x_continuous(breaks=doses,trans = scales::trans_new("log1p",log1p,ilog1p))+ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+**Basic Summary of the Data**
+
+```{r}
+ctr <- testdata %>% filter(Dose == 0)
+ctr0 <- mean(ctr$Response)
+sres <- testdata %>% group_by(Dose)%>% dplyr::summarize(Mean=mean(Response),SD=sd(Response)) %>% mutate(`% Inhibition` = - ((Mean-ctr0)/ctr0)*100, CV=SD/Mean*100)
+sres %>% knitr::kable(.,digits = 3)
+
+```
+
+
+
+```{r include=FALSE,eval=FALSE}
+sid <- unique(testdata$`Study ID`)
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"LN3, mean") & `Study ID`==sid)
+testthat::expect_equal(sres$Mean,as.numeric(eres$`expected result value`),tolerance=1e-4)
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"LN3, Standard deviation") & `Study ID`==sid)
+testthat::expect_equal(sres$SD,as.numeric(eres$`expected result value`),tolerance=1e-4)
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"LN3, %Inhibition") & `Study ID`==sid)
+testthat::expect_equal(sres$`% Inhibition`[-1],as.numeric(eres$`expected result value`),tolerance=1e-4)
+
+eres <- test_cases_res %>% filter(stringr::str_detect(`Brief description`,"LN3, Coefficient of variation") & `Study ID`==sid)
+testthat::expect_equal(sres$CV,as.numeric(eres$`expected result value`),tolerance=1e-4)
+```
+
+
+
+
+```{r}
+testdata <- testdata %>% mutate(Treatment=factor(Dose))
+mod0 <- lm(Response~Treatment,data=testdata)
+```
+
+**Check normality of residuals**
+```{r}
+shapiro.test(residuals(mod0)) ## not completely normal 
+opar <- par(no.readonly = TRUE)
+
+qqnorm(residuals(mod0))
+qqline(residuals(mod0), col = 2)
+#par(mfrow = c(2, 2), oma = c(0, 0, 2, 0)) 
+#plot(mod0,ask=F)
+```
+
+**Check homogeneity of variance**
+
+```{r}
+car::leveneTest(Response~Treatment,data=testdata,center=mean)
+car::leveneTest(Response~Treatment,data=testdata,center=median)
+```
+
+At $\alpha=0.01$, homogeneity variance assumption cannot be rejected. At $\alpha=0.05$, there is enough evidence to reject the homogeneity variance assumption.
+
+```{r include=FALSE}
+pairwiseplot <- require(ggstatsplot)
+```
+
+```{r eval=pairwiseplot,include=pairwiseplot}
+# Visualize the results
+ggstatsplot::ggbetweenstats(
+  data = testdata,
+  x = Treatment,
+  y = Response,
+  type = "parametric",
+  pairwise.comparisons = TRUE,
+  pairwise.display = "significant",
+  p.adjust.method = "bonferroni"
+)
+```
+
+**Check Monotonicity**
+
+```{r}
+monotonicityTest(testdata,Treatment="Treatment",Response="Response")
+```
+
+The data shows significant linear trend and can be considered monotonic. 
+
+
+
+## Williams' trend test
+
+Note that `PMCMRplus::williamsTest` produces more accurate results. But both functions gives almost perfect agreement in most cases. 
+
+```{r}
+(will <- PMCMRplus::williamsTest(Response~Treatment,testdata,alternative ="less"))
+drcHelper::williamsTest_JG(testdata,trt ="Treatment",res ="Response")
+```
+
+Inside the **drcHelper** package, `getwilliamRes` is a function to get accept or reject vector results. 
+
+```{r}
+getwilliamRes(will)
+```
+
+
+## Dunnett's Tests
+
+Dunnett's test is a multiple comparison test for determining significant differences between the mean values of several test groups and a control with normally distributed errors with homogeneous variance. Dunnett's test is robust to slight violations of the normality and variance homogeneity assumptions.
+
+There are several packages providing function for the calculation of the Dunnett's test. The function `DunnettTest` from the library `DescTools` is calculating correct results for the "two.sided" direction. The function `dunnettTest` from the library `PMCMRplus` can be used to calculate the test options "less" (smaller), "greater" and "two.sided". The results for the "two.sided" option differ in some cases from the results of `DunnettTest` from the library **DescTools**, due to multivariate normal calculations. Another commonly used tool is the `glht` function with Dunnet type contrast in the **multcomp** package.
+
+There are also possibilities to use other packages. For example, **emmeans** is a package for estimating marginal means and conducting pairwise comparisons.
+
+
+```{r}
+library(multcomp)
+(dun <- summary(glht(aov(Response~Treatment, data=testdata), linfct=mcp(Treatment="Dunnett"),alternative="less")))
+
+(dun <- summary(glht(aov(Response~Treatment, data=testdata), linfct=mcp(Treatment="Dunnett"),alternative="two.sided")))
+```
+
+
+Another approach is to use **emmeans** package. Note that the p value adjustment method is different and is called "dunnettx". However the t statistic, df, and SE estimations are all the same. 
+
+
+```{r}
+library(emmeans)
+m <- aov(Response~Treatment, data=testdata)
+emmeans(m, specs = trt.vs.ctrl ~ Treatment)
+```
+
+NOEC is the lowest tested concentration `r `doses[2]`. 
+
+
+
+
+
+## Nonparametric Tests
+
+### Jonckheere-Terpstra test
+
+```{r}
+jonckheere <- PMCMRplus::stepDownTrendTest(Response~Treatment, data=testdata,test = "jonckheereTest",
+                         alternative = "less")
+summary(jonckheere)
+```
+
+
+### Dunn's test
+
+Dunn's test is not very powerful in general. 
+
+```{r}
+m <- lm(Response~Treatment, data=testdata)
+dunn <- PMCMRplus::kwManyOneDunnTest(Response~Treatment, data=testdata,alternative = "less")
+summary(dunn)
+```
+
+## Dunnett's Tests with Inhomogenious Variance
+
+```{r}
+inhomo <- require(nlme)
+```
+
+
+```{r eval=inhomo}
+library(nlme)
+gls0 <- gls(Response ~ Treatment, data=testdata,weights=varIdent(form= ~1|Treatment))
+plot(gls0,Treatment ~ fitted(.))
+## Looking at the variances
+plot(gls0,Treatment ~ resid(.),abline=0)
+treat.means <- emmeans(gls0, ~ Treatment)
+## no adjustment for p-values
+## contrast(treat.means, adjust="none", method="dunnett", ref = 1)
+contrast(treat.means, method="dunnett", ref = 1)
+summary(glht(gls0,mcp(Treatment="Dunnett"))) 
+fit <- aov(Response ~ Treatment, data=testdata)
+summary(PMCMRplus::welchManyOneTTest(fit, alternative = "two.sided", p.adjust="holm"))
+summary(glht(gls0,mcp(Treatment="Dunnett")),test = adjusted("holm")) 
+```
+
+# Alternative Approaches
+
+These approaches are not routinely used in the regulatory NOEC calculations. However, they are very useful in certain situations.
+
+## Tamhane-Dunnett's Test
+
+For many-to-one comparisons in an one-factorial layout with normally distributed residuals and unequal variances Tamhane-Dunnett's test can be used.
+
+```{r}
+set.seed(245)
+mn <- c(1, 2, 2^2, 2^3, 2^4)
+x <- rep(mn, each=5) + rnorm(25)
+g <- factor(rep(1:5, each=5))
+
+fit <- aov(x ~ g - 1)
+shapiro.test(residuals(fit))
+bartlett.test(x ~ g - 1)
+anova(fit)
+## works with object of class aov
+library(PMCMRplus)
+summary(tamhaneDunnettTest(fit, alternative = "greater"))
+## summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="single-step"))
+## p.adjust “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”, “none”
+summary(welchManyOneTTest(fit, alternative = "greater", p.adjust="holm"))
+DescTools::DunnettTest(x~g, alternative = "greater") ## alternative is not taking effect in this case
+PMCMRplus::dunnettTest(x~g)
+PMCMRplus::dunnettTest(x~g, alternative = "greater")
+```
+
+## References
+
+- DUNNETT C. W. (1955): A multiple comparison procedure for comparing several treatments with a control, Journal of the American Statistical Association, 50, pp. 1096-1121.

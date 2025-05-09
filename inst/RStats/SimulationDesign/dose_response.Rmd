@@ -1,0 +1,127 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Dose-response generating function
+
+## Latex
+
+\begin{align*}
+\text{Response}(d) = \begin{cases}
+100 - \left(\frac{d}{d_{max}}\right) \cdot E_{max} & \text{decreasing} \\[2ex]
+100 - E_{max}\left(1 - \left(\frac{d - d_{mid}}{d_{mid}}\right)^2\right) & \text{non-monotonic} \\[2ex]
+\begin{cases}
+100 & \text{if } d < d_{threshold} \\
+100 - \left(\frac{d - d_{threshold}}{d_{max} - d_{threshold}}\right) \cdot E_{max} & \text{if } d \geq d_{threshold}
+\end{cases} & \text{threshold} \\[2ex]
+100 + E_{max}\sin(2\pi f d) & \text{oscillating} \\[2ex]
+100 & \text{none}
+\end{cases}
+\end{align*}
+
+
+
+
+## Markdown
+
+The response function R(d) is defined as follows:
+
+For decreasing response:
+R(d) = 100 - (d/d_max) × E_max
+
+For non-monotonic response:
+R(d) = 100 - E_max × (1 - ((d - d_mid)/d_mid)²)
+
+For threshold response:
+R(d) = 100                                                    if d < d_threshold
+R(d) = 100 - ((d - d_threshold)/(d_max - d_threshold)) × E_max   if d ≥ d_threshold
+
+For oscillating response:
+R(d) = 100 + E_max × sin(2πfd)
+
+For no response:
+R(d) = 100
+
+Where:
+- d is the dose
+- d_max is the maximum dose
+- d_mid is the mean of the dose range
+- E_max is the maximum effect
+- f is the frequency (set to 1)
+- d_threshold is the threshold dose
+
+
+# Variance Pattern Generation
+
+\begin{align*}
+\sigma^2(i) = \begin{cases}
+\sigma^2_b & \text{homogeneous} \\[2ex]
+\sigma^2_b \cdot \left(0.5 + \frac{1.5(i-1)}{n-1}\right) & \text{increasing} \\[2ex]
+\sigma^2_b \cdot \left(2 - \frac{1.5(i-1)}{n-1}\right) & \text{decreasing} \\[2ex]
+\sigma^2_b \cdot \begin{cases}
+2 - \frac{i-1}{\lceil n/2 \rceil-1} & \text{if } i \leq \lceil n/2 \rceil \\[1ex]
+1 + \frac{i-\lceil n/2 \rceil}{n-\lceil n/2 \rceil} & \text{if } i > \lceil n/2 \rceil
+\end{cases} & \text{v-shaped}
+\end{cases}
+\end{align*}
+
+
+
+
+The variance σ²(i) at dose level i is defined as follows:
+
+For homogeneous variance:
+σ²(i) = σ²_b
+
+For increasing variance:
+σ²(i) = σ²_b × (0.5 + 1.5(i-1)/(n-1))
+
+For decreasing variance:
+σ²(i) = σ²_b × (2 - 1.5(i-1)/(n-1))
+
+For v-shaped variance:
+σ²(i) = σ²_b × (2 - (i-1)/⌈n/2⌉-1)     for i ≤ ⌈n/2⌉
+σ²(i) = σ²_b × (1 + (i-⌈n/2⌉)/(n-⌈n/2⌉))   for i > ⌈n/2⌉
+
+Where:
+- i is the dose level index (1 to n)
+- n is the number of dose levels
+- σ²_b is the base variance (default = 4)
+- ⌈n/2⌉ represents the ceiling of n/2 (mid-point)
+
+
+
+
+
+**Markdown Version:**
+```markdown
+The variance σ²(i) at dose level i is defined as follows:
+
+For homogeneous variance:
+σ²(i) = σ²_b
+
+For increasing variance:
+σ²(i) = σ²_b × (0.5 + 1.5(i-1)/(n-1))
+
+For decreasing variance:
+σ²(i) = σ²_b × (2 - 1.5(i-1)/(n-1))
+
+For v-shaped variance:
+σ²(i) = σ²_b × (2 - (i-1)/⌈n/2⌉-1)     for i ≤ ⌈n/2⌉
+σ²(i) = σ²_b × (1 + (i-⌈n/2⌉)/(n-⌈n/2⌉))   for i > ⌈n/2⌉
+
+Where:
+- i is the dose level index (1 to n)
+- n is the number of dose levels
+- σ²_b is the base variance (default = 4)
+- ⌈n/2⌉ represents the ceiling of n/2 (mid-point)
+```
+
+These expressions describe how the variance changes across dose levels for each variance pattern:
+- Homogeneous: Constant variance across all doses
+- Increasing: Linear increase from 0.5×base_var to 2×base_var
+- Decreasing: Linear decrease from 2×base_var to 0.5×base_var
+- V-shaped: Decreases to base_var at the midpoint, then increases back to 2×base_var
+
+Note that the actual implementation uses `seq()` for smooth transitions, but these formulas represent the mathematical relationship between dose level and variance.

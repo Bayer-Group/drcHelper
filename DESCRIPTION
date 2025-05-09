@@ -1,0 +1,45 @@
+Package: drcHelper
+Title: Collection and verification of helper functions for dose-response analysis
+Version: 0.0.2.9000
+Authors@R: c(
+    person("Zhenglei", "Gao",  email="zhenglei.gao@bayer.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4042-310X")),
+    person("Sean", "Ryan", email = "sryan@exponent.com", role = "aut"))
+Description: Helper functions for drc package and other dose-response analysis functions.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Depends: 
+    drc,
+    R (>= 2.10)
+LazyData: true
+URL: https://bayer-group.github.io/drcHelper/index.html
+Imports: 
+    bmd,
+    DescTools,
+    isotone,
+    multcomp,
+    PMCMRplus,
+    dplyr,
+    ggplot2,
+    scales,
+    magrittr,
+    Iso,
+    plyr,
+    metafor,
+    purrr,
+    tidyr,
+    rlang,
+    MASS,
+    stringr,
+    tidyselect,
+    rstatix,
+    tibble
+Remotes: DoseResponse/bmd

@@ -1,0 +1,16 @@
+^drcHelper\.Rproj$
+^\.Rproj\.user$
+^vignettes/articles$
+^data-raw$
+^README\.Rmd$
+^inst/apps$
+^inst/Archive$
+^inst/DevNotes$
+^inst/References$
+^inst/SystemTesting$
+^inst/RStats$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^LICENSE\.md$

@@ -1,0 +1,438 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Implementing Heterogeneous Variance Simulation
+
+**Do not Run!**
+
+For the heterogeneous variance question with tank-level data only (no individuals), we can adapt the existing framework. Let's create a specific approach for this scenario:
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval=FALSE)
+```
+
+## 1. Define Variance Patterns
+
+First, let's define functions that generate dose-specific variance patterns:
+
+```{r}
+# Variance pattern generator functions
+variance_patterns <- list(
+  homogeneous = function(n_doses, base_var = 4) {
+    rep(base_var, n_doses)
+  },
+  
+  increasing = function(n_doses, base_var = 4) {
+    base_var * seq(0.5, 2, length.out = n_doses)
+  },
+  
+  decreasing = function(n_doses, base_var = 4) {
+    base_var * seq(2, 0.5, length.out = n_doses)
+  },
+  
+  v_shaped = function(n_doses, base_var = 4) {
+    mid_point <- ceiling(n_doses/2)
+    c(
+      base_var * seq(2, 1, length.out = mid_point),
+      base_var * seq(1, 2, length.out = n_doses - mid_point + 1)[-1]
+    )
+  }
+)
+```
+
+## 2. Modify the Simulation Function for Heterogeneous Variances
+
+Let's create a specialized version of the power simulation function for heterogeneous variances:
+
+```{r}
+run_hetero_variance_simulation <- function(n_sim = 100,
+                                           n_doses = 5,
+                                           dose_range = c(0, 20),
+                                           m_tanks = 3,
+                                           variance_pattern = "homogeneous",
+                                           base_variance = 4,
+                                           max_effect = 20,
+                                           response_type = c("decreasing", "non_monotonic", "none", "threshold", "oscillating"),
+                                           threshold_idx = 3,
+                                           test_methods = list(),
+                                           alpha = 0.05,
+                                           alternative = "less",
+                                           n_cores = parallel::detectCores() - 1,
+                                           seed = 123) {
+  
+  # Match response type argument
+  response_type <- match.arg(response_type)
+  
+  # Calculate doses
+  doses <- seq(dose_range[1], dose_range[2], length.out = n_doses)
+  
+  # Generate dose-specific variances based on pattern
+  if (is.character(variance_pattern) && variance_pattern %in% names(variance_patterns)) {
+    var_tank <- variance_patterns[[variance_pattern]](n_doses, base_variance)
+  } else if (is.numeric(variance_pattern) && length(variance_pattern) == n_doses) {
+    var_tank <- variance_pattern
+  } else {
+    stop("variance_pattern must be one of the predefined patterns or a numeric vector of length n_doses")
+  }
+  
+  # Set up response function based on type (same as in run_power_simulation)
+  if (response_type == "decreasing") {
+    response_fn <- function(dose, max_effect) {
+      base_response <- 100
+      max_dose <- max(doses)
+      return(base_response - (dose / max_dose) * max_effect)
+    }
+  } else if (response_type == "non_monotonic") {
+    response_fn <- function(dose, max_effect) {
+      base_response <- 100
+      mid_dose <- mean(dose_range)
+      return(base_response - max_effect * (1 - ((dose - mid_dose)/(mid_dose))^2)) ## Here I need a change.
+    }
+  } else if (response_type == "threshold") {
+    response_fn <- function(dose, max_effect) {
+      base_response <- 100
+      result <- rep(base_response, length(dose))
+      threshold_dose <- doses[threshold_idx]
+      high_doses <- dose >= threshold_dose
+      if (any(high_doses)) {
+        max_high_dose <- max(doses)
+        relative_position <- (dose[high_doses] - threshold_dose) / (max_high_dose - threshold_dose)
+        result[high_doses] <- base_response - relative_position * max_effect
+      }
+      return(result)
+    }
+  } else if (response_type == "oscillating") { ## direct definition without calling oscillatinng_response function from drcHelper
+    response_fn <- function(dose, max_effect) {
+      base_response <- 100
+      normalized_doses <- (dose - min(doses)) / (max(doses) - min(doses))
+      return(base_response + max_effect * sin(2 * pi * normalized_doses))
+    }
+  } else { # "none"
+    response_fn <- function(dose, max_effect) {
+      rep(100, length(dose))
+    }
+  }
+  
+  # Set up parallel backend
+  cl <- parallel::makeCluster(n_cores)
+  doParallel::registerDoParallel(cl)
+  
+  # Create a function to run a single simulation
+  run_single_sim <- function(sim_id, seed_offset) {
+    # Set seed for this simulation
+    set.seed(seed + seed_offset)
+    
+    # Generate data (tank-level only, no individuals)
+    sim_data <- simulate_dose_response(
+      n_doses = n_doses,
+      dose_range = dose_range,
+      m_tanks = m_tanks,
+      var_tank = var_tank,  # Pass the dose-specific variances, note here it should be a vector instead of a singe number.
+      include_individuals = FALSE,  # Tank-level data only
+      response_function = function(dose) response_fn(dose, max_effect)
+    )
+    
+    # Apply each test method
+    results <- list()
+    for (method_name in names(test_methods)) {
+      method_fn <- test_methods[[method_name]]
+      test_result <- method_fn(sim_data, alpha = alpha, alternative = alternative)
+      
+      # Extract p-values and significant flags
+      results[[method_name]] <- list(
+        p_values = test_result$p_values,
+        significant = test_result$significant
+      )
+    }
+    
+    return(list(
+      sim_id = sim_id,
+      results = results
+    ))
+  }
+  
+  # Run simulations in parallel
+  sim_results <- foreach::foreach(i = 1:n_sim, 
+                                  .packages = c("PMCMRplus", "rstatix", "nlme", "lme4", "multcomp","drcHelper")) %dopar% {
+                                    run_single_sim(i, i)
+                                  }
+  
+  # Stop cluster
+  parallel::stopCluster(cl)
+  
+  # Process results (similar to run_power_simulation)
+  process_results <- function(sim_results) {
+    # Initialize results storage
+    method_names <- names(test_methods)
+    n_methods <- length(method_names)
+    
+    # Calculate power for each method and dose level
+    n_dose_levels <- length(sim_results[[1]]$results[[method_names[1]]]$significant)
+    
+    power_matrix <- matrix(0, nrow = n_methods, ncol = n_dose_levels)
+    rownames(power_matrix) <- method_names
+    colnames(power_matrix) <- paste0("Dose_", 1:n_dose_levels)
+    
+    for (m in 1:n_methods) {
+      method <- method_names[m]
+      for (d in 1:n_dose_levels) {
+        sig_count <- sum(sapply(sim_results, function(x) x$results[[method]]$significant[d]))
+        power_matrix[m, d] <- sig_count / n_sim
+      }
+    }
+    
+    # Convert to data frame
+    power_df <- as.data.frame(power_matrix)
+    power_df$Method <- rownames(power_df)
+    
+    # Reshape to long format
+    power_long <- reshape2::melt(power_df, id.vars = "Method", 
+                                 variable.name = "Dose_Level", 
+                                 value.name = "Power")
+    
+    # Add simulation parameters
+    power_long$n_sim <- n_sim
+    power_long$n_doses <- n_doses
+    power_long$m_tanks <- m_tanks
+    power_long$variance_pattern <- if(is.character(variance_pattern)) variance_pattern else "custom"
+    power_long$base_variance <- base_variance
+    power_long$max_effect <- max_effect
+    power_long$response_type <- response_type
+    power_long$alpha <- alpha
+    power_long$alternative <- alternative
+    
+    # Add actual doses, expected responses, and variances
+    doses <- seq(dose_range[1], dose_range[2], length.out = n_doses)
+    power_long$Dose <- doses[as.numeric(gsub("Dose_", "", power_long$Dose_Level))+1]
+    power_long$Expected_Response <- response_fn(power_long$Dose, max_effect)
+    power_long$Variance <- var_tank[as.numeric(gsub("Dose_", "", power_long$Dose_Level))+1]
+    
+    return(power_long)
+  }
+  
+  results_df <- process_results(sim_results)
+  
+  return(results_df)
+}
+```
+
+## 3. Define Parameter Grid for Heterogeneous Variance Question
+
+```{r}
+# Parameter grid for heterogeneous variance question
+param_grid_hetero <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(3, 5),
+  variance_pattern = c("homogeneous", "increasing", "decreasing", "v_shaped"),
+  base_variance = 4,
+  max_effect = c(0, 20),  # Null and moderate effect
+  response_type = c("none", "threshold", "oscillating"),  # Focus on null and decreasing
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+```
+
+## 4. Function to Run Multiple Heterogeneous Variance Simulations
+
+```{r}
+run_multiple_hetero_simulations <- function(param_grid, test_methods, n_sim = 1000,
+                                            n_cores = parallel::detectCores() - 1,
+                                            seed = 123,
+                                            log_file = "hetero_simulation_log.txt",
+                                            checkpoint_file = "hetero_simulation_checkpoint.rds") {
+  
+  # Initialize log
+  log_message(paste("Starting heterogeneous variance simulations with", 
+                    nrow(param_grid), "parameter combinations"), 
+              log_file = log_file)
+  
+  results_list <- list()
+  
+  # Check if checkpoint exists
+  if (file.exists(checkpoint_file)) {
+    checkpoint_data <- readRDS(checkpoint_file)
+    results_list <- checkpoint_data$results_list
+    start_idx <- checkpoint_data$next_idx
+    log_message(paste("Resuming from checkpoint at index", start_idx), log_file = log_file)
+  } else {
+    start_idx <- 1
+  }
+  
+  for (i in start_idx:nrow(param_grid)) {
+    params <- param_grid[i, ]
+    
+    log_message(sprintf("Running simulation %d of %d: pattern = %s, max_effect = %f", 
+                        i, nrow(param_grid), params$variance_pattern, params$max_effect),
+                log_file = log_file)
+    
+    # Run simulation with these parameters
+    tryCatch({
+      sim_result <- run_hetero_variance_simulation(
+        n_sim = n_sim,
+        n_doses = params$n_doses,
+        dose_range = c(params$min_dose, params$max_dose),
+        m_tanks = params$m_tanks,
+        variance_pattern = params$variance_pattern,
+        base_variance = params$base_variance,
+        max_effect = params$max_effect,
+        response_type = params$response_type,
+        test_methods = test_methods,
+        alpha = params$alpha,
+        alternative = params$alternative,
+        n_cores = n_cores,
+        seed = seed + i
+      )
+      
+      # Store result
+      results_list[[i]] <- sim_result
+      
+      # Save checkpoint
+      saveRDS(list(results_list = results_list, next_idx = i + 1), 
+              file = checkpoint_file)
+      
+    }, error = function(e) {
+      log_message(paste("ERROR in simulation", i, ":", conditionMessage(e)), 
+                  log_file = log_file)
+      
+      # Save checkpoint even if there's an error
+      saveRDS(list(results_list = results_list, next_idx = i), 
+              file = checkpoint_file)
+    })
+  }
+  
+  # Combine all results
+  valid_results <- results_list[!sapply(results_list, is.null)]
+  all_results <- do.call(rbind, valid_results)
+  
+  return(all_results)
+}
+```
+
+## 5. Visualization for Heterogeneous Variance Results
+
+```{r}
+plot_hetero_variance_results <- function(results) {
+  # Create a plot showing power by dose level for each method and variance pattern
+  ggplot2::ggplot(results, 
+                  ggplot2::aes(x = Dose, y = Power, color = Method, group = Method)) +
+    ggplot2::geom_line(linewidth = 1) +
+    ggplot2::geom_point(size = 3) +
+    ggplot2::facet_grid(response_type ~ variance_pattern, 
+                        labeller = ggplot2::labeller(
+                          response_type = function(x) paste0("Response: ", x),
+                          variance_pattern = function(x) paste0("Variance: ", x)
+                        )) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      title = "Power Analysis with Heterogeneous Variances",
+      subtitle = paste("Tanks per dose:", results$m_tanks[1], 
+                       "| Max effect:", results$max_effect[1]),
+      x = "Dose",
+      y = "Power (Proportion of Significant Results)"
+    )
+}
+
+# Function to visualize the variance patterns
+plot_variance_patterns <- function(n_doses = 5, base_variance = 4, dose_range=NULL) {
+  # Generate variance patterns
+  patterns <- names(variance_patterns)
+  
+  # Create data frame for plotting
+  plot_data <- data.frame(
+    Dose_Level = rep(1:n_doses, length(patterns)),
+    
+    Variance = unlist(lapply(patterns, function(p) {
+      variance_patterns[[p]](n_doses, base_variance)
+    })),
+    Pattern = rep(patterns, each = n_doses)
+  )
+  if(!is.null(dose_range)) {
+    x <- seq(dose_range[1],dose_range[2],length=n_doses)
+    plot_data$Dose_Level <- factor(as.character(x),levels=x)
+  }
+  
+  # Create plot
+  ggplot2::ggplot(plot_data, ggplot2::aes(x = Dose_Level, y = Variance, color = Pattern, group = Pattern)) +
+    ggplot2::geom_line(linewidth = 1.2) +
+    ggplot2::geom_point(size = 3) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      title = "Variance Patterns by Dose Level",
+      subtitle = paste("Base variance:", base_variance),
+      x = "Dose Level",
+      y = "Variance"
+    )
+}
+```
+
+## 6. Example Usage
+
+```{r}
+# Define test methods focusing on tank-level data methods
+library(parallel)
+library(doParallel)
+library(drcHelper)
+source("~/Projects/drcHelper/inst/RStats/RStats_wrapper_tests.R")
+source("~/Projects/drcHelper/inst/RStats/RStats_Sim_Engine.R")
+# Clean up any existing connections before starting
+closeAllConnections()
+gc()  # Force garbage
+# gls_dunnett_agg_simple <- function(data, alpha = 0.05, alternative = "less") {
+#   gls_dunnett_agg(data,alpha,alternative,notAgged =FALSE)
+# } 
+# 
+# lm_dunnett_agg_simple <- function(data, alpha = 0.05, alternative = "less") {
+#   lm_dunnett_agg(data,alpha,alternative,notAgged =FALSE)
+# } 
+
+tank_level_methods <- list(
+  "LM_Homo" = lm_dunnett_agg_simple,
+  "GLS_Hetero" = gls_dunnett_agg_simple,
+  "Williams" = williams_test,
+  "Jonckheere" = jonckheere_test,
+  "Dunns" = manyone_dunns_test
+)
+
+# Visualize the variance patterns
+variance_plot <- plot_variance_patterns(n_doses = 5, base_variance = 4)
+print(variance_plot)
+
+# Run a small test simulation
+test_hetero_sim <- run_hetero_variance_simulation(
+  n_sim = 10,  # Small number for testing
+  n_doses = 5,
+  m_tanks = 3,
+  variance_pattern = "increasing",
+  max_effect = 5,
+  response_type = "decreasing",
+  test_methods = tank_level_methods,
+  n_cores = 2
+)
+
+# Plot test results
+test_plot <- plot_hetero_variance_results(test_hetero_sim)
+print(test_plot)
+
+# Run full simulation (commented out - would take time)
+# full_hetero_results <- run_multiple_hetero_simulations(
+#   param_grid = param_grid_hetero,
+#   test_methods = tank_level_methods,
+#   n_sim = 1000,
+#   n_cores = parallel::detectCores() - 1
+# )
+```
+
+This implementation provides a specialized approach for the heterogeneous variance question, focusing on tank-level data only. The key features are:
+
+1. Predefined variance patterns (homogeneous, increasing, decreasing, v-shaped)
+2. Tank-level data only (no individuals, no ICC)
+3. Dose-specific variances passed directly to `simulate_dose_response`
+4. Specialized results processing that includes variance information
+
+This approach allows you to directly compare how different statistical methods perform under various patterns of heteroscedasticity, which is particularly relevant for evaluating Welch-type tests versus standard methods.

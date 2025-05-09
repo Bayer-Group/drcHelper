@@ -1,0 +1,102 @@
+---
+title: "EFSA Criteria"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## EFSA: ECx reliability
+
+EFSA published in 2019 "Outcome of the Pesticides Peer Review Meeting on general recurring issues in ecotoxicology", where some additional reliability criteria are proposed.  
+
+- DOI: https://doi.org/10.2903/sp.efsa.2019.EN-1673
+
+### Model Comparison Criteria
+
+Apart from generic model comparison criteria, like scaled residuals, visual fit, AIC, lack-of-fit test or goodness-of-fit test, etc., EFSA has proposed to use the following two criteria: 
+
+**Normalized Width**
+
+|NW   |    Rating|
+|:----|:---------|
+|$<0.2$ | Excellent|
+|$<0.5$ | Good     |
+|$<1$   | Fair     |
+|$<2$   | Poor     |
+|$\geq2$ | Bad      |
+
+
+Normalized width can be calculated by `calc`
+
+**Overlapping of EC10, 20 and 50**
+
+Certainty of protection is classified based on the relationship between EC10 and EC20/EC50 confidence intervals
+
+|Overlapping  Conditions                  |Certainty of the Protection Level |
+|:----------------------------------------|:---------------------------------|
+|EC$_{10}$ < EC$_{20,low}$                | High                             |
+|EC$_{20,low}$ < EC$_{10}$ < EC$_{50,low}$| Medium                           |
+|EC$_{10}$ > EC$_{50,low}$                | Low                              |
+
+
+**Steepness of the curve**
+
+Steepness is defined as the ratio between EC$_{10}$ and EC$_{50}$.
+
+The certainty of protection level and the steepness of the curves can be calculated by `calcSteepnessOverlap(mod = mod, trend = "Decrease")`.
+
+
+## Model Selection and Model Averaging
+
+Model selection involves choosing the best statistical model from a set of candidate models based on the data at hand. Criteria for Model Selection is based on criteria like Akaike Information Criterion (AIC), residuals check, or a combination of several criteria, etc. 
+
+Model averaging is a technique that combines predictions from multiple models to improve accuracy and robustness. This approach is particularly useful when there is uncertainty about which model is the best. Bayesian Model Averaging (BMA) assigns weights to models based on their posterior probabilities, allowing for a weighted average of predictions. This method incorporates uncertainty in model selection directly into the predictions. Frequentist Model Averaging involves averaging predictions from models selected based on criteria like AIC or BIC, without the Bayesian framework, the weight could directly come from AIC. 
+
+Model averaging incoporates model uncertainty into the analysis and can improve out-of-sample predictive performance compared to single models. 
+
+Research is still needed on developing more efficient algorithms for model averaging and improving interpretability to facilitate the application of these techniques in regulatory decision-making.
+
+## Other suggested Criteria
+
+Green JW, Foudoulakis M, Fredricks T, Maul J, Plautz S, Valverde P, Schapaugh A, Sopko X, Gao Z, Bean T 2022. Statistical Analysis of Avian Reproduction Studies. Environmental Sciences Europe. 34:31 https://doi.org/10.1186/s12302-022-00603-5
+
+- Model predictions should be consistent with observations at tested concentrations, especially for control. Visually, the fitted curve should appear to fit the data across the entire range of test concentrations. Since an x% effect is estimated from the model predicted control mean, it is especially important that the model provide good agreement with the observed control mean response.
+-  Confidence interval for ECx should not be “overly” wide.  No hard rule is given to define what overly wide means, but if the confidence interval for ECx spans the entire range of tested concentrations including 0, it is overly wide and the estimate has little value for risk assessment.
+- For every parameter, confidence interval should not include 0. This is to eliminate overly parameterized models and reduce model instability.
+- Prediction interval for predicted response at ECx should not contain estimated control mean. Otherwise, an x% effect is indistinguishable from no effect. Figure 15 below illustrates this criterion.
+
+
+## Additional Criteria in Guidances
+
+### BM Guidance 2022 Criteria
+
+### EFSA BMD Guidance 2012 Criteria
+
+### EFSA BMD Guidance 2022 Criteria
+
+### US EPA BMDS Criteria
+
+BMD:BMDL ratio is used in the BMDS program as part of its model choice criteria. It is an indicator of the uncertainty level (how much information is provided) on BMD given the experimental design assuming the model is correct. This is similar to NW criteria used by EFSA. 
+
+- a BMD:BMDL ratio of >20 results in a model being placed in the “questionable” bin
+- a BMD:BMDL ratio of >5 result in a "caution" flag. 
+User-specified modifications to this decision logic are also possible.
+
+
+
+
+## Test Guidelines
+
+## References
+
+- OECD (2006), Current Approaches in the Statistical Analysis of Ecotoxicity Data: A guidance to application (annexes to this publication exist as a separate document), OECD Series on Testing and Assessment, No. 54, OECD Publishing, Paris, https://doi.org/10.1787/9789264085275-en.

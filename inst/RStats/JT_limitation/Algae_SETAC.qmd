@@ -1,0 +1,182 @@
+---
+title: "KNF Algae Growth Inhibition "
+author: "Zhenglei Gao"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+n<- c(12,rep(6,6))
+a<-qt(1-0.05/2, n-1)
+a
+a <- qnorm(1-0.05/2)
+a
+dat <- structure(list(Treatment = structure(c(1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 4L, 4L, 
+4L, 4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L, 6L, 7L, 7L, 7L, 7L), levels = c("Control", 
+"0.0015", "0.004", "0.016", "0.05", "0.16", "0.5"), class = c("ordered", 
+"factor")), Response = c(0.0500751550402492, 0.0549766102708876, 
+0.0510179538436234, 0.0504660348080099, 0.0499809345685877, 0.0539911129987799, 
+0.054056210976094, 0.0546848380887881, 0.0511028700289316, 0.0521132294706069, 
+0.0516136666906998, 0.054006668312382, 0.0584551412709057, 0.0537452668039128, 
+0.0523058493653312, 0.0597996499408036, 0.0551921754687093, 0.0549841190670617, 
+0.0557558414385654, 0.0571090072982945, 0.0550790786321275, 0.0538856068123132, 
+0.0566810136275366, 0.0530885395532474, 0.0538114115982316, 0.0511170609363355, 
+0.0513881320494227, 0.0505882840408944, 0.0232783194745891, 0.0119942272946239, 
+0.0275260484650731, 0.0305045980902389, 0.00691141055684537, 
+0.000590934835374355, 0.0072092273690179, 0.00127559194218367
+)), row.names = c(NA, -36L), class = "data.frame")
+
+## write.csv(dat,file="JT_dat1.csv",row.names = F) 
+# Create the dataset
+datsum <-dat %>% group_by(Treatment) %>% summarise(mean=mean(Response), SE=sd(Response)/sqrt(length(Response))) %>% mutate(Lower=mean-a*SE,Upper=mean+a*SE)
+```
+
+
+
+```{r}
+
+theme_set(theme_bw())
+ggplot(dat,aes(x=Treatment,y=Response)) + geom_point() + geom_point(data = datsum,aes(as.numeric(Treatment)+0.2,y=mean),position=position_dodge(width = 0.9),col = "red",size = 3,shape = 24, fill = "pink")+
+geom_errorbar(data = datsum, aes(x=as.numeric(Treatment)+0.2,y=mean,ymin = Lower, ymax = Upper),col="red",position=position_dodge(width = 0.9),width = .2)
+
+ggsave("JT_example.png",width = 5 ,height =3.5,dpi=300 )
+```
+
+- https://www.tandfonline.com/doi/full/10.1080/03610920601041556#:~:text=This%20article%20examines%20the%20variance
+
+
+Jonckheere's test and Kendall's tau) are closely related. In some software implementations, the two test produce identical p-values.
+
+
+```{r}
+## Jonckheere, A. R. (1954). A distribution-free k-sample test again ordered alternatives. Biometrika 41:133-145.
+
+## Terpstra, T. J. (1952). The asymptotic normality and consistency of Kendall's test against trend, when ties are present in one ranking. Indagationes Mathematicae 14:327-333.
+
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat)
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat%>% filter(Treatment!="0.5"))
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat%>% filter(Treatment!="0.5" & Treatment!="0.16"))
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat%>% filter(Treatment!="0.5" & Treatment!="0.16" & Treatment!="0.05"))
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat%>% filter(Treatment!="0.5" & Treatment!="0.16" & Treatment!="0.05" & Treatment != "0.016"))
+
+DescTools::JonckheereTerpstraTest(Response~Treatment,data=dat%>% filter(Treatment!="0.5" & Treatment!="0.16" & Treatment!="0.05" & Treatment != "0.016" & Treatment != "0.004" ))
+
+
+PMCMRplus::jonckheereTest(dat$Response,dat$Treatment)
+cor.test(dat$Response,as.numeric(dat$Treatment),method="kendall",exact = T)
+
+clinfun::jonckheere.test(dat$Response,dat$Treatment)
+## example from Exact Test (Mehta), figure 12.2
+dat1 <- matrix(
+  c(100, 18, 50, 50, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1), 4,
+  dimnames = list(dose = 1:4 * 100,
+                  toxicity = c('Mild', 'Moderate', 'Severe', 'Death'))
+)
+rawr::jt.test(dat1)
+
+tbl <- table(mtcars$gear, mtcars$cyl)
+rawr::jt.test(tbl)
+## compare
+cor.test(mtcars$gear, mtcars$cyl, method = 'kendall', exact = FALSE)
+clinfun::jonckheere.test(mtcars$gear, mtcars$cyl)
+```
+
+```{r}
+PMCMRplus::stepDownTrendTest(Response~Treatment,data=dat,test = "jonckheere")
+library(PMCMRplus)
+welchManyOneTTest(Response~Treatment,data=dat,p.adjust.method = "none")
+welchManyOneTTest(Response~Treatment,data=dat,p.adjust.method = "holm",alternative = "less")
+welchManyOneTTest(Response~Treatment,data=dat,p.adjust.method = "holm")
+```
+
+
+```{r}
+library(emmeans)
+mod0 <- lm(Response~Treatment,data=dat)
+treat.means <- emmeans(mod0, ~Treatment)
+treat.means
+
+contrast(treat.means, adjust="none", method="dunnett", ref = 1)
+contrast(treat.means, method="dunnett", ref = 1)
+
+DescTools::DunnettTest(Response~Treatment,data=dat)
+library(multcomp)
+summary(glht(mod0,mcp(Treatment="Dunnett"))) %>% broom::tidy() %>% dplyr::select(-c(term,null.value)) %>% knitr::kable(digits = 3) %>% kableExtra::kable_classic() ## Same as DescTools implementation
+```
+
+
+glht(..., mcp(trt = "Dunnett")) pulls its P-values out of a multivariate t distribution. They call mvtnorm::pmvt with the observed t statistics and correlation matrix (actual code here). DescTools::DunnettTest does roughly the same (code here).
+
+emmeans does something.. different. Already in the documentation they call their dunnetx method "a close approximation to the Dunnett adjustment". This is the actual source:
+
+
+
+```{r eval=F}
+### My approximate dunnett distribution 
+### - a mix of the Tukey cdf and Sidak-corrected t
+.pdunnx = function(x, k, df, twt = (k - 1)/k) {
+    tukey = ptukey(sqrt(2)*x, (1 + sqrt(1 + 8*k))/2, df)
+    sidak = (pf(x^2, 1, df))^k
+    twt*tukey + (1 - twt)*sidak
+}
+```
+
+(x are the t statistics, k the number of contrasts and df self-explanatory)
+
+You can make emmeans match the others by using adjust="mvt" which will then also call mvtnorm::pmvt. Either way I wouldn't sweat the small differences in P-values, or I'd worry equally much about the fact that any default call to mvtnorm::pmvt (which wasn't changed in any of the above) targets an absolute epsilon of 1e−3
+, so your P-values would only be accurate to about 3 decimal places anyway.
+
+Small aside, unless you include a seed there will never be a match against any subsequent runs of your randomly sampling code (making your example non-reproducible).
+
+```{r}
+library(nlme)
+
+gls0 <- gls(Response ~ Treatment, data=dat,weights=varIdent(form= ~1|Treatment))
+plot(gls0,Response ~ fitted(.) | Treatment)
+plot(gls0,Treatment ~ fitted(.))
+plot(gls0,Treatment ~ resid(.),abline=0)
+dat$fitted <- fitted(gls0)
+ggplot(dat,aes(x=fitted,y=Response,col=Treatment))+geom_point()+geom_abline(intercept = 0,slope=1)
+plot(gls0, resid(.) ~ fitted(.) | Treatment, abline = 0)
+treat.means <- emmeans(gls0, ~ Treatment)
+contrast(treat.means, adjust="none", method="dunnett", ref = 1)
+
+summary(glht(gls0,mcp(Treatment="Dunnett"),alternative = "less")) 
+```
+
+```{r}
+testres1 <- summary(glht(gls0,mcp(Treatment="Dunnett"))) 
+testres1 %>% broom::tidy() %>% dplyr::select(-c(term,null.value)) %>% knitr::kable(digits = 3) %>% kableExtra::kable_classic()
+```
+
+```{r}
+testres2 <- summary(glht(gls0,mcp(Treatment="Dunnett"),alternative="less")) 
+testres2 %>% broom::tidy() %>% dplyr::select(-c(term,null.value)) %>% knitr::kable(digits = 3) %>% kableExtra::kable_classic()
+```
+
+## Manipulate the dataset
+
+Increase the variance at NOEC 0.05 by changing the maximum or the minimum.
+
+```{r}
+library(multcomp)
+mod0 <- lm(Response~Treatment,data=dat)
+summary(glht(mod0,linfct = mcp(Treatment="Dunnett"),alternative="less"))
+dat2 <- dat
+dat2$Response[dat$Treatment==0.05] <- c(0.0538114115982316, 0.0511170609363355, 0.0513881320494227, 
+0.02)
+mod2 <- lm(Response~Treatment,data=dat2)
+summary(glht(mod2,linfct = mcp(Treatment="Dunnett"),alternative="less"))
+PMCMRplus::stepDownTrendTest(Response~Treatment,data=dat2,test="jonckheere")
+dat3 <- dat
+dat3$Response[dat$Treatment==0.05] <-c(0.1, 0.0511170609363355, 0.0513881320494227, 
+0.0505882840408944)
+mod3 <- lm(Response~Treatment,data=dat3)
+summary(glht(mod3,linfct = mcp(Treatment="Dunnett"),alternative="less"))
+PMCMRplus::stepDownTrendTest(Response~Treatment,data=dat3,test="jonckheere")
+
+```
+

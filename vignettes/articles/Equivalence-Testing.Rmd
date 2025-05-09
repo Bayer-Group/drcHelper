@@ -1,0 +1,218 @@
+---
+title: "Equivalence Testing"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(ggplot2)
+```
+
+In a nutshell, an equivalence test is conducted if you want to provide strong support for the absence of a meaningful effect. A often used procedure is two onse-sided tests. It means you need to be able to reject two null hypothesis to conclude equivalence with some confidence. Interestingly, we will be still using the same confidence intervals as in difference testing, but need to use the 90% CI and need this CI to be completely included in the predefined range of "no meaningful differences". 
+
+It should be noted that studies designed under the difference testing framework would not be suitable for direct switch to equivalence test, the power requirement is just different. Even though we are using a narrower CI (from 95% to 90%), we need the entire CI fit inside the predefined bounds, on the other hand, a difference test just require the point of zero falling into the CI. Therefore, we would need a much tighter CI so that the full length fits within.  
+
+
+## Introduction
+
+Equivalence testing is a statistical testing approach used to determine whether two treatments or interventions produce effects that are practically the same within a predefined margin of difference. This method is particularly useful in fields like pharmaceuticals, where demonstrating that a new drug is not worse than an existing one by more than a specified margin is crucial.
+
+Equivalence testing is closely related to difference testing. While the latter focuses on identifying whether a difference exists by controlling the false positive error, the former aims to show that any difference is within a predefined acceptable range, by controlling the false negative error in the difference testing scenario.
+
+he design and interpretation of equivalence tests can be more complex than traditional difference tests, requiring careful consideration of the equivalence margin, which could be so called biologically relevant effect size.
+
+The null and alternative hypotheses in equivalence tests are
+
+$$
+H_0: | \mu_1 - \mu_0 | > \Delta
+$$
+$$
+H_1: | \mu_1 - \mu_0 | \leq \Delta
+$$
+where $\mu_1$ and $\mu_0$ are the means of the two treatments, and $\Delta$ is the equivalence margin.
+
+There are also non-inferiority or non-superiority cases, where the nulls are $\mu_1 - \mu_0 <= - \Delta$ or $\mu_1 - \mu_0 > \Delta$
+
+Sometimes the tests can be formulated on standardized differences or means. Depending on how you frame the problem, the multiplicative model for ratios-to-control comparisons could be used. Related approach is available
+
+The $\alpha$ level in equivalence testing is the probability of making a Type I error, which occurs when the null hypothesis is incorrectly rejected. This means concluding that the treatments are equivalent when they are not.
+
+The $\beta$ in difference testing is the probability of making a Type II error, which occurs when the null hypothesis is not rejected when it should be. This means failing to detect a difference (concluding equivalence) when one actually exists.
+
+In equivalence testing, a low alpha level is crucial to ensure that the conclusion of equivalence is reliable. Conversely, in difference testing, a low beta level is important to ensure that a true difference is detected.
+
+On the other hand, the $\alpha$ level in difference testing is playing similarly a complementary role to the $\beta$ in equivalence testing. 
+
+## The Confusion
+
+If thinking from the confidence interval (CI) direction, the equivalence testing uses the 90% CI for confidence level of 95% ($\alpha = 0.05$). We illustrate it here.
+
+The switch from 95% to 90% confidence intervals in equivalence testing is actually a simple mathematical approach to maintain an overall 5% Type I error rate (95% confidence) in our conclusion about equivalence. 
+
+1. In equivalence testing, we need to show that BOTH the upper and lower bounds of our confidence interval fall within our predefined zone of indifference.
+
+2. When we use a 90% confidence interval, we have:
+- 5% error probability in the upper tail
+- 5% error probability in the lower tail
+- (Because 100% - 90% = 10%, split equally between two tails)
+
+3. For equivalence to be concluded, we need both bounds to fall within our zone of indifference. The probability of this happening by chance (if the treatments aren't truly equivalent) is approximately 5% because:
+- We multiply the probability of success for each bound (0.95 × 0.95 ≈ 0.90)
+- This gives us 95% confidence in our overall conclusion about equivalence
+
+So while we're using a 90% confidence interval as our tool, the end result gives us 95% confidence in our conclusion about equivalence. This approach effectively controls the overall Type I error rate at the traditional 5% level, maintaining the statistical rigor we expect in hypothesis testing.
+
+This is why equivalence testing protocols specifically call for 90% confidence intervals - it's not a reduction in our confidence standards, but rather a mathematical adjustment to achieve the desired 95% confidence in our final conclusion about equivalence.
+
+
+## Impacts of changing from difference to equivalence testing
+
+- Equivalence testing often requires larger sample sizes to achieve sufficient power, which can be resource-intensive.
+- The design and interpretation of equivalence tests can be more complex than traditional difference tests, requiring careful consideration of the "equivalence margin".
+
+
+### Hypothetical Examples
+
+
+I will simulate a dose response 
+
+```{r}
+library(drcHelper)
+n_doses <- 5
+dose_range <- c(0,20)
+## Define a threshold dose response
+threshold_idx  <-  3 ## kind of global
+doses <- seq(dose_range[1], dose_range[2], length.out = n_doses)
+response_fn <- function(dose, max_effect) {
+  base_response <- 100
+  result <- rep(base_response, length(dose))
+  threshold_dose <- doses[threshold_idx]
+  high_doses <- dose >= threshold_dose
+  if (any(high_doses)) {
+    max_high_dose <- max(doses)
+    relative_position <- (dose[high_doses] - threshold_dose) / (max_high_dose - threshold_dose)
+    result[high_doses] <- base_response - relative_position * max_effect
+  }
+  return(result)
+}
+
+
+max_effect <- 5
+sim_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0,20),
+  m_tanks = 10,
+  var_tank = 3,  # Pass the dose-specific variances, note here it should be a vector instead of a singe number.
+  include_individuals = FALSE,  # Tank-level data only
+  response_function = function(dose) response_fn(dose, max_effect)
+)
+theme_set(theme_bw())
+prelimPlot3(sim_data)
+
+mod <- lm(Response~Dose, data=sim_data %>% dplyr::mutate(Dose=factor(Dose)))
+summary(mod)
+library(multcomp)
+summary(glht(mod,linfct = mcp(Dose="Dunnett")))
+
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="greater", rhs=-10 ))
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="less", rhs= 10 ))
+confint(glht(mod,linfct = mcp(Dose="Dunnett")),level=0.9)
+
+```
+```{r}
+max_effect <- 10
+sim_data <- simulate_dose_response(
+  n_doses = 5,
+  dose_range = c(0,20),
+  m_tanks = 10,
+  var_tank = 3,  # Pass the dose-specific variances, note here it should be a vector instead of a singe number.
+  include_individuals = FALSE,  # Tank-level data only
+  response_function = function(dose) response_fn(dose, max_effect)
+)
+theme_set(theme_bw())
+prelimPlot3(sim_data)
+
+mod <- lm(Response~Dose, data=sim_data %>% dplyr::mutate(Dose=factor(Dose)))
+summary(mod)
+library(multcomp)
+summary(glht(mod,linfct = mcp(Dose="Dunnett")))
+
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="greater", rhs=-10 ))
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="less", rhs= 10 ))
+confint(glht(mod,linfct = mcp(Dose="Dunnett")),level=0.9)
+```
+
+```{r}
+max_effect <- 15
+threshold_idx <- 1
+ response_fn <- function(dose, max_effect) {
+      base_response <- 100
+      mid_dose <- mean(dose_range)
+      return(base_response - max_effect * (1 - ((dose - mid_dose)/(mid_dose))^2)) ## Here I need a change.
+ }
+  response_fn <- function(dose, lower = 100, upper = 0, ED50 = 10, slope = 1) {
+      lower + (upper - lower) / (1 + exp(-slope * (dose - ED50)))
+  }
+  set.seed(456)
+sim_data <- simulate_dose_response(
+  n_doses = 10,
+  dose_range = c(0,20),
+  m_tanks = 5,
+  var_tank = 20,  # Pass the dose-specific variances, note here it should be a vector instead of a singe number.
+  include_individuals = FALSE,  # Tank-level data only
+  response_function = function(dose) response_fn(dose, max_effect)
+)
+theme_set(theme_bw())
+
+sim_data <-sim_data %>% dplyr::mutate(Dose = round(Dose, 2))
+prelimPlot3(sim_data)
+mod <- lm(Response~Dose, data=sim_data %>% dplyr::filter(Dose <=15) %>% 
+            dplyr::mutate(Dose=factor(Dose)))
+summary(mod)
+library(multcomp)
+
+
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="greater", rhs=-10 ))
+summary(glht(mod,linfct = mcp(Dose="Dunnett"), alternative="less", rhs= 10 ))
+
+summary(glht(mod,linfct = mcp(Dose="Dunnett")))
+confint(glht(mod,linfct = mcp(Dose="Dunnett")),level=0.9)
+```
+
+## An example using chick weights dataset
+
+```{r}
+
+```
+
+```{r include=FALSE}
+if(require(equivUMP)){
+  # compare two feed from chickwts dataset
+  data("chickwts")
+  chickwts2 <- chickwts[chickwts$feed %in% c("linseed", "soybean"),]
+  chickwts2$feed <- droplevels(chickwts2$feed)
+  
+  # similar but cannot be shown to be equivalent up to 0.5 sigma at 0.05 level^
+  plot(weight ~ feed, data = chickwts2)
+  equiv.test(weight ~ feed, data = chickwts2, eps = 0.5)
+}
+
+```
+
+
+## References
+
+- Dilba, G., Bretz, F., Guiard, V., and Hothorn, L. A. (2004). Simultaneous confidence intervals for ratios with applications to the comparison of several treatments with a control. Methods of Information in Medicine 43, 465–469.
+- Djira G, Hasler M, Gerhard D, Segbehoe L, Schaarschmidt F (2025). _mratios: 
+Ratios of Coefficients in the General Linear Model_. R package version 1.4.4,
+<https://CRAN.R-project.org/package=mratios>.
