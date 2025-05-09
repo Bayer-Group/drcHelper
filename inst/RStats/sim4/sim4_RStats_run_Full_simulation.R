@@ -132,7 +132,7 @@ if(plotit){
                dplyr::filter(m_tanks==m_tank0, k_individuals==k_individuals0,
                              max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point()+
         facet_grid(response_type ~ Dose_Level,scales = "free")  +
-        geom_line()+
+        geom_line(alpha=0.5)+
         geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
         theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
         ggthemes::scale_color_solarized()+ggtitle(paste0("4 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
@@ -144,8 +144,27 @@ if(plotit){
   }
 
 
+    here::here()
+    setwd("~/Projects/drcHelper/inst/RStats/sim4/")
+    sim4_full_results <- readRDS("~/Projects/drcHelper/inst/RStats/sim4/sim4_full_results.rds")
 
+    full_results <- dplyr::left_join(param_grid,sim4_full_results)
+    design_effect <- full_results %>% group_by(max_effect,response_type,Dose_Level) %>%
+      reframe(neffect=length(unique(Expected_Response)), Reduction = paste0(100-Expected_Response[1],"%"))
+    tempdata <- full_results
+    for(m_tank0 in c(4,6)){
+      for(k_individuals0 in c(3,6,10)){
 
-
+        ggplot(tempdata%>%
+                 dplyr::filter(m_tanks==m_tank0, k_individuals==k_individuals0,
+                               max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point()+
+          facet_grid(response_type ~ Dose_Level,scales = "free")  +
+          geom_line(alpha=0.5)+
+          geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+          theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+          ggthemes::scale_color_solarized()+ggtitle(paste0("4 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
+          geom_text(data=design_effect_temp%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.05,label=Reduction), size=2,col= "black" )
+        ggsave(paste0("SimPower_",m_tank0, "_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =5)
+      }
 
 }

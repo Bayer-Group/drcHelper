@@ -1,5 +1,7 @@
 ---
 title: "Examples using some small helper functions"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -10,6 +12,9 @@ knitr::opts_chunk$set(
 library(drcHelper)
 ```
 
+## Williams' Test
+
+Note that PMCMRplus does not produce correct t-statistics in the version "1.9.12" (mayber also in other versions), therefore we replace the t-statistics using the ones calculated by multcomp. 
 
 ```{r}
 # Create example data
@@ -28,9 +33,13 @@ result <- broom_williams(response ~ dose, data = test_data, method = "Williams_J
 print(result)
 ```
 
+## Dunnett's Test
+
+
+Note that Dunnett's test outcome from different packages are also different. It will depends on what need to be reported to tidy the result table. 
 
 ```{r}
-# Apply Williams test
+# Apply  test
 result <- broom_dunnett(response ~ dose, data = test_data,method = "Dunnett_multcomp")
 print(result)
 
