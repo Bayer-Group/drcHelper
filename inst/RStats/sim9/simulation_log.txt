@@ -1,0 +1,14 @@
+[2025-05-10 12:52:32] Starting multiple simulations with 36 parameter combinations 
+[2025-05-10 12:52:32] Using 71 CPU cores 
+[2025-05-10 12:52:32] No checkpoint found, starting from beginning 
+[2025-05-10 12:52:32] Start time: 2025-05-10 12:52:32 
+[2025-05-10 12:52:32] Starting simulation 1 of 36 
+[2025-05-10 12:52:32] Parameters: response_type = none , max_effect = 0 , m_tanks = 50 , k_individuals = 3 , var_tank = 1 , var_individual = 9 
+[2025-05-10 12:52:32] Starting simulation with 1000 iterations 
+[2025-05-10 12:52:56] Parallel processing completed 
+[2025-05-10 12:52:56] Simulation completed 
+[2025-05-10 12:52:56] Completed simulation 1 in 0.40 minutes 
+[2025-05-10 12:52:56] Estimated remaining time: 14.0 minutes (0.2 hours) 
+[2025-05-10 12:52:56] Starting simulation 2 of 36 
+[2025-05-10 12:52:56] Parameters: response_type = none , max_effect = 0 , m_tanks = 50 , k_individuals = 3 , var_tank = 2 , var_individual = 8 
+[2025-05-10 12:52:56] Starting simulation with 1000 iterations 
