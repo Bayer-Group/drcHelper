@@ -23,7 +23,9 @@ describe("cochranArmitageTrendTest", {
 
     # Without correction
     result1 <- cochranArmitageTrendTest(successes, totals, doses)
-
+    result1.0 <- prop.trend.test(successes, totals, doses)
+    ## check against prop.trend.test
+    expect_equal(as.numeric(sqrt(result1.0$statistic)),abs(result1$statistic),tolerance = 1e-6)
     # With Rao-Scott correction
     result2 <- cochranArmitageTrendTest(successes, totals, doses, rao_scott = TRUE)
 

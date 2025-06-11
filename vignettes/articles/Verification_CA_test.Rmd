@@ -1,0 +1,64 @@
+---
+title: "Verification CA Test Implementation"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+## Comparison: Cochran-Armitage Test Implementation vs `prop.trend.test`
+
+The implementation in **drcHelper** and `prop.trend.test` are mathematically equivalent but use different computational approaches. In particular, the drcHelper implementation uses actual dose values as default scoring, adds overdispersion handling by Rao-Scott correction for clustered data, the grouping by doses are done automatically, and uses the more intuitive Z-statistic. It is more comprehensive and has a cleaner interface for dose-response studies.
+
+Here's the detailed comparison:
+
+
+## Key Differences 
+
+| Aspect | drcHelper Implementation | `prop.trend.test` |
+|--------|-------------------|-------------------|
+| **Computational Method** | Direct Z-statistic calculation | Weighted linear regression |
+| **Test Statistic** | Z-score (normal distribution) | Chi-squared ($Z^2$) |
+| **Score Usage** | Uses actual `doses` values | Uses `seq_along(x)` by default |
+| **Overdispersion** | Rao-Scott correction available | No correction |
+| **Data Grouping** | Groups by doses automatically | Assumes pre-grouped data |
+
+## Mathematical Relationship
+
+The relationship between the two approaches:
+
+- **Z-statistic**: $Z = \frac{\sum n_i(s_i - \bar{s})p_i}{\sqrt{p(1-p)\sum n_i(s_i - \bar{s})^2}}$
+- **prop.trend.test Chi-squared**: $\chi^2 = Z^2$
+
+Where $p(\chi^2) = 2 \times p(|Z|)$ for two-sided tests.
+
+
+
+## Verification Example ✅
+
+```{r}
+# Test data
+successes <- c(83, 90, 129, 70)
+totals <- c(86, 93, 136, 82)
+
+# R's function (default scores: 1,2,3,4)
+result_r <- prop.trend.test(successes, totals)
+result_r
+# drcHelper function (after correction, using doses = 1,2,3,4)
+result <- cochranArmitageTrendTest(successes, totals, doses = 1:4)
+result
+# Should give: sqrt(result_r$statistic) ≈ abs(result_yours$statistic)
+sqrt(result_r$statistic) - abs(result$statistic)
+```
+
+
+
+
+
