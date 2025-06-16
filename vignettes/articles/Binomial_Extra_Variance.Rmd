@@ -188,3 +188,96 @@ print(analysis_ranks_trend)
 ```
 
 
+
+## The False Significance Problem
+
+The traditional CA trend test may not be the best tool for some dose-response patterns. In particular, CA test ignores within-group dispersion - it's purely about group means. Even if over-dispersion is corrected within each group, it is not adjusted by the corresponding trend that is assumed in the testing procedure. It could happen that there is no over-dispersion within each treatment group, but the residuals after the trend removal are actually overdispersed,  which is exactly what happened in the specific data example. Secondly, Scoring systems can mask biological reality - equal weight to unequal biological changes. Thirdly, linear trend assumption fails with cliff data - the 40 mg a.i./L "significance" can be an artifact of the testing assumption and procedure. 
+
+The data pattern: 0%, 0%, 0%, 0%, 6.7%, 63.3%
+
+What happens in step-down testing:
+Step 1: Test all groups (0,5,10,20,40,80) - SIGNIFICANT (driven by 80 mg a.i./L)
+Step 2: Test (0,5,10,20,40) - May be SIGNIFICANT (driven by 40 mg a.i./L vs others)
+Step 3: Test (0,5,10,20) - NOT significant
+
+Result: NOEC = 20mg, LOEC = 40 mg a.i./L
+But biologically: 40mg shows minimal effect (6.7%)
+The real biological effect starts at 80 mg a.i./L (63.3%)
+
+This happens because:
+1. CA test uses LINEAR trend assumption
+2. The huge 80 mg a.i./L effect 'pulls' the trend line
+3. 40 mg a.i./La ppears significant relative to this trend
+4. Actual biological threshold (cliff) is ignored
+
+Given these limitations, there could be more suitable approaches. 
+
+1. Pairwise Comparisons with Control
+2. Change-Point Detection
+3. BMD
+4. Other custom threshold tests
+
+### Pairwise Comparison with Control
+
+```{r}
+second_arcsin_data <- second_arcsin_data %>% mutate(Active = Total-Immobile)
+res1<- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",success_col = "Immobile",failure_col = "Active",
+                          p.adjust.method = "none")
+res1
+res2 <- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",success_col = "Immobile",failure_col = "Active", p.adjust.method = "holm")
+res2
+```
+
+
+### Change Point Analysis
+
+```{r}
+#' Detect change points in dose-response
+detect_change_point <- function(successes, totals, doses) {
+  
+  group_data <- data.frame(successes, totals, doses) %>%
+    dplyr::group_by(doses) %>%
+    dplyr::summarise(
+      successes = sum(successes),
+      totals = sum(totals),
+      proportion = sum(successes) / sum(totals),
+      .groups = 'drop'
+    ) %>%
+    dplyr::arrange(doses)
+  
+  cat("Change Point Analysis:\n")
+  cat("=====================\n")
+  
+  # Look for largest jump in proportions
+  prop_diffs <- diff(group_data$proportion)
+  max_jump_idx <- which.max(prop_diffs)
+  
+  cat("Proportion differences between consecutive doses:\n")
+  diff_df <- data.frame(
+    From_Dose = group_data$doses[-nrow(group_data)],
+    To_Dose = group_data$doses[-1],
+    Proportion_Jump = round(prop_diffs, 3)
+  )
+  print(diff_df, row.names = FALSE)
+  
+  cat("\nLargest jump: from", group_data$doses[max_jump_idx], 
+      "to", group_data$doses[max_jump_idx + 1], "\n")
+  cat("Jump size:", round(prop_diffs[max_jump_idx], 3), "\n")
+  
+  cat("\nSuggested biological threshold:", group_data$doses[max_jump_idx + 1], "\n")
+  
+  return(list(
+    change_point = group_data$doses[max_jump_idx + 1],
+    jump_size = prop_diffs[max_jump_idx]
+  ))
+}
+
+change_point <- detect_change_point(
+  second_arcsin_data$Immobile,
+  second_arcsin_data$Total,
+  second_arcsin_data$Dose
+)
+```
+
+
+

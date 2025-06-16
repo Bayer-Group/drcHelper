@@ -818,3 +818,4 @@ print.completeTrendAnalysis <- function(x, ...) {
 
   invisible(x)
 }
+
