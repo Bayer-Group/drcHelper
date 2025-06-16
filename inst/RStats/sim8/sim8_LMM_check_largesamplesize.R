@@ -1,3 +1,4 @@
+Sys.sleep(12000)
 rm(list=ls())
 setwd("~/Projects/drcHelper/inst/RStats/sim8")
 library(parallel)

@@ -3,11 +3,7 @@
 \name{calcTaronesTest}
 \alias{calcTaronesTest}
 \alias{Tarones}
-\title{Tarones test for Stratified OR (integrated from
-https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R). The original
-MIT license is included in the source code. The function
-is included for validation purpose. Please use the most updated function in
-ClinStats package for related calculation in a non-GLP environment.}
+\title{Tarones test for Stratified OR (ClinStats version)}
 \usage{
 calcTaronesTest(mylist, referencerow = 2)
 }
@@ -20,10 +16,18 @@ calcTaronesTest(mylist, referencerow = 2)
 string with a list of p-values
 }
 \description{
-\code{calcTaronesTest} is used to test whether the OR in different strata are different
+\code{calcTaronesTest} is used to test whether the OR in different strata are different.
+It is integrated from
+https://github.com/the8thday/ClinStats/blob/master/R/Tarones.R). The original
+MIT license is included in the source code. The function
+is included for validation purpose. Please use the most updated function in
+ClinStats package for related calculation in a non-GLP environment.
 }
 \details{
-modified the output to return p-values, need metafor package to run
+modified the output to return p-values, need metafor package to run.
+This function is not really used in GLP calculations as it is not designed for
+ecotox studies where usually only one control is included.
+However, it could be useful in refinement analyses.
 }
 \examples{
 mymatrix1 <- matrix(c(4,5,5,103),nrow=2,byrow=TRUE)

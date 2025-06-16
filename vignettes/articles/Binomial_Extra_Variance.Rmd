@@ -1,0 +1,283 @@
+---
+title: "Binomial Extra Variance and Trend Test"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+library(tidyverse)
+library(conflicted)
+conflict_prefer("filter","dplyr")
+conflict_prefer("group_by","dplyr")
+conflict_prefer("select","dplyr")
+```
+
+## Background
+
+One very standard procedure for dealing with binomial or quantal data in Ecotox area is to test first if extra-binomial variation exists when there are replications, if no, continue with Cochran-Armitage trend test to derive NOEC;  if yes, then use the Cochran-Armitage test with Rao-Scott correction. 
+
+Therefore, the Tarone's test under this settings is designed to test for extra-binomial variation (overdispersion) in the context of dose-response data, specifically:
+
+- Assumes a trend exists (linear dose-response relationship)
+- Tests if the observed variation around this expected trend is greater than what binomial distribution would predict.
+
+It is used to validate the Cochran-Armitage trend test assumptions. This actually comes together with the issue of scoring in the Cochran-Armitage test. 
+
+| Scoring Method | When to Use | Advantages | Disadvantages |
+|----------------|-------------|------------|---------------|
+| **Actual doses** | Known dose-response relationship | Biologically meaningful | Sensitive to dose spacing |
+| **Ranks** (`seq_along`) | Unknown relationship | Robust to outlying doses | May miss non-linear patterns |
+| **Log-transformed doses** | Exponential relationships | Handles wide dose ranges | Requires exponential relationships |
+| **Equally spaced** | Exploratory analysis | Simple interpretation | May not reflect true spacing |
+
+
+
+## The Ben O'Neill's version of Tarone's Test
+
+The  implementation of Ben O'Neill's Tarone's test takes ..
+1. It pools all the data and calculates an **overall proportion**: `estimate <- sum(M)/sum(N)`
+2. It calculates a Pearson chi-square-like statistic S based on deviations from the overall proportion: `S <- ifelse(estimate == 1, sum(N), sum((M - N * estimate)^2/(estimate * (1 - estimate))))`. Note that the denominator is the variance under binomial assumption
+3. Then it calculates the statistic by standardization, converting it to a z-statistic : `statistic <- (S - sum(N))/sqrt(2 * sum(N * (N - 1)))`
+4. Uses a normal approximation for p-value: `p.value <- 2 * pnorm(-abs(statistic), 0, 1)`
+
+This tests:
+$H_0$: All groups have the same underlying proportion (pooled estimate)
+$H_a$: Extra-binomial variation exists (overdispersion relative to pooled proportion)
+
+It doesn't assume any particular dose-response relationship. It's more like testing for heterogeneity between groups.
+
+An example is given below:
+
+```{r}
+ #Generate example data
+N <- c(30, 32, 40, 28, 29, 35, 30, 34, 31, 39)
+M <- c( 9, 10, 22, 15,  8, 19, 16, 19, 15, 10)
+Tarone.test(N, M)
+```
+
+
+## Comparison with Trend-Based Tarone's Test:
+
+Trend-based Tarone's test can be implemented by excluding a trend first followed by the z-test or chi-square test.
+
+```{r}
+
+```
+
+
+
+
+## Which Should You Use?
+
+The O'Neill's version is simpler and tests for basic **heterogeneity between groups**. **Trend-based version** is more appropriate when you expect a **dose-response relationship** and want to test if there's **extra variation beyond the trend**.
+
+For **NOEC determination with Cochran-Armitage**, the **trend-based version** is more theoretically appropriate since CA test assumes a dose-response trend.
+
+
+## Example Data
+
+We do a comparison of various approaches using an example dataset.
+
+Note that the arcsine transformation is used to "stretch out" data points that range between 0 and 1. This transformation is typically used when dealing with proportions and percentages. This has been the lab routine procedure for analyzing Daphnia acute studies. However, in generic OECD statistical guidances, the recommended approach is the step down Cochran-Armitage test, in combine nation with Tarone test as a pre-test for overdispersion.
+
+Ideally, inn the normal statistical procedure outside the regulatory statistics, we would conduct GLM binomial regression first to see if there is a trend by treating concentration levels as continuous predictor or to calculate an NOEC by treating concentration levels as categorical predictor. However, often in this type of study data, we have the quasi-complete separation where there are perfect zeros in the lower doses and some responses the few high dose levels, creating a "cliff" in the data. The GLM algorithm will struggle to estimate parameters and produce very large standard error estimations which will result insignificance even if there are high mortality or incidence rate in high dose groups. There are several approaches to deal with this separation issue. For example, Firth's method adds a penalty term that stabilizes estimation, giving much more reasonable standard errors and interpretable results. We can also pool low-dose levels to do the regression. For small samples with separation, exact logistic regression (elrm) can be conducted but it is computationally intensive. 
+
+In this example data, we encounter this separation issue, which prevents us from using the GLM approach as a reliable anchor point for meaningful NOEC comparisons without conducting a more robust analysis. Instead, we directly compare NOEC calculation with the two approaches: 
+
+1. arcsine sqrt transformation and then test normality and variance homogeneity, monotonicity test, followed by either Williams' or Dunnett's or non-parametric alternatives.
+2. Tarone's test for overdispersion in binomial data, followed by step-down Cochran-Armitage test. 
+
+However, in option 2, in terms testing overdispersion, just as in ANOVA, normality should be tested on residuals, overdispersion should be tested on residuals removing the trend. In terms of the Cochran-Armitage test, the scores can be directly the dose, or using the rank, for example, default coding would be just `seq_along(c(0.10,30,50,80))`. This creates the question how to define the trend and how to remove the trend. To make it consistent, we make sure that
+
+1. The overdispersion phi parameter should be calculated from the trend-adjusted residuals, not the raw residuals. $\phi = \frac{S_{adj}}{df_{adj}}$ where $S_{adj}$ is the sum of squared standardized residuals after trend removal.
+2. The linear trend is properly estimated and removed before calculating overdispersion.
+3. The linear trend is calculated using the same scoring as that will be used in the Cochran-Armitage test.
+
+With different scoring approaches, we can obtain very different results. In this example data, the dramatic difference  ($\phi$ = 1.97 for doses vs $\phi$ = 6.01 for ranks) suggests that the choice of scoring method is crucial, and the rank-based scoring is detecting much stronger overdispersion after trend removal. 
+
+
+
+```{r}
+proj_dir <- here::here()
+quantal_dat_nested <- readRDS(paste0(proj_dir,"/data-raw/quantal_dat_nested.rds"))
+second_arcsin_data <- quantal_dat_nested$data[[2]] %>% mutate(arcsin_prop = asin(sqrt(immob)),Treatment = factor(Treatment, levels = c("Control", sort(as.numeric(unique(Treatment[Treatment != "Control"])))))
+)
+```
+
+
+```{r}
+# Full comparison
+comparison_results <- drcHelper:::compare_tarone_scoring(
+    successes = second_arcsin_data$Immobile,
+    totals = second_arcsin_data$Total,
+    doses = second_arcsin_data$Dose
+)
+
+# Create publication-ready summary
+summary_table <- drcHelper:::create_summary_table(comparison_results)
+```
+
+Perform Tarone's test followed by stepdown CA test and compare the results
+
+```{r}
+# Test the fixed function
+phi_comparison_ranks <- drcHelper:::compare_phi_methods(
+  successes = second_arcsin_data$Immobile,
+  totals = second_arcsin_data$Total,
+  doses = second_arcsin_data$Dose,
+  scoring = "ranks"
+)
+
+# Comprehensive comparison
+comprehensive_results <- drcHelper:::comprehensive_phi_comparison(
+  successes = second_arcsin_data$Immobile,
+  totals = second_arcsin_data$Total,
+  doses = second_arcsin_data$Dose
+)
+```
+
+
+```{r}
+# Step-down test with simple phi method
+stepdown_simple <- stepDownTrendTestBinom(
+  successes = second_arcsin_data$Immobile,
+  totals = second_arcsin_data$Total,
+  doses = second_arcsin_data$Dose,
+  scoring = "rank",
+  alternative = "greater",
+  rao_scott = TRUE,
+  phi_method = "simple"
+)
+
+# Step-down test with trend-adjusted phi method
+stepdown_trend <- stepDownTrendTestBinom(
+  successes = second_arcsin_data$Immobile,
+  totals = second_arcsin_data$Total,
+  doses = second_arcsin_data$Dose,
+  scoring = "rank",
+  alternative = "greater",
+  rao_scott = TRUE,
+  phi_method = "trend_adjusted"
+)
+```
+
+
+
+
+
+```{r}
+# Test with ranks scoring and trend-adjusted phi
+analysis_ranks_trend <- drcHelper:::complete_trend_analysis(
+  successes = second_arcsin_data$Immobile,
+  totals = second_arcsin_data$Total,
+  doses = second_arcsin_data$Dose,
+  scoring = "ranks",
+  alternative = "greater",
+  phi_method = "trend_adjusted"
+)
+
+print(analysis_ranks_trend)
+```
+
+
+
+## The False Significance Problem
+
+The traditional CA trend test may not be the best tool for some dose-response patterns. In particular, CA test ignores within-group dispersion - it's purely about group means. Even if over-dispersion is corrected within each group, it is not adjusted by the corresponding trend that is assumed in the testing procedure. It could happen that there is no over-dispersion within each treatment group, but the residuals after the trend removal are actually overdispersed,  which is exactly what happened in the specific data example. Secondly, Scoring systems can mask biological reality - equal weight to unequal biological changes. Thirdly, linear trend assumption fails with cliff data - the 40 mg a.i./L "significance" can be an artifact of the testing assumption and procedure. 
+
+The data pattern: 0%, 0%, 0%, 0%, 6.7%, 63.3%
+
+What happens in step-down testing:
+Step 1: Test all groups (0,5,10,20,40,80) - SIGNIFICANT (driven by 80 mg a.i./L)
+Step 2: Test (0,5,10,20,40) - May be SIGNIFICANT (driven by 40 mg a.i./L vs others)
+Step 3: Test (0,5,10,20) - NOT significant
+
+Result: NOEC = 20mg, LOEC = 40 mg a.i./L
+But biologically: 40mg shows minimal effect (6.7%)
+The real biological effect starts at 80 mg a.i./L (63.3%)
+
+This happens because:
+1. CA test uses LINEAR trend assumption
+2. The huge 80 mg a.i./L effect 'pulls' the trend line
+3. 40 mg a.i./La ppears significant relative to this trend
+4. Actual biological threshold (cliff) is ignored
+
+Given these limitations, there could be more suitable approaches. 
+
+1. Pairwise Comparisons with Control
+2. Change-Point Detection
+3. BMD
+4. Other custom threshold tests
+
+### Pairwise Comparison with Control
+
+```{r}
+second_arcsin_data <- second_arcsin_data %>% mutate(Active = Total-Immobile)
+res1<- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",success_col = "Immobile",failure_col = "Active",
+                          p.adjust.method = "none")
+res1
+res2 <- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",success_col = "Immobile",failure_col = "Active", p.adjust.method = "holm")
+res2
+```
+
+
+### Change Point Analysis
+
+```{r}
+#' Detect change points in dose-response
+detect_change_point <- function(successes, totals, doses) {
+  
+  group_data <- data.frame(successes, totals, doses) %>%
+    dplyr::group_by(doses) %>%
+    dplyr::summarise(
+      successes = sum(successes),
+      totals = sum(totals),
+      proportion = sum(successes) / sum(totals),
+      .groups = 'drop'
+    ) %>%
+    dplyr::arrange(doses)
+  
+  cat("Change Point Analysis:\n")
+  cat("=====================\n")
+  
+  # Look for largest jump in proportions
+  prop_diffs <- diff(group_data$proportion)
+  max_jump_idx <- which.max(prop_diffs)
+  
+  cat("Proportion differences between consecutive doses:\n")
+  diff_df <- data.frame(
+    From_Dose = group_data$doses[-nrow(group_data)],
+    To_Dose = group_data$doses[-1],
+    Proportion_Jump = round(prop_diffs, 3)
+  )
+  print(diff_df, row.names = FALSE)
+  
+  cat("\nLargest jump: from", group_data$doses[max_jump_idx], 
+      "to", group_data$doses[max_jump_idx + 1], "\n")
+  cat("Jump size:", round(prop_diffs[max_jump_idx], 3), "\n")
+  
+  cat("\nSuggested biological threshold:", group_data$doses[max_jump_idx + 1], "\n")
+  
+  return(list(
+    change_point = group_data$doses[max_jump_idx + 1],
+    jump_size = prop_diffs[max_jump_idx]
+  ))
+}
+
+change_point <- detect_change_point(
+  second_arcsin_data$Immobile,
+  second_arcsin_data$Total,
+  second_arcsin_data$Dose
+)
+```
+
+
+

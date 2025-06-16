@@ -11,3 +11,17 @@ TODO
 - [ ] AWS update to the new version
 Existing domains using version 2023.03.3-547.pro5 can upgrade to 2024.04.2+764.pro1
 https://docs.aws.amazon.com/sagemaker/latest/dg/rstudio-version-upgrade.html#:~:text=Create%20a%20new%20domain%20from%20the%20AWS%20CLI,an%20existing%20domain%20to%20use%20the%202024.04.2%2B764.pro1%20version.
+
+
+## Testing And Documentation
+
+Writing print.TaroneTrendTest.Rd
+Writing compare_tarone_scoring.Rd
+Writing create_summary_table.Rd
+Writing cochranArmitageTrendTest.Rd
+Writing stepDownTrendTestBinom.Rd
+Writing estimate_phi_with_scoring.Rd
+Writing comprehensive_phi_comparison.Rd
+Writing compare_phi_methods.Rd
+Writing complete_trend_analysis.Rd
+Writing print.completeTrendAnalysis.Rd
