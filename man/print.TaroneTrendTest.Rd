@@ -2,7 +2,7 @@
 % Please edit documentation in R/overdispersion_binom.R
 \name{print.TaroneTrendTest}
 \alias{print.TaroneTrendTest}
-\title{Print method for TaroneTrendTest}
+\title{Print method for TaroneTrendTest with tabular output}
 \usage{
 \method{print}{TaroneTrendTest}(x, ...)
 }
@@ -12,5 +12,5 @@
 \item{...}{Additional arguments}
 }
 \description{
-Print method for TaroneTrendTest
+Print method for TaroneTrendTest with tabular output
 }

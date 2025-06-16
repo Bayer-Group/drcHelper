@@ -8,9 +8,11 @@ cochranArmitageTrendTest(
   successes,
   totals,
   doses,
+  scoring = c("doses", "ranks", "log_doses", "equal_spaced"),
   alternative = c("two.sided", "greater", "less"),
   rao_scott = FALSE,
-  phi = NULL
+  phi = NULL,
+  phi_method = c("simple", "trend_adjusted")
 )
 }
 \arguments{
@@ -20,6 +22,8 @@ cochranArmitageTrendTest(
 
 \item{doses}{Numeric vector of dose levels or scores corresponding to each observation.}
 
+\item{scoring}{Method for defining trend}
+
 \item{alternative}{Character string specifying the alternative hypothesis.
 Must be one of "two.sided" (default), "greater", or "less".}
 
@@ -28,6 +32,8 @@ overdispersion (default: FALSE).}
 
 \item{phi}{Overdispersion parameter for Rao-Scott correction. If NULL (default),
 it will be estimated from the data.}
+
+\item{phi_method}{simple without trend adjustment or trend_adjusted.}
 }
 \value{
 A list containing:

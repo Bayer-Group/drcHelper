@@ -91,6 +91,8 @@ navbar:
         href: articles/LMM-GLMM-and-GAMM.html
       - text: Normality Check
         href: articles/Normality-Check.html
+      - text: Extra Binomial Variance and Trend Test
+        href: articles/Binomial_Extra_Variance.html
       - text: -------
       - text: More Topics
       - text: NLS

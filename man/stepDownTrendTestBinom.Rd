@@ -2,35 +2,42 @@
 % Please edit documentation in R/stepdown_binom.R
 \name{stepDownTrendTestBinom}
 \alias{stepDownTrendTestBinom}
-\title{Step-Down Trend Test for Binomial Data}
+\title{Step-down Cochran-Armitage trend test with consistent scoring}
 \usage{
 stepDownTrendTestBinom(
   successes,
   totals,
   doses,
+  scoring = c("doses", "ranks", "log_doses", "equal_spaced"),
   alternative = c("two.sided", "greater", "less"),
   rao_scott = FALSE,
-  phi = NULL
+  phi = NULL,
+  phi_method = c("simple", "trend_adjusted"),
+  tarone_results = NULL
 )
 }
 \arguments{
-\item{successes}{Numeric vector of successes (e.g., number of survivors).}
+\item{successes}{Vector of success counts}
 
-\item{totals}{Numeric vector of total observations (e.g., total organisms).}
+\item{totals}{Vector of total trials}
 
-\item{doses}{Numeric vector of dose levels corresponding to each observation.}
+\item{doses}{Vector of dose levels}
 
-\item{alternative}{Character string specifying the alternative hypothesis.
-Must be one of "two.sided" (default), "greater", or "less".}
+\item{scoring}{Method for defining trend: "doses", "ranks", "log_doses", "equal_spaced"}
 
-\item{rao_scott}{Logical indicating whether to apply Rao-Scott correction for
-overdispersion (default: FALSE).}
+\item{alternative}{Direction of test}
 
-\item{phi}{Overdispersion parameter for Rao-Scott correction. If NULL (default),
-it will be estimated from the data.}
+\item{rao_scott}{Whether to apply Rao-Scott correction}
+
+\item{phi}{Overdispersion parameter (if NULL, estimated from Tarone test)}
+
+\item{phi_method}{simple or trend_adjusted description}
+
+\item{tarone_results}{Optional results from Tarone.trend.test for phi estimation}
 }
 \value{
-A list with class "stepDownTrendBinom" containing:
+stepDownTrendBinom object with consistent scoring A list with class "stepDownTrendBinom"
+containing:
 \item{method}{Description of the test performed}
 \item{data.name}{Description of the data}
 \item{p.value}{Matrix of p-values for each step}
@@ -41,8 +48,7 @@ A list with class "stepDownTrendBinom" containing:
 \item{loec}{The Lowest Observed Effect Concentration (lowest dose with significant effect)}
 }
 \description{
-Performs a step-down trend test procedure on binomial data using either the
-Cochran-Armitage test or Rao-Scott corrected Cochran-Armitage test.
+Step-down Cochran-Armitage trend test with consistent scoring
 }
 \details{
 The step-down procedure starts with all dose groups and sequentially removes the

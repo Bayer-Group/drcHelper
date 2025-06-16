@@ -1,5 +1,5 @@
 ---
-title: "Binomial Extra Variance"
+title: "Binomial Extra Variance and Trend Test"
 editor_options: 
   chunk_output_type: console
 ---
