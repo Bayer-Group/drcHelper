@@ -106,8 +106,9 @@ With different scoring approaches, we can obtain very different results. In this
 
 
 ```{r}
-proj_dir <- here::here()
-quantal_dat_nested <- readRDS(paste0(proj_dir,"/data-raw/quantal_dat_nested.rds"))
+##proj_dir <- here::here()
+##quantal_dat_nested <- readRDS(paste0(proj_dir,"/data-raw/quantal_dat_nested.rds"))
+data("quantal_dat_nested")
 second_arcsin_data <- quantal_dat_nested$data[[2]] %>% mutate(arcsin_prop = asin(sqrt(immob)),Treatment = factor(Treatment, levels = c("Control", sort(as.numeric(unique(Treatment[Treatment != "Control"])))))
 )
 ```
