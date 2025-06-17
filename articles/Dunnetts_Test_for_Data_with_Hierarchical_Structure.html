@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">drcHelper</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.1</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,7 @@
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
     <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
     <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><a class="dropdown-item" href="../articles/Binomial_Extra_Variance.html">Extra Binomial Variance and Trend Test</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
@@ -310,7 +311,7 @@ data (<code>tank_model</code>).</p>
 <span>  data <span class="op">=</span> <span class="va">sim_data</span>,</span>
 <span>  response_var <span class="op">=</span> <span class="st">"Response"</span>,</span>
 <span>  dose_var <span class="op">=</span> <span class="st">"Treatment"</span>,  <span class="co"># Using your Treatment factor</span></span>
-<span>  block_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
+<span>  tank_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
 <span>  include_random_effect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  variance_structure <span class="op">=</span> <span class="st">"homoscedastic"</span></span>
 <span><span class="op">)</span></span>
@@ -322,11 +323,11 @@ data (<code>tank_model</code>).</p>
 <span><span class="co">#&gt; Alpha level: 0.05 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Results Table:</span></span>
-<span><span class="co">#&gt;  comparison   estimate std.error  statistic   p.value  conf.low  conf.high</span></span>
-<span><span class="co">#&gt;       5 - 0  0.2648670 0.5504523  0.4811807 0.9693741 -1.080374  1.6101079</span></span>
-<span><span class="co">#&gt;      10 - 0 -0.5573896 0.5504523 -1.0126029 0.7017975 -1.902630  0.7878513</span></span>
-<span><span class="co">#&gt;      15 - 0 10.5099513 0.5504523 19.0933022 0.0000000  9.164710 11.8551922</span></span>
-<span><span class="co">#&gt;      20 - 0 18.6355902 0.5504523 33.8550527 0.0000000 17.290349 19.9808311</span></span>
+<span><span class="co">#&gt;  comparison   estimate std.error  statistic      p.value  conf.low conf.high</span></span>
+<span><span class="co">#&gt;       5 - 0  0.2648670  1.762098  0.1503135 9.996387e-01 -4.041493  4.571227</span></span>
+<span><span class="co">#&gt;      10 - 0 -0.5573896  1.762098 -0.3163216 9.934653e-01 -4.863750  3.748971</span></span>
+<span><span class="co">#&gt;      15 - 0 10.5099513  1.762098  5.9644545 1.252943e-08  6.203591 14.816312</span></span>
+<span><span class="co">#&gt;      20 - 0 18.6355902  1.762098 10.5757988 0.000000e+00 14.329230 22.941950</span></span>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;        FALSE</span></span>
 <span><span class="co">#&gt;        FALSE</span></span>
@@ -343,7 +344,7 @@ data (<code>tank_model</code>).</p>
 <span></span>
 <span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ind_dunnett1</span><span class="op">)</span></span>
 <span><span class="va">result1</span><span class="op">$</span><span class="va">results_table</span><span class="op">$</span><span class="va">p.value</span> <span class="op">-</span> <span class="va">s1</span><span class="op">$</span><span class="va">test</span><span class="op">$</span><span class="va">pvalues</span> <span class="op">&lt;</span> <span class="fl">1e-04</span></span>
-<span><span class="co">#&gt; [1] TRUE TRUE TRUE TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] FALSE FALSE  TRUE  TRUE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="heteroscedastic-mixed-model">Heteroscedastic mixed model<a class="anchor" aria-label="anchor" href="#heteroscedastic-mixed-model"></a>
@@ -354,7 +355,7 @@ data (<code>tank_model</code>).</p>
 <span>  data <span class="op">=</span> <span class="va">sim_data</span>,</span>
 <span>  response_var <span class="op">=</span> <span class="st">"Response"</span>,</span>
 <span>  dose_var <span class="op">=</span> <span class="st">"Treatment"</span>,</span>
-<span>  block_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
+<span>  tank_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
 <span>  include_random_effect <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  variance_structure <span class="op">=</span> <span class="st">"heteroscedastic"</span></span>
 <span><span class="op">)</span></span>
@@ -404,7 +405,7 @@ data (<code>tank_model</code>).</p>
 <span>  data <span class="op">=</span> <span class="va">tank_data</span>,</span>
 <span>  response_var <span class="op">=</span> <span class="st">"Response"</span>,</span>
 <span>  dose_var <span class="op">=</span> <span class="st">"Treatment"</span>,</span>
-<span>  block_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
+<span>  tank_var <span class="op">=</span> <span class="st">"Tank"</span>,</span>
 <span>  include_random_effect <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  variance_structure <span class="op">=</span> <span class="st">"homoscedastic"</span></span>
 <span><span class="op">)</span></span>
@@ -460,7 +461,7 @@ data (<code>tank_model</code>).</p>
 <span>  data <span class="op">=</span> <span class="va">tank_data</span>,</span>
 <span>  response_var <span class="op">=</span> <span class="st">"Response"</span>,</span>
 <span>  dose_var <span class="op">=</span> <span class="st">"Treatment"</span>,</span>
-<span>  block_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tank_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_random_effect <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  variance_structure <span class="op">=</span> <span class="st">"heteroscedastic"</span></span>
 <span><span class="op">)</span></span>
@@ -510,7 +511,7 @@ data (<code>tank_model</code>).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

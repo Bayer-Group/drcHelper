@@ -15,7 +15,7 @@ ordered groups, with an optional Rao-Scott correction for overdispersion."></hea
 
     <a class="navbar-brand me-2" href="../index.html">drcHelper</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.1</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,7 @@ ordered groups, with an optional Rao-Scott correction for overdispersion."></hea
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
     <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
     <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><a class="dropdown-item" href="../articles/Binomial_Extra_Variance.html">Extra Binomial Variance and Trend Test</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
@@ -91,9 +92,11 @@ ordered groups, with an optional Rao-Scott correction for overdispersion.</p>
 <span>  <span class="va">successes</span>,</span>
 <span>  <span class="va">totals</span>,</span>
 <span>  <span class="va">doses</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"doses"</span>, <span class="st">"ranks"</span>, <span class="st">"log_doses"</span>, <span class="st">"equal_spaced"</span><span class="op">)</span>,</span>
 <span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"greater"</span>, <span class="st">"less"</span><span class="op">)</span>,</span>
 <span>  rao_scott <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  phi <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  phi <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  phi_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simple"</span>, <span class="st">"trend_adjusted"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,6 +116,10 @@ ordered groups, with an optional Rao-Scott correction for overdispersion.</p>
 <dd><p>Numeric vector of dose levels or scores corresponding to each observation.</p></dd>
 
 
+<dt id="arg-scoring">scoring<a class="anchor" aria-label="anchor" href="#arg-scoring"></a></dt>
+<dd><p>Method for defining trend</p></dd>
+
+
 <dt id="arg-alternative">alternative<a class="anchor" aria-label="anchor" href="#arg-alternative"></a></dt>
 <dd><p>Character string specifying the alternative hypothesis.
 Must be one of "two.sided" (default), "greater", or "less".</p></dd>
@@ -126,6 +133,10 @@ overdispersion (default: FALSE).</p></dd>
 <dt id="arg-phi">phi<a class="anchor" aria-label="anchor" href="#arg-phi"></a></dt>
 <dd><p>Overdispersion parameter for Rao-Scott correction. If NULL (default),
 it will be estimated from the data.</p></dd>
+
+
+<dt id="arg-phi-method">phi_method<a class="anchor" aria-label="anchor" href="#arg-phi-method"></a></dt>
+<dd><p>simple without trend adjustment or trend_adjusted.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -171,7 +182,7 @@ test statistic by the square root of the estimated dispersion parameter.</p>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">cochranArmitageTrendTest</span><span class="op">(</span><span class="va">successes</span>, <span class="va">totals</span>, <span class="va">doses</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Cochran-Armitage test for trend</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 	Cochran-Armitage test for trend (doses scoring)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> data:  proportions 1, 0.9, 0.75, 0.5, 0.25 at doses 0, 1, 2, 5, 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> = -5.7465, p-value = 9.108e-09</span>
@@ -180,9 +191,10 @@ test statistic by the square root of the estimated dispersion parameter.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With Rao-Scott correction</span></span></span>
 <span class="r-in"><span><span class="va">result_rs</span> <span class="op">&lt;-</span> <span class="fu">cochranArmitageTrendTest</span><span class="op">(</span><span class="va">successes</span>, <span class="va">totals</span>, <span class="va">doses</span>, rao_scott <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Estimated phi = 8.571 using simple method with doses scoring</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_rs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Rao-Scott corrected Cochran-Armitage test for trend</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 	Rao-Scott corrected Cochran-Armitage test for trend (doses scoring)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> data:  proportions 1, 0.9, 0.75, 0.5, 0.25 at doses 0, 1, 2, 5, 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> = -1.9629, p-value = 0.04966</span>
@@ -200,7 +212,7 @@ test statistic by the square root of the estimated dispersion parameter.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

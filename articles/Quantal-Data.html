@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">drcHelper</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.1</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,7 @@
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
     <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
     <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><a class="dropdown-item" href="../articles/Binomial_Extra_Variance.html">Extra Binomial Variance and Trend Test</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
@@ -311,7 +312,7 @@ direction.</p>
 <span><span class="co">#&gt; X-squared = 3.5556, df = 1, p-value = 0.05935</span></span>
 <span><span class="fu">drcHelper</span><span class="fu">::</span><span class="fu"><a href="../reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">7</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">4</span><span class="op">)</span>,<span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 1, 0.9, 1, 0.7 at doses 0, 1, 2, 3</span></span>
 <span><span class="co">#&gt; = -1.8856, p-value = 0.05935</span></span>
@@ -325,14 +326,14 @@ direction.</p>
 <span><span class="co">#&gt; alternative hypothesis: one.sided</span></span>
 <span><span class="fu"><a href="../reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">7</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">4</span><span class="op">)</span>,<span class="fl">0</span><span class="op">:</span><span class="fl">3</span>,alternative <span class="op">=</span> <span class="st">"less"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 1, 0.9, 1, 0.7 at doses 0, 1, 2, 3</span></span>
 <span><span class="co">#&gt; = -1.8856, p-value = 0.02967</span></span>
 <span><span class="co">#&gt; alternative hypothesis: less</span></span>
 <span><span class="fu"><a href="../reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">9</span>,<span class="fl">10</span>,<span class="fl">7</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">4</span><span class="op">)</span>,<span class="fl">0</span><span class="op">:</span><span class="fl">3</span>,alternative <span class="op">=</span> <span class="st">"greater"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 1, 0.9, 1, 0.7 at doses 0, 1, 2, 3</span></span>
 <span><span class="co">#&gt; = -1.8856, p-value = 0.9703</span></span>
@@ -457,18 +458,19 @@ in package <strong>coin</strong>.</p>
 <span>  doses <span class="op">=</span> <span class="va">dose_summary</span><span class="op">$</span><span class="va">dose</span>,</span>
 <span>  rao_scott <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Estimated phi = 17.871 using simple method with doses scoring</span></span>
 <span></span>
 <span><span class="co"># Compare results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ca_test</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 0.867, 0.967, 0.767, 0.533, 0.033 at doses 0, 1, 2, 5, 10</span></span>
 <span><span class="co">#&gt; = -8.3049, p-value &lt; 2.2e-16</span></span>
 <span><span class="co">#&gt; alternative hypothesis: two.sided</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ca_test_rs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Rao-Scott corrected Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Rao-Scott corrected Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 0.867, 0.967, 0.767, 0.533, 0.033 at doses 0, 1, 2, 5, 10</span></span>
 <span><span class="co">#&gt; = -1.9646, p-value = 0.04947</span></span>
@@ -487,12 +489,13 @@ in package <strong>coin</strong>.</p>
 <span>  doses <span class="op">=</span> <span class="va">dose_summary</span><span class="op">$</span><span class="va">dose</span>,</span>
 <span>  rao_scott <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Estimated phi = 17.871 using simple method with doses scoring</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">step_down</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Step-down Cochran-Armitage test for trend </span></span>
+<span><span class="co">#&gt; Step-down Cochran-Armitage test for trend (doses scoring) (doses scoring) </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data: successes out of totals at doses 0, 1, 2, 5, 10 </span></span>
+<span><span class="co">#&gt; data: successes out of totals at doses 0, 1, 2, 5, 10 with doses scoring </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Step-down results:</span></span>
 <span><span class="co">#&gt;        Doses_Included Statistic      P_Value</span></span>
@@ -506,16 +509,16 @@ in package <strong>coin</strong>.</p>
 <span><span class="co">#&gt; LOEC: 5</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">step_down_rs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Step-down Rao-Scott corrected Cochran-Armitage test for trend </span></span>
+<span><span class="co">#&gt; Step-down Rao-Scott corrected Cochran-Armitage test for trend (doses scoring) (doses scoring) </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data: successes out of totals at doses 0, 1, 2, 5, 10 </span></span>
+<span><span class="co">#&gt; data: successes out of totals at doses 0, 1, 2, 5, 10 with doses scoring </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Step-down results:</span></span>
 <span><span class="co">#&gt;        Doses_Included  Statistic    P_Value</span></span>
 <span><span class="co">#&gt; Step 1 0, 1, 2, 5, 10 -1.9645577 0.04946545</span></span>
-<span><span class="co">#&gt; Step 2     0, 1, 2, 5 -1.5840507 0.11318218</span></span>
-<span><span class="co">#&gt; Step 3        0, 1, 2 -0.7071068 0.47950012</span></span>
-<span><span class="co">#&gt; Step 4           0, 1  1.0000000 0.31731051</span></span>
+<span><span class="co">#&gt; Step 2     0, 1, 2, 5 -0.9245870 0.35518078</span></span>
+<span><span class="co">#&gt; Step 3        0, 1, 2 -0.2695120 0.78753573</span></span>
+<span><span class="co">#&gt; Step 4           0, 1  0.3314808 0.74028134</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Alternative hypothesis: two.sided </span></span>
 <span><span class="co">#&gt; NOEC: 5 </span></span>
@@ -579,6 +582,7 @@ the dose-response relationship.</p>
 <span>  doses <span class="op">=</span> <span class="va">dose_summary</span><span class="op">$</span><span class="va">dose</span>,</span>
 <span>  rao_scott <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Estimated phi = 17.871 using simple method with doses scoring</span></span>
 <span></span>
 <span><span class="co"># Print results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\nStandard Cochran-Armitage Test:\n"</span><span class="op">)</span></span>
@@ -586,7 +590,7 @@ the dose-response relationship.</p>
 <span><span class="co">#&gt; Standard Cochran-Armitage Test:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ca_test</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 0.867, 0.967, 0.767, 0.533, 0.033 at doses 0, 1, 2, 5, 10</span></span>
 <span><span class="co">#&gt; = -8.3049, p-value &lt; 2.2e-16</span></span>
@@ -597,7 +601,7 @@ the dose-response relationship.</p>
 <span><span class="co">#&gt; Rao-Scott Corrected Cochran-Armitage Test:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ca_test_rs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Rao-Scott corrected Cochran-Armitage test for trend</span></span>
+<span><span class="co">#&gt;  Rao-Scott corrected Cochran-Armitage test for trend (doses scoring)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  proportions 0.867, 0.967, 0.767, 0.533, 0.033 at doses 0, 1, 2, 5, 10</span></span>
 <span><span class="co">#&gt; = -1.9646, p-value = 0.04947</span></span>
@@ -618,6 +622,74 @@ binary and multinomial data), regression modelling using test
 concentration as categorical variable can also be applied. We will fill
 in this section in future.</p>
 </div>
+<div class="section level2">
+<h2 id="comparison-between-arcsin-approach-and-stepdown-approach">Comparison between arcsin approach and stepdown approach<a class="anchor" aria-label="anchor" href="#comparison-between-arcsin-approach-and-stepdown-approach"></a>
+</h2>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">##quantal_dat_nested &lt;- readRDS("~/Projects/drcHelper/data-raw/quantal_dat_nested.rds")</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">quantal_dat_nested</span><span class="op">)</span></span>
+<span><span class="va">second_arcsin_data</span> <span class="op">&lt;-</span> <span class="va">quantal_dat_nested</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>arcsin_prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">asin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">immob</span><span class="op">)</span><span class="op">)</span>,Treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Treatment</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">[</span><span class="va">Treatment</span> <span class="op">!=</span> <span class="st">"Control"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">result_nors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stepDownTrendTestBinom.html">stepDownTrendTestBinom</a></span><span class="op">(</span>successes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Immobile</span><span class="op">)</span>, totals <span class="op">=</span> <span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Total</span>, doses <span class="op">=</span> <span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Dose</span>, rao_scott <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">result_rs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stepDownTrendTestBinom.html">stepDownTrendTestBinom</a></span><span class="op">(</span>successes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Immobile</span><span class="op">)</span>, totals <span class="op">=</span> <span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Total</span>, doses <span class="op">=</span> <span class="va">second_arcsin_data</span><span class="op">$</span><span class="va">Dose</span>, rao_scott <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Estimated phi = 18.857 using simple method with doses scoring</span></span>
+<span></span>
+<span><span class="va">result_nors</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Step-down Cochran-Armitage test for trend (doses scoring) (doses scoring) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data: successes out of totals at doses 0, 5, 10, 20, 40, 80 with doses scoring </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Step-down results:</span></span>
+<span><span class="co">#&gt;              Doses_Included Statistic      P_Value</span></span>
+<span><span class="co">#&gt; Step 1 0, 5, 10, 20, 40, 80  8.944886 3.723348e-19</span></span>
+<span><span class="co">#&gt; Step 2     0, 5, 10, 20, 40  2.516835 1.184142e-02</span></span>
+<span><span class="co">#&gt; Step 3         0, 5, 10, 20  0.000000 1.000000e+00</span></span>
+<span><span class="co">#&gt; Step 4             0, 5, 10  0.000000 1.000000e+00</span></span>
+<span><span class="co">#&gt; Step 5                 0, 5  0.000000 1.000000e+00</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Alternative hypothesis: two.sided </span></span>
+<span><span class="co">#&gt; NOEC: 20 </span></span>
+<span><span class="co">#&gt; LOEC: 40</span></span>
+<span><span class="va">result_rs</span> </span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Step-down Rao-Scott corrected Cochran-Armitage test for trend (doses scoring) (doses scoring) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data: successes out of totals at doses 0, 5, 10, 20, 40, 80 with doses scoring </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Step-down results:</span></span>
+<span><span class="co">#&gt;              Doses_Included Statistic    P_Value</span></span>
+<span><span class="co">#&gt; Step 1 0, 5, 10, 20, 40, 80 2.0598560 0.03941231</span></span>
+<span><span class="co">#&gt; Step 2     0, 5, 10, 20, 40 0.5795846 0.56219478</span></span>
+<span><span class="co">#&gt; Step 3         0, 5, 10, 20 0.0000000 1.00000000</span></span>
+<span><span class="co">#&gt; Step 4             0, 5, 10 0.0000000 1.00000000</span></span>
+<span><span class="co">#&gt; Step 5                 0, 5 0.0000000 1.00000000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Alternative hypothesis: two.sided </span></span>
+<span><span class="co">#&gt; NOEC: 40 </span></span>
+<span><span class="co">#&gt; LOEC: 80</span></span>
+<span></span>
+<span><span class="va">second_arcsin_data_2</span> <span class="op">&lt;-</span> <span class="va">second_arcsin_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Dose</span> <span class="op">&lt;</span> <span class="fl">80</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest</a></span><span class="op">(</span>successes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Immobile</span><span class="op">)</span>, totals <span class="op">=</span> <span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Total</span>, doses <span class="op">=</span> <span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Dose</span>,rao_scott <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Estimated phi = 2.027 using simple method with doses scoring</span></span>
+<span><span class="va">result</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Rao-Scott corrected Cochran-Armitage test for trend (doses scoring)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  proportions 0, 0, 0, 0, 0.067 at doses 0, 5, 10, 20, 40</span></span>
+<span><span class="co">#&gt; = 1.7678, p-value = 0.0771</span></span>
+<span><span class="co">#&gt; alternative hypothesis: two.sided</span></span>
+<span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest</a></span><span class="op">(</span>successes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Immobile</span><span class="op">)</span>, totals <span class="op">=</span> <span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Total</span>, doses <span class="op">=</span> <span class="va">second_arcsin_data_2</span><span class="op">$</span><span class="va">Dose</span>,rao_scott <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">result</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Cochran-Armitage test for trend (doses scoring)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  proportions 0, 0, 0, 0, 0.067 at doses 0, 5, 10, 20, 40</span></span>
+<span><span class="co">#&gt; = 2.5168, p-value = 0.01184</span></span>
+<span><span class="co">#&gt; alternative hypothesis: two.sided</span></span></code></pre></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
@@ -629,7 +701,7 @@ in this section in future.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
