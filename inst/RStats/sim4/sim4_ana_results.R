@@ -148,10 +148,10 @@ out <- wide_res %>% group_by(Expected_Response) %>% nest() %>% mutate(power_summ
 
 
 
-out %>% mutate(across(is.table,
+out %>% mutate(across(where(is.table),
                       as.numeric))
 
-out %>% mutate(across(is.table,
+out %>% mutate(across(where(is.table),
                       as.numeric)) %>% knitr::kable(.,digits = 3) %>% kableExtra::kable_classic()
 
 pander::panderOptions("table.split.table" , Inf)
