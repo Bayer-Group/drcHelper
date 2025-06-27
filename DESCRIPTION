@@ -43,7 +43,9 @@ Imports:
     rstatix,
     tibble,
     lme4,
-    nlme
+    nlme,
+    drcData
 Remotes: 
     DoseResponse/bmd,
-    DoseResponse/drc
+    DoseResponse/drc,
+    DoseResponse/drcData
