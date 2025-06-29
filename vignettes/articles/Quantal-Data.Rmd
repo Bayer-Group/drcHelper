@@ -96,7 +96,7 @@ noec <- max(fisher_results$dose[fisher_results$p_value > 0.05])
 ```
 
 
-
+## Other types of tests not used in regulatory statistical analysis in ecotoxicology
 
 ### Cochran-Mantel-Haenszel Chi-Squared Test for Count Data
 

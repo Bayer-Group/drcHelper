@@ -13,6 +13,19 @@ RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
+    ggplot2,
+    scales,
+    magrittr,
+    Iso,
+    plyr,
+    metafor,
+    purrr,
+    tidyr,
+    rlang,
+    rstatix,
+    DescTools,
+    drcData,
+    isotone,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
@@ -23,28 +36,15 @@ LazyData: true
 URL: https://bayer-group.github.io/drcHelper/index.html
 Imports: 
     bmd,
-    DescTools,
-    isotone,
     multcomp,
     PMCMRplus,
     dplyr,
-    ggplot2,
-    scales,
-    magrittr,
-    Iso,
-    plyr,
-    metafor,
-    purrr,
-    tidyr,
-    rlang,
     MASS,
     stringr,
     tidyselect,
-    rstatix,
     tibble,
     lme4,
-    nlme,
-    drcData
+    nlme
 Remotes: 
     DoseResponse/bmd,
     DoseResponse/drc,

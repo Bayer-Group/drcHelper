@@ -24,9 +24,7 @@ conflict_prefer("select","dplyr")
 
 ## Background
 
-One very standard procedure for dealing with binomial or quantal data in Ecotox area is to test first if extra-binomial variation exists when there are replications, if no, continue with Cochran-Armitage trend test to derive NOEC;  if yes, then use the Cochran-Armitage test with Rao-Scott correction. 
-
-Therefore, the Tarone's test under this settings is designed to test for extra-binomial variation (overdispersion) in the context of dose-response data, specifically:
+One very standard procedure for dealing with binomial or quantal data in Ecotox area is to test first if extra-binomial variation exists when there are replications, if no, continue with Cochran-Armitage trend test to derive NOEC;  if yes, then use the Cochran-Armitage test with Rao-Scott correction. The question is, are we going to use replicate data or are we going to use pooled data in the following Cochran-Armitage test. If the latter, testing within-group overdispersion is necessary for pooling the data together; if the former, the overdispersion should be designed to test for extra-binomial variation (overdispersion) in the context of dose-response data, specifically:
 
 - Assumes a trend exists (linear dose-response relationship)
 - Tests if the observed variation around this expected trend is greater than what binomial distribution would predict.
@@ -39,6 +37,26 @@ It is used to validate the Cochran-Armitage trend test assumptions. This actuall
 | **Ranks** (`seq_along`) | Unknown relationship | Robust to outlying doses | May miss non-linear patterns |
 | **Log-transformed doses** | Exponential relationships | Handles wide dose ranges | Requires exponential relationships |
 | **Equally spaced** | Exploratory analysis | Simple interpretation | May not reflect true spacing |
+
+
+### Test Statistic Calculation
+
+Going back to standard Cochran-Armitage test. The core calculation follows the standard Cochran-Armitage formula:
+
+$$ Z = -\sqrt{\frac{N}{R(N-R)}} \cdot \frac{\sum_{i=1}^k (r_i - \frac{n_i R}{N}) d_i}{\sqrt{\sum_{i=1}^k \frac{n_i d_i^2}{N} - \left(\sum_{i=1}^k \frac{n_i d_i}{N}\right)^2}} $$
+
+Where:
+- $ N = \sum n_i $ (total sample size)
+- $ R = \sum r_i $ (total cases)
+- $ n_i $ = totals in group i
+- $ r_i $ = cases in group i  
+- $ d_i $ = dose rating for group i
+
+or considering a two-way contingency table with R rows and C columns, we can write the test statistics in a different way. 
+
+The null hypothesis is the binomial proportion in each group ($p_i=n_i/n_{total}$) is the same across all dose levels. 
+
+On a separate note, the default implementation of Cochran-Armitage test usually uses the normal distribution as the test statistic distribution. It is possible to calculate exact p-values by specifying "exact" options. However, it requires enumerating all possible configurations of cases across groups while maintaining the marginal totals, which becomes computationally prohibitive for large samples. Most practical implementations use the asymptotic approximation or Monte Carlo methods for the exact test.
 
 
 
@@ -68,18 +86,15 @@ Tarone.test(N, M)
 
 ## Comparison with Trend-Based Tarone's Test:
 
-Trend-based Tarone's test can be implemented by excluding a trend first followed by the z-test or chi-square test.
-
-```{r}
-
-```
-
-
-
+Trend-based Tarone's test can be implemented by excluding a trend first followed by the z-test or chi-square test. Details please see the example below. 
 
 ## Which Should You Use?
 
-The O'Neill's version is simpler and tests for basic **heterogeneity between groups**. **Trend-based version** is more appropriate when you expect a **dose-response relationship** and want to test if there's **extra variation beyond the trend**.
+The O'Neill's version is simpler and tests for basic **heterogeneity between groups**. However, things become more complicated when there are replicates, how do we derive a $p_i$ for $i_{th}$ dose level? Are there within group overdispersion already? Do we use incidence occurred for each replicate, or use an average of incidence rates from each replicate, or do we pool all incidences from all replicates to calculate a pooled average? 
+
+If we have one "average" proportion for each dose group, then what is the total should be used? Because in analogous to ANOVA, in the case we used average of a replicate, then the sample size from that dose group is becoming the number of replicates instead of number of all individuals. When each replicate have the same amount of individuals, then there is no difference between using average of average or pooled incidence rates. but the sample size in each dose group is still a concern. 
+
+**Trend-based version** is more appropriate when you expect a **dose-response relationship** and want to test if there's **extra variation beyond the trend** using the replicate data.
 
 For **NOEC determination with Cochran-Armitage**, the **trend-based version** is more theoretically appropriate since CA test assumes a dose-response trend.
 
@@ -229,6 +244,37 @@ res1<- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",suc
 res1
 res2 <- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",success_col = "Immobile",failure_col = "Active", p.adjust.method = "holm")
 res2
+```
+
+### Exact Cochran-Armitage on replicate averages
+
+Another important aspect is the difference between the exact test p-value and the asymptotic p-value, apart from the sample size being used. 
+
+-----------------------------------------------------------------------
+ Dose   test.statistic   exact.pvalue   asymptotic.pvalue   sampe.size 
+------ ---------------- -------------- ------------------- ------------
+  40        -1.798           0.2             0.03609            6      
+
+  40        -2.517         0.03893          0.005921            30     
+
+  80        -4.053        0.0002546         2.531e-05           6      
+
+  80        -8.945         2.12e-17         1.862e-19           30     
+-----------------------------------------------------------------------
+
+```{r eval = FALSE}
+ca_dose_40 <- second_arcsin_data %>% dplyr::group_by(Dose) %>% summarise(nrep=n(),p=mean(immob),ntot=sum(Total),p2= sum(Immobile)/sum(Total)) %>% filter(Dose!= 80)
+a1 <- CATTexact::catt_exact(ca_dose_40$Dose,ca_dose_40$nrep,ceiling(ca_dose_40$p*ca_dose_40$nrep))
+a2 <- CATTexact::catt_exact(ca_dose_40$Dose,ca_dose_40$ntot,ceiling(ca_dose_40$p*ca_dose_40$ntot))
+
+
+ca_dose_80 <- second_arcsin_data %>% dplyr::group_by(Dose) %>% summarise(nrep=n(),p=mean(immob),ntot=sum(Total),p2= sum(Immobile)/sum(Total)) 
+b1 <- CATTexact::catt_exact(ca_dose_80$Dose,ca_dose_80$nrep,ceiling(ca_dose_80$p*ca_dose_80$nrep))
+b2 <- CATTexact::catt_exact(ca_dose_80$Dose,ca_dose_80$ntot,ceiling(ca_dose_80$p*ca_dose_80$ntot))
+rbind(data.frame(Dose=40,a1,sampe.size=6),
+      data.frame(Dose=40,a2,sampe.size=30),
+      data.frame(Dose=80,b1,sampe.size=6),
+      data.frame(Dose=80,b2,sampe.size=30))
 ```
 
 

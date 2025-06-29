@@ -415,13 +415,14 @@ print.stepDownTrendBinom <- function(x, ...) {
 
 
 
-#' Function to test for overdispersion in binomial data
+#' Function to test for overdispersion in binomial data using glm approach
 #'
 #' @param successes Numeric vector of successes (e.g., number of survivors).
 #' @param totals Numeric vector of total observations (e.g., total organisms).
 #' @param model A fitted binomial GLM with predictors accounted for. (default is NULL)
 #'
 #' @return a list of dispersion test results
+#' @importFrom stats binomial glm pchisq residuals symnum
 #' @export
 test_overdispersion <- function(successes, totals, model = NULL) {
   if (is.null(model)) {
@@ -437,7 +438,7 @@ test_overdispersion <- function(successes, totals, model = NULL) {
   # Calculate dispersion parameter
   phi <- sum(pearson_resid^2) / model$df.residual
 
-  # Conduct a formal test using the fact that sum(pearson_resid^2) ~ χ²(df)
+  # Conduct a formal test using the fact that sum(pearson_resid^2) ~ \\u03c7²(df)
   p_value <- 1 - pchisq(sum(pearson_resid^2), df = model$df.residual)
 
   return(list(
@@ -754,6 +755,9 @@ complete_trend_analysis <- function(successes, totals, doses,
 
 
 #' Print method for complete trend analysis (UPDATED)
+#'
+#' @param x completeTrendAnalysis results
+#' @param ... additional arguments
 print.completeTrendAnalysis <- function(x, ...) {
   cat("Complete Trend Analysis Results\n")
   cat(paste(rep("=", 50), collapse = ""), "\n\n")

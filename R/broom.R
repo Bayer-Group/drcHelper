@@ -140,7 +140,7 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
       # Assuming williamsTest_JG returns a data frame with standardized columns
       # If not, you'll need to transform its output to match the standard format
       result <- tibble::tibble(
-        comparison = comparisons,
+        comparison = rev(comparisons),
         estimate = wt$Y.Tilde - wt$Y0,
         `t'-stat` = wt$Will,
         `t'-crit` = wt$TCrit,

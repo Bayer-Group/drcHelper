@@ -299,7 +299,7 @@ print.TaroneTrendTest <- function(x, ...) {
     Statistic = c(
       ifelse(is.na(x$trend_adjusted_tarone$statistic), "NA",
              sprintf("Z = %.3f", x$trend_adjusted_tarone$statistic)),
-      sprintf("φ = %.3f", x$phi_estimate)
+      sprintf("\u03c6 = %.3f", x$phi_estimate)
     ),
     P_Value = c(
       ifelse(is.na(x$trend_adjusted_tarone$p.value), "NA",
@@ -418,7 +418,7 @@ create_summary_table <- function(comparison_results) {
   main_table <- comparison_results$comparison_table %>%
     dplyr::mutate(
       `Scoring Method` = Scoring_Method,
-      `φ (Overdispersion)` = Phi_Estimate,
+      `Phi (Overdispersion)` = Phi_Estimate,
       `Trend Test Z` = Trend_Z_Stat,
       `P-value` = Trend_P_Value,
       `Significant?` = Overdispersion,
@@ -433,8 +433,8 @@ create_summary_table <- function(comparison_results) {
 
   # Interpretation
   cat("\nInterpretation Guide:\n")
-  cat("- φ > 1.2: Consider overdispersion correction\n")
-  cat("- φ > 1.5: Strong evidence of overdispersion\n")
+  cat("- \u03c6 > 1.2: Consider overdispersion correction\n")
+  cat("- \u03c6 > 1.5: Strong evidence of overdispersion\n")
   cat("- * indicates statistical significance (p < 0.05)\n")
   cat("- Groupwise tests examine within-dose variation\n")
   cat("- Trend-adjusted tests examine overdispersion after removing dose-response trend\n")
