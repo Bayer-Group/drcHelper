@@ -13,19 +13,10 @@ RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2,
-    scales,
-    magrittr,
     Iso,
     plyr,
-    metafor,
-    purrr,
     tidyr,
-    rlang,
-    rstatix,
-    DescTools,
     drcData,
-    isotone,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
@@ -44,7 +35,16 @@ Imports:
     tidyselect,
     tibble,
     lme4,
-    nlme
+    nlme,
+    scales,
+    magrittr,
+    metafor,
+    purrr,
+    tidyr,
+    rlang,
+    rstatix,
+    DescTools,
+    isotone
 Remotes: 
     DoseResponse/bmd,
     DoseResponse/drc,
