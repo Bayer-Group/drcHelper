@@ -127,10 +127,13 @@
 in Ecotox area is to test first if extra-binomial variation exists when
 there are replications, if no, continue with Cochran-Armitage trend test
 to derive NOEC; if yes, then use the Cochran-Armitage test with
-Rao-Scott correction.</p>
-<p>Therefore, the Tarone’s test under this settings is designed to test
-for extra-binomial variation (overdispersion) in the context of
-dose-response data, specifically:</p>
+Rao-Scott correction. The question is, are we going to use replicate
+data or are we going to use pooled data in the following
+Cochran-Armitage test. If the latter, testing within-group
+overdispersion is necessary for pooling the data together; if the
+former, the overdispersion should be designed to test for extra-binomial
+variation (overdispersion) in the context of dose-response data,
+specifically:</p>
 <ul>
 <li>Assumes a trend exists (linear dose-response relationship)</li>
 <li>Tests if the observed variation around this expected trend is
@@ -180,6 +183,31 @@ Cochran-Armitage test.</p>
 </tr>
 </tbody>
 </table>
+<div class="section level3">
+<h3 id="test-statistic-calculation">Test Statistic Calculation<a class="anchor" aria-label="anchor" href="#test-statistic-calculation"></a>
+</h3>
+<p>Going back to standard Cochran-Armitage test. The core calculation
+follows the standard Cochran-Armitage formula:</p>
+<p><span class="math display">\[ Z = -\sqrt{\frac{N}{R(N-R)}} \cdot
+\frac{\sum_{i=1}^k (r_i - \frac{n_i R}{N}) d_i}{\sqrt{\sum_{i=1}^k
+\frac{n_i d_i^2}{N} - \left(\sum_{i=1}^k \frac{n_i d_i}{N}\right)^2}}
+\]</span></p>
+<p>Where: - $ N = n_i $ (total sample size) - $ R = r_i $ (total cases)
+- $ n_i $ = totals in group i - $ r_i $ = cases in group i<br>
+- $ d_i $ = dose rating for group i</p>
+<p>or considering a two-way contingency table with R rows and C columns,
+we can write the test statistics in a different way.</p>
+<p>The null hypothesis is the binomial proportion in each group (<span class="math inline">\(p_i=n_i/n_{total}\)</span>) is the same across all
+dose levels.</p>
+<p>On a separate note, the default implementation of Cochran-Armitage
+test usually uses the normal distribution as the test statistic
+distribution. It is possible to calculate exact p-values by specifying
+“exact” options. However, it requires enumerating all possible
+configurations of cases across groups while maintaining the marginal
+totals, which becomes computationally prohibitive for large samples.
+Most practical implementations use the asymptotic approximation or Monte
+Carlo methods for the exact test.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="the-ben-oneills-version-of-tarones-test">The Ben O’Neill’s version of Tarone’s Test<a class="anchor" aria-label="anchor" href="#the-ben-oneills-version-of-tarones-test"></a>
@@ -221,16 +249,30 @@ more like testing for heterogeneity between groups.</p>
 <h2 id="comparison-with-trend-based-tarones-test">Comparison with Trend-Based Tarone’s Test:<a class="anchor" aria-label="anchor" href="#comparison-with-trend-based-tarones-test"></a>
 </h2>
 <p>Trend-based Tarone’s test can be implemented by excluding a trend
-first followed by the z-test or chi-square test.</p>
+first followed by the z-test or chi-square test. Details please see the
+example below.</p>
 </div>
 <div class="section level2">
 <h2 id="which-should-you-use">Which Should You Use?<a class="anchor" aria-label="anchor" href="#which-should-you-use"></a>
 </h2>
 <p>The O’Neill’s version is simpler and tests for basic
-<strong>heterogeneity between groups</strong>. <strong>Trend-based
-version</strong> is more appropriate when you expect a
-<strong>dose-response relationship</strong> and want to test if there’s
-<strong>extra variation beyond the trend</strong>.</p>
+<strong>heterogeneity between groups</strong>. However, things become
+more complicated when there are replicates, how do we derive a <span class="math inline">\(p_i\)</span> for <span class="math inline">\(i_{th}\)</span> dose level? Are there within group
+overdispersion already? Do we use incidence occurred for each replicate,
+or use an average of incidence rates from each replicate, or do we pool
+all incidences from all replicates to calculate a pooled average?</p>
+<p>If we have one “average” proportion for each dose group, then what is
+the total should be used? Because in analogous to ANOVA, in the case we
+used average of a replicate, then the sample size from that dose group
+is becoming the number of replicates instead of number of all
+individuals. When each replicate have the same amount of individuals,
+then there is no difference between using average of average or pooled
+incidence rates. but the sample size in each dose group is still a
+concern.</p>
+<p><strong>Trend-based version</strong> is more appropriate when you
+expect a <strong>dose-response relationship</strong> and want to test if
+there’s <strong>extra variation beyond the trend</strong> using the
+replicate data.</p>
 <p>For <strong>NOEC determination with Cochran-Armitage</strong>, the
 <strong>trend-based version</strong> is more theoretically appropriate
 since CA test assumes a dose-response trend.</p>
@@ -346,11 +388,11 @@ detecting much stronger overdispersion after trend removal.</p>
 <span><span class="va">summary_table</span> <span class="op">&lt;-</span> <span class="fu">drcHelper</span><span class="fu">:::</span><span class="fu"><a href="../reference/create_summary_table.html">create_summary_table</a></span><span class="op">(</span><span class="va">comparison_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Summary Table for Publication:</span></span>
 <span><span class="co">#&gt; ==============================</span></span>
-<span><span class="co">#&gt;  Scoring Method φ (Overdispersion) Trend Test Z P-value Significant?</span></span>
-<span><span class="co">#&gt;           doses              1.966        1.366  0.1719           No</span></span>
-<span><span class="co">#&gt;           ranks              6.006        7.080  0.0000        Yes *</span></span>
-<span><span class="co">#&gt;       log_doses              7.639        9.388  0.0000        Yes *</span></span>
-<span><span class="co">#&gt;    equal_spaced              6.006        7.080  0.0000        Yes *</span></span>
+<span><span class="co">#&gt;  Scoring Method Phi (Overdispersion) Trend Test Z P-value Significant?</span></span>
+<span><span class="co">#&gt;           doses                1.966        1.366  0.1719           No</span></span>
+<span><span class="co">#&gt;           ranks                6.006        7.080  0.0000        Yes *</span></span>
+<span><span class="co">#&gt;       log_doses                7.639        9.388  0.0000        Yes *</span></span>
+<span><span class="co">#&gt;    equal_spaced                6.006        7.080  0.0000        Yes *</span></span>
 <span><span class="co">#&gt;             Analysis Recommendation</span></span>
 <span><span class="co">#&gt;  Strong Rao-Scott correction needed</span></span>
 <span><span class="co">#&gt;  Strong Rao-Scott correction needed</span></span>
@@ -720,9 +762,75 @@ significant relative to this trend 4. Actual biological threshold
 <span><span class="co">#&gt; 5        80  0.0000          0        0   0.1005          0</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="exact-cochran-armitage-on-replicate-averages">Exact Cochran-Armitage on replicate averages<a class="anchor" aria-label="anchor" href="#exact-cochran-armitage-on-replicate-averages"></a>
+</h3>
+<p>Another important aspect is the difference between the exact test
+p-value and the asymptotic p-value, apart from the sample size being
+used.</p>
+<table class="table">
+<colgroup>
+<col width="9%">
+<col width="23%">
+<col width="20%">
+<col width="27%">
+<col width="18%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Dose</th>
+<th align="center">test.statistic</th>
+<th align="center">exact.pvalue</th>
+<th align="center">asymptotic.pvalue</th>
+<th align="center">sampe.size</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">40</td>
+<td align="center">-1.798</td>
+<td align="center">0.2</td>
+<td align="center">0.03609</td>
+<td align="center">6</td>
+</tr>
+<tr class="even">
+<td align="center">40</td>
+<td align="center">-2.517</td>
+<td align="center">0.03893</td>
+<td align="center">0.005921</td>
+<td align="center">30</td>
+</tr>
+<tr class="odd">
+<td align="center">80</td>
+<td align="center">-4.053</td>
+<td align="center">0.0002546</td>
+<td align="center">2.531e-05</td>
+<td align="center">6</td>
+</tr>
+<tr class="even">
+<td align="center">80</td>
+<td align="center">-8.945</td>
+<td align="center">2.12e-17</td>
+<td align="center">1.862e-19</td>
+<td align="center">30</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ca_dose_40</span> <span class="op">&lt;-</span> <span class="va">second_arcsin_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>nrep<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,p<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">immob</span><span class="op">)</span>,ntot<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Total</span><span class="op">)</span>,p2<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Immobile</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Total</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">!=</span> <span class="fl">80</span><span class="op">)</span></span>
+<span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu">CATTexact</span><span class="fu">::</span><span class="fu">catt_exact</span><span class="op">(</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">Dose</span>,<span class="va">ca_dose_40</span><span class="op">$</span><span class="va">nrep</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">p</span><span class="op">*</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">nrep</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">a2</span> <span class="op">&lt;-</span> <span class="fu">CATTexact</span><span class="fu">::</span><span class="fu">catt_exact</span><span class="op">(</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">Dose</span>,<span class="va">ca_dose_40</span><span class="op">$</span><span class="va">ntot</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">p</span><span class="op">*</span><span class="va">ca_dose_40</span><span class="op">$</span><span class="va">ntot</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">ca_dose_80</span> <span class="op">&lt;-</span> <span class="va">second_arcsin_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>nrep<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,p<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">immob</span><span class="op">)</span>,ntot<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Total</span><span class="op">)</span>,p2<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Immobile</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Total</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">CATTexact</span><span class="fu">::</span><span class="fu">catt_exact</span><span class="op">(</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">Dose</span>,<span class="va">ca_dose_80</span><span class="op">$</span><span class="va">nrep</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">p</span><span class="op">*</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">nrep</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu">CATTexact</span><span class="fu">::</span><span class="fu">catt_exact</span><span class="op">(</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">Dose</span>,<span class="va">ca_dose_80</span><span class="op">$</span><span class="va">ntot</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">p</span><span class="op">*</span><span class="va">ca_dose_80</span><span class="op">$</span><span class="va">ntot</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Dose<span class="op">=</span><span class="fl">40</span>,<span class="va">a1</span>,sampe.size<span class="op">=</span><span class="fl">6</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Dose<span class="op">=</span><span class="fl">40</span>,<span class="va">a2</span>,sampe.size<span class="op">=</span><span class="fl">30</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Dose<span class="op">=</span><span class="fl">80</span>,<span class="va">b1</span>,sampe.size<span class="op">=</span><span class="fl">6</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Dose<span class="op">=</span><span class="fl">80</span>,<span class="va">b2</span>,sampe.size<span class="op">=</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="change-point-analysis">Change Point Analysis<a class="anchor" aria-label="anchor" href="#change-point-analysis"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' Detect change points in dose-response</span></span>
 <span><span class="va">detect_change_point</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">successes</span>, <span class="va">totals</span>, <span class="va">doses</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  </span>
