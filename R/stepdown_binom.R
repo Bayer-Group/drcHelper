@@ -438,7 +438,7 @@ test_overdispersion <- function(successes, totals, model = NULL) {
   # Calculate dispersion parameter
   phi <- sum(pearson_resid^2) / model$df.residual
 
-  # Conduct a formal test using the fact that sum(pearson_resid^2) ~ \\u03c7²(df)
+  # Conduct a formal test using the fact that sum(pearson_resid^2) ~ chi^2(df)
   p_value <- 1 - pchisq(sum(pearson_resid^2), df = model$df.residual)
 
   return(list(
@@ -720,7 +720,7 @@ complete_trend_analysis <- function(successes, totals, doses,
   # Rao-Scott corrected analysis (if overdispersion detected)
   stepdown_corrected <- NULL
   if (phi_to_use > 1.2) {
-    cat("Overdispersion detected (φ =", round(phi_to_use, 3),
+    cat("Overdispersion detected (phi =", round(phi_to_use, 3),
         "), applying Rao-Scott correction...\n")
     stepdown_corrected <- stepDownTrendTestBinom(
       successes = successes,
@@ -767,7 +767,7 @@ print.completeTrendAnalysis <- function(x, ...) {
   cat("- Phi Estimation Method:", x$phi_method, "\n\n")
 
   # Phi estimates comparison
-  cat("Overdispersion Parameter (φ) Estimates:\n")
+  cat("Overdispersion Parameter (phi) Estimates:\n")  # \u03c6 = phi
   phi_df <- data.frame(
     Method = c("Simple (no trend)", "Trend-adjusted", "Tarone test", "Used for correction"),
     Phi_Value = c(

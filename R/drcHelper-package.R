@@ -10,6 +10,7 @@
 #' @importFrom stats AIC aov approx coef
 #'            lm logLik predict qnorm qt sd
 #'            summary.lm update var vcov xtabs
+#'            BIC
 #' @importFrom bmd bmd
 #' @importFrom drc ED
 ## usethis namespace: end

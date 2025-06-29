@@ -41,7 +41,6 @@ Imports:
     magrittr,
     metafor,
     purrr,
-    tidyr,
     rlang,
     rstatix,
     DescTools,
