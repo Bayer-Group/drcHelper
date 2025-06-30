@@ -109,6 +109,7 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #' @return Back calculated regulatory ECx
 #' @export ED.plus
 #' @rdname ED.plus
+#' @importFrom bmd bmd
 #'
 #' @examples
 #' \dontrun{
@@ -196,9 +197,9 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
         y <- object
         if (object$type == "binomial") {
           ## browser()
-          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "excess", interval = "delta", display = F),silent = TRUE)
+          res <- try(bmd::bmd(y, x / 100, backgType = "modelBased", def = "excess", interval = "delta", display = F),silent = TRUE)
         } else {
-          res <- try(bmd(y, x / 100, backgType = "modelBased", def = "relative", interval = "inv", display = F),silent = TRUE)
+          res <- try(bmd::bmd(y, x / 100, backgType = "modelBased", def = "relative", interval = "inv", display = F),silent = TRUE)
         }
         if (!inherits(res, "try-error")) {
           return(c(res$Results[1], res$SE, res$interval))
@@ -263,7 +264,7 @@ ED.ZG <- ED.plus
 #' @param data data used
 #' @param type type of models, binomial, continuous, etc.
 #' @param additionalReliability additional reliability need to be calculated
-#'
+#' @importFrom stats AIC BIC
 #' @return a model comparison object with class drcComp
 #' @export
 #' @rdname mselect.plus

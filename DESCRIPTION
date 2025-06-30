@@ -26,7 +26,7 @@ Depends:
 LazyData: true
 URL: https://bayer-group.github.io/drcHelper/index.html
 Imports: 
-    bmd,
+    stats,
     multcomp,
     PMCMRplus,
     dplyr,
@@ -36,6 +36,7 @@ Imports:
     tibble,
     lme4,
     nlme,
+    bmd,
     ggplot2,
     scales,
     magrittr,
