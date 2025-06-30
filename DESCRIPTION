@@ -47,6 +47,6 @@ Imports:
     DescTools,
     isotone
 Remotes: 
-    DoseResponse/bmd,
+    DoseResponse/bmd@a3bd9c6113e35d43e0990614469dabb10cd409bd,
     DoseResponse/drc,
     DoseResponse/drcData
