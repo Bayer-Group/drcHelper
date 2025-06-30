@@ -62,3 +62,55 @@ cd path/to/drcHelper
 # Search for "plot.edList" in all R files
 grep -r "plot.edList" --include="*.R" .
 ```
+
+## check and build
+
+### Find non-ASCII characters
+
+```
+tools::showNonASCII("~/R/stepdown_binom.R")
+```
+
+### Too many imports
+
+Move packages that are only used in:
+
+- Examples
+- Vignettes
+- Optional functionality
+- Specific methods that users might not need
+
+to Suggests. Example:
+
+```
+# In DESCRIPTION
+Suggests: 
+    ggplot2,
+    dplyr,
+    knitr,
+    rmarkdown,
+    testthat
+
+# Then use conditionally in code
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+    # ggplot2 code here
+} else {
+    stop("Package 'ggplot2' is required for this function. Please install it.")
+}
+
+
+# Internal helper that checks for package availability
+check_package <- function(pkg) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+        stop(sprintf("Package '%s' is required but not installed.", pkg),
+             call. = FALSE)
+    }
+}
+
+# Use in functions
+my_function <- function(...) {
+    check_package("dplyr")
+    # dplyr code here
+}
+```
+

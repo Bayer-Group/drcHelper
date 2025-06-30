@@ -96,7 +96,7 @@ noec <- max(fisher_results$dose[fisher_results$p_value > 0.05])
 ```
 
 
-
+## Other types of tests not used in regulatory statistical analysis in ecotoxicology
 
 ### Cochran-Mantel-Haenszel Chi-Squared Test for Count Data
 
@@ -495,7 +495,8 @@ Instead of these nonparametric tests (with options for clustered binary and mult
 
 
 ```{r}
-quantal_dat_nested <- readRDS("~/Projects/drcHelper/data-raw/quantal_dat_nested.rds")
+##quantal_dat_nested <- readRDS("~/Projects/drcHelper/data-raw/quantal_dat_nested.rds")
+data(quantal_dat_nested)
 second_arcsin_data <- quantal_dat_nested$data[[2]] %>% mutate(arcsin_prop = asin(sqrt(immob)),Treatment = factor(Treatment, levels = c("Control", sort(as.numeric(unique(Treatment[Treatment != "Control"])))))
 )
 result_nors <- stepDownTrendTestBinom(successes = as.numeric(second_arcsin_data$Immobile), totals = second_arcsin_data$Total, doses = second_arcsin_data$Dose, rao_scott = FALSE)

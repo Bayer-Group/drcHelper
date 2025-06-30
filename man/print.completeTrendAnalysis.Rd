@@ -6,6 +6,11 @@
 \usage{
 \method{print}{completeTrendAnalysis}(x, ...)
 }
+\arguments{
+\item{x}{completeTrendAnalysis results}
+
+\item{...}{additional arguments}
+}
 \description{
 Print method for complete trend analysis (UPDATED)
 }

@@ -363,7 +363,7 @@ stepDownRSCABS <-
 #'
 #' @return Results.Effect
 #' \itemize{
-#' \item{Results.Effect}{ An intermediary step for results. }
+#' \item{Results.Effect}{An intermediary step for results.}
 #' }
 #' @export
 #'

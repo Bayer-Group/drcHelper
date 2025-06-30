@@ -1,8 +1,14 @@
-## Used only here, to be integrated into the package
+## Used only here, to be integrated into the package, currently not included in the validation
 ##./inst/RStats/RStats_wrapper_tests.R:  comparisons <- getComparison(test_result)
 ##./inst/RStats/RStats_wrapper_tests.R:  comparisons <- getComparison(test_result,test="many-to-one")
 
 ## Internal helper functions
+#' Function to get the comparison groups for Williams test or other.
+#'
+#' @param object test result from different type of tests
+#'
+#' @param test the test used, either a trend test or a many-to-one test
+#'
 #'@export
 getComparison <- function(object,test=c("trend","many-to-one")){
   cnam <- colnames(object$p.value)

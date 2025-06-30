@@ -2,7 +2,7 @@
 % Please edit documentation in R/stepdown_binom.R
 \name{test_overdispersion}
 \alias{test_overdispersion}
-\title{Function to test for overdispersion in binomial data}
+\title{Function to test for overdispersion in binomial data using glm approach}
 \usage{
 test_overdispersion(successes, totals, model = NULL)
 }
@@ -17,5 +17,5 @@ test_overdispersion(successes, totals, model = NULL)
 a list of dispersion test results
 }
 \description{
-Function to test for overdispersion in binomial data
+Function to test for overdispersion in binomial data using glm approach
 }

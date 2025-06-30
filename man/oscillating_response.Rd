@@ -20,6 +20,8 @@ oscillating_response(
 \item{frequency}{How many complete oscillations across the dose range}
 
 \item{baseline}{Baseline response value}
+
+\item{dose_range}{range of doses or concentrations}
 }
 \value{
 Vector of response values

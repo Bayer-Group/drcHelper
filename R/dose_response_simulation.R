@@ -7,6 +7,7 @@
 #' @param max_effect Maximum magnitude of effect (both positive and negative)
 #' @param frequency How many complete oscillations across the dose range
 #' @param baseline Baseline response value
+#' @param dose_range range of doses or concentrations
 #' @return Vector of response values
 #' @keywords simulation
 #' @export

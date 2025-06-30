@@ -6,3 +6,7 @@ inst/doc
 docs
 int/**/*.html
 int/**/*.png
+int/**/*.pdf
+int/**/**/*.html
+int/**/**/*.png
+int/**/**/*.pdf
