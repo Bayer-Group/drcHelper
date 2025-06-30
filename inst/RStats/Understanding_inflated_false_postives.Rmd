@@ -1,0 +1,125 @@
+# Understanding False Positives in RCBD Designs: A Mathematical Decomposition
+
+During the simulation study, due to my labeling of  high false positive rates in a Randomized Complete Block Design (RCBD) with positional effects.
+
+## The Experimental Setup
+
+- 5 treatment groups (doses)
+- Each treatment has tanks numbered 1-3
+- All tank #1s are in Position 1, all tank #2s in Position 2, etc.
+- True response is identical across all treatments (no treatment effect)
+
+## Mathematical Decomposition
+
+### True Data Generating Process
+
+For an observation from dose i, tank/block j:
+
+$$Y_{ij} = \mu + \alpha_i + \beta_j + \epsilon_{ij}$$
+
+Where:
+
+- $\mu$ is the overall mean (100 in your case)
+- $\alpha_i$ is the treatment effect (0 for all treatments in your simulation)
+- $\beta_j$ is the block/Position effect (random, with variance $\sigma^2_{\text{block}}$)
+- $\epsilon_{ij}$ is the residual error (random, with variance $\sigma^2_{\text{error}}$)
+
+### Variance Components
+
+The total variance in the data is:
+
+$$\text{Var}(Y_{ij}) = \text{Var}(\alpha_i) + \text{Var}(\beta_j) + \text{Var}(\epsilon_{ij})$$
+
+In your simulation:
+- $\text{Var}(\alpha_i) = 0$ (no true treatment effect)
+- $\text{Var}(\beta_j) = \sigma^2_{\text{block}}$ (block/Position variance)
+- $\text{Var}(\epsilon_{ij}) = \sigma^2_{\text{error}}$ (residual variance)
+
+## The Statistical Model
+
+When you fit `Response ~ Dose + (1|Tank)`, you're using the model:
+
+$$Y_{ij} = \mu + \alpha_i + b_j + e_{ij}$$
+
+Where:
+- $b_j \sim N(0, \sigma^2_{\text{tank}})$ is the random tank effect
+- $e_{ij} \sim N(0, \sigma^2_e)$ is the residual error
+
+## Why False Positives Occur
+
+### 1. F-test for Treatment Effect
+
+The F-test for treatment effect is:
+
+$$F = \frac{\text{MS}_{\text{treatment}}}{\text{MS}_{\text{error}}}$$
+
+Where:
+
+- $\text{MS}_{\text{treatment}}$ is the mean square for treatments
+- $\text{MS}_{\text{error}}$ is the mean square error
+
+### 2. Expected Mean Squares
+
+In a RCBD, the expected mean squares are:
+
+$$E(\text{MS}_{\text{treatment}}) = \sigma^2_{\text{error}} + n \cdot \sigma^2_{\text{treatment}}$$
+$$E(\text{MS}_{\text{block}}) = \sigma^2_{\text{error}} + k \cdot \sigma^2_{\text{block}}$$
+$$E(\text{MS}_{\text{error}}) = \sigma^2_{\text{error}}$$
+
+Where:
+
+- $n$ is the number of blocks
+- $k$ is the number of treatments
+
+### 3. The Critical Issue: Denominator for F-test
+
+In a proper RCBD analysis, the F-test for treatment should use:
+
+$$F = \frac{\text{MS}_{\text{treatment}}}{\text{MS}_{\text{error}}}$$
+
+But the error term $\text{MS}_{\text{error}}$ is only appropriate if the block×treatment interaction is negligible.
+
+### 4. Variance Inflation Due to Block Structure
+
+When all tank #1s are in Position 1, etc., you create a systematic structure where:
+
+$$\text{Var}(\bar{Y}_{i.} - \bar{Y}_{i'.}) < \frac{2\sigma^2_{\text{error}}}{n}$$
+
+This is because the block effects partially cancel out when comparing treatment means, making treatments appear more different than they really are.
+
+## Mathematical Proof of Inflated Type I Error
+
+For a standard F-test with no treatment effect, the test statistic follows an F-distribution with (k-1) and (n-1)(k-1) degrees of freedom.
+
+However, with your block structure, the actual distribution has a higher mean than expected under the null hypothesis:
+
+$$E(F) > 1$$
+
+This shifts the entire distribution to the right, causing more frequent rejections of the null hypothesis.
+
+## Numerical Example
+
+With 5 treatments, 3 blocks, and assuming:
+- $\sigma^2_{\text{block}} = 4$ (block variance)
+- $\sigma^2_{\text{error}} = 1$ (residual variance)
+
+The expected F-statistic under the null hypothesis should be 1, but with your design it becomes approximately:
+
+$$E(F) \approx 1 + \frac{\sigma^2_{\text{block}} \cdot \text{ICC}}{(k-1)\sigma^2_{\text{error}}}$$
+
+Where ICC is the intraclass correlation coefficient.
+
+This explains why you're seeing false positive rates of 20-40% instead of the expected 5%.
+
+## Solution
+
+The correct model for your design is:
+
+$$\text{Response} \sim \text{Dose} + \text{Block} + \text{Dose:Block}$$
+
+Or in R:
+```r
+lmer(Response ~ Dose + (1|Block) + (1|Dose:Block))
+```
+
+This properly accounts for the block structure and will bring your false positive rate back to the expected 5%.

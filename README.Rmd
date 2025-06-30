@@ -143,6 +143,23 @@ knitr::kable(coef(modsum),digits = 3)
 ```
 
 
+## GitHub Actions
+
+1. R-CMD-check.yaml: This triggers when:
+
+- A pull request is opened that targets any branch matching the pattern releases/**
+- This includes branches like releases/v1.0, releases/beta, releases/hotfix, etc.
+- It will NOT trigger for PRs targeting main or master
+- workflow_dispatch: This allows manual triggering of the workflow from the GitHub Actions tab.
+
+This workflow will only run when working with release branches, not during normal development on main. If you want it to run on regular development, you'll need to change the branch patterns.
+
+2. pkgdown.yaml: This triggers when 
+
+- whenever a pull request event occurs.
+- when a GitHub release event occurs, but only for the specific type published.
+- when pushed to dev. 
+
 ## ToDo
 
 - [ ] Develop all test cases for NOEC functions

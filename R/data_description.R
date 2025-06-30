@@ -130,6 +130,16 @@ NULL
 "dat_bcs1"
 
 
+#' Data from Acute Studies
+#'
+#' Data are from a study of the response of the daphnids. There are 6 treatment
+#' groups and 6 replicates in each treatment group, 5 individuals in each replicates.
+#'
+#' @docType data
+#' @keywords datasets
+"quantal_dat_nested"
+
+
 #' Data from heavy metal mixture experiments (drcData)
 #'
 #' Data are from a study of the response of the cyanobacterial

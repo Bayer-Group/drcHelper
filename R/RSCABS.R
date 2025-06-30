@@ -362,9 +362,7 @@ stepDownRSCABS <-
 #' the Rao-Scott adjustment to the Cochran-Armitage test and "CA" to ignore the adjustment.
 #'
 #' @return Results.Effect
-#' \itemize{
-#' \item{Results.Effect}{ An intermediary step for results. }
-#' }
+#' \item{Results.Effect}{An intermediary step for results.}
 #' @export
 #'
 #' @author Joe Swintek
