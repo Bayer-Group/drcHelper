@@ -21,7 +21,7 @@ the Rao-Scott adjustment to the Cochran-Armitage test and "CA" to ignore the adj
 \value{
 Results.Effect
 \itemize{
-\item{Results.Effect}{ An intermediary step for results. }
+\item{Results.Effect}{An intermediary step for results.}
 }
 }
 \description{
