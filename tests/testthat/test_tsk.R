@@ -1,5 +1,5 @@
 
-test_that("tsk can calculate ",{
+test_that("tsk can calculate EPA result correctly",{
 
 
   p <- 2 * pnorm(2) - 1
@@ -105,6 +105,37 @@ test_that("tsk can calculate ",{
 
 
 )
+
+
+describe("tsk function from drcHelper", {
+  test_data <- data.frame(
+    x = c(15.54, 20.47, 27.92, 35.98, 55.52),
+    r = c(0, 0, 0, 1, 20),
+    n = c(20, 20, 20, 19, 20)
+  )
+
+  it("computes TSK estimate and confidence intervals matching ecotoxicology::TSK", {
+    result <- drcHelper::tsk(
+      x = test_data$x,
+      r = test_data$r,
+      n = test_data$n,
+      control = 0,
+      trim = 0,
+      conf.level = 0.95,
+      use.log.doses = TRUE
+    )
+
+    expect_s3_class(result, "tskresult")
+    expect_equal(result$LD50, 43.89339, tolerance = 0.0001,
+                 info = "LD50 should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$gsd), 1.017763, tolerance = 0.0001,
+                 info = "Geometric standard deviation should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$conf.int[1]), 42.40451, tolerance = 0.0001,
+                 info = "Lower confidence interval should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$conf.int[2]), 45.43455, tolerance = 0.0001,
+                 info = "Upper confidence interval should match ecotoxicology::TSK result")
+  })
+})
 
 
 

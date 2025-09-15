@@ -110,6 +110,8 @@ navbar:
       menu:
       - text: System Testing
         href: articles/System_Testing.html
+      - text: TSK and Probit Model
+        href: articles/TSK-and-Probit-Models.html
       - text: Which JT test to use
         href: articles/Verification_which_JT.html
       - text: Study Types and Templates

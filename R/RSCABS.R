@@ -5,13 +5,23 @@
 
 
 
-#' Run RSCABS test
+#' Run RSCABS test (DEPRECATED)
 #'
+#' @description 
+#' **DEPRECATED**: Please use [step_down_RSCABS()] instead for new code.
+#' 
 #' Runs the Rao-Scott adjusted Cochran-Armitage trend test by slices (RSCABS)
 #' analysis.The function is adapted from the archived version of RSCABS developed by
 #' Joe Swintek et al with CC0 license. It is not updated anymore and included
-#' for validation purpose. It is provided in this package a different function
-#' to perform the same task.
+#' for validation purpose. The modern replacement is [step_down_RSCABS()].
+#' 
+#' @details 
+#' This function is deprecated. For new analyses, please use the modern
+#' implementation in [step_down_RSCABS()] which provides:
+#' - Better error handling and input validation
+#' - More flexible data input formats  
+#' - Improved statistical methodology
+#' - Better documentation and examples
 #'
 #' @param Data A standard data set in the tall format.  Every row indicates an organism.
 #' The data set must contain columns for the treatment level and every tested histological endpoint.
@@ -40,6 +50,12 @@
 #'                           'Replicate',test.type='RS')
 #' }
 runRSCABS <- function(Data,Treatment,Replicate='',Effects='',test.type='RS'){
+  # Issue deprecation warning
+  .Deprecated("step_down_RSCABS", 
+              msg = paste("runRSCABS() is deprecated.", 
+                         "Please use step_down_RSCABS() for new code.",
+                         "See ?step_down_RSCABS for the modern API."))
+  
   #This function will produce a table of step-down Cochran-Armitage trend tests with possible Rao-Scott adjustment by slices
   #It will Run the test on every effect in the Effect list
   #' @export
