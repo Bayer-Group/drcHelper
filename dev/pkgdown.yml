@@ -1,8 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   articles/Advanced_Fitting-a-biphasic-dose-reponse-model: Advanced_Fitting-a-biphasic-dose-reponse-model.html
+  articles/Binomial_Extra_Variance: Binomial_Extra_Variance.html
   articles/Count_Data: Count_Data.html
   drcHelper: drcHelper.html
   Dunnetts_Test_for_Data_with_Hierarchical_Structure: Dunnetts_Test_for_Data_with_Hierarchical_Structure.html
@@ -28,9 +29,11 @@ articles:
   articles/Test-Guidelines: Test-Guidelines.html
   articles/Trend-Testing: Trend-Testing.html
   articles/TSK_method: TSK_method.html
+  articles/TSK-and-Probit-Models: TSK-and-Probit-Models.html
   articles/Validation_MCP_tests: Validation_MCP_tests.html
+  articles/Verification_CA_test: Verification_CA_test.html
   articles/Verification_which_JT: Verification_which_JT.html
-last_built: 2025-05-09T15:52Z
+last_built: 2025-09-16T12:36Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles

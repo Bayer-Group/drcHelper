@@ -1,6 +1,8 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/LICENSE.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/REDUNDANCY_ANALYSIS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Binomial_Extra_Variance.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Count_Data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Dunnetts_Test_for_Data_with_Hierarchical_Structure.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/EFSA-Criteria.html</loc></url>
@@ -22,10 +24,12 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Ordinal-Data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Quantal-Data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/System_Testing.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/TSK-and-Probit-Models.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/TSK_method.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Test-Guidelines.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Trend-Testing.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Validation_MCP_tests.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Verification_CA_test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/Verification_which_JT.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/drcHelper.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/articles/index.html</loc></url>
@@ -40,6 +44,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/NTP_example_rate_expected.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/RSCABK.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/Tarone.test.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/Tarone.trend.test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/addECxCI.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/aggregate_from_individual_simple.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/aggregate_from_individual_tidy.html</loc></url>
@@ -53,20 +58,27 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/calpha.test.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/cochranArmitageTrendTest.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/collembola_juveniles.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/compare_phi_methods.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/compare_tarone_scoring.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/compare_to_control_fisher.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/complete_trend_analysis.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/comprehensive_phi_comparison.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/contEndpoint.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/convert2Score.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/convert_fish_data.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/create_contingency_table.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/create_summary_table.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/dat_bcs1.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/dose.p.glmmPQL.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/drcCompare.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/drcHelper-package.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/drcHelper_datasets.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/dunnett_test.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/estimate_phi_with_scoring.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/exampleHistData.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/expand_to_individual_simple.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/expand_to_individual_tidy.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/getComparison.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/getEC50.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/getEndpoint.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/getLineContrast.html</loc></url>
@@ -88,6 +100,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/oecd201.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/oscillating_response.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/pavaMean.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/perform_groupwise_tarone.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/pipe.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/plot.StepDownRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/plot.dunnett_test_result.html</loc></url>
@@ -100,10 +113,13 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/prepDataRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.RSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.StepDownRSCABS.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.TaroneTrendTest.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.completeTrendAnalysis.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.drcComp.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.dunnett_test_result.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/print.stepDownTrendBinom.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/pvi_example.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/quantal_dat_nested.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/rankTransform.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/reshape_drcData.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/runRSCABS.html</loc></url>
@@ -119,6 +135,7 @@
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/step_down_RSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/summary.StepDownRSCABS.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/summaryZG.html</loc></url>
+<url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/tarone_with_trend_removal.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/test_overdispersion.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/treatment2dose.html</loc></url>
 <url><loc>https://bayer-group.github.io/drcHelper/index.html/dev/reference/tsk.data.frame.html</loc></url>

@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">drcHelper</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.0.2.9000</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.0.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,6 +67,7 @@
     <li><a class="dropdown-item" href="../articles/Count_Data.html">Count Data</a></li>
     <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
     <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
+    <li><a class="dropdown-item" href="../articles/Binomial_Extra_Variance.html">Extra Binomial Variance and Trend Test</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
@@ -80,6 +81,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-validation">
 <li><a class="dropdown-item" href="../articles/System_Testing.html">System Testing</a></li>
+    <li><a class="dropdown-item" href="../articles/TSK-and-Probit-Models.html">TSK and Probit Model</a></li>
     <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
@@ -126,7 +128,7 @@ improvement.</p>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"dat_medium"</span><span class="op">)</span></span>
-<span><span class="va">dat_medium</span> <span class="op">&lt;-</span> <span class="va">dat_medium</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">mutate</span><span class="op">(</span>Treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Dose</span>,levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">dat_medium</span> <span class="op">&lt;-</span> <span class="va">dat_medium</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Treatment<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Dose</span>,levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Dose</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
 <span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span><span class="op">[</span><span class="va">dat_medium</span><span class="op">$</span><span class="va">Response</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span><span class="fu"><a href="../reference/prelimPlot3.html">prelimPlot3</a></span><span class="op">(</span><span class="va">dat_medium</span><span class="op">)</span></span></code></pre></div>
 <p><img src="drcHelper_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
@@ -258,7 +260,7 @@ improvement.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot.modList.html">plot.modList</a></span><span class="op">(</span><span class="va">modList</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/addECxCI.html">addECxCI</a></span><span class="op">(</span><span class="va">p1</span>,object<span class="op">=</span><span class="va">modList</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,EDres<span class="op">=</span><span class="cn">NULL</span>,trend<span class="op">=</span><span class="st">"Decrease"</span>,endpoint<span class="op">=</span><span class="st">"EC"</span>, respLev<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">50</span><span class="op">)</span>,</span>
-<span>                     textAjust.x<span class="op">=</span><span class="fl">0.01</span>,textAjust.y<span class="op">=</span><span class="fl">0.3</span>,useObsCtr<span class="op">=</span><span class="cn">FALSE</span>,d0<span class="op">=</span><span class="cn">NULL</span>,textsize <span class="op">=</span> <span class="fl">4</span>,lineheight <span class="op">=</span> <span class="fl">0.5</span>,xmin<span class="op">=</span><span class="fl">0.012</span><span class="op">)</span><span class="op">+</span> <span class="fu">ylab</span><span class="op">(</span><span class="st">"Response Variable [unit]"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">xlab</span><span class="op">(</span><span class="st">"Concentration [µg a.s./L]"</span><span class="op">)</span></span></code></pre></div>
+<span>                     textAjust.x<span class="op">=</span><span class="fl">0.01</span>,textAjust.y<span class="op">=</span><span class="fl">0.3</span>,useObsCtr<span class="op">=</span><span class="cn">FALSE</span>,d0<span class="op">=</span><span class="cn">NULL</span>,textsize <span class="op">=</span> <span class="fl">4</span>,lineheight <span class="op">=</span> <span class="fl">0.5</span>,xmin<span class="op">=</span><span class="fl">0.012</span><span class="op">)</span><span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Response Variable [unit]"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Concentration [µg a.s./L]"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="drcHelper_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## addECxCI(p)</span></span></code></pre></div>
@@ -429,7 +431,7 @@ improvement.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
