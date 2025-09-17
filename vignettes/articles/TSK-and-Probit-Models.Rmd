@@ -1,13 +1,12 @@
+%\VignetteIndexEntry{TSK and Probit Models}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
 ---
 title: "TSK and Probit Models"
-editor_options: 
-  chunk_output_type: console
 ---
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
 )
 ```
 
