@@ -220,17 +220,21 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 }
 
 
-#' Get Model Name
-#'
-#' @param fname a character string contains the name of the fitted model.
-#'
-#' @return the model name
-#' @importFrom drc getMeanFunctions
-#' @export
-#'
-#' @examples
-#' getModelName("LL.2")
-#'
+##' Get Model Name and Description
+##'
+##' Returns the model name and description for one or more fitted model names.
+##'
+##' @param fname Character vector of model names (e.g., "LL.2", "LN.4"). If NULL, returns all available model names and descriptions.
+##'
+##' @return Character vector of model names and descriptions. For NULL, returns all available models. For vector input, returns corresponding descriptions for each name. Special handling for LN.* and LL.* models.
+##'
+##' @importFrom drc getMeanFunctions
+##' @export
+##'
+##' @examples
+##' getModelName() # Returns all available model names and descriptions
+##' getModelName("LL.2") # Returns description for LL.2
+##' getModelName(c("LL.2", "LN.4")) # Returns descriptions for multiple models
 getModelName <- function(fname = NULL) {
   if (is.null(fname)) {
     ss1 <- getMeanFunctions()
