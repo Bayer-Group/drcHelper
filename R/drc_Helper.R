@@ -232,14 +232,61 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 #' getModelName("LL.2")
 #'
 getModelName <- function(fname = NULL) {
-  if (any(grepl("EXD", fname))) { ## for now just one character
-    noParm <- stringr::str_split(fname, stringr::fixed("."))[[1]][2]
-    ModelName <- paste0(noParm, "-parameter exponential decay model")
-  } else {
-    ModelName <- getMeanFunctions(fname = fname)
-    ModelName <- paste0(ModelName[[1]]$noParm, "-parameter ", ModelName[[1]]$text)
+  if (is.null(fname)) {
+    ss1 <- getMeanFunctions()
+    return(sapply(ss1, function(x) {
+      if (length(x) >= 2) {
+        paste0(x[1], ": ", x[2])
+      } else {
+        x[1]
+      }
+    }))
   }
-  return(ModelName)
+
+  # Accept character vector input for fname
+  if (length(fname) > 1) {
+    return(unname(sapply(fname, getModelName)))
+  }
+
+  # Special handling for LN.2, LN.3, LN.3u, LN.4
+  if (fname %in% c("LN.2", "LN.3", "LN.3u", "LN.4")) {
+    ln_map <- list(
+      "LN.2" = "2-parameter log-normal (lower limit at 0 and upper limit at 1)",
+      "LN.3" = "3-parameter log-normal (lower limit at 0)",
+      "LN.3u" = "3-parameter log-normal (upper limit at 1)",
+      "LN.4" = "4-parameter log-normal"
+    )
+    return(paste0(fname, ": ", ln_map[[fname]]))
+  }
+
+  # Special handling for LL.* models
+  if (grepl("^LL\\.[0-9]+u?$", fname)) {
+    ll_map <- list(
+      "LL.2" = "2-parameter Log-logistic (ED50 as parameter) with lower limit at 0 and upper limit at 1",
+      "LL.3" = "3-parameter Log-logistic (ED50 as parameter) with lower limit at 0",
+      "LL.3u" = "3-parameter Log-logistic (ED50 as parameter) with upper limit at 1",
+      "LL.4" = "4-parameter Log-logistic (ED50 as parameter)",
+      "LL.5" = "5-parameter Generalized log-logistic (ED50 as parameter)"
+    )
+    if (!is.null(ll_map[[fname]])) {
+      return(paste0(fname, ": ", ll_map[[fname]]))
+    }
+  }
+
+  if (any(grepl("EXD", fname))) {
+    noParm <- stringr::str_split(fname, stringr::fixed("."))[[1]][2]
+    ModelName <- paste0(fname, ": ", noParm, "-parameter exponential decay model")
+    return(ModelName)
+  }
+
+  # Default: try getMeanFunctions
+  ModelInfo <- getMeanFunctions(fname = fname)
+  if (!is.null(ModelInfo) && length(ModelInfo) > 0 && !is.null(ModelInfo[[1]]$noParm) && !is.null(ModelInfo[[1]]$text)) {
+    ModelName <- paste0(fname, ": ", ModelInfo[[1]]$noParm, "-parameter ", ModelInfo[[1]]$text)
+    return(ModelName)
+  } else {
+    return(NA)
+  }
 }
 #' Deprecated helper function for ED calculation
 #'
