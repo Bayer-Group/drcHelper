@@ -126,7 +126,12 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = "Percentage", CI = c("delta", "inv", "bmd-inv"), ...) {
   ## Note that this might not be suitable for models with fixed c or d parameters, where
   CI <- match.arg(CI)
-
+  # Check for invalid 'interval' argument
+  dots <- list(...)
+  if ("interval" %in% names(dots)) { ## added to avoid user confusion in issue #14 and #15
+    stop("The 'interval' argument is not supported in mselect.ED(). ",
+         "Please use the 'CI' argument instead with values 'delta', 'inv', or 'bmd-inv'.")
+  }
   if (!inherits(object, "try-error")) {
     if (CI == "delta") {
       type <- object$type
@@ -300,7 +305,10 @@ getModelName <- function(fname = NULL) {
 #' @seealso [ED.plus()] for the public version of usage
 #' @export ED.ZG
 #' @keywords Deprecated
-ED.ZG <- ED.plus
+ED.ZG <- function(...) {
+  .Deprecated("ED.plus", package = "drcHelper", msg = "ED.ZG is deprecated. Please use ED.plus instead.")
+  ED.plus(...)
+}
 
 #' added functionality for mselect
 #'

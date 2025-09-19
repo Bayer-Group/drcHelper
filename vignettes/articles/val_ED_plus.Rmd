@@ -1,0 +1,89 @@
+---
+title: "Validation ED.plus"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+This article explains the differences between `drcHelper::addECxCI()` and `drc:::ED.drc()` functions in calculating EC values, which were filed as issues in [GitHub](https://github.com/Bayer-Group/drcHelper/issues/14).
+
+# Understanding EC Value Calculations in `addECxCI()`
+
+
+## The Root Cause
+
+The key difference is that `addECxCI()` uses `ED.plus()` internally, which transforms the response levels to follow regulatory definitions in ecotoxicology, while `drc:::ED.drc()` uses raw mathematical definitions of percentages.
+
+Let me explain exactly how `ED.plus()` transforms the response levels:
+
+## Transformation in `ED.plus()` Function
+
+Looking at the code in your `drcHelper` package, `ED.plus()` contains this crucial transformation for decreasing trends:
+
+```r
+if (trend == "Decrease") {
+  x.relative <- d * respLev / (d - cVal)
+}
+```
+
+Where:
+- `d` is the upper limit parameter (typically representing control response)
+- `cVal` is the lower limit parameter 
+- `respLev` is the input response level (e.g., 10, 20, 50)
+
+This transformed `x.relative` value is then passed to the underlying `ED()` function from the `drc` package.
+
+## Difference in Interpretation
+
+1. **Standard `drc::ED()` approach**: 
+   - 50% means "halfway between upper and lower asymptotes"
+   - Purely mathematical definition based on the curve parameters
+
+2. **`drcHelper::ED.plus()` approach**:
+   - 50% means "50% reduction compared to control"
+   - Follows regulatory ecotoxicology definitions (e.g., OECD guidelines)
+
+## Printing the Transformed Values
+
+If you want to see exactly what transformed values `addECxCI()` is using, here's a function to retrieve them:
+
+```{r}
+show_transformed_EC_levels <- function(object, respLev, trend = "Decrease") {
+  # Get model parameters
+  coefs <- coef(object)
+  if ("c:(Intercept)" %in% names(coefs)) cVal <- coefs["c:(Intercept)"] else cVal <- 0
+  if ("d:(Intercept)" %in% names(coefs)) d <- coefs["d:(Intercept)"] else d <- 1
+  
+  # Calculate the transformed values
+  if (trend == "Decrease") {
+    x.relative <- d * respLev / (d - cVal)
+  } else {
+    x.relative <- (respLev - cVal * 100) / (d - cVal)
+  }
+  
+  # Return the original and transformed values
+  return(data.frame(
+    original_respLev = respLev,
+    transformed_x.relative = x.relative
+  ))
+}
+
+# Use it with your model:
+model <- drm(Response ~ Dose, data = dat_medium, fct = LN.4())
+show_transformed_EC_levels(model, c(10, 20, 50))
+```
+
+## Which One Should You Use?
+
+- Use `drcHelper::ED.plus()` or `addECxCI()` if you need EC values that comply with regulatory definitions (percent reduction relative to control)
+- Use `drc::ED()` directly if you want EC values based on raw percentages of the fitted curve range
+
+This transformation is intentional and represents the standard approach in ecotoxicology where "x% effect" is defined as x% reduction from control, rather than x% of the way between minimum and maximum response.

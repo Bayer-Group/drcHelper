@@ -93,8 +93,10 @@ navbar:
         href: articles/Normality-Check.html
       - text: Extra Binomial Variance and Trend Test
         href: articles/Binomial_Extra_Variance.html
-      - text: -------
+      - text: Equivalence Testing
+        href: articles/Equivalence-Testing.html
       - text: More Topics
+      - text: -------
       - text: NLS
         href: articles/Examples using NLS.html
       - text: drda
@@ -110,6 +112,8 @@ navbar:
       menu:
       - text: System Testing
         href: articles/System_Testing.html
+      - text: ED Calculation Consistency
+        href: articles/ED_Calculation_Consistency.html
       - text: TSK and Probit Model
         href: articles/TSK-and-Probit-Models.html
       - text: Which JT test to use
