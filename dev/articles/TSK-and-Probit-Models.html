@@ -68,9 +68,8 @@
     <li><a class="dropdown-item" href="../articles/LMM-GLMM-and-GAMM.html">Understanding Mixed Models</a></li>
     <li><a class="dropdown-item" href="../articles/Normality-Check.html">Normality Check</a></li>
     <li><a class="dropdown-item" href="../articles/Binomial_Extra_Variance.html">Extra Binomial Variance and Trend Test</a></li>
-    <li><a class="dropdown-item" href="../articles/Equivalence-Testing.html">Equivalence Testing</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>More Topics</h6></li>
     <li><a class="dropdown-item" href="../articles/Examples%20using%20NLS.html">NLS</a></li>
     <li><a class="dropdown-item" href="../articles/Examples_using_drda.html">drda</a></li>
     <li><a class="dropdown-item" href="../articles/TSK_method.html">TSK method</a></li>
@@ -82,7 +81,6 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-validation" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Validation</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-validation">
 <li><a class="dropdown-item" href="../articles/System_Testing.html">System Testing</a></li>
-    <li><a class="dropdown-item" href="../articles/val_ED_plus.html">ED Calculation Consistency</a></li>
     <li><a class="dropdown-item" href="../articles/TSK-and-Probit-Models.html">TSK and Probit Model</a></li>
     <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
@@ -111,7 +109,7 @@
       <h1>TSK and Probit Models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/TSK-and-Probit-Models.Rmd" class="external-link"><code>vignettes/TSK-and-Probit-Models.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Bayer-Group/drcHelper/blob/main/vignettes/articles/TSK-and-Probit-Models.Rmd" class="external-link"><code>vignettes/articles/TSK-and-Probit-Models.Rmd</code></a></small>
       <div class="d-none name"><code>TSK-and-Probit-Models.Rmd</code></div>
     </div>
 
@@ -119,18 +117,18 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="co">## Loading required package: drc</span></span>
-<span><span class="co">## Loading required package: MASS</span></span>
-<span><span class="co">## Loading required package: drcData</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## 'drc' has been loaded.</span></span>
-<span><span class="co">## Please cite R and 'drc' if used for a publication,</span></span>
-<span><span class="co">## for references type 'citation()' and 'citation('drc')'.</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Attaching package: 'drc'</span></span>
-<span><span class="co">## The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     gaussian, getInitial</span></span></code></pre></div>
+<span><span class="co">#&gt; Loading required package: drc</span></span>
+<span><span class="co">#&gt; Loading required package: MASS</span></span>
+<span><span class="co">#&gt; Loading required package: drcData</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 'drc' has been loaded.</span></span>
+<span><span class="co">#&gt; Please cite R and 'drc' if used for a publication,</span></span>
+<span><span class="co">#&gt; for references type 'citation()' and 'citation('drc')'.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'drc'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     gaussian, getInitial</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="trimmed-spearman-karber-tsk-method">Trimmed Spearman-Karber (TSK) Method<a class="anchor" aria-label="anchor" href="#trimmed-spearman-karber-tsk-method"></a>
 </h2>
@@ -249,22 +247,22 @@ handling datasets where full 0-100% response isn’t achieved.</p>
 <p><img src="TSK-and-Probit-Models_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"TSK Results:"</span><span class="op">)</span></span>
-<span><span class="co">## [1] "TSK Results:"</span></span>
+<span><span class="co">#&gt; [1] "TSK Results:"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tsk_result_ecotox</span><span class="op">)</span></span>
-<span><span class="co">## $mu</span></span>
-<span><span class="co">## [1] 43.89339</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $gsd</span></span>
-<span><span class="co">##        x </span></span>
-<span><span class="co">## 1.017763 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $left</span></span>
-<span><span class="co">##        x </span></span>
-<span><span class="co">## 42.40451 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $right</span></span>
-<span><span class="co">##        x </span></span>
-<span><span class="co">## 45.43455</span></span></code></pre></div>
+<span><span class="co">#&gt; $mu</span></span>
+<span><span class="co">#&gt; [1] 43.89339</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $gsd</span></span>
+<span><span class="co">#&gt;        x </span></span>
+<span><span class="co">#&gt; 1.017763 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $left</span></span>
+<span><span class="co">#&gt;        x </span></span>
+<span><span class="co">#&gt; 42.40451 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $right</span></span>
+<span><span class="co">#&gt;        x </span></span>
+<span><span class="co">#&gt; 45.43455</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="validation-against-ecotoxicologytsk">Validation against <code>ecotoxicology::TSK</code><a class="anchor" aria-label="anchor" href="#validation-against-ecotoxicologytsk"></a>
@@ -284,16 +282,16 @@ ecotoxicology::TSK.</p>
 <span>  use.log.doses <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"TSK Results from drcHelper:"</span><span class="op">)</span></span>
-<span><span class="co">## [1] "TSK Results from drcHelper:"</span></span>
+<span><span class="co">#&gt; [1] "TSK Results from drcHelper:"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tsk_result_drc</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Trimmed Spearman-Karber method using 0 percent trim</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Data was not smoothed</span></span>
-<span><span class="co">## Calculation done using the logs of the doses</span></span>
-<span><span class="co">## Estimated LD50: 43.89339 GSD of estimate: 1.017763</span></span>
-<span><span class="co">## 95 percent confidence interval on LD50:</span></span>
-<span><span class="co">##  42.40451 45.43455</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 0 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the logs of the doses</span></span>
+<span><span class="co">#&gt; Estimated LD50: 43.89339 GSD of estimate: 1.017763</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  42.40451 45.43455</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  Metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LD50/Mu"</span>, <span class="st">"GSD"</span>, <span class="st">"CI Lower"</span>, <span class="st">"CI Upper"</span><span class="op">)</span>,</span>
@@ -409,103 +407,103 @@ TRUE
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Probit GLM (binomial family)</span></span>
 <span><span class="va">model_glm_log10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">r</span>, <span class="va">n</span> <span class="op">-</span> <span class="va">r</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span><span class="co">#&gt; Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model_glm_log10</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## glm(formula = cbind(r, n - r) ~ log10(x), family = binomial(link = "probit"), </span></span>
-<span><span class="co">##     data = data)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##             Estimate Std. Error z value Pr(&gt;|z|)</span></span>
-<span><span class="co">## (Intercept)   -73.32   76403.95  -0.001    0.999</span></span>
-<span><span class="co">## log10(x)       46.08   49100.87   0.001    0.999</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## (Dispersion parameter for binomial family taken to be 1)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     Null deviance: 9.4482e+01  on 4  degrees of freedom</span></span>
-<span><span class="co">## Residual deviance: 4.6395e-10  on 3  degrees of freedom</span></span>
-<span><span class="co">## AIC: 5.9464</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Number of Fisher Scoring iterations: 25</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; glm(formula = cbind(r, n - r) ~ log10(x), family = binomial(link = "probit"), </span></span>
+<span><span class="co">#&gt;     data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)</span></span>
+<span><span class="co">#&gt; (Intercept)   -73.32   76403.95  -0.001    0.999</span></span>
+<span><span class="co">#&gt; log10(x)       46.08   49100.87   0.001    0.999</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 9.4482e+01  on 4  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 4.6395e-10  on 3  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 5.9464</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 25</span></span>
 <span><span class="va">lc50_glm_log10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/dose.p.html" class="external-link">dose.p</a></span><span class="op">(</span><span class="va">model_glm_log10</span>, cf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, p <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"GLM Probit LC50 (with SE):"</span><span class="op">)</span></span>
-<span><span class="co">## [1] "GLM Probit LC50 (with SE):"</span></span>
+<span><span class="co">#&gt; [1] "GLM Probit LC50 (with SE):"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">lc50_glm_log10</span><span class="op">)</span></span>
-<span><span class="co">##              Dose       SE</span></span>
-<span><span class="co">## p = 0.5: 1.591216 37.46047</span></span>
+<span><span class="co">#&gt;              Dose       SE</span></span>
+<span><span class="co">#&gt; p = 0.5: 1.591216 37.46047</span></span>
 <span></span>
 <span><span class="va">lc50_glm_log10_val</span> <span class="op">&lt;-</span> <span class="fl">10</span><span class="op">^</span><span class="va">lc50_glm_log10</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">lc50_glm_log10_val</span></span>
-<span><span class="co">## p = 0.5: </span></span>
-<span><span class="co">## 39.01356</span></span>
+<span><span class="co">#&gt; p = 0.5: </span></span>
+<span><span class="co">#&gt; 39.01356</span></span>
 <span><span class="va">lc50_glm_log10_se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">lc50_glm_log10</span>, <span class="st">"SE"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">a_glm_log10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_glm_log10</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">b_glm_log10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_glm_log10</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">lc50_glm_log10</span> <span class="op">==</span> <span class="op">-</span><span class="va">a_glm_log10</span><span class="op">/</span><span class="va">b_glm_log10</span></span>
-<span><span class="co">## p = 0.5: </span></span>
-<span><span class="co">##     TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; p = 0.5: </span></span>
+<span><span class="co">#&gt;     TRUE</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_glm_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">r</span>, <span class="va">n</span> <span class="op">-</span> <span class="va">r</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span><span class="co">#&gt; Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></span>
 <span><span class="va">lc50_glm_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/dose.p.html" class="external-link">dose.p</a></span><span class="op">(</span><span class="va">model_glm_log</span>, cf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, p <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">lc50_glm_log_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lc50_glm_log</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">lc50_glm_log_se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">lc50_glm_log</span>, <span class="st">"SE"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">a_glm_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_glm_log</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">b_glm_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_glm_log</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span><span class="va">a_glm_log</span></span>
-<span><span class="co">## (Intercept) </span></span>
-<span><span class="co">##   -73.32047</span></span>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;   -73.32047</span></span>
 <span><span class="va">a_glm_log10</span></span>
-<span><span class="co">## (Intercept) </span></span>
-<span><span class="co">##   -73.32047</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;   -73.32047</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Probit DRC (LN.2 with binomial)</span></span>
 <span><span class="va">model_drc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">r</span><span class="op">/</span><span class="va">n</span> <span class="op">~</span> <span class="va">x</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.2</a></span><span class="op">(</span><span class="op">)</span>, weight <span class="op">=</span> <span class="va">n</span>, type <span class="op">=</span> <span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model_drc</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Model fitted: Log-normal with lower limit at 0 and upper limit at 1 (2 parms)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Parameter estimates:</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##               Estimate Std. Error t-value p-value  </span></span>
-<span><span class="co">## b:(Intercept)   14.168     63.140  0.2244 0.82245  </span></span>
-<span><span class="co">## e:(Intercept)   40.338     20.573  1.9607 0.04991 *</span></span>
-<span><span class="co">## ---</span></span>
-<span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model fitted: Log-normal with lower limit at 0 and upper limit at 1 (2 parms)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Parameter estimates:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;               Estimate Std. Error t-value p-value  </span></span>
+<span><span class="co">#&gt; b:(Intercept)   14.168     63.140  0.2244 0.82245  </span></span>
+<span><span class="co">#&gt; e:(Intercept)   40.338     20.573  1.9607 0.04991 *</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="va">ed50_drc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">model_drc</span>, <span class="fl">50</span>, interval <span class="op">=</span> <span class="st">"inv"</span><span class="op">)</span> <span class="co">## note. if here using delta, very wide CI. </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Estimated effective doses</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##        Estimate  Lower  Upper</span></span>
-<span><span class="co">## e:1:50   40.338 36.681 48.478</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate  Lower  Upper</span></span>
+<span><span class="co">#&gt; e:1:50   40.338 36.681 48.478</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">model_drc</span>, <span class="fl">50</span>, interval <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Estimated effective doses</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##         Estimate Std. Error     Lower     Upper</span></span>
-<span><span class="co">## e:1:50 40.337797  20.572946  0.015564 80.660031</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;         Estimate Std. Error     Lower     Upper</span></span>
+<span><span class="co">#&gt; e:1:50 40.337797  20.572946  0.015564 80.660031</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"DRC Probit ED50/LC50 (with CI):"</span><span class="op">)</span></span>
-<span><span class="co">## [1] "DRC Probit ED50/LC50 (with CI):"</span></span>
+<span><span class="co">#&gt; [1] "DRC Probit ED50/LC50 (with CI):"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ed50_drc</span><span class="op">)</span></span>
-<span><span class="co">##        Estimate    Lower    Upper</span></span>
-<span><span class="co">## e:1:50  40.3378 36.68111 48.47803</span></span>
+<span><span class="co">#&gt;        Estimate    Lower    Upper</span></span>
+<span><span class="co">#&gt; e:1:50  40.3378 36.68111 48.47803</span></span>
 <span><span class="va">drc_lc50</span> <span class="op">&lt;-</span> <span class="va">ed50_drc</span><span class="op">[</span><span class="fl">1</span>, <span class="st">"Estimate"</span><span class="op">]</span></span>
 <span><span class="va">drc_ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ed50_drc</span><span class="op">[</span><span class="fl">1</span>, <span class="st">"Lower"</span><span class="op">]</span>, <span class="va">ed50_drc</span><span class="op">[</span><span class="fl">1</span>, <span class="st">"Upper"</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model_drc_loge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">r</span><span class="op">/</span><span class="va">n</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.2</a></span><span class="op">(</span><span class="op">)</span>, weight <span class="op">=</span> <span class="va">n</span>, type <span class="op">=</span> <span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">model_drc_loge</span>, <span class="fl">50</span>, interval <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Estimated effective doses</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##        Estimate Std. Error   Lower   Upper</span></span>
-<span><span class="co">## e:1:50  3.69711    0.32517 3.05979 4.33442</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error   Lower   Upper</span></span>
+<span><span class="co">#&gt; e:1:50  3.69711    0.32517 3.05979 4.33442</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">model_drc_loge</span>, <span class="fl">50</span>, interval <span class="op">=</span> <span class="st">"fls"</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Estimated effective doses</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##        Estimate  Lower  Upper</span></span>
-<span><span class="co">## e:1:50   40.330 21.323 76.281</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate  Lower  Upper</span></span>
+<span><span class="co">#&gt; e:1:50   40.330 21.323 76.281</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
@@ -936,20 +934,20 @@ log scale.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">b_drc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_drc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_drc</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">*</span><span class="va">b_drc</span> <span class="op">-</span> <span class="va">a_glm_log</span></span>
-<span><span class="co">## e:(Intercept) </span></span>
-<span><span class="co">##      20.93709</span></span>
+<span><span class="co">#&gt; e:(Intercept) </span></span>
+<span><span class="co">#&gt;      20.93709</span></span>
 <span><span class="va">b_glm_log</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">-</span> <span class="va">b_glm_log10</span></span>
-<span><span class="co">##       log(x) </span></span>
-<span><span class="co">## -8.05251e-10</span></span>
+<span><span class="co">#&gt;       log(x) </span></span>
+<span><span class="co">#&gt; -8.05251e-10</span></span>
 <span><span class="va">b_drc</span></span>
-<span><span class="co">## b:(Intercept) </span></span>
-<span><span class="co">##      14.16805</span></span>
+<span><span class="co">#&gt; b:(Intercept) </span></span>
+<span><span class="co">#&gt;      14.16805</span></span>
 <span><span class="va">b_glm_log</span></span>
-<span><span class="co">##   log(x) </span></span>
-<span><span class="co">## 20.01154</span></span>
+<span><span class="co">#&gt;   log(x) </span></span>
+<span><span class="co">#&gt; 20.01154</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_drc_loge</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="co">## b:(Intercept) </span></span>
-<span><span class="co">##      51.66112</span></span></code></pre></div>
+<span><span class="co">#&gt; b:(Intercept) </span></span>
+<span><span class="co">#&gt;      51.66112</span></span></code></pre></div>
 <p>The DRC LN.2 slope parameter is on the natural log scale and should
 equal to the GLM (log) slope.</p>
 <ul>
@@ -978,14 +976,14 @@ original scale, compute: <span class="math display">\[
 <p>In the example dataset:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">-</span><span class="va">a_glm_log10</span><span class="op">/</span><span class="va">b_glm_log10</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> </span>
-<span><span class="co">## (Intercept) </span></span>
-<span><span class="co">##    3.663909</span></span>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;    3.663909</span></span>
 <span><span class="op">-</span><span class="va">a_glm_log</span><span class="op">/</span><span class="va">b_glm_log</span></span>
-<span><span class="co">## (Intercept) </span></span>
-<span><span class="co">##    3.663909</span></span>
+<span><span class="co">#&gt; (Intercept) </span></span>
+<span><span class="co">#&gt;    3.663909</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_drc</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">## e:(Intercept) </span></span>
-<span><span class="co">##      3.697289</span></span></code></pre></div>
+<span><span class="co">#&gt; e:(Intercept) </span></span>
+<span><span class="co">#&gt;      3.697289</span></span></code></pre></div>
 <p>Then, approximate GLM parameters as: <span class="math display">\[
   b_{\mathrm{GLM}} \approx \frac{1}{b_{\mathrm{DRC}} \cdot \log(10)}
   \]</span> <span class="math display">\[
@@ -1056,25 +1054,25 @@ rates:</p>
 <span><span class="va">glm_log10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">affected</span>, <span class="va">total</span> <span class="op">-</span> <span class="va">affected</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">finney71</span><span class="op">[</span><span class="va">finney71</span><span class="op">$</span><span class="va">dose</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">lc50_log10</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/dose.p.html" class="external-link">dose.p</a></span><span class="op">(</span><span class="va">glm_log10</span>, cf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, p <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"GLM log10 LC50:"</span>, <span class="fl">10</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">lc50_log10</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">## GLM log10 LC50: 4.845492</span></span>
+<span><span class="co">#&gt; GLM log10 LC50: 4.845492</span></span>
 <span></span>
 <span><span class="co"># Probit GLM (log)</span></span>
 <span><span class="va">glm_log</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">affected</span>, <span class="va">total</span> <span class="op">-</span> <span class="va">affected</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dose</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">finney71</span><span class="op">[</span><span class="va">finney71</span><span class="op">$</span><span class="va">dose</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">lc50_log</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/dose.p.html" class="external-link">dose.p</a></span><span class="op">(</span><span class="va">glm_log</span>, cf <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, p <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"GLM log LC50:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">lc50_log</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">## GLM log LC50: 4.845492</span></span>
+<span><span class="co">#&gt; GLM log LC50: 4.845492</span></span>
 <span></span>
 <span><span class="co"># Probit DRC (LN.2)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
 <span><span class="va">drc_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">affected</span><span class="op">/</span><span class="va">total</span> <span class="op">~</span> <span class="va">dose</span>, weights <span class="op">=</span> <span class="va">total</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/lnormal.html" class="external-link">LN.2</a></span><span class="op">(</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">finney71</span><span class="op">)</span></span>
 <span><span class="va">ed50_drc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">drc_mod</span>, <span class="fl">50</span>, interval <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Estimated effective doses</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##        Estimate Std. Error   Lower   Upper</span></span>
-<span><span class="co">## e:1:50  4.84550    0.24654 4.36229 5.32871</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Estimated effective doses</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;        Estimate Std. Error   Lower   Upper</span></span>
+<span><span class="co">#&gt; e:1:50  4.84550    0.24654 4.36229 5.32871</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"DRC LN.2 LC50:"</span>, <span class="va">ed50_drc</span><span class="op">[</span><span class="fl">1</span>, <span class="st">"Estimate"</span><span class="op">]</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">## DRC LN.2 LC50: 4.845502</span></span>
+<span><span class="co">#&gt; DRC LN.2 LC50: 4.845502</span></span>
 <span></span>
 <span><span class="co"># TSK</span></span>
 <span><span class="va">finney71</span> <span class="op">&lt;-</span> <span class="va">finney71</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">finney71</span><span class="op">$</span><span class="va">dose</span><span class="op">)</span>,<span class="op">]</span></span>
@@ -1088,7 +1086,7 @@ rates:</p>
 <span>  use.log.doses <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"TSK LC50:"</span>, <span class="va">tsk_res</span><span class="op">$</span><span class="va">LD50</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">## TSK LC50: 4.779998</span></span>
+<span><span class="co">#&gt; TSK LC50: 4.779998</span></span>
 <span><span class="co">#ecotoxicology::TSK(finney71$dose, finney71$affected, finney71$total, A = 0.12, conf = 0.95)</span></span></code></pre></div>
 <p>Note that we have to trim here. This is because the TSK method
 assumes that the response curve is monotonic and that the intermediate
@@ -1167,14 +1165,14 @@ median effective dose (LC50/EC50).</p>
 </table>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">drc_mod</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> </span>
-<span><span class="co">## b:(Intercept) </span></span>
-<span><span class="co">##      1.829697</span></span>
+<span><span class="co">#&gt; b:(Intercept) </span></span>
+<span><span class="co">#&gt;      1.829697</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">glm_log</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span><span class="co">## log(dose) </span></span>
-<span><span class="co">##  1.829768</span></span>
+<span><span class="co">#&gt; log(dose) </span></span>
+<span><span class="co">#&gt;  1.829768</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">glm_log10</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">## log10(dose) </span></span>
-<span><span class="co">##    1.829768</span></span></code></pre></div>
+<span><span class="co">#&gt; log10(dose) </span></span>
+<span><span class="co">#&gt;    1.829768</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="why-do-they-agree-here">
 <strong>Why do they agree here?</strong><a class="anchor" aria-label="anchor" href="#why-do-they-agree-here"></a>
