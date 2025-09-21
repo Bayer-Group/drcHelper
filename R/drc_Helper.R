@@ -126,7 +126,12 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = "Percentage", CI = c("delta", "inv", "bmd-inv"), ...) {
   ## Note that this might not be suitable for models with fixed c or d parameters, where
   CI <- match.arg(CI)
-
+  # Check for invalid 'interval' argument
+  dots <- list(...)
+  if ("interval" %in% names(dots)) { ## added to avoid user confusion in issue #14 and #15
+    stop("The 'interval' argument is not supported in mselect.ED(). ",
+         "Please use the 'CI' argument instead with values 'delta', 'inv', or 'bmd-inv'.")
+  }
   if (!inherits(object, "try-error")) {
     if (CI == "delta") {
       type <- object$type
@@ -220,26 +225,77 @@ ED.plus <- function(object, respLev, maxEff = TRUE, trend = "Increase", range = 
 }
 
 
-#' Get Model Name
-#'
-#' @param fname a character string contains the name of the fitted model.
-#'
-#' @return the model name
-#' @importFrom drc getMeanFunctions
-#' @export
-#'
-#' @examples
-#' getModelName("LL.2")
-#'
+##' Get Model Name and Description
+##'
+##' Returns the model name and description for one or more fitted model names.
+##'
+##' @param fname Character vector of model names (e.g., "LL.2", "LN.4"). If NULL, returns all available model names and descriptions.
+##'
+##' @return Character vector of model names and descriptions. For NULL, returns all available models. For vector input, returns corresponding descriptions for each name. Special handling for LN.* and LL.* models.
+##'
+##' @importFrom drc getMeanFunctions
+##' @export
+##'
+##' @examples
+##' getModelName() # Returns all available model names and descriptions
+##' getModelName("LL.2") # Returns description for LL.2
+##' getModelName(c("LL.2", "LN.4")) # Returns descriptions for multiple models
 getModelName <- function(fname = NULL) {
-  if (any(grepl("EXD", fname))) { ## for now just one character
-    noParm <- stringr::str_split(fname, stringr::fixed("."))[[1]][2]
-    ModelName <- paste0(noParm, "-parameter exponential decay model")
-  } else {
-    ModelName <- getMeanFunctions(fname = fname)
-    ModelName <- paste0(ModelName[[1]]$noParm, "-parameter ", ModelName[[1]]$text)
+  if (is.null(fname)) {
+    ss1 <- getMeanFunctions()
+    return(sapply(ss1, function(x) {
+      if (length(x) >= 2) {
+        paste0(x[1], ": ", x[2])
+      } else {
+        x[1]
+      }
+    }))
   }
-  return(ModelName)
+
+  # Accept character vector input for fname
+  if (length(fname) > 1) {
+    return(unname(sapply(fname, getModelName)))
+  }
+
+  # Special handling for LN.2, LN.3, LN.3u, LN.4
+  if (fname %in% c("LN.2", "LN.3", "LN.3u", "LN.4")) {
+    ln_map <- list(
+      "LN.2" = "2-parameter log-normal (lower limit at 0 and upper limit at 1)",
+      "LN.3" = "3-parameter log-normal (lower limit at 0)",
+      "LN.3u" = "3-parameter log-normal (upper limit at 1)",
+      "LN.4" = "4-parameter log-normal"
+    )
+    return(paste0(fname, ": ", ln_map[[fname]]))
+  }
+
+  # Special handling for LL.* models
+  if (grepl("^LL\\.[0-9]+u?$", fname)) {
+    ll_map <- list(
+      "LL.2" = "2-parameter Log-logistic (ED50 as parameter) with lower limit at 0 and upper limit at 1",
+      "LL.3" = "3-parameter Log-logistic (ED50 as parameter) with lower limit at 0",
+      "LL.3u" = "3-parameter Log-logistic (ED50 as parameter) with upper limit at 1",
+      "LL.4" = "4-parameter Log-logistic (ED50 as parameter)",
+      "LL.5" = "5-parameter Generalized log-logistic (ED50 as parameter)"
+    )
+    if (!is.null(ll_map[[fname]])) {
+      return(paste0(fname, ": ", ll_map[[fname]]))
+    }
+  }
+
+  if (any(grepl("EXD", fname))) {
+    noParm <- stringr::str_split(fname, stringr::fixed("."))[[1]][2]
+    ModelName <- paste0(fname, ": ", noParm, "-parameter exponential decay model")
+    return(ModelName)
+  }
+
+  # Default: try getMeanFunctions
+  ModelInfo <- getMeanFunctions(fname = fname)
+  if (!is.null(ModelInfo) && length(ModelInfo) > 0 && !is.null(ModelInfo[[1]]$noParm) && !is.null(ModelInfo[[1]]$text)) {
+    ModelName <- paste0(fname, ": ", ModelInfo[[1]]$noParm, "-parameter ", ModelInfo[[1]]$text)
+    return(ModelName)
+  } else {
+    return(NA)
+  }
 }
 #' Deprecated helper function for ED calculation
 #'
@@ -249,7 +305,10 @@ getModelName <- function(fname = NULL) {
 #' @seealso [ED.plus()] for the public version of usage
 #' @export ED.ZG
 #' @keywords Deprecated
-ED.ZG <- ED.plus
+ED.ZG <- function(...) {
+  .Deprecated("ED.plus", package = "drcHelper", msg = "ED.ZG is deprecated. Please use ED.plus instead.")
+  ED.plus(...)
+}
 
 #' added functionality for mselect
 #'

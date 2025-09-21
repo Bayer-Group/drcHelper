@@ -36,9 +36,11 @@ jobs:
           extra-packages: any::pkgdown, any::tidyverse, any::drda, any::pander, any::metafor, any::kableExtra, any::plyr, any::ggprism, any::ggnewscale, any::GLMcat, any::quarto,any::Hmisc,any::outliers, any::multcomp, any::emmeans, any::patchwork, any::here, any::ecotoxicology, local::.
           needs: website
 
-      - name: Build site
+      - name: Build site with verbose output
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
+        env:
+          PKGDOWN_VERBOSE: true
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
