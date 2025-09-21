@@ -80,6 +80,8 @@ navbar:
         href: articles/NOEC_ECx_BMD.html
     articles:
       text: Articles
+    menu:
+    - text: Core Statistical Methods
       menu:
       - text: Quantal Data
         href: articles/Quantal-Data.html
@@ -89,23 +91,25 @@ navbar:
         href: articles/Count_Data.html
       - text: Understanding Mixed Models
         href: articles/LMM-GLMM-and-GAMM.html
+    - text: Advanced Topics
+      menu:
       - text: Normality Check
         href: articles/Normality-Check.html
       - text: Extra Binomial Variance and Trend Test
         href: articles/Binomial_Extra_Variance.html
       - text: Equivalence Testing
         href: articles/Equivalence-Testing.html
-      - text: More Topics
-      - text: -------
-      - text: NLS
+    - text: "🔧 Alternative Tools"
+      menu:
+      - text: NLS Approaches
         href: articles/Examples using NLS.html
-      - text: drda
+      - text: Using drda Package
         href: articles/Examples_using_drda.html
-      - text: TSK method
+      - text: TSK Method
         href: articles/TSK_method.html
-      - text: MQJT
+      - text: MQJT Analysis
         href: articles/MQJT.html
-      - text: Fitting A biphasic dose response model
+      - text: Advanced Model Fitting
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
     validation:
       text: Validation
