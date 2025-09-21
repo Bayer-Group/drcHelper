@@ -2,7 +2,7 @@
 % Please edit documentation in R/RSCABS.R
 \name{runRSCABS}
 \alias{runRSCABS}
-\title{Run RSCABS test}
+\title{Run RSCABS test (DEPRECATED)}
 \usage{
 runRSCABS(Data, Treatment, Replicate = "", Effects = "", test.type = "RS")
 }
@@ -26,11 +26,22 @@ adjustment to the Cochran-Armitage test and "CA" to ignore the adjustment.}
 a table of the test results for each treatment and injury score.
 }
 \description{
+\strong{DEPRECATED}: Please use \code{\link[=step_down_RSCABS]{step_down_RSCABS()}} instead for new code.
+
 Runs the Rao-Scott adjusted Cochran-Armitage trend test by slices (RSCABS)
 analysis.The function is adapted from the archived version of RSCABS developed by
 Joe Swintek et al with CC0 license. It is not updated anymore and included
-for validation purpose. It is provided in this package a different function
-to perform the same task.
+for validation purpose. The modern replacement is \code{\link[=step_down_RSCABS]{step_down_RSCABS()}}.
+}
+\details{
+This function is deprecated. For new analyses, please use the modern
+implementation in \code{\link[=step_down_RSCABS]{step_down_RSCABS()}} which provides:
+\itemize{
+\item Better error handling and input validation
+\item More flexible data input formats
+\item Improved statistical methodology
+\item Better documentation and examples
+}
 }
 \examples{
 \dontrun{
