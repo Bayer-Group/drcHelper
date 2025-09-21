@@ -113,7 +113,7 @@ navbar:
       - text: System Testing
         href: articles/System_Testing.html
       - text: ED Calculation Consistency
-        href: articles/ED_Calculation_Consistency.html
+        href: articles/val_ED_plus.html
       - text: TSK and Probit Model
         href: articles/TSK-and-Probit-Models.html
       - text: Which JT test to use
