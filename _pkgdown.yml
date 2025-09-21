@@ -15,7 +15,7 @@ repo:
 news:
   cran_dates: yes
 development:
-  mode: auto
+  mode: release  # Change from 'auto' to 'release' sot that the articles are always built to /docs/ instead of /docs/dev/, making your current navigation URLs work correctly.
   version_label: default
 authors:
   before: We define *authors* as those who are actively maintaining the code base,
