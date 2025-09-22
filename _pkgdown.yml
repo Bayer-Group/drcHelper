@@ -99,7 +99,7 @@ navbar:
         href: articles/Binomial_Extra_Variance.html
       - text: Equivalence Testing
         href: articles/Equivalence-Testing.html
-    - text: "🔧 Alternative Tools"
+    - text: "🔧 Alternative Methods"
       menu:
       - text: NLS Approaches
         href: articles/Examples using NLS.html

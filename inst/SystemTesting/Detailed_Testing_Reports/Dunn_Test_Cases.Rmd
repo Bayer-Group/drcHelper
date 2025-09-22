@@ -103,7 +103,7 @@ run_dunn_validation <- function(study_ids = NULL, alternatives = NULL) {
   validation_results <- list()
   
   for(study_id in study_ids) {
-    cat("Processing study:", study_id, "\n")
+    cat("Processing study:", study_id, "\n\n")
     
     # Get test data for this study
     study_data <- test_cases_data[test_cases_data[['Study ID']] == study_id, ]

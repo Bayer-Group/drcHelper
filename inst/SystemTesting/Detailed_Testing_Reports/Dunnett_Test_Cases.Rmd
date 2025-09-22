@@ -132,7 +132,7 @@ Below are the detailed test cases designed to validate the `dunnett_test` functi
 
 The following code executes the test cases using the `testthat` framework. Results are summarized in a table and visualized for clarity.
 
-```{r}
+```{r results="asis"}
 # Load test case datasets
 test_cases_data <- drcHelper::test_cases_data
 test_cases_res <- drcHelper::test_cases_res
@@ -172,7 +172,10 @@ validate_expected_values <- function(study_id, function_group_id) {
 
 # Validate expected values for each function group
 cat("=== Expected Values Validation ===\n")
+```
 
+
+```{r}
 for(fg_info in function_groups) {
   cat("\n", fg_info$name, "(", fg_info$id, "):\n")
   
