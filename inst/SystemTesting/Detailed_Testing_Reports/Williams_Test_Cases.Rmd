@@ -31,49 +31,52 @@ This document presents comprehensive validation results for the **Williams' Tren
 - **Test Alternatives**: less, greater
 - **Key Metrics**: T-value, Tcrit, Mean, df, %Inhibition
 
-```{r load_data}
+```{r load_data, results='asis'}
 # Load test cases data
 data("test_cases_data")
 data("test_cases_res")
 
-cat("Dataset dimensions:\n")
-cat("- Test cases data:", nrow(test_cases_data), "rows,", ncol(test_cases_data), "columns\n")
-cat("- Expected results:", nrow(test_cases_res), "rows,", ncol(test_cases_res), "columns\n")
+cat("**Dataset dimensions:**\n\n")
+cat("- Test cases data: ", nrow(test_cases_data), " rows, ", ncol(test_cases_data), " columns\n")
+cat("- Expected results: ", nrow(test_cases_res), " rows, ", ncol(test_cases_res), " columns\n\n")
 ```
 
 ## Test Configuration
 
-```{r test_config}
+```{r test_config, results='asis'}
 # Define test configuration
 TEST_NAME <- "williams"
 FUNCTION_GROUPS <- get_function_groups(TEST_NAME)
 TEST_CONFIG <- STATISTICAL_TESTS[[TEST_NAME]]
 
-cat("Test Configuration:\n")
-cat("- Test Name:", TEST_CONFIG$name, "\n")
-cat("- Function Groups:", paste(FUNCTION_GROUPS, collapse = ", "), "\n")
-cat("- Test Function:", TEST_CONFIG$test_function, "\n")
-cat("- Implemented:", TEST_CONFIG$implemented, "\n")
+cat("**Test Configuration:**\n\n")
+cat("- **Test Name:** ", TEST_CONFIG$name, "\n")
+cat("- **Function Groups:** ", paste(FUNCTION_GROUPS, collapse = ", "), "\n")
+cat("- **Test Function:** ", TEST_CONFIG$test_function, "\n")
+cat("- **Implemented:** ", ifelse(TEST_CONFIG$implemented, "✅ Yes", "⚠️ No"), "\n\n")
 
 if(!TEST_CONFIG$implemented) {
-  cat("\n⚠️ WARNING: This test is not yet implemented. This template shows the validation framework structure.\n")
+  cat("> ⚠️ **WARNING:** This test is not yet implemented. This template shows the validation framework structure.\n\n")
 }
 ```
 
 ## Data Preparation and Validation
 
-```{r data_preparation}
+```{r data_preparation, results='asis'}
 # Filter expected results for this test's function groups
 expected_results <- test_cases_res[test_cases_res[['Function group ID']] %in% FUNCTION_GROUPS, ]
 
-cat("Expected results for", TEST_CONFIG$name, ":\n")
-cat("- Total expected results:", nrow(expected_results), "\n")
-cat("- Unique studies:", length(unique(expected_results[['Study ID']])), "\n")
+cat("**Expected results for ", TEST_CONFIG$name, ":**\n\n")
+cat("- **Total expected results:** ", nrow(expected_results), "\n")
+cat("- **Unique studies:** ", length(unique(expected_results[['Study ID']])), "\n\n")
 
 # Show breakdown by function group
-cat("\nBreakdown by Function Group:\n")
+cat("**Breakdown by Function Group:**\n\n")
 fg_summary <- table(expected_results[['Function group ID']])
-print(fg_summary)
+for(i in seq_along(fg_summary)) {
+  cat("- ", names(fg_summary)[i], ": ", fg_summary[i], " test cases\n")
+}
+cat("\n")
 ```
 
 ## Validation Methodology
@@ -94,7 +97,7 @@ run_williams_validation <- function(study_ids = NULL, alternatives = NULL) {
   }
   
   if(is.null(alternatives)) {
-    alternatives <- TEST_CONFIG$alternatives %||% c("two.sided")
+    alternatives <- if(!is.null(TEST_CONFIG$alternatives)) TEST_CONFIG$alternatives else c("two.sided")
   }
   
   validation_results <- list()
@@ -154,8 +157,6 @@ run_williams_validation <- function(study_ids = NULL, alternatives = NULL) {
 # Basic functionality tests framework  
 basic_functionality_tests <- function() {
   
-  cat("\n=== Running Basic Functionality Tests ===\n")
-  
   basic_tests <- list()
   
   # Test 1: Basic function execution
@@ -182,9 +183,9 @@ basic_functionality_tests <- function() {
 
 ## Test Execution
 
-```{r execute_tests}
+```{r execute_tests, results='asis'}
 if(TEST_CONFIG$implemented) {
-  cat("Executing validation tests...\n")
+  cat("**Executing validation tests...**\n\n")
   
   # Run validation tests
   test_results <- run_williams_validation()
@@ -192,9 +193,9 @@ if(TEST_CONFIG$implemented) {
   # Run basic functionality tests
   basic_tests <- basic_functionality_tests()
   
-  cat("Validation completed.\n")
+  cat("✅ **Validation completed.**\n\n")
 } else {
-  cat("Test implementation not available - showing framework structure only.\n")
+  cat("> ℹ️ **Note:** Test implementation not available - showing framework structure only.\n\n")
   
   # Create placeholder results to demonstrate framework
   test_results <- list(

@@ -63,13 +63,17 @@ get_test_summary()
 
 ```{r load_config, echo=FALSE}
 # Load configuration for demonstration
-source("config/test_framework_config.R", local = TRUE)
-
-# Display test summary
-test_summary <- get_test_summary()
-kable(test_summary, caption = "Available Statistical Tests in Framework") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
-  column_spec(4, color = ifelse(grepl("Implemented", test_summary$Status), "darkgreen", "orange"))
+if(file.exists("config/test_framework_config.R")) {
+  source("config/test_framework_config.R", local = TRUE)
+  
+  # Display test summary
+  test_summary <- get_test_summary()
+  kable(test_summary, caption = "Available Statistical Tests in Framework") %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+    column_spec(4, color = ifelse(grepl("Implemented", test_summary$Status), "darkgreen", "orange"))
+} else {
+  cat("Configuration file not found. Please ensure you're in the correct directory.\n")
+}
 ```
 
 ### Configuration Structure
@@ -88,23 +92,27 @@ Each statistical test is defined with the following properties:
 The framework uses metric-specific tolerance values for numerical comparisons:
 
 ```{r tolerance_settings, echo=FALSE}
-tolerance_df <- data.frame(
-  Metric_Type = names(TOLERANCE_SETTINGS),
-  Tolerance = unlist(TOLERANCE_SETTINGS),
-  Description = c(
-    "T-statistics", "t-statistics", "z-statistics", "W-statistics",
-    "H-statistics", "F-statistics", "P-values (more lenient)",
-    "Means", "Degrees of freedom", "Parameter estimates",
-    "Standard deviations", "Log10 LR50 values", "LR50 values",
-    "Inhibition percentages", "Reduction percentages",
-    "Uncorrected values", "Corrected values", "Default for other metrics"
+if(exists("TOLERANCE_SETTINGS")) {
+  tolerance_df <- data.frame(
+    Metric_Type = names(TOLERANCE_SETTINGS),
+    Tolerance = unlist(TOLERANCE_SETTINGS),
+    Description = c(
+      "T-statistics", "t-statistics", "z-statistics", "W-statistics",
+      "H-statistics", "F-statistics", "P-values (more lenient)",
+      "Means", "Degrees of freedom", "Parameter estimates",
+      "Standard deviations", "Log10 LR50 values", "LR50 values",
+      "Inhibition percentages", "Reduction percentages",
+      "Uncorrected values", "Corrected values", "Default for other metrics"
+    )
   )
-)
 
-kable(tolerance_df, caption = "Tolerance Settings by Metric Type") %>%
-  kable_styling(bootstrap_options = c("striped", "hover")) %>%
-  row_spec(which(tolerance_df$Tolerance == 1e-04), background = "#fff3cd") %>%
-  row_spec(which(tolerance_df$Tolerance == 1e-06), background = "#d4edda")
+  kable(tolerance_df, caption = "Tolerance Settings by Metric Type") %>%
+    kable_styling(bootstrap_options = c("striped", "hover")) %>%
+    row_spec(which(tolerance_df$Tolerance == 1e-04), background = "#fff3cd") %>%
+    row_spec(which(tolerance_df$Tolerance == 1e-06), background = "#d4edda")
+} else {
+  cat("Configuration not loaded. Tolerance settings not available.\n")
+}
 ```
 
 ## 2. Template Engine
@@ -533,7 +541,7 @@ options(verbose = TRUE)
 tryCatch({
   generate_test_report("dunn")
 }, error = function(e) {
-  cat("Error:", e$message, "\n")
+  message("Error: ", e$message)
   traceback()
 })
 ```

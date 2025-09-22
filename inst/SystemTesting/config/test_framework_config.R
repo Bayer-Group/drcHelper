@@ -17,10 +17,10 @@ STATISTICAL_TESTS <- list(
   "dunn" = list(
     name = "Dunn's Multiple Comparison Test", 
     function_groups = c("FG00250", "FG00251", "FG00252", "FG00255"),
-    test_function = "dunn_test",  # To be implemented
+    test_function = "dunn_test",  # Implemented using PMCMRplus::kwManyOneDunnTest
     alternatives = c("less", "greater", "two.sided"),
     key_metrics = c("z-value", "p-value", "Mean", "df", "H-statistic"),
-    implemented = FALSE
+    implemented = TRUE
   ),
   
   "williams" = list(
@@ -198,4 +198,28 @@ identify_test_from_fg <- function(function_group) {
     }
   }
   return(NULL)
+}
+
+# Function to get summary of all tests for display
+get_test_summary <- function() {
+  test_summary <- data.frame(
+    Test = character(),
+    Name = character(),
+    `Function Groups` = character(),
+    Status = character(),
+    stringsAsFactors = FALSE
+  )
+  
+  for(test_key in names(STATISTICAL_TESTS)) {
+    test <- STATISTICAL_TESTS[[test_key]]
+    test_summary <- rbind(test_summary, data.frame(
+      Test = test_key,
+      Name = test$name,
+      `Function.Groups` = paste(test$function_groups, collapse = ", "),
+      Status = ifelse(test$implemented, "✅ Implemented", "⚠️ Not Implemented"),
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  return(test_summary)
 }
