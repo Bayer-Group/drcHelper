@@ -80,7 +80,7 @@ test_that("NTP SE_DE emergence and survival can be calculated correctly",{
       em_reduction_uncorr = (1 - em_alive / total) * 100
       , #Uncorrected reduction for Survival
       sur_reduction_uncorr = (1 - sur_alive / em_alive) * 100
-      , )
+      )
 
   mean_control_em_reduction_uncorr <- mean(NTP_example[ (NTP_example$rate == 0), ]$em_reduction_uncorr)
   mean_control_sur_reduction_uncorr <- mean(NTP_example[ (NTP_example$rate == 0), ]$sur_reduction_uncorr)
