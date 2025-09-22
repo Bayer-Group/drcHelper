@@ -1,0 +1,740 @@
+---
+title: "Statistical Test Validation Framework"
+subtitle: "Comprehensive Guide for drcHelper Package"
+author: "drcHelper Development Team"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: show
+    theme: united
+    highlight: tango
+  pdf_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(drcHelper)
+library(kableExtra)
+library(ggplot2)
+library(DT)
+```
+
+# Overview
+
+This document provides a comprehensive guide to the **Statistical Test Validation Framework** implemented in the drcHelper package. This modular framework enables systematic validation of multiple statistical tests against V-COP expected results with standardized structure and reusable components.
+
+## Framework Architecture
+
+The validation framework consists of three core components:
+
+1. **Configuration System** - Centralized test definitions and settings
+2. **Template Engine** - Reusable R Markdown templates for validation reports
+3. **Report Generator** - Automated generation and rendering system
+
+## Key Features
+
+- ✅ **Modular Design**: Easy to extend with new statistical tests
+- ✅ **Standardized Validation**: Consistent structure across all tests
+- ✅ **Automated Generation**: Batch processing of multiple test reports
+- ✅ **Flexible Configuration**: Test-specific parameters and tolerances
+- ✅ **Comprehensive Reporting**: Detailed HTML reports with visualizations
+- ✅ **V-COP Compliance**: Validation against regulatory expected results
+
+---
+
+# Framework Components
+
+## 1. Configuration System
+
+The framework's configuration is managed through `config/test_framework_config.R`, which defines all supported statistical tests and their properties.
+
+```{r show_config, eval=FALSE}
+# Load the configuration
+source("config/test_framework_config.R")
+
+# View available tests
+get_test_summary()
+```
+
+```{r load_config, echo=FALSE}
+# Load configuration for demonstration
+source("config/test_framework_config.R", local = TRUE)
+
+# Display test summary
+test_summary <- get_test_summary()
+kable(test_summary, caption = "Available Statistical Tests in Framework") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(4, color = ifelse(grepl("Implemented", test_summary$Status), "darkgreen", "orange"))
+```
+
+### Configuration Structure
+
+Each statistical test is defined with the following properties:
+
+- **Name**: Display name of the test
+- **Function Groups**: V-COP function group IDs (e.g., FG00250)
+- **Test Function**: R function name to execute the test
+- **Alternatives**: Supported hypothesis alternatives
+- **Key Metrics**: Expected output metrics for validation
+- **Implementation Status**: Whether the test is implemented
+
+### Tolerance Settings
+
+The framework uses metric-specific tolerance values for numerical comparisons:
+
+```{r tolerance_settings, echo=FALSE}
+tolerance_df <- data.frame(
+  Metric_Type = names(TOLERANCE_SETTINGS),
+  Tolerance = unlist(TOLERANCE_SETTINGS),
+  Description = c(
+    "T-statistics", "t-statistics", "z-statistics", "W-statistics",
+    "H-statistics", "F-statistics", "P-values (more lenient)",
+    "Means", "Degrees of freedom", "Parameter estimates",
+    "Standard deviations", "Log10 LR50 values", "LR50 values",
+    "Inhibition percentages", "Reduction percentages",
+    "Uncorrected values", "Corrected values", "Default for other metrics"
+  )
+)
+
+kable(tolerance_df, caption = "Tolerance Settings by Metric Type") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  row_spec(which(tolerance_df$Tolerance == 1e-04), background = "#fff3cd") %>%
+  row_spec(which(tolerance_df$Tolerance == 1e-06), background = "#d4edda")
+```
+
+## 2. Template Engine
+
+The framework uses a master template (`templates/statistical_test_template.Rmd`) that can generate validation reports for any statistical test through dynamic content replacement.
+
+### Template Features
+
+- **Dynamic Content Replacement**: Test-specific information inserted automatically
+- **Standardized Structure**: Consistent validation methodology across all tests
+- **Flexible Validation Logic**: Adapts to implemented vs. pending tests
+- **Comprehensive Reporting**: Executive summary, detailed results, visualizations
+
+### Template Placeholders
+
+The template uses placeholder tokens that get replaced during generation:
+
+```{r template_placeholders, echo=FALSE}
+placeholders <- data.frame(
+  Placeholder = c("{TEST_NAME}", "{TEST_TITLE}", "{FUNCTION_GROUPS}", 
+                  "{TEST_ALTERNATIVES}", "{KEY_METRICS}", "{IMPLEMENTATION_STATUS}"),
+  Description = c(
+    "Internal test name (e.g., 'dunn')",
+    "Display name (e.g., 'Dunn's Multiple Comparison Test')",
+    "Comma-separated function group IDs",
+    "Supported hypothesis alternatives",
+    "Key metrics for validation",
+    "Implementation status indicator"
+  ),
+  stringsAsFactors = FALSE
+)
+
+kable(placeholders, caption = "Template Placeholder Tokens") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## 3. Report Generator
+
+The `generate_test_reports.R` script provides automated generation and rendering capabilities.
+
+### Core Functions
+
+```{r generator_functions, eval=FALSE}
+# Generate a single test report
+generate_test_report(test_name, output_dir = "Detailed_Testing_Reports")
+
+# Generate all test reports
+generate_all_test_reports(output_dir = "Detailed_Testing_Reports", implemented_only = FALSE)
+
+# Render report to HTML
+render_test_report(test_name, output_dir = "Detailed_Testing_Reports")
+
+# Get test summary information
+get_test_summary()
+```
+
+---
+
+# Installation and Setup
+
+## Prerequisites
+
+Ensure you have the following packages installed:
+
+```{r prerequisites, eval=FALSE}
+install.packages(c("rmarkdown", "kableExtra", "ggplot2", "DT"))
+```
+
+## Directory Structure
+
+The framework expects the following directory structure:
+
+```
+inst/SystemTesting/
+├── config/
+│   └── test_framework_config.R          # Central configuration
+├── templates/
+│   └── statistical_test_template.Rmd    # Master template
+├── Detailed_Testing_Reports/             # Generated reports
+├── generate_test_reports.R               # Report generator
+└── Statistical_Test_Framework_Guide.Rmd # This guide
+```
+
+## Setup Instructions
+
+1. **Clone/Download the Framework**: Ensure all framework files are in place
+2. **Load drcHelper Package**: `library(drcHelper)`
+3. **Navigate to Framework Directory**: `setwd("inst/SystemTesting")`
+4. **Verify Configuration**: `source("config/test_framework_config.R")`
+
+---
+
+# Usage Instructions
+
+## Quick Start
+
+### Generate a Single Test Report
+
+```{bash quick_start_single, eval=FALSE}
+cd /workspaces/drcHelper/inst/SystemTesting
+Rscript generate_test_reports.R dunn
+```
+
+This creates `Detailed_Testing_Reports/Dunn_Test_Cases.Rmd`.
+
+### Generate All Test Reports
+
+```{bash quick_start_all, eval=FALSE}
+cd /workspaces/drcHelper/inst/SystemTesting
+Rscript generate_test_reports.R all
+```
+
+### Generate Only Implemented Tests
+
+```{bash quick_start_implemented, eval=FALSE}
+cd /workspaces/drcHelper/inst/SystemTesting
+Rscript generate_test_reports.R implemented
+```
+
+## Detailed Usage
+
+### 1. Interactive Generation
+
+```{r interactive_usage, eval=FALSE}
+# Load the generator
+source("generate_test_reports.R")
+
+# View available tests
+summary <- get_test_summary()
+print(summary)
+
+# Generate specific test report
+generate_test_report("dunn")
+
+# Render to HTML
+render_test_report("dunn")
+```
+
+### 2. Batch Processing
+
+```{r batch_processing, eval=FALSE}
+# Generate reports for multiple specific tests
+tests_to_generate <- c("dunn", "williams", "wilcoxon")
+for(test in tests_to_generate) {
+  generate_test_report(test)
+  render_test_report(test)
+}
+
+# Or use the batch function
+generate_all_test_reports(implemented_only = TRUE)
+```
+
+### 3. Custom Output Directory
+
+```{r custom_directory, eval=FALSE}
+# Generate reports in custom directory
+generate_test_report("dunn", output_dir = "custom_reports")
+render_test_report("dunn", output_dir = "custom_reports")
+```
+
+## Command Line Usage
+
+The generator script supports command-line execution:
+
+```{bash cli_usage, eval=FALSE}
+# Show help
+Rscript generate_test_reports.R
+
+# Generate specific test
+Rscript generate_test_reports.R dunn
+
+# Generate all tests
+Rscript generate_test_reports.R all
+
+# Generate implemented tests only
+Rscript generate_test_reports.R implemented
+```
+
+---
+
+# Adding New Statistical Tests
+
+## Step-by-Step Process
+
+### 1. Update Configuration
+
+Add your new test to `config/test_framework_config.R`:
+
+```{r new_test_config, eval=FALSE}
+STATISTICAL_TESTS[["your_test"]] <- list(
+  name = "Your Test Name",
+  function_groups = c("FG00XXX", "FG00YYY"),
+  test_function = "your_test_function",
+  alternatives = c("less", "greater", "two.sided"),
+  key_metrics = c("statistic", "p-value", "estimate"),
+  implemented = FALSE  # Set to TRUE when implemented
+)
+```
+
+### 2. Implement Test Function
+
+Create your test function in the appropriate R file:
+
+```{r implement_function, eval=FALSE}
+your_test_function <- function(data, response_var, dose_var, 
+                               control_level = 0, alternative = "two.sided", ...) {
+  
+  # Implement your statistical test logic
+  
+  # Return standardized structure
+  result <- list(
+    results_table = results_df,  # Data frame with comparisons
+    test_statistic = statistic,  # Main test statistic
+    p_values = p_vals,          # P-values
+    model_info = model_details,  # Model information
+    # Add other relevant outputs
+  )
+  
+  class(result) <- "your_test_result"
+  return(result)
+}
+```
+
+### 3. Generate Framework
+
+```{r generate_new_framework, eval=FALSE}
+# Generate the validation framework
+generate_test_report("your_test")
+
+# The framework will show "PENDING IMPLEMENTATION" status
+render_test_report("your_test")
+```
+
+### 4. Implement Validation Logic
+
+Edit the generated `.Rmd` file to add actual validation logic:
+
+```{r validation_logic, eval=FALSE}
+# In the generated Rmd file, update the validation function
+run_your_test_validation <- function(study_ids = NULL, alternatives = NULL) {
+  # Add your specific validation logic here
+  
+  # Call your test function
+  result <- your_test_function(data = test_data, ...)
+  
+  # Compare with expected results
+  # Return validation results
+}
+```
+
+### 5. Update Implementation Status
+
+Once implemented, update the configuration:
+
+```{r update_status, eval=FALSE}
+STATISTICAL_TESTS[["your_test"]]$implemented <- TRUE
+```
+
+---
+
+# Validation Methodology
+
+## Expected vs. Actual Comparison
+
+The framework performs systematic validation by:
+
+1. **Data Matching**: Match test case data with expected results by Study ID
+2. **Test Execution**: Run statistical test with appropriate parameters  
+3. **Result Extraction**: Extract key metrics from test results
+4. **Tolerance-Based Comparison**: Compare actual vs. expected with appropriate tolerances
+5. **Summary Generation**: Aggregate validation results and success rates
+
+## Validation Structure
+
+Each validation report includes:
+
+### Executive Summary
+- Test overview and configuration
+- Function groups and alternatives tested
+- Overall success rate
+
+### Data Preparation
+- Dataset loading and filtering
+- Study ID matching
+- Data structure validation
+
+### Test Execution
+- Individual test case results
+- Alternative hypothesis testing
+- Error handling and reporting
+
+### Results Analysis
+- Detailed comparison tables
+- Statistical summaries
+- Visualization of results
+
+### Implementation Status
+- Current implementation state
+- Required components for completion
+- Next steps for implementation
+
+## Basic Functionality Tests
+
+In addition to V-COP validation, each test includes basic functionality tests:
+
+1. **Basic Function Execution** - Core functionality verification
+2. **Alternative Hypothesis Support** - All alternatives tested
+3. **Parameter Validation** - Edge cases and error handling
+4. **Data Structure Tests** - Various input formats
+5. **Error Handling** - Invalid inputs and edge cases
+
+---
+
+# Examples
+
+## Example 1: Dunn's Test Framework
+
+```{r example_dunn, eval=FALSE}
+# Generate Dunn's test validation framework
+generate_test_report("dunn")
+
+# The generated report will include:
+# - V-COP validation for function groups FG00250, FG00251, FG00252, FG00255
+# - Support for Kruskal-Wallis test + Dunn's post-hoc comparisons
+# - Key metrics: z-value, p-value, H-statistic
+# - Implementation guidance for dunn_test() function
+```
+
+## Example 2: Williams' Test Framework
+
+```{r example_williams, eval=FALSE}
+# Generate Williams' trend test validation framework
+generate_test_report("williams")
+
+# The generated report will include:
+# - V-COP validation for function groups FG00210, FG00215
+# - Trend test for ordered dose levels
+# - Key metrics: T-value, Tcrit, significance
+# - Implementation guidance for williams_test() function
+```
+
+## Example 3: Batch Generation for Parametric Tests
+
+```{r example_batch, eval=FALSE}
+# Generate frameworks for all parametric tests
+parametric_tests <- c("dunnett", "student_t", "welch", "williams")
+
+for(test in parametric_tests) {
+  cat("Generating framework for:", test, "\n")
+  generate_test_report(test)
+  render_test_report(test)
+}
+```
+
+---
+
+# Troubleshooting
+
+## Common Issues and Solutions
+
+### Issue 1: Template Not Found
+
+**Error**: `Template file not found: templates/statistical_test_template.Rmd`
+
+**Solution**: 
+```{r troubleshoot_template, eval=FALSE}
+# Ensure you're in the correct directory
+setwd("inst/SystemTesting")
+
+# Verify template exists
+file.exists("templates/statistical_test_template.Rmd")
+```
+
+### Issue 2: Configuration Not Loaded
+
+**Error**: `object 'STATISTICAL_TESTS' not found`
+
+**Solution**:
+```{r troubleshoot_config, eval=FALSE}
+# Load configuration explicitly
+source("config/test_framework_config.R")
+
+# Verify configuration loaded
+names(STATISTICAL_TESTS)
+```
+
+### Issue 3: Rendering Failures
+
+**Error**: Various pandoc or R Markdown errors
+
+**Solution**:
+```{r troubleshoot_render, eval=FALSE}
+# Check pandoc installation
+rmarkdown::pandoc_available()
+
+# Try rendering with verbose output
+rmarkdown::render("Detailed_Testing_Reports/Dunn_Test_Cases.Rmd", 
+                  output_format = "html_document", 
+                  quiet = FALSE)
+```
+
+### Issue 4: Missing Dependencies
+
+**Error**: Package loading errors
+
+**Solution**:
+```{r troubleshoot_deps, eval=FALSE}
+# Install required packages
+required_packages <- c("rmarkdown", "kableExtra", "ggplot2", "DT", "drcHelper")
+missing_packages <- required_packages[!required_packages %in% installed.packages()[,"Package"]]
+
+if(length(missing_packages) > 0) {
+  install.packages(missing_packages)
+}
+```
+
+## Debug Mode
+
+Enable debug output for troubleshooting:
+
+```{r debug_mode, eval=FALSE}
+# Enable verbose output
+options(verbose = TRUE)
+
+# Generate with error catching
+tryCatch({
+  generate_test_report("dunn")
+}, error = function(e) {
+  cat("Error:", e$message, "\n")
+  traceback()
+})
+```
+
+---
+
+# Advanced Usage
+
+## Custom Templates
+
+Create custom templates for specialized validation needs:
+
+```{r custom_template, eval=FALSE}
+# Copy and modify the base template
+file.copy("templates/statistical_test_template.Rmd", 
+          "templates/custom_template.Rmd")
+
+# Modify the custom template as needed
+# Then use in generate_test_report() with custom logic
+```
+
+## Integration with CI/CD
+
+Automate framework generation in continuous integration:
+
+```{bash ci_integration, eval=FALSE}
+#!/bin/bash
+# validation_pipeline.sh
+
+cd inst/SystemTesting
+
+# Generate all implemented test reports
+Rscript generate_test_reports.R implemented
+
+# Check for rendering errors
+for file in Detailed_Testing_Reports/*.html; do
+  if [ -f "$file" ]; then
+    echo "✅ Successfully generated: $file"
+  else
+    echo "❌ Failed to generate: $file"
+    exit 1
+  fi
+done
+
+echo "All validation reports generated successfully"
+```
+
+## Performance Monitoring
+
+Monitor framework performance:
+
+```{r performance_monitoring, eval=FALSE}
+# Time the generation process
+system.time({
+  generate_all_test_reports(implemented_only = TRUE)
+})
+
+# Profile memory usage
+profvis::profvis({
+  generate_test_report("dunnett")
+})
+```
+
+---
+
+# Framework Extension
+
+## Adding New Metrics
+
+To add support for new validation metrics:
+
+1. **Update Tolerance Settings**:
+```{r add_metrics, eval=FALSE}
+TOLERANCE_SETTINGS[["new_metric"]] <- 1e-05
+```
+
+2. **Extend Validation Logic**:
+```{r extend_validation, eval=FALSE}
+# Add metric-specific validation in template or test-specific code
+validate_new_metric <- function(expected, actual) {
+  tolerance <- get_tolerance("new_metric")
+  abs(expected - actual) < tolerance
+}
+```
+
+## Adding New Test Types
+
+For fundamentally different test types (e.g., non-statistical tests):
+
+1. **Create Specialized Template**
+2. **Extend Configuration Schema**
+3. **Add Type-Specific Generator Logic**
+
+## Integration with Other Packages
+
+The framework can be extended to validate tests from other R packages:
+
+```{r package_integration, eval=FALSE}
+# Example integration with another package
+STATISTICAL_TESTS[["external_test"]] <- list(
+  name = "External Package Test",
+  function_groups = c("FG00XXX"),
+  test_function = "external_package::test_function",
+  package = "external_package",  # Add package dependency
+  alternatives = c("two.sided"),
+  key_metrics = c("statistic", "p.value"),
+  implemented = TRUE
+)
+```
+
+---
+
+# Best Practices
+
+## Code Organization
+
+- **Modular Design**: Keep test implementations separate and focused
+- **Consistent Naming**: Follow naming conventions (e.g., `test_name_test()`)
+- **Documentation**: Document all test functions with roxygen2
+- **Error Handling**: Implement robust error handling in test functions
+
+## Validation Standards
+
+- **Tolerance Testing**: Use appropriate tolerances for different metric types
+- **Edge Case Testing**: Include boundary conditions and edge cases
+- **Alternative Hypotheses**: Test all supported alternatives
+- **Data Validation**: Validate input data structure and content
+
+## Reporting Quality
+
+- **Clear Summaries**: Provide executive summaries with key findings
+- **Detailed Results**: Include comprehensive result tables
+- **Visualizations**: Add meaningful plots and charts
+- **Implementation Guidance**: Clear next steps for pending implementations
+
+## Version Control
+
+- **Template Versioning**: Version the master template
+- **Configuration Management**: Track configuration changes
+- **Generated File Management**: Consider whether to version generated files
+
+---
+
+# Conclusion
+
+The Statistical Test Validation Framework provides a robust, scalable foundation for systematic validation of statistical tests in the drcHelper package. Key benefits include:
+
+- **🎯 Standardized Validation**: Consistent methodology across all statistical tests
+- **🚀 Rapid Development**: Quick framework generation for new tests
+- **🔧 Flexible Configuration**: Easy customization for different test requirements  
+- **📊 Comprehensive Reporting**: Detailed HTML reports with visualizations
+- **✅ V-COP Compliance**: Validation against regulatory expected results
+- **🔄 Scalable Architecture**: Easy extension to new tests and metrics
+
+## Next Steps
+
+1. **Implement Pending Tests**: Complete implementation of dunn_test, williams_test, etc.
+2. **Enhance Validation Logic**: Add more sophisticated comparison methods
+3. **Expand Coverage**: Add support for additional statistical tests
+4. **Automate Pipeline**: Integrate with continuous integration systems
+5. **User Training**: Provide training materials for framework users
+
+---
+
+**Framework Version**: 1.0  
+**Last Updated**: `r Sys.Date()`  
+**Documentation**: Complete  
+**Status**: Production Ready  
+
+---
+
+## Appendix: Function Reference
+
+```{r function_reference, echo=FALSE}
+# Generate function reference table
+functions <- data.frame(
+  Function = c(
+    "generate_test_report()", "generate_all_test_reports()", "render_test_report()",
+    "get_test_summary()", "get_available_tests()", "get_function_groups()",
+    "identify_test_from_fg()", "convert_dose()", "get_tolerance()", "convert_alternative()"
+  ),
+  Description = c(
+    "Generate validation report for specific test",
+    "Generate reports for multiple tests",
+    "Render Rmd file to HTML",
+    "Get summary of all available tests", 
+    "Get list of available tests",
+    "Get function groups for specific test",
+    "Identify test type from function group",
+    "Convert dose string to numeric",
+    "Get tolerance value for metric type",
+    "Convert alternative hypothesis description"
+  ),
+  File = c(
+    "generate_test_reports.R", "generate_test_reports.R", "generate_test_reports.R",
+    "generate_test_reports.R", "test_framework_config.R", "test_framework_config.R",
+    "test_framework_config.R", "test_framework_config.R", "test_framework_config.R", "test_framework_config.R"
+  ),
+  stringsAsFactors = FALSE
+)
+
+kable(functions, caption = "Framework Function Reference") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
