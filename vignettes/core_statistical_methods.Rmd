@@ -1,0 +1,24 @@
+---
+title: "Core Statistical Methods"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Core Statistical Methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This index page provides access to all core statistical methods implemented in drcHelper.
+
+## Available Methods
+
+- [Quantal Data](Quantal-Data.html)
+- [Ordinal Data](Ordinal-Data.html)
+- [Count Data](Count_Data.html)
+- [Understanding Mixed Models](LMM-GLMM-and-GAMM.html)

@@ -81,33 +81,12 @@ navbar:
     articles:
       text: Articles
       menu:
-      # Core Statistical Methods
-      - text: "Core: Quantal Data"
-        href: articles/Quantal-Data.html
-      - text: "Core: Ordinal Data"
-        href: articles/Ordinal-Data.html
-      - text: "Core: Count Data"
-        href: articles/Count_Data.html
-      - text: "Core: Understanding Mixed Models"
-        href: articles/LMM-GLMM-and-GAMM.html
-      # Advanced Topics
-      - text: "Advanced: Normality Check"
-        href: articles/Normality-Check.html
-      - text: "Advanced: Extra Binomial Variance and Trend Test"
-        href: articles/Binomial_Extra_Variance.html
-      - text: "Advanced: Equivalence Testing"
-        href: articles/Equivalence-Testing.html
-      # Alternative Methods
-      - text: "Alternative: NLS Approaches"
-        href: articles/Examples using NLS.html
-      - text: "Alternative: Using drda Package"
-        href: articles/Examples_using_drda.html
-      - text: "Alternative: TSK Method"
-        href: articles/TSK_method.html
-      - text: "Alternative: MQJT Analysis"
-        href: articles/MQJT.html
-      - text: "Alternative: Advanced Model Fitting"
-        href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
+      - text: Core Statistical Methods
+        href: articles/core_statistical_methods.html
+      - text: Advanced Statistical Topics
+        href: articles/advanced_topics.html
+      - text: Alternative Methods
+        href: articles/alternative_methods.html
     validation:
       text: Validation
       menu:
@@ -125,4 +104,3 @@ navbar:
       icon: fa-bug
       href: https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue
       aria-label: New Issue
-
