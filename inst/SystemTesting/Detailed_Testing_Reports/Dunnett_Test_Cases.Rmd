@@ -433,7 +433,7 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
         results_df <- result$results_table
         
         # Compare T-values (T-statistics)
-        tvalue_expected <- expected_alt[grepl("T-value", expected_alt[['Brief description']]), ]
+        tvalue_expected <- expected_alt[grepl("t-value", expected_alt[['Brief description']]), ]
         if(nrow(tvalue_expected) > 0) {
           for(i in 1:nrow(tvalue_expected)) {
             exp_dose <- convert_dose(tvalue_expected$Dose[i])
@@ -834,20 +834,19 @@ for(test_name in names(test_results)) {  # All validation tests
   if(!is.null(result$function_group)) {
     cat("  Function Group:", result$function_group, "\n")
   }
-  if(result$passed) {
-    if(!is.null(result$details$note)) {
-      cat("  Note:", result$details$note, "\n")
-    } else {
-      cat("  Status: PASSED\n")
-      if(!is.null(result$details$n_comparisons) && result$details$n_comparisons > 0) {
-        cat("  Comparisons:", result$details$n_passed, "/", result$details$n_comparisons, "passed\n")
-      }
-    }
-  } else {
-    cat("  Status: FAILED\n")
-    if(!is.null(result$details$error)) {
-      cat("  Error:", result$details$error, "\n")
-    }
+  # Show status and details for both passed and failed tests
+  cat("  Status:", ifelse(result$passed, "PASSED", "FAILED"), "\n")
+  
+  if(!is.null(result$details$note)) {
+    cat("  Note:", result$details$note, "\n")
+  }
+  
+  if(!is.null(result$details$error)) {
+    cat("  Error:", result$details$error, "\n")
+  }
+  
+  if(!is.null(result$details$n_comparisons) && result$details$n_comparisons > 0) {
+    cat("  Comparisons:", result$details$n_passed, "/", result$details$n_comparisons, "passed\n")
   }
 }
 ```
@@ -874,7 +873,7 @@ cat("\n=== Detailed Expected vs Actual Comparison ===\n")
 for(test_name in names(test_results)) {  # All validation tests
   result <- test_results[[test_name]]
   
-  if(result$passed && !is.null(result$details$validation_results)) {
+  if(!is.null(result$details$validation_results)) {
     validation_data <- result$details$validation_results
     
     if(nrow(validation_data) > 0) {
