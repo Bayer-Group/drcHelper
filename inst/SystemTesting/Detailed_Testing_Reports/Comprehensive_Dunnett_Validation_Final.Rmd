@@ -62,6 +62,83 @@ cat("Function groups:", length(function_groups), "\n")
 cat("Alternatives:", length(alternatives), "\n")
 ```
 
+## Test Case Descriptions
+
+Below are the detailed test cases designed to validate the `dunnett_test` function across the different function groups defined in the validation datasets, incorporating the corrected data matching logic and multi-endpoint support.
+
+### 1. FG00220 - Myriophyllum Growth Rate Tests
+
+- **Study ID**: MOCK0065
+- **Purpose**: Validate Dunnett's test for continuous response data (growth rates) with decreasing dose-response relationship
+- **Input Data**: 30 observations across 7 dose levels (6 control + 4 per treatment level)
+- **Doses**: 0, 0.0448, 0.132, 0.390, 1.15, 3.39, 10.0 µg a.s./L
+- **Alternative**: "smaller" (testing for growth inhibition)
+- **Expected Outputs**:
+  - Treatment means ranging from ~0.126 (control) to ~0.030 (highest dose)
+  - Degrees of freedom: varies by comparison (~3.9 to 6.8)
+  - %Inhibition values increasing with dose
+  - T-values and p-values for each comparison
+- **Pass/Fail Criteria**: Results within tolerance (1e-6) of expected values
+
+### 2. FG00221 - Aphidius rhopalosiphi Reproduction Tests  
+
+- **Study ID**: MOCK08/15-001
+- **Purpose**: Validate Dunnett's test for count data (reproduction endpoint)
+- **Input Data**: Count data with Alive/Dead/Total columns across multiple dose levels
+- **Doses**: 0, 0.1, 0.2, 0.3, 0.375, 0.625, 2.0 L product/ha
+- **Alternative**: "smaller" (testing for reproduction reduction)
+- **Expected Outputs**:
+  - %Reduction values for each dose level
+  - T-values and p-values for mortality/reproduction effects
+- **Pass/Fail Criteria**: Specialized handling for binomial/count data structure
+
+### 3. FG00222 - Aphidius rhopalosiphi Repellency Tests
+
+- **Study ID**: MOCK08/15-001  
+- **Purpose**: Validate Dunnett's test for behavioral endpoint (% wasps on plant)
+- **Input Data**: Repellency data measuring behavioral response
+- **Alternative**: "smaller" (testing for repellency effect)
+- **Expected Outputs**: 
+  - Statistical measures for repellency behavior
+  - T-values and p-values for behavioral comparisons
+- **Pass/Fail Criteria**: Results consistent with expected behavioral analysis
+
+### 4. FG00225 - BRSOL Plant Tests (Multi-Endpoint)
+
+- **Study ID**: MOCKSE21/001-1
+- **Purpose**: Validate Dunnett's test for multiple endpoints (plant height, shoot dry weight)
+- **Input Data**: Plant growth measurements across multiple dose levels  
+- **Doses**: Multiple levels including 0.41, 1.02, 2.56, 6.4, 16, 40, 120
+- **Endpoints**: Both "Plant height" and "Shoot dry weight" are validated separately
+- **Alternative**: "smaller" (testing for growth inhibition)
+- **Expected Outputs**:
+  - Dose-specific means and statistical measures for each endpoint
+  - Multiple comparisons across different dose levels
+  - T-values and p-values for each dose comparison per endpoint
+- **Pass/Fail Criteria**: All dose-level comparisons within expected ranges for both endpoints
+
+### 5. Alternative Hypotheses Validation
+
+- **Purpose**: Ensure correct handling of different alternative hypotheses across all function groups
+- **Test Cases**: 
+  - "smaller" (decrease expected)
+  - "greater" (increase expected) 
+  - "two.sided" (any difference)
+- **Expected Behavior**: 
+  - P-values adjust appropriately based on alternative direction
+  - One-sided tests more powerful when direction is correct
+- **Pass/Fail Criteria**: P-value relationships hold as expected
+
+### 6. Model Specifications and Edge Cases
+
+- **Purpose**: Test robustness and proper error handling
+- **Test Cases**:
+  - Multi-endpoint studies (FG00225)
+  - Different variance structures
+  - European decimal notation handling
+  - Control dose variations (0 vs NA)
+- **Pass/Fail Criteria**: Appropriate model fitting and comprehensive endpoint coverage
+
 ## Core Validation Functions
 
 ```{r core_functions}
@@ -81,8 +158,10 @@ convert_dose <- function(dose_str) {
   return(as.numeric(dose_str))
 }
 
-# Main validation function with proper filtering
-run_dunnett_validation <- function(study_id, function_group_id, alternative = "less") {
+# Load the improved multi-endpoint validation function
+source("comprehensive_validation_functions.R")
+
+# Original function is replaced by the multi-endpoint version from the sourced file
   
   cat("\\n**Testing:", study_id, "/", function_group_id, "/", alternative, "**\\n")
   
@@ -101,12 +180,26 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
   available_endpoints <- unique(expected_results[['Endpoint']])
   cat("Available endpoints:", paste(available_endpoints, collapse = ", "), "\\n")
   
-  # For multi-endpoint studies, test each endpoint separately
-  # For now, test the first endpoint (can be expanded to test all)
-  test_endpoint <- available_endpoints[1]
-  cat("Testing endpoint:", test_endpoint, "\\n")
+  # Initialize storage for multiple endpoint results
+  endpoint_results <- list()
   
-  # Get study data for specific endpoint
+  # For multi-endpoint studies, test each endpoint separately
+  for(test_endpoint in available_endpoints) {
+    cat("Testing endpoint:", test_endpoint, "\\n")
+    
+    # Initialize validation results for this endpoint
+    validation_results <- data.frame(
+      endpoint = character(),
+      metric = character(),
+      dose = character(),
+      expected = numeric(),
+      actual = numeric(),
+      diff = numeric(),
+      passed = logical(),
+      stringsAsFactors = FALSE
+    )
+    
+    # Get study data for specific endpoint
   study_data <- test_cases_data[
     test_cases_data[['Study ID']] == study_id & 
     test_cases_data[['Endpoint']] == test_endpoint, ]
@@ -186,18 +279,7 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
       return(list(passed = FALSE, error = "Dunnett test failed"))
     }
     
-    # Validate results
-    validation_results <- data.frame(
-      endpoint = character(),
-      metric = character(),
-      dose = character(),
-      expected = numeric(),
-      actual = numeric(), 
-      diff = numeric(),
-      passed = logical(),
-      stringsAsFactors = FALSE
-    )
-    
+    # Validate results against expected values
     results_df <- result$results_table
     
     # Validate T-values with improved dose matching and NA filtering
@@ -334,19 +416,36 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
       }
     }
     
-    # Overall result
-    overall_passed <- if(nrow(validation_results) > 0) all(validation_results$passed) else TRUE
+    # Calculate overall result for this endpoint
+    endpoint_passed <- if(nrow(validation_results) > 0) all(validation_results$passed) else TRUE
     
-    cat("Validation completed:", sum(validation_results$passed), "/", nrow(validation_results), "passed\\n")
-    
-    return(list(
-      passed = overall_passed,
-      endpoint = test_endpoint,
+    # Store results for this endpoint
+    endpoint_results[[test_endpoint]] <- list(
+      passed = endpoint_passed,
       validation_results = validation_results,
       n_comparisons = nrow(validation_results),
-      n_passed = sum(validation_results$passed),
-      dunnett_result = result
-    ))
+      n_passed = sum(validation_results$passed)
+    )
+    
+    cat("Endpoint", test_endpoint, "validation completed:", sum(validation_results$passed), "/", nrow(validation_results), "passed\\n\\n")
+  } # End endpoint loop
+  
+  # Combine results from all endpoints
+  all_validation_results <- do.call(rbind, lapply(names(endpoint_results), function(ep) {
+    endpoint_results[[ep]]$validation_results
+  }))
+  
+  overall_passed <- if(nrow(all_validation_results) > 0) all(all_validation_results$passed) else TRUE
+  
+  return(list(
+    passed = overall_passed,
+    endpoints_tested = names(endpoint_results),
+    endpoint_results = endpoint_results,
+    validation_results = all_validation_results,
+    n_comparisons = nrow(all_validation_results),
+    n_passed = sum(all_validation_results$passed),
+    dunnett_result = result
+  ))
     
   }, error = function(e) {
     cat("Error:", e$message, "\\n")

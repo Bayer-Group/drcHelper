@@ -2151,197 +2151,398 @@ cat(&quot;Validation functions loaded\\n&quot;)</code></pre>
 </div>
 <div id="expected-values-summary" class="section level2">
 <h2>Expected Values Summary</h2>
-<pre class="r"><code>cat(&quot;\\n### Expected Values Overview\\n\\n&quot;)</code></pre>
-<pre><code>## \n### Expected Values Overview\n\n</code></pre>
-<pre class="r"><code>for(fg_info in function_groups) {
-  cat(&quot;**&quot;, fg_info$name, &quot;(&quot;, fg_info$id, &quot;)**\\n\\n&quot;)
-  
-  expected_data &lt;- test_cases_res[
-    test_cases_res[[&#39;Study ID&#39;]] == fg_info$study &amp;
-    test_cases_res[[&#39;Function group ID&#39;]] == fg_info$id, ]
-  
-  if(nrow(expected_data) &gt; 0) {
-    sample_values &lt;- head(expected_data, 5)
-    sample_table &lt;- sample_values[, c(&quot;Brief description&quot;, &quot;expected result value&quot;, &quot;Test group&quot;, &quot;Dose&quot;)]
-    names(sample_table) &lt;- c(&quot;Metric&quot;, &quot;Expected&quot;, &quot;Test Group&quot;, &quot;Dose&quot;)
-    
-    print(kable(sample_table, caption = paste(&quot;Sample Expected Values -&quot;, fg_info$name)) %&gt;%
-          kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;)))
-    
-    cat(&quot;\\nTotal expected values:&quot;, nrow(expected_data), &quot;\\n\\n&quot;)
-  } else {
-    cat(&quot;No expected values found\\n\\n&quot;)
-  }
-}</code></pre>
-<pre><code>## ** Myriophyllum Growth Rate ( FG00220 )**\n\n&lt;table class=&quot;table table-striped table-hover table-condensed&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
-## &lt;caption&gt;Sample Expected Values - Myriophyllum Growth Rate&lt;/caption&gt;
-##  &lt;thead&gt;
-##   &lt;tr&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Metric &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Expected &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Test Group &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Dose &lt;/th&gt;
-##   &lt;/tr&gt;
-##  &lt;/thead&gt;
-## &lt;tbody&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.12639772807371155 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Control &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.12371897205349909 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 4.48E-2 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 9.994388947631723E-2 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.13200000000000001 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 7.2083750958727932E-2 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.39 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 4.6333981944515414E-2 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 1.1499999999999999 &lt;/td&gt;
-##   &lt;/tr&gt;
-## &lt;/tbody&gt;
-## &lt;/table&gt;\nTotal expected values: 183 \n\n** Aphidius Reproduction ( FG00221 )**\n\n&lt;table class=&quot;table table-striped table-hover table-condensed&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
-## &lt;caption&gt;Sample Expected Values - Aphidius Reproduction&lt;/caption&gt;
-##  &lt;thead&gt;
-##   &lt;tr&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Metric &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Expected &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Test Group &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Dose &lt;/th&gt;
-##   &lt;/tr&gt;
-##  &lt;/thead&gt;
-## &lt;tbody&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 13.714285714284999 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Control &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; NA &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 13.142857142857142 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.2 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 9.6428571428571423 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.3 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 4.2142857142857144 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.375 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; - &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.625 &lt;/td&gt;
-##   &lt;/tr&gt;
-## &lt;/tbody&gt;
-## &lt;/table&gt;\nTotal expected values: 138 \n\n** Aphidius Repellency ( FG00222 )**\n\n&lt;table class=&quot;table table-striped table-hover table-condensed&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
-## &lt;caption&gt;Sample Expected Values - Aphidius Repellency&lt;/caption&gt;
-##  &lt;thead&gt;
-##   &lt;tr&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Metric &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Expected &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Test Group &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Dose &lt;/th&gt;
-##   &lt;/tr&gt;
-##  &lt;/thead&gt;
-## &lt;tbody&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, % Wasps on plant &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 33.5 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Control &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; NA &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, % Wasps on plant &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 37.166666666666664 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.2 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, % Wasps on plant &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 52.88888888333333 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.3 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, % Wasps on plant &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 53.444444449999999 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.375 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, % Wasps on plant &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 29.5 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.625 &lt;/td&gt;
-##   &lt;/tr&gt;
-## &lt;/tbody&gt;
-## &lt;/table&gt;\nTotal expected values: 105 \n\n** BRSOL Plant Tests ( FG00225 )**\n\n&lt;table class=&quot;table table-striped table-hover table-condensed&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
-## &lt;caption&gt;Sample Expected Values - BRSOL Plant Tests&lt;/caption&gt;
-##  &lt;thead&gt;
-##   &lt;tr&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Metric &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Expected &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Test Group &lt;/th&gt;
-##    &lt;th style=&quot;text-align:left;&quot;&gt; Dose &lt;/th&gt;
-##   &lt;/tr&gt;
-##  &lt;/thead&gt;
-## &lt;tbody&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 22.725000000000001 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Control &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, 0,41, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 22.975000000000001 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 0.41 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, 1,02, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 18.473684210526315 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 1.02 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, 2,56, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 15.184210526315789 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 2.56 &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Dunnett&#39;s test, smaller, 6,4, Mean &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 13.411764705882353 &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; Test item &lt;/td&gt;
-##    &lt;td style=&quot;text-align:left;&quot;&gt; 6.4 &lt;/td&gt;
-##   &lt;/tr&gt;
-## &lt;/tbody&gt;
-## &lt;/table&gt;\nTotal expected values: 352 \n\n</code></pre>
+<div id="expected-values-overview" class="section level3">
+<h3>Expected Values Overview</h3>
+<div id="myriophyllum-growth-rate-fg00220" class="section level4">
+<h4>Myriophyllum Growth Rate (FG00220)</h4>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<caption>
+Sample Expected Values - Myriophyllum Growth Rate
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Metric
+</th>
+<th style="text-align:left;">
+Expected
+</th>
+<th style="text-align:left;">
+Test Group
+</th>
+<th style="text-align:left;">
+Dose
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+0.12639772807371155
+</td>
+<td style="text-align:left;">
+Control
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+0.12371897205349909
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+4.48E-2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+9.994388947631723E-2
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.13200000000000001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+7.2083750958727932E-2
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+4.6333981944515414E-2
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+1.1499999999999999
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total expected values:</strong> 183</p>
+</div>
+<div id="aphidius-reproduction-fg00221" class="section level4">
+<h4>Aphidius Reproduction (FG00221)</h4>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<caption>
+Sample Expected Values - Aphidius Reproduction
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Metric
+</th>
+<th style="text-align:left;">
+Expected
+</th>
+<th style="text-align:left;">
+Test Group
+</th>
+<th style="text-align:left;">
+Dose
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+13.714285714284999
+</td>
+<td style="text-align:left;">
+Control
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+13.142857142857142
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+9.6428571428571423
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+4.2142857142857144
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+<ul>
+<li></td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.625
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Total expected values:</strong> 138</li>
+</ul>
+</div>
+<div id="aphidius-repellency-fg00222" class="section level4">
+<h4>Aphidius Repellency (FG00222)</h4>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<caption>
+Sample Expected Values - Aphidius Repellency
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Metric
+</th>
+<th style="text-align:left;">
+Expected
+</th>
+<th style="text-align:left;">
+Test Group
+</th>
+<th style="text-align:left;">
+Dose
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, % Wasps on plant
+</td>
+<td style="text-align:left;">
+33.5
+</td>
+<td style="text-align:left;">
+Control
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, % Wasps on plant
+</td>
+<td style="text-align:left;">
+37.166666666666664
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, % Wasps on plant
+</td>
+<td style="text-align:left;">
+52.88888888333333
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, % Wasps on plant
+</td>
+<td style="text-align:left;">
+53.444444449999999
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, % Wasps on plant
+</td>
+<td style="text-align:left;">
+29.5
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.625
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total expected values:</strong> 105</p>
+</div>
+<div id="brsol-plant-tests-fg00225" class="section level4">
+<h4>BRSOL Plant Tests (FG00225)</h4>
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<caption>
+Sample Expected Values - BRSOL Plant Tests
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Metric
+</th>
+<th style="text-align:left;">
+Expected
+</th>
+<th style="text-align:left;">
+Test Group
+</th>
+<th style="text-align:left;">
+Dose
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, Mean
+</td>
+<td style="text-align:left;">
+22.725000000000001
+</td>
+<td style="text-align:left;">
+Control
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, 0,41, Mean
+</td>
+<td style="text-align:left;">
+22.975000000000001
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+0.41
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, 1,02, Mean
+</td>
+<td style="text-align:left;">
+18.473684210526315
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+1.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, 2,56, Mean
+</td>
+<td style="text-align:left;">
+15.184210526315789
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+2.56
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dunnett’s test, smaller, 6,4, Mean
+</td>
+<td style="text-align:left;">
+13.411764705882353
+</td>
+<td style="text-align:left;">
+Test item
+</td>
+<td style="text-align:left;">
+6.4
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total expected values:</strong> 352</p>
+</div>
+</div>
 </div>
 <div id="comprehensive-test-execution" class="section level2">
 <h2>Comprehensive Test Execution</h2>
@@ -2608,10 +2809,10 @@ P-value
 0.648290
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.648282
+0.648281
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-8.5e-06
+9.9e-06
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -2631,10 +2832,10 @@ P-value
 0.000001
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.000002
+0.000001
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.1e-06
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3082,10 +3283,10 @@ P-value
 0.980659
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.980617
+0.980621
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-4.22e-05
+3.81e-05
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3556,10 +3757,10 @@ P-value
 0.970255
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.970258
+0.970257
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-2.8e-06
+2.1e-06
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3579,10 +3780,10 @@ P-value
 0.000006
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.000003
+0.000012
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-2.2e-06
+6.4e-06
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3852,9 +4053,9 @@ dose 2 non-numeric T-value expected: - for dose 0.1 non-numeric P-value
 expected: - for dose 0 non-numeric P-value expected: - for dose 0.625
 non-numeric P-value expected: - for dose 2 non-numeric P-value expected:
 - for dose 0.1 non-numeric mean expected value: - for dose 0.625
-non-numeric mean expected value: - for dose 2 completed: 10 / 10
-passed*Status:** ✅ PASS *Endpoint:** Reproduction *Validation
-Summary:** 10 / 10 validations passed
+non-numeric mean expected value: - for dose 2 completed: 9 / 10
+passed*Status:** ❌ FAIL *Endpoint:** Reproduction *Validation
+Summary:** 9 / 10 validations passed
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>
 Detailed Validation Results - Aphidius Reproduction - less
@@ -3902,7 +4103,7 @@ T-statistic
 -0.306146
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3925,7 +4126,7 @@ T-statistic
 -2.181290
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3948,7 +4149,7 @@ T-statistic
 -5.089677
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -3968,36 +4169,36 @@ P-value
 0.627892
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.627854
+0.627807
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-3.72e-05
+0.0000844
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
 </td>
 </tr>
 <tr>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 Reproduction
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 P-value
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 0.3
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
 0.043036
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.043056
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
+0.042853
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.97e-05
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
+0.0001832
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-✅ PASS |
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
+❌ FAIL |
 </td>
 </tr>
 <tr>
@@ -4014,10 +4215,10 @@ P-value
 0.000006
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.000004
+0.000008
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.30e-06
+0.0000022
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4040,7 +4241,7 @@ Mean
 13.714286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4063,7 +4264,7 @@ Mean
 13.142857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4086,7 +4287,7 @@ Mean
 9.642857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4109,7 +4310,7 @@ Mean
 4.214286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4117,7 +4318,7 @@ Mean
 </tr>
 </tbody>
 </table>
-*Test Summary:** 10 / 10 validations passed—#### Testing Alternative:
+*Test Summary:** 9 / 10 validations passed—#### Testing Alternative:
 greater *Testing: MOCK08/15-001 / FG00221 / greater **endpoints:
 Reproduction endpoint: Reproduction non-numeric T-value expected: - for
 dose 0 non-numeric T-value expected: - for dose 0.625 non-numeric
@@ -4175,7 +4376,7 @@ T-statistic
 -0.306146
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4198,7 +4399,7 @@ T-statistic
 -2.181290
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4221,7 +4422,7 @@ T-statistic
 -5.089677
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4241,10 +4442,10 @@ P-value
 0.847029
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.846939
+0.847030
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-9.03e-05
+1.4e-06
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4264,10 +4465,10 @@ P-value
 0.999036
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.999045
+0.999029
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-9.60e-06
+6.5e-06
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4290,7 +4491,7 @@ P-value
 1.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4313,7 +4514,7 @@ Mean
 13.714286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4336,7 +4537,7 @@ Mean
 13.142857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4359,7 +4560,7 @@ Mean
 9.642857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4382,7 +4583,7 @@ Mean
 4.214286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4448,7 +4649,7 @@ T-statistic
 -0.306146
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4471,7 +4672,7 @@ T-statistic
 -2.181290
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4494,7 +4695,7 @@ T-statistic
 -5.089677
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4514,10 +4715,10 @@ P-value
 0.980550
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.980565
+0.980568
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.58e-05
+0.0000186
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4537,10 +4738,10 @@ P-value
 0.086127
 </td>
 <td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
-0.085814
+0.085741
 </td>
 <td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
-3.13e-04
+0.0003864
 </td>
 <td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 ❌ FAIL |
@@ -4560,10 +4761,10 @@ P-value
 0.000016
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.000016
+0.000011
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000049
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4586,7 +4787,7 @@ Mean
 13.714286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4609,7 +4810,7 @@ Mean
 13.142857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4632,7 +4833,7 @@ Mean
 9.642857
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4655,7 +4856,7 @@ Mean
 4.214286
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.00e+00
+0.0000000
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4683,8 +4884,8 @@ MOCK08/15-001 / FG00222 / two.sided **endpoints: Repellency endpoint:
 Repellency non-numeric T-value expected: - for dose 0 non-numeric
 T-value expected: NA for dose 0.2 non-numeric P-value expected: - for
 dose 0 non-convertible P-value expected: n.a. for dose 0.1 non-numeric
-mean expected value: - for dose 0 completed: 4 / 14 passed*Status:** ❌
-FAIL *Endpoint:** Repellency *Validation Summary:** 4 / 14 validations
+mean expected value: - for dose 0 completed: 3 / 14 passed*Status:** ❌
+FAIL *Endpoint:** Repellency *Validation Summary:** 3 / 14 validations
 passed
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
 <caption>
@@ -4822,10 +5023,10 @@ P-value
 0.996417
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.996415
+0.996417
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0000021
+0.0000001
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4845,36 +5046,36 @@ P-value
 0.253710
 </td>
 <td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
-0.253836
+0.253811
 </td>
 <td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
-0.0001266
+0.0001015
 </td>
 <td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 ❌ FAIL |
 </td>
 </tr>
 <tr>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 Repellency
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 P-value
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 0.375
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
 0.231385
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.231456
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
+0.231719
 </td>
-<td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0000706
+<td style="text-align:right;background-color: rgba(255, 204, 204, 255) !important;">
+0.0003335
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-✅ PASS |
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
+❌ FAIL |
 </td>
 </tr>
 <tr>
@@ -4891,10 +5092,10 @@ P-value
 0.994656
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.994649
+0.994654
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0000071
+0.0000021
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -4914,10 +5115,10 @@ P-value
 0.977333
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.977327
+0.977316
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0000066
+0.0000175
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -5040,7 +5241,7 @@ Mean
 </tr>
 </tbody>
 </table>
-*Test Summary:** 4 / 14 validations passed—### Function Group: BRSOL
+*Test Summary:** 3 / 14 validations passed—### Function Group: BRSOL
 Plant Tests ( FG00225 )#### Testing Alternative: less *Testing:
 MOCKSE21/001-1 / FG00225 / less **endpoints: Plant height, Shoot dry
 weight endpoint: Plant height non-numeric T-value expected: - for dose 0
@@ -5252,10 +5453,10 @@ P-value
 0.946421
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.946431
+0.946441
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.04e-05
+2.08e-05
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -5275,10 +5476,10 @@ P-value
 0.000845
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.000878
+0.000859
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-3.28e-05
+1.38e-05
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -5796,10 +5997,10 @@ P-value
 0.848015
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.848029
+0.848043
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-1.45e-05
+2.81e-05
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6182,7 +6383,7 @@ T-statistic
 0.224830
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6205,7 +6406,7 @@ T-statistic
 -3.773957
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6228,7 +6429,7 @@ T-statistic
 -6.694072
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6251,7 +6452,7 @@ T-statistic
 -8.028848
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6274,7 +6475,7 @@ T-statistic
 -9.207258
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6297,7 +6498,7 @@ T-statistic
 -10.811410
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6320,7 +6521,7 @@ T-statistic
 -10.081619
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6343,7 +6544,7 @@ P-value
 0.999984
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6363,10 +6564,10 @@ P-value
 0.001683
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.001679
+0.001634
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-3.6e-06
+4.88e-05
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6389,7 +6590,7 @@ P-value
 0.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6412,7 +6613,7 @@ P-value
 0.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6435,7 +6636,7 @@ P-value
 0.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6458,7 +6659,7 @@ P-value
 0.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6481,7 +6682,7 @@ P-value
 0.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6504,7 +6705,7 @@ Mean
 22.725000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6527,7 +6728,7 @@ Mean
 22.975000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6550,7 +6751,7 @@ Mean
 18.473684
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6573,7 +6774,7 @@ Mean
 15.184211
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6596,7 +6797,7 @@ Mean
 13.411765
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6619,7 +6820,7 @@ Mean
 11.666667
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6642,7 +6843,7 @@ Mean
 8.454545
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6665,7 +6866,7 @@ Mean
 5.000000
 </td>
 <td style="text-align:right;background-color: rgba(204, 255, 204, 255) !important;">
-0.0e+00
+0.00e+00
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
 ✅ PASS |
@@ -6756,7 +6957,7 @@ less
 9/19 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.417 |
+.501 |
 </td>
 </tr>
 <tr>
@@ -6782,7 +6983,7 @@ greater
 9/19 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.299 |
+.294 |
 </td>
 </tr>
 <tr>
@@ -6808,33 +7009,33 @@ two.sided
 9/19 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.334 |
+.350 |
 </td>
 </tr>
 <tr>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 Aphidius Reproduction - less (Reproduction)
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 Aphidius Reproduction - less (Reproduction)
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 FG00221
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 MOCK08/15-001
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
 less
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-✅ PASS |
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
+❌ FAIL |
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-0/10 |
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
+/10 |
 </td>
-<td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.055 |
+<td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
+.053 |
 </td>
 </tr>
 <tr>
@@ -6860,7 +7061,7 @@ greater
 0/10 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.055 |
+.058 |
 </td>
 </tr>
 <tr>
@@ -6912,7 +7113,7 @@ less
 /A |
 </td>
 <td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
-.210 |
+.195 |
 </td>
 </tr>
 <tr>
@@ -6964,7 +7165,7 @@ two.sided
 /14 |
 </td>
 <td style="text-align:left;background-color: rgba(255, 204, 204, 255) !important;">
-.483 |
+.402 |
 </td>
 </tr>
 <tr>
@@ -6990,7 +7191,7 @@ less
 2/22 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.273 |
+.277 |
 </td>
 </tr>
 <tr>
@@ -7016,7 +7217,7 @@ greater
 2/22 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.274 |
+.264 |
 </td>
 </tr>
 <tr>
@@ -7042,7 +7243,7 @@ two.sided
 2/22 |
 </td>
 <td style="text-align:left;background-color: rgba(204, 255, 204, 255) !important;">
-.495 |
+.439 |
 </td>
 </tr>
 </tbody>
@@ -7057,13 +7258,13 @@ cat(&quot;\\n### Overall Statistics\\n&quot;)</code></pre>
 <pre class="r"><code>cat(&quot;- **Total Tests:** &quot;, total_tests, &quot;\\n&quot;)</code></pre>
 <pre><code>## - **Total Tests:**  12 \n</code></pre>
 <pre class="r"><code>cat(&quot;- **Tests Passed:** &quot;, passed_tests, &quot;\\n&quot;)</code></pre>
-<pre><code>## - **Tests Passed:**  8 \n</code></pre>
+<pre><code>## - **Tests Passed:**  7 \n</code></pre>
 <pre class="r"><code>cat(&quot;- **Tests Failed:** &quot;, total_tests - passed_tests, &quot;\\n&quot;)</code></pre>
-<pre><code>## - **Tests Failed:**  4 \n</code></pre>
+<pre><code>## - **Tests Failed:**  5 \n</code></pre>
 <pre class="r"><code>cat(&quot;- **Success Rate:** &quot;, success_rate, &quot;%\\n&quot;)</code></pre>
-<pre><code>## - **Success Rate:**  66.7 %\n</code></pre>
+<pre><code>## - **Success Rate:**  58.3 %\n</code></pre>
 <pre class="r"><code>cat(&quot;- **Total Execution Time:** &quot;, round(total_test_time, 2), &quot; seconds\\n&quot;)</code></pre>
-<pre><code>## - **Total Execution Time:**  3.49  seconds\n</code></pre>
+<pre><code>## - **Total Execution Time:**  3.39  seconds\n</code></pre>
 </div>
 <div id="basic-functionality-tests" class="section level2">
 <h2>Basic Functionality Tests</h2>
@@ -7189,8 +7390,8 @@ validated against expected results</li>
 <div id="technical-implementation" class="section level3">
 <h3>Technical Implementation</h3>
 <ul>
-<li><strong>Success Rate</strong>: 66.7% overall test success</li>
-<li><strong>Execution Time</strong>: 3.49 seconds total</li>
+<li><strong>Success Rate</strong>: 58.3% overall test success</li>
+<li><strong>Execution Time</strong>: 3.39 seconds total</li>
 <li><strong>Data Quality</strong>: Proper filtering and format
 conversion applied</li>
 <li><strong>Validation Coverage</strong>: All function groups and
@@ -7217,7 +7418,7 @@ performance across diverse ecotoxicological scenarios with proper data
 filtering, format handling, and statistical accuracy validation.</p>
 <hr />
 <p><strong>Report Generated</strong>: 2025-09-23<br />
-<strong>Total Execution Time</strong>: 3.49 seconds</p>
+<strong>Total Execution Time</strong>: 3.39 seconds</p>
 </div>
 </div>
 
