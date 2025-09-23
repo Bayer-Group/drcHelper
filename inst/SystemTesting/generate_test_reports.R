@@ -2,7 +2,8 @@
 # ================================
 
 # Load configuration
-source("config/test_framework_config.R")
+# Load configuration
+source("inst/SystemTesting/config/test_framework_config.R")
 
 generate_test_report <- function(test_name, output_dir = "Detailed_Testing_Reports") {
   
@@ -13,7 +14,7 @@ generate_test_report <- function(test_name, output_dir = "Detailed_Testing_Repor
   test_config <- STATISTICAL_TESTS[[test_name]]
   
   # Read template
-  template_path <- "templates/statistical_test_template.Rmd"
+  template_path <- "inst/SystemTesting/templates/statistical_test_template.Rmd"
   if(!file.exists(template_path)) {
     stop("Template file not found: ", template_path)
   }

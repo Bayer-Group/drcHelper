@@ -1,5 +1,5 @@
 ---
-title: "Statistical Test Validation Framework - dunn"
+title: "Statistical Test Validation Framework - fisher"
 author: "Automated Validation System"
 date: "`r Sys.Date()`"
 output: 
@@ -21,15 +21,15 @@ library(ggplot2)
 source("../config/test_framework_config.R")
 ```
 
-# Dunn's Multiple Comparison Test Validation Report
+# Fisher's Exact Test Validation Report
 
 ## Executive Summary
 
-This document presents comprehensive validation results for the **Dunn's Multiple Comparison Test** implementation against V-COP expected results. The validation covers:
+This document presents comprehensive validation results for the **Fisher's Exact Test** implementation against V-COP expected results. The validation covers:
 
-- **Function Groups**: FG00250, FG00251, FG00252, FG00255
+- **Function Groups**: FG00280
 - **Test Alternatives**: less, greater, two.sided
-- **Key Metrics**: z-value, p-value, Mean, df, H-statistic
+- **Key Metrics**: p-value, Uncorrected, Corrected
 
 ```{r load_data, results='asis'}
 # Load test cases data
@@ -45,7 +45,7 @@ cat("- Expected results: ", nrow(test_cases_res), " rows, ", ncol(test_cases_res
 
 ```{r test_config, results='asis'}
 # Define test configuration
-TEST_NAME <- "dunn"
+TEST_NAME <- "fisher"
 FUNCTION_GROUPS <- get_function_groups(TEST_NAME)
 TEST_CONFIG <- STATISTICAL_TESTS[[TEST_NAME]]
 
@@ -84,13 +84,13 @@ cat("\n")
 The validation process follows these steps:
 
 1. **Data Matching**: Match test case data with expected results by Study ID
-2. **Test Execution**: Run Dunn's Multiple Comparison Test with appropriate parameters
+2. **Test Execution**: Run Fisher's Exact Test with appropriate parameters
 3. **Result Comparison**: Compare actual vs expected values with tolerance-based validation
 4. **Statistical Summary**: Aggregate validation results and success rates
 
 ```{r validation_framework}
 # Validation function framework
-run_dunn_validation <- function(study_ids = NULL, alternatives = NULL) {
+run_fisher_validation <- function(study_ids = NULL, alternatives = NULL) {
   
   if(is.null(study_ids)) {
     study_ids <- unique(expected_results[['Study ID']])
@@ -188,7 +188,7 @@ if(TEST_CONFIG$implemented) {
   cat("**Executing validation tests...**\n\n")
   
   # Run validation tests
-  test_results <- run_dunn_validation()
+  test_results <- run_fisher_validation()
   
   # Run basic functionality tests
   basic_tests <- basic_functionality_tests()
@@ -289,7 +289,7 @@ if(nrow(test_summary) > 0) {
   ggplot(test_summary, aes(x = reorder(Test, Time_Numeric), y = Time_Numeric, fill = Status_Clean)) +
     geom_bar(stat = "identity") +
     coord_flip() +
-    labs(title = "Dunn's Multiple Comparison Test - Test Execution Time", 
+    labs(title = "Fisher's Exact Test - Test Execution Time", 
          x = "Test Case", 
          y = "Time (seconds)") +
     scale_fill_manual(values = c("PASS" = "darkgreen", "FAIL" = "red")) +
@@ -300,16 +300,19 @@ if(nrow(test_summary) > 0) {
 
 ## Conclusion
 
-This validation framework provides the structure for comprehensive Dunn's Multiple Comparison Test validation. The test implementation is complete and validation results demonstrate the accuracy of the statistical calculations.
+This validation framework provides the structure for comprehensive Fisher's Exact Test validation. The test implementation is pending. This framework provides the structure for validation once the test function is implemented.
 
 ### Next Steps
 
-1. Review validation results
-2. Address any failing test cases
-3. Update test parameters if needed
+1. Implement
+fisher_test
+function
+2. Add result validation logic
+3. Implement basic functionality tests
+4. Run full validation suite
 
 ---
 
 **Generated on:** `r Sys.time()`  
 **Framework Version:** 1.0  
-**Test Status:** IMPLEMENTED
+**Test Status:** PENDING IMPLEMENTATION
