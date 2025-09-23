@@ -80,7 +80,34 @@ navbar:
         href: articles/NOEC_ECx_BMD.html
     articles:
       text: Articles
-      href: articles/index.html
+      menu:
+      # Core Statistical Methods
+      - text: "Core: Quantal Data"
+        href: articles/Quantal-Data.html
+      - text: "Core: Ordinal Data"
+        href: articles/Ordinal-Data.html
+      - text: "Core: Count Data"
+        href: articles/Count_Data.html
+      - text: "Core: Understanding Mixed Models"
+        href: articles/LMM-GLMM-and-GAMM.html
+      # Advanced Topics
+      - text: "Advanced: Normality Check"
+        href: articles/Normality-Check.html
+      - text: "Advanced: Extra Binomial Variance and Trend Test"
+        href: articles/Binomial_Extra_Variance.html
+      - text: "Advanced: Equivalence Testing"
+        href: articles/Equivalence-Testing.html
+      # Alternative Methods
+      - text: "Alternative: NLS Approaches"
+        href: articles/Examples using NLS.html
+      - text: "Alternative: Using drda Package"
+        href: articles/Examples_using_drda.html
+      - text: "Alternative: TSK Method"
+        href: articles/TSK_method.html
+      - text: "Alternative: MQJT Analysis"
+        href: articles/MQJT.html
+      - text: "Alternative: Advanced Model Fitting"
+        href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
     validation:
       text: Validation
       menu:
@@ -99,29 +126,3 @@ navbar:
       href: https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue
       aria-label: New Issue
 
-# Article organization with sections
-articles:
-  - title: "Core Statistical Methods"
-    desc: >
-      These articles cover the foundational statistical methods implemented in drcHelper
-    contents:
-      - Quantal-Data
-      - Ordinal-Data
-      - Count_Data
-      - LMM-GLMM-and-GAMM
-  - title: "Advanced Topics"
-    desc: >
-      These articles cover more advanced statistical concepts and techniques
-    contents:
-      - Normality-Check
-      - Binomial_Extra_Variance
-      - Equivalence-Testing
-  - title: "Alternative Methods"
-    desc: >
-      These articles explore alternative statistical methods and approaches
-    contents:
-      - "Examples using NLS"
-      - Examples_using_drda
-      - TSK_method
-      - MQJT
-      - Advanced_Fitting-a-biphasic-dose-reponse-model
