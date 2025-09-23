@@ -101,6 +101,43 @@ match_test_data_correctly <- function(data_row, results_df) {
 }
 ```
 
+### Count Data Detection Issue
+
+#### Critical Bug Fixed: Endpoint-Specific Count Data Detection
+
+A critical issue was identified and resolved in the validation logic:
+
+**Problem**: The original code was checking if ANY endpoint in a study had count data:
+```r
+# INCORRECT: Checks entire study
+has_count_data <- any(!is.na(study_data$Total))
+```
+
+**Issue**: Studies can have multiple endpoints with different data types. For example, study "MOCK08/15-001" has:
+- **Mortality** endpoint: Count data (Alive/Dead/Total columns)
+- **Reproduction** endpoint: Continuous data (numeric response)
+- **Repellency** endpoint: Continuous data (percentage response)
+
+The old logic would incorrectly classify Reproduction and Repellency as "count data" just because the same study also contains a Mortality endpoint with count data.
+
+**Solution**: Check count data only for the specific endpoint being tested:
+```r
+# CORRECT: First determine which endpoint we're testing
+test_endpoint <- unique(expected_results[['Endpoint']])[1]
+
+# Get data for the specific study + endpoint combination
+study_data <- test_cases_data[
+  test_cases_data[['Study ID']] == study_id & 
+  test_cases_data[['Endpoint']] == test_endpoint, ]
+
+# Check count data for THIS SPECIFIC ENDPOINT only
+has_count_data <- any(!is.na(study_data$Total)) || 
+                  any(!is.na(study_data$Alive)) || 
+                  any(!is.na(study_data$Dead))
+```
+
+**Result**: All endpoints with Dunnett's test expected results are now correctly identified as continuous data and can proceed with testing.
+
 ### Control Dose Handling
 
 #### Important Note: Control Dose Values
@@ -291,18 +328,7 @@ convert_dose <- function(dose_str) {
 # Helper function to run Dunnett test validation
 run_dunnett_validation <- function(study_id, function_group_id, alternative = "less") {
   
-  # Get test data for this study
-  study_data <- test_cases_data[test_cases_data[['Study ID']] == study_id, ]
-  
-  if(nrow(study_data) == 0) {
-    return(list(passed = FALSE, error = "No data found for study ID"))
-  }
-  
-  # Convert dose to numeric (European decimal notation)
-  study_data$Dose_numeric <- sapply(study_data$Dose, convert_dose)
-  study_data <- study_data[!is.na(study_data$Dose_numeric), ]
-  
-  # Get expected results for this function group - Filter for Dunnett's test only
+  # First, get expected results to determine which endpoint we're testing
   # Apply correct matching logic based on study type
   if (study_id == "MOCK0065") {
     # Myriophyllum: match on Study ID + Endpoint + Measurement Variable
@@ -322,6 +348,22 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
     return(list(passed = FALSE, error = "No Dunnett expected results found"))
   }
   
+  # Get the endpoint we're testing from the expected results
+  test_endpoint <- unique(expected_results[['Endpoint']])[1]
+  
+  # Get test data for this study AND SPECIFIC ENDPOINT (not entire study)
+  study_data <- test_cases_data[
+    test_cases_data[['Study ID']] == study_id & 
+    test_cases_data[['Endpoint']] == test_endpoint, ]
+  
+  if(nrow(study_data) == 0) {
+    return(list(passed = FALSE, error = paste("No data found for study", study_id, "endpoint", test_endpoint)))
+  }
+  
+  # Convert dose to numeric (European decimal notation)
+  study_data$Dose_numeric <- sapply(study_data$Dose, convert_dose)
+  study_data <- study_data[!is.na(study_data$Dose_numeric), ]
+  
   # Filter expected results for the specific alternative hypothesis
   alternative_pattern <- switch(alternative,
     "less" = "smaller",
@@ -335,8 +377,11 @@ run_dunnett_validation <- function(study_id, function_group_id, alternative = "l
   }
   
   tryCatch({
-    # Determine if we have continuous or count data
-    has_count_data <- any(!is.na(study_data$Total))
+    # Determine if THIS SPECIFIC ENDPOINT has continuous or count data
+    # CRITICAL FIX: Check count data for the specific endpoint being tested, not entire study
+    has_count_data <- any(!is.na(study_data$Total)) || 
+                      any(!is.na(study_data$Alive)) || 
+                      any(!is.na(study_data$Dead))
     
     if(has_count_data) {
       # Count data - requires specialized handling
@@ -998,12 +1043,15 @@ The validation framework successfully:
 - ✅ Prepares expected value comparisons
 - ✅ Implements correct data matching logic (Study ID + Endpoint for most studies, + Measurement Variable for MOCK0065)
 - ✅ Handles control dose variations (numeric 0 and NA values)
+- ✅ **CRITICAL FIX**: Correctly detects count data per endpoint, not per study (prevents false positives)
 
 ### Recommendations:
 
-1. **Data Matching Logic**: Implement the corrected matching logic where MOCK0065 requires 3-field matching (Study ID + Endpoint + Measurement Variable) while other studies use 2-field matching (Study ID + Endpoint only).
+1. **CRITICAL: Endpoint-Specific Count Data Detection**: Ensure the validation logic checks count data for the specific endpoint being tested, not the entire study. This prevents false classification of continuous endpoints as count data.
 
-2. **Control Dose Handling**: Ensure functions properly handle both numeric (0) and missing (NA) control dose values in the test data.
+2. **Data Matching Logic**: Implement the corrected matching logic where MOCK0065 requires 3-field matching (Study ID + Endpoint + Measurement Variable) while other studies use 2-field matching (Study ID + Endpoint only).
+
+3. **Control Dose Handling**: Ensure functions properly handle both numeric (0) and missing (NA) control dose values in the test data.
 
 3. **Implementation Priority**: Focus on continuous data scenarios (FG00220, FG00225) as these represent the most common use cases.
 
