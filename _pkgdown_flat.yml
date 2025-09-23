@@ -131,15 +131,6 @@ navbar:
 
 # Article index page section organization
 articles:
-  - title: "Get Started"
-    desc: >
-      Introduction to the package and basic usage
-    contents:
-      - Introduction
-      - drcHelper
-      - Dunnetts_Test_for_Data_with_Hierarchical_Structure
-      - Example_Analysis_Workflow
-  
   - title: "Core Statistical Methods"
     desc: >
       These articles cover the foundational statistical methods implemented in drcHelper
@@ -169,34 +160,3 @@ articles:
       - articles/TSK_method
       - articles/MQJT
       - articles/Advanced_Fitting-a-biphasic-dose-reponse-model
-      
-  - title: "Regulatory Statistics"
-    desc: >
-      Statistical methods for regulatory assessments
-    contents:
-      - articles/NOEC_Methods
-      - articles/Limit-Test
-      - articles/EFSA-Criteria
-      - articles/Example_RSCABS
-      - articles/Trend-Testing
-      - articles/NOEC_ECx_BMD
-      - articles/OECD_ED_Assays
-      - articles/Test-Guidelines
-      
-  - title: "Validation"
-    desc: >
-      Validation of statistical methods in the package
-    contents:
-      - articles/System_Testing
-      - articles/val_ED_plus
-      - articles/TSK-and-Probit-Models
-      - articles/Verification_which_JT
-      - articles/Validation_MCP_tests
-      - articles/Verification_CA_test
-      
-  - title: "Examples"
-    desc: >
-      Example applications of the package
-    contents:
-      - articles/Examples_drc
-      - articles/Examples_oecd201
