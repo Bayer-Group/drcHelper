@@ -26,7 +26,7 @@ Analysis of quantal data typically involves the following steps as shown in the 
 ```{r echo=FALSE,out.width="90%"}
 #| fig.alt: >
 #|   Quantal NOEC Flowchart
-knitr::include_graphics("../assets/quantal_NOEC.png")
+knitr::include_graphics("vignettes/assets/quantal_NOEC.png")
 ```
 
 ## An example dataset
@@ -438,7 +438,7 @@ ggsave("binomial_tank_effects_visualization.png", combined_plot, width = 12, hei
 ```
 
 ```{r echo=FALSE,eval=FALSE,include=FALSE}
-knitr::include_graphics("./../assets/binomial_tank_effects_visualization.png")
+knitr::include_graphics("vignettes/assets/binomial_tank_effects_visualization.png")
 ```
 
 The plot on the upper left shows the survival proportions for each tank (colored points) at each dose level. The black diamonds represent the mean survival proportion at each dose level, and the dashed line shows the theoretical dose-response relationship without tank effects. The variation among tanks at the same dose level illustrates the tank effect. 
