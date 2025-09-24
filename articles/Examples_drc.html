@@ -86,6 +86,8 @@
     <li><a class="dropdown-item" href="../articles/val_ED_plus.html">ED Calculation Consistency</a></li>
     <li><a class="dropdown-item" href="../articles/TSK-and-Probit-Models.html">TSK and Probit Model</a></li>
     <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
+    <li><a class="dropdown-item" href="../articles/Verification_CA_test.html">Verification of CA test</a></li>
+    <li><a class="dropdown-item" href="../articles/Validation_MCP_tests.html">Validation of MCP tests</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
@@ -133,7 +135,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     gaussian, getInitial</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.r-project.org" class="external-link">drc</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://had.co.nz/plyr" class="external-link">plyr</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://had.co.nz/plyr" class="external-link">plyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"../knitr-setup.R"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="is-there-a-difference-between-ecx-and-bmd">Is there a difference between ECx and BMD?<a class="anchor" aria-label="anchor" href="#is-there-a-difference-between-ecx-and-bmd"></a>
 </h2>
@@ -202,7 +205,7 @@ obtained through inverse regression.</p>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">finney71.m1</span>, broken <span class="op">=</span> <span class="cn">TRUE</span>, bp <span class="op">=</span> <span class="fl">0.1</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-2-1.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/drc/man/ED.drc.html" class="external-link">ED</a></span><span class="op">(</span><span class="va">finney71.m1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">50</span><span class="op">)</span>, interval <span class="op">=</span> <span class="st">"delta"</span>, reference <span class="op">=</span> <span class="st">"control"</span>,type<span class="op">=</span><span class="st">"relative"</span><span class="op">)</span></span>
@@ -266,13 +269,13 @@ obtained through inverse regression.</p>
 <span><span class="co">#&gt; e:1:90  6.38864    0.84510 4.62580 8.15148</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ryegrass.m1</span>,broken <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ryegrass.m1</span>, broken <span class="op">=</span> <span class="cn">TRUE</span>, type<span class="op">=</span><span class="st">"confidence"</span>, add<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-3-1.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Fitting the Brain-Cousens model</span></span>
 <span><span class="va">lettuce.m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/drm.html" class="external-link">drm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">conc</span>,</span>
 <span>data <span class="op">=</span> <span class="va">lettuce</span>, fct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/drc/man/BC.html" class="external-link">BC.4</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lettuce.m1</span>,confidence.level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-4-1.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### Calculating ED[-10]</span></span>
 <span></span>
@@ -301,22 +304,22 @@ obtained through inverse regression.</p>
 <span></span>
 <span><span class="co">## Plot with no colours</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spinach.m1</span>, main <span class="op">=</span> <span class="st">"Different line types (default)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-1.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Plot with default colours</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spinach.m1</span>, col <span class="op">=</span> <span class="cn">TRUE</span>, main <span class="op">=</span> <span class="st">"Default colours"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-2.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Plot with specified colours</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spinach.m1</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">6</span>,<span class="fl">3</span>,<span class="fl">23</span>,<span class="fl">56</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"User-specified colours"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-3.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Plot of curves 1 and 2 only</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">spinach.m1</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"User-specified curves"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
+<p><img src="Examples_drc_files/figure-html/unnamed-chunk-5-4.png" alt="A plot generated from an R code chunk." width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

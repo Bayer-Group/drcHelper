@@ -86,6 +86,8 @@
     <li><a class="dropdown-item" href="../articles/val_ED_plus.html">ED Calculation Consistency</a></li>
     <li><a class="dropdown-item" href="../articles/TSK-and-Probit-Models.html">TSK and Probit Model</a></li>
     <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
+    <li><a class="dropdown-item" href="../articles/Verification_CA_test.html">Verification of CA test</a></li>
+    <li><a class="dropdown-item" href="../articles/Validation_MCP_tests.html">Validation of MCP tests</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
@@ -247,7 +249,7 @@ handling datasets where full 0-100% response isn’t achieved.</p>
 <span></span>
 <span><span class="co"># Compute TSK</span></span>
 <span><span class="va">tsk_result_ecotox</span> <span class="op">&lt;-</span> <span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/TSK.html" class="external-link">TSK</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">x</span>, <span class="va">data</span><span class="op">$</span><span class="va">r</span>, <span class="va">data</span><span class="op">$</span><span class="va">n</span>, A <span class="op">=</span> <span class="fl">0</span>, conf <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
-<p><img src="TSK-and-Probit-Models_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="TSK-and-Probit-Models_files/figure-html/unnamed-chunk-3-1.png" alt="A plot generated from an R code chunk." width="700"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"TSK Results:"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "TSK Results:"</span></span>

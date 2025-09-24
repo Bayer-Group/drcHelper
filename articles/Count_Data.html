@@ -90,6 +90,8 @@
     <li><a class="dropdown-item" href="../articles/val_ED_plus.html">ED Calculation Consistency</a></li>
     <li><a class="dropdown-item" href="../articles/TSK-and-Probit-Models.html">TSK and Probit Model</a></li>
     <li><a class="dropdown-item" href="../articles/Verification_which_JT.html">Which JT test to use</a></li>
+    <li><a class="dropdown-item" href="../articles/Verification_CA_test.html">Verification of CA test</a></li>
+    <li><a class="dropdown-item" href="../articles/Validation_MCP_tests.html">Validation of MCP tests</a></li>
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
@@ -232,37 +234,35 @@ is more likely to be observed from a Poisson but not from a normal
 distribution.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###  Fisher's Exact Test for Count Data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Exact Poisson test</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## data:  120 time base: 1</span></span>
-<span><span class="co">## number of events = 120, time base = 1, p-value = 0.05088</span></span>
-<span><span class="co">## alternative hypothesis: true event rate is not equal to 100</span></span>
-<span><span class="co">## 95 percent confidence interval:</span></span>
-<span><span class="co">##   99.49193 143.49059</span></span>
-<span><span class="co">## sample estimates:</span></span>
-<span><span class="co">## event rate </span></span>
-<span><span class="co">##        120</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">120</span>,mean<span class="op">=</span><span class="fl">100</span>,sd<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.9772499</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">##  Exact Poisson test</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## data:  8 time base: 1</span></span>
-<span><span class="co">## number of events = 8, time base = 1, p-value = 0.06945</span></span>
-<span><span class="co">## alternative hypothesis: true event rate is not equal to 4</span></span>
-<span><span class="co">## 95 percent confidence interval:</span></span>
-<span><span class="co">##   3.453832 15.763189</span></span>
-<span><span class="co">## sample estimates:</span></span>
-<span><span class="co">## event rate </span></span>
-<span><span class="co">##          8</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">8</span>,mean<span class="op">=</span><span class="fl">4</span>,sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.9772499</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">120</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Exact Poisson test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  120 time base: 1</span></span>
+<span><span class="co">#&gt; number of events = 120, time base = 1, p-value = 0.05088</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true event rate is not equal to 100</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;   99.49193 143.49059</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; event rate </span></span>
+<span><span class="co">#&gt;        120</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">120</span>,mean<span class="op">=</span><span class="fl">100</span>,sd<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.9772499</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html" class="external-link">poisson.test</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">1</span>,r<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Exact Poisson test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  8 time base: 1</span></span>
+<span><span class="co">#&gt; number of events = 8, time base = 1, p-value = 0.06945</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true event rate is not equal to 4</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;   3.453832 15.763189</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; event rate </span></span>
+<span><span class="co">#&gt;          8</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="fl">8</span>,mean<span class="op">=</span><span class="fl">4</span>,sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.9772499</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="data-transformation">Data Transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a>
 </h3>
