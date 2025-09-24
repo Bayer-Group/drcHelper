@@ -4,6 +4,16 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+source("../knitr-setup.R")
+```
+
 We focus on ED assessment for non-mammalian vertebrates (fish and amphibians) here.
 
 # XETA (Xenopus embryonic thyroid assay)

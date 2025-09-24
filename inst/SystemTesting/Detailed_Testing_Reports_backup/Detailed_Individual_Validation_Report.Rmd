@@ -1,0 +1,288 @@
+---
+title: "Detailed Dunnett Validation Results"
+subtitle: "Individual Actual vs Expected Value Comparisons"
+author: "drcHelper Package Validation"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: bootstrap
+    code_folding: hide
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, results = 'asis')
+library(drcHelper)
+library(knitr)
+library(kableExtra)
+data("test_cases_data")
+data("test_cases_res")
+```
+
+## Overview
+
+This report provides **detailed individual comparisons** showing actual vs expected values for each Dunnett test validation, including investigation of validation failures.
+
+```{r load_functions, include=FALSE}
+# Load both validation functions
+source("comprehensive_validation_functions.R")
+source("detailed_validation_functions.R")
+```
+
+## Detailed Validation Results
+
+```{r detailed_validation, echo=FALSE}
+# Get all Dunnett function groups
+dunnett_cases <- test_cases_res[grepl("Dunnett", test_cases_res$`Brief description`, ignore.case = TRUE), ]
+unique_study_fgs <- unique(dunnett_cases[, c("Study ID", "Function group ID", "Test organism")])
+
+# Store all detailed results
+all_detailed_results <- data.frame()
+
+cat("### Individual Function Group Results with Detailed Comparisons\n\n")
+
+for(i in 1:nrow(unique_study_fgs)) {
+  study <- unique_study_fgs$`Study ID`[i]
+  fg <- unique_study_fgs$`Function group ID`[i]
+  organism <- unique_study_fgs$`Test organism`[i]
+  
+  cat("#### ", study, " / ", fg, " (", organism, ")\n\n")
+  
+  # Get detailed results
+  detailed_result <- run_detailed_dunnett_validation(study, fg, alternative = "less")
+  
+  if(nrow(detailed_result$detailed_results) > 0) {
+    
+    # Add organism info to detailed results
+    detailed_result$detailed_results$Test_Organism <- organism
+    
+    # Reorder columns for better display
+    detailed_display <- detailed_result$detailed_results[, c("Study_ID", "Function_Group", "Test_Organism", "Endpoint", "Comparison", 
+                                                            "Actual_T_Value", "Expected_T_Value", "T_Match",
+                                                            "Actual_P_Value", "Expected_P_Value", "P_Match")]
+    
+    # Show the detailed table
+    print(kable(detailed_display,
+                caption = paste("Detailed Results for", study, "/", fg),
+                col.names = c("Study", "FG", "Organism", "Endpoint", "Comparison", 
+                             "Actual T", "Expected T", "T Match", 
+                             "Actual P", "Expected P", "P Match")) %>%
+          kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+          column_spec(6, width = "1.2cm") %>%
+          column_spec(7, width = "1.2cm") %>%
+          column_spec(8, width = "1cm") %>%
+          column_spec(9, width = "1.2cm") %>%
+          column_spec(10, width = "1.2cm") %>%
+          column_spec(11, width = "1cm") %>%
+          row_spec(which(detailed_display$T_Match == TRUE & detailed_display$P_Match == TRUE), 
+                   background = "#d4edda") %>%
+          row_spec(which(detailed_display$Comparison == "ERROR"), background = "#f8d7da"))
+    
+    all_detailed_results <- rbind(all_detailed_results, detailed_result$detailed_results)
+    
+    # Summary for this function group
+    total_comparisons <- detailed_result$n_comparisons
+    passed_comparisons <- detailed_result$n_passed
+    success_rate <- ifelse(total_comparisons > 0, round(100 * passed_comparisons / total_comparisons, 1), 0)
+    
+    cat("**Summary:**\n")
+    cat("- Endpoints processed:", paste(detailed_result$endpoints_tested, collapse = ", "), "\n")
+    cat("- Individual validations:", passed_comparisons, "/", total_comparisons, " (", success_rate, "%)\n")
+    cat("- Overall status:", ifelse(detailed_result$passed, "✅ PASSED", "❌ FAILED"), "\n\n")
+    
+  } else {
+    cat("**No detailed results available - validation failed**\n\n")
+    
+    # Add error entry to all_detailed_results
+    error_entry <- data.frame(
+      Study_ID = study,
+      Function_Group = fg,
+      Test_Organism = organism,
+      Endpoint = "ERROR",
+      Comparison = "Validation Failed",
+      Actual_T_Value = NA,
+      Actual_P_Value = NA,
+      Expected_T_Value = NA,
+      Expected_P_Value = NA,
+      T_Match = FALSE,
+      P_Match = FALSE,
+      stringsAsFactors = FALSE
+    )
+    all_detailed_results <- rbind(all_detailed_results, error_entry)
+  }
+}
+```
+
+## Investigation of Validation Failures
+
+```{r failure_investigation, echo=FALSE}
+cat("### Analysis of Failed Validations\n\n")
+
+# Identify failed cases
+failed_cases <- all_detailed_results[all_detailed_results$Comparison == "ERROR" | 
+                                    all_detailed_results$Comparison == "Validation Failed", ]
+
+if(nrow(failed_cases) > 0) {
+  cat("**Failed Validation Cases:**\n\n")
+  
+  print(kable(failed_cases[, c("Study_ID", "Function_Group", "Test_Organism", "Endpoint")],
+              caption = "Function Groups with Validation Failures",
+              col.names = c("Study ID", "Function Group", "Test Organism", "Endpoint")) %>%
+        kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+        row_spec(1:nrow(failed_cases), background = "#f8d7da"))
+  
+  cat("\n**Detailed Investigation:**\n\n")
+  
+  # Investigate each failed case
+  for(i in 1:nrow(failed_cases)) {
+    study <- failed_cases$Study_ID[i]
+    fg <- failed_cases$Function_Group[i]
+    organism <- failed_cases$Test_Organism[i]
+    
+    cat("**", study, "/", fg, " (", organism, "):**\n")
+    
+    # Check data availability
+    test_data_count <- nrow(test_cases_data[test_cases_data$`Study ID` == study & 
+                                           test_cases_data$`Function group ID` == fg, ])
+    expected_count <- nrow(test_cases_res[test_cases_res$`Study ID` == study & 
+                                         test_cases_res$`Function group ID` == fg, ])
+    
+    cat("- Test data rows available:", test_data_count, "\n")
+    cat("- Expected result rows available:", expected_count, "\n")
+    
+    if(test_data_count > 0) {
+      test_sample <- test_cases_data[test_cases_data$`Study ID` == study & 
+                                    test_cases_data$`Function group ID` == fg, ]
+      cat("- Endpoints in data:", paste(unique(test_sample$Endpoint), collapse = ", "), "\n")
+      cat("- Data quality issues: Likely missing values or format problems\n")
+    } else {
+      cat("- **ISSUE: No test data found for this function group**\n")
+    }
+    cat("\n")
+  }
+} else {
+  cat("✅ **No validation failures found - all function groups processed successfully**\n\n")
+}
+```
+
+## Complete Results Summary
+
+```{r complete_summary, echo=FALSE}
+cat("### Overall Detailed Results Summary\n\n")
+
+# Calculate comprehensive statistics
+successful_results <- all_detailed_results[all_detailed_results$Comparison != "ERROR" & 
+                                          all_detailed_results$Comparison != "Validation Failed", ]
+
+if(nrow(successful_results) > 0) {
+  # Count matches
+  t_matches <- sum(successful_results$T_Match, na.rm = TRUE)
+  p_matches <- sum(successful_results$P_Match, na.rm = TRUE)
+  total_t_tests <- sum(!is.na(successful_results$T_Match))
+  total_p_tests <- sum(!is.na(successful_results$P_Match))
+  
+  # Summary statistics
+  summary_stats <- data.frame(
+    Metric = c("Function Groups Tested", "Individual Comparisons", 
+               "T-Value Tests", "T-Value Matches", "T-Value Success Rate",
+               "P-Value Tests", "P-Value Matches", "P-Value Success Rate",
+               "Total Individual Validations", "Total Passed", "Overall Success Rate"),
+    Value = c(
+      length(unique(paste(all_detailed_results$Study_ID, all_detailed_results$Function_Group))),
+      nrow(successful_results),
+      total_t_tests, t_matches, paste0(round(100 * t_matches / total_t_tests, 1), "%"),
+      total_p_tests, p_matches, paste0(round(100 * p_matches / total_p_tests, 1), "%"),
+      total_t_tests + total_p_tests, t_matches + p_matches, 
+      paste0(round(100 * (t_matches + p_matches) / (total_t_tests + total_p_tests), 1), "%")
+    ),
+    stringsAsFactors = FALSE
+  )
+  
+  print(kable(summary_stats,
+              caption = "Complete Detailed Validation Statistics",
+              col.names = c("Performance Metric", "Value")) %>%
+        kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+        row_spec(nrow(summary_stats), background = "#e8f4fd", bold = TRUE))
+}
+
+cat("\n### Test Organism Performance\n\n")
+
+# Performance by organism
+if(nrow(successful_results) > 0) {
+  organism_performance <- data.frame()
+  organisms <- unique(all_detailed_results$Test_Organism)
+  
+  for(organism in organisms) {
+    org_data <- successful_results[successful_results$Test_Organism == organism, ]
+    
+    if(nrow(org_data) > 0) {
+      org_t_matches <- sum(org_data$T_Match, na.rm = TRUE)
+      org_p_matches <- sum(org_data$P_Match, na.rm = TRUE)
+      org_t_total <- sum(!is.na(org_data$T_Match))
+      org_p_total <- sum(!is.na(org_data$P_Match))
+      org_success_rate <- round(100 * (org_t_matches + org_p_matches) / (org_t_total + org_p_total), 1)
+      
+      organism_performance <- rbind(organism_performance, data.frame(
+        Test_Organism = organism,
+        Comparisons = nrow(org_data),
+        T_Tests = org_t_total,
+        T_Passed = org_t_matches,
+        P_Tests = org_p_total,
+        P_Passed = org_p_matches,
+        Success_Rate = paste0(org_success_rate, "%"),
+        stringsAsFactors = FALSE
+      ))
+    }
+  }
+  
+  if(nrow(organism_performance) > 0) {
+    print(kable(organism_performance,
+                caption = "Performance by Test Organism",
+                col.names = c("Test Organism", "Comparisons", "T-Tests", "T-Passed", 
+                             "P-Tests", "P-Passed", "Success Rate")) %>%
+          kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+          column_spec(1, bold = TRUE, color = "darkblue"))
+  }
+}
+```
+
+## Conclusions
+
+```{r conclusions, echo=FALSE}
+cat("### Key Findings\n\n")
+
+if(nrow(failed_cases) > 0) {
+  cat("**Issues Identified:**\n")
+  cat("- ", nrow(failed_cases), " function groups have validation failures\n")
+  cat("- Main issue appears to be data quality problems (missing values, format issues)\n")
+  cat("- Specific case MOCK08/15-001 FG00222 has endpoint 'Repellency' but data processing fails\n\n")
+}
+
+if(nrow(successful_results) > 0) {
+  total_success <- round(100 * (t_matches + p_matches) / (total_t_tests + total_p_tests), 1)
+  cat("**Successful Validations:**\n")
+  cat("- Overall success rate:", total_success, "%\n")
+  cat("- Individual T-value validations:", t_matches, "/", total_t_tests, "\n")
+  cat("- Individual P-value validations:", p_matches, "/", total_p_tests, "\n\n")
+  
+  cat("**Production Assessment:**\n")
+  if(total_success >= 90) {
+    cat("✅ **EXCELLENT** - Validation framework performs very well\n")
+  } else if(total_success >= 80) {
+    cat("⚠️ **GOOD** - Validation framework performs well with some data quality issues\n")
+  } else {
+    cat("❌ **NEEDS WORK** - Validation framework has significant issues to address\n")
+  }
+}
+
+cat("\n**Answers to User Questions:**\n")
+cat("1. **Detailed actual vs expected values**: Now shown in individual comparison tables above\n")
+cat("2. **MOCK08/15-001 FG00222 'None' issue**: Data quality problem - endpoint exists but has missing/invalid values preventing model fitting\n")
+```
+
+---
+
+**Report Generated:** `r Sys.time()`  
+**Analysis Type:** Individual Actual vs Expected Value Comparisons

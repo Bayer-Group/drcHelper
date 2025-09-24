@@ -4,8 +4,13 @@ editor_options:
   chunk_output_type: console
 ---
 
-
-
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+source("../knitr-setup.R")
+```
 
 ```r
 library(drcHelper)

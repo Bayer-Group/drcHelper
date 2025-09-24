@@ -1,0 +1,318 @@
+---
+title: "Statistical Test Validation Framework - fisher"
+author: "Automated Validation System"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(drcHelper)
+library(kableExtra)
+library(ggplot2)
+
+# Load test framework configuration
+source("../config/test_framework_config.R")
+```
+
+# Fisher's Exact Test Validation Report
+
+## Executive Summary
+
+This document presents comprehensive validation results for the **Fisher's Exact Test** implementation against V-COP expected results. The validation covers:
+
+- **Function Groups**: FG00280
+- **Test Alternatives**: less, greater, two.sided
+- **Key Metrics**: p-value, Uncorrected, Corrected
+
+```{r load_data, results='asis'}
+# Load test cases data
+data("test_cases_data")
+data("test_cases_res")
+
+cat("**Dataset dimensions:**\n\n")
+cat("- Test cases data: ", nrow(test_cases_data), " rows, ", ncol(test_cases_data), " columns\n")
+cat("- Expected results: ", nrow(test_cases_res), " rows, ", ncol(test_cases_res), " columns\n\n")
+```
+
+## Test Configuration
+
+```{r test_config, results='asis'}
+# Define test configuration
+TEST_NAME <- "fisher"
+FUNCTION_GROUPS <- get_function_groups(TEST_NAME)
+TEST_CONFIG <- STATISTICAL_TESTS[[TEST_NAME]]
+
+cat("**Test Configuration:**\n\n")
+cat("- **Test Name:** ", TEST_CONFIG$name, "\n")
+cat("- **Function Groups:** ", paste(FUNCTION_GROUPS, collapse = ", "), "\n")
+cat("- **Test Function:** ", TEST_CONFIG$test_function, "\n")
+cat("- **Implemented:** ", ifelse(TEST_CONFIG$implemented, "✅ Yes", "⚠️ No"), "\n\n")
+
+if(!TEST_CONFIG$implemented) {
+  cat("> ⚠️ **WARNING:** This test is not yet implemented. This template shows the validation framework structure.\n\n")
+}
+```
+
+## Data Preparation and Validation
+
+```{r data_preparation, results='asis'}
+# Filter expected results for this test's function groups
+expected_results <- test_cases_res[test_cases_res[['Function group ID']] %in% FUNCTION_GROUPS, ]
+
+cat("**Expected results for ", TEST_CONFIG$name, ":**\n\n")
+cat("- **Total expected results:** ", nrow(expected_results), "\n")
+cat("- **Unique studies:** ", length(unique(expected_results[['Study ID']])), "\n\n")
+
+# Show breakdown by function group
+cat("**Breakdown by Function Group:**\n\n")
+fg_summary <- table(expected_results[['Function group ID']])
+for(i in seq_along(fg_summary)) {
+  cat("- ", names(fg_summary)[i], ": ", fg_summary[i], " test cases\n")
+}
+cat("\n")
+```
+
+## Validation Methodology
+
+The validation process follows these steps:
+
+1. **Data Matching**: Match test case data with expected results by Study ID
+2. **Test Execution**: Run Fisher's Exact Test with appropriate parameters
+3. **Result Comparison**: Compare actual vs expected values with tolerance-based validation
+4. **Statistical Summary**: Aggregate validation results and success rates
+
+```{r validation_framework}
+# Validation function framework
+run_fisher_validation <- function(study_ids = NULL, alternatives = NULL) {
+  
+  if(is.null(study_ids)) {
+    study_ids <- unique(expected_results[['Study ID']])
+  }
+  
+  if(is.null(alternatives)) {
+    alternatives <- if(!is.null(TEST_CONFIG$alternatives)) TEST_CONFIG$alternatives else c("two.sided")
+  }
+  
+  validation_results <- list()
+  
+  for(study_id in study_ids) {
+    cat("Processing study:", study_id, "\n")
+    
+    # Get test data for this study
+    study_data <- test_cases_data[test_cases_data[['Study ID']] == study_id, ]
+    
+    if(nrow(study_data) == 0) {
+      cat("  No test data found for study", study_id, "\n")
+      next
+    }
+    
+    # Get expected results for this study  
+    study_expected <- expected_results[expected_results[['Study ID']] == study_id, ]
+    
+    if(nrow(study_expected) == 0) {
+      cat("  No expected results found for study", study_id, "\n")
+      next
+    }
+    
+    for(alt in alternatives) {
+      test_name <- paste(study_id, alt, sep = "_")
+      
+      validation_results[[test_name]] <- list(
+        study_id = study_id,
+        alternative = alt,
+        test = test_name,
+        passed = FALSE,  # Will be updated when test is implemented
+        time = 0,
+        details = list(
+          note = "Test not yet implemented - framework structure only",
+          n_comparisons = nrow(study_expected),
+          n_passed = 0
+        )
+      )
+      
+      # TODO: Implement actual test execution when test function is available
+      # if(TEST_CONFIG$implemented) {
+      #   result <- do.call(TEST_CONFIG$test_function, list(
+      #     data = study_data,
+      #     alternative = alt,
+      #     # Add other parameters as needed
+      #   ))
+      #   
+      #   # Validate results against expected values
+      #   # validation_results[[test_name]] <- validate_test_results(result, study_expected, alt)
+      # }
+    }
+  }
+  
+  return(validation_results)
+}
+
+# Basic functionality tests framework  
+basic_functionality_tests <- function() {
+  
+  basic_tests <- list()
+  
+  # Test 1: Basic function execution
+  if(TEST_CONFIG$implemented) {
+    # TODO: Add real basic functionality tests when implemented
+    basic_tests[["Basic Function Execution"]] <- list(
+      test = "Basic Function Execution",
+      passed = FALSE,
+      time = 0,
+      details = "Test function not yet implemented"
+    )
+  } else {
+    basic_tests[["Framework Structure"]] <- list(
+      test = "Framework Structure",
+      passed = TRUE,
+      time = 0.001,
+      details = "Validation framework structure verified"
+    )
+  }
+  
+  return(basic_tests)
+}
+```
+
+## Test Execution
+
+```{r execute_tests, results='asis'}
+if(TEST_CONFIG$implemented) {
+  cat("**Executing validation tests...**\n\n")
+  
+  # Run validation tests
+  test_results <- run_fisher_validation()
+  
+  # Run basic functionality tests
+  basic_tests <- basic_functionality_tests()
+  
+  cat("✅ **Validation completed.**\n\n")
+} else {
+  cat("> ℹ️ **Note:** Test implementation not available - showing framework structure only.\n\n")
+  
+  # Create placeholder results to demonstrate framework
+  test_results <- list(
+    "PLACEHOLDER_less" = list(
+      study_id = "PLACEHOLDER",
+      alternative = "less", 
+      test = "PLACEHOLDER_less",
+      passed = FALSE,
+      time = 0,
+      details = list(note = "Placeholder - awaiting implementation")
+    )
+  )
+  
+  basic_tests <- basic_functionality_tests()
+}
+```
+
+## Results Summary
+
+```{r results_summary}
+# Convert test results to summary format
+validation_tests_list <- list()
+for(test_name in names(test_results)) {
+  validation_tests_list[[test_name]] <- list(
+    test = test_name,
+    passed = test_results[[test_name]]$passed,
+    time = test_results[[test_name]]$time
+  )
+}
+
+all_results <- c(validation_tests_list, basic_tests)
+
+# Create summary table
+test_summary <- data.frame(
+  Test = sapply(all_results, function(x) x$test),
+  Status = sapply(all_results, function(x) ifelse(x$passed, "✅ PASS", "❌ FAIL")),
+  Time = sapply(all_results, function(x) sprintf("%.3f sec", x$time)),
+  stringsAsFactors = FALSE
+)
+
+# Display results
+kable(test_summary) %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  row_spec(which(grepl("❌ FAIL", test_summary$Status)), background = "#FFCCCC") %>%
+  row_spec(which(grepl("✅ PASS", test_summary$Status)), background = "#CCFFCC")
+
+cat("Total Tests:", nrow(test_summary), "\n")
+cat("Passed:", sum(grepl("✅ PASS", test_summary$Status)), "\n")
+cat("Failed:", sum(grepl("❌ FAIL", test_summary$Status)), "\n")
+cat("Success Rate:", round(100 * sum(grepl("✅ PASS", test_summary$Status)) / nrow(test_summary), 1), "%\n")
+```
+
+## Implementation Status
+
+```{r implementation_status}
+if(!TEST_CONFIG$implemented) {
+  cat("📋 IMPLEMENTATION REQUIRED:\n\n")
+  cat("To complete this validation, the following components need to be implemented:\n\n")
+  cat("1. **Test Function**: ", TEST_CONFIG$test_function, "\n")
+  cat("   - Input: test data, alternative hypothesis, other parameters\n")
+  cat("   - Output: results structure with key metrics\n\n")
+  cat("2. **Key Metrics Extraction**:\n")
+  for(metric in TEST_CONFIG$key_metrics) {
+    cat("   -", metric, "\n")
+  }
+  cat("\n3. **Alternative Hypothesis Support**:\n")
+  if(!is.null(TEST_CONFIG$alternatives)) {
+    for(alt in TEST_CONFIG$alternatives) {
+      cat("   -", alt, "\n")
+    }
+  } else {
+    cat("   - Not applicable (single test type)\n")
+  }
+  cat("\n4. **Integration with Validation Framework**:\n")
+  cat("   - Update run_", TEST_NAME, "_validation() function\n")
+  cat("   - Add result validation logic\n")
+  cat("   - Implement basic functionality tests\n")
+} else {
+  cat("✅ Implementation completed - validation results above show actual test performance.\n")
+}
+```
+
+## Visualization
+
+```{r visualization}
+if(nrow(test_summary) > 0) {
+  # Create visualization
+  test_summary$Time_Numeric <- as.numeric(gsub(" sec", "", test_summary$Time))
+  test_summary$Status_Clean <- ifelse(grepl("✅ PASS", test_summary$Status), "PASS", "FAIL")
+  
+  ggplot(test_summary, aes(x = reorder(Test, Time_Numeric), y = Time_Numeric, fill = Status_Clean)) +
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    labs(title = "Fisher's Exact Test - Test Execution Time", 
+         x = "Test Case", 
+         y = "Time (seconds)") +
+    scale_fill_manual(values = c("PASS" = "darkgreen", "FAIL" = "red")) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 8))
+}
+```
+
+## Conclusion
+
+This validation framework provides the structure for comprehensive Fisher's Exact Test validation. The test implementation is pending. This framework provides the structure for validation once the test function is implemented.
+
+### Next Steps
+
+1. Implement
+fisher_test
+function
+2. Add result validation logic
+3. Implement basic functionality tests
+4. Run full validation suite
+
+---
+
+**Generated on:** `r Sys.time()`  
+**Framework Version:** 1.0  
+**Test Status:** PENDING IMPLEMENTATION

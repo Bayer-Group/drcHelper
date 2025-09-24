@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(drcHelper)
+source("../knitr-setup.R")
 ```
 
 MQJT(Multiquantal Jonckheere–Terpstra) is mentioned in OECD TG 231 for AMA life stage (integers ranging from 45 to 66 in general) analysis. It is identical to the standard JT test except that it is applied to several quantiles in addition to the median and decisions are made using the median p‐value.  

@@ -17,6 +17,7 @@ Note that for trend tests, the null hypotheses are different from those many-to-
 
 ```{r setup}
 library(drcHelper)
+source("../knitr-setup.R")
 ```
 
 

@@ -5,7 +5,10 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml)
+<!--[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml) -->
+<!-- Workflow badges for main and dev branches -->
+ <!--[![R-CMD-check (main)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml?query=branch%3Amain) -->
+[![R-CMD-check (dev)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg?branch=dev)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml?query=branch%3Adev)
 <!-- badges: end -->
 
 The goal of **drcHelper** is to assist with routine dose-response

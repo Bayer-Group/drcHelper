@@ -22,7 +22,7 @@ library(tidyverse)
 
 ```{r setup}
 library(drcHelper)
-
+source("../knitr-setup.R")
 ```
 
 

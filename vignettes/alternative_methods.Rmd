@@ -1,0 +1,25 @@
+---
+title: "Alternative Methods"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Alternative Methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This index page provides access to alternative statistical methods implemented in drcHelper.
+
+## Available Methods
+
+- [NLS Approaches](Examples%20using%20NLS.html)
+- [Using drda Package](Examples_using_drda.html)
+- [TSK Method](TSK_method.html)
+- [MQJT Analysis](MQJT.html)
+- [Advanced Model Fitting](Advanced_Fitting-a-biphasic-dose-reponse-model.html)

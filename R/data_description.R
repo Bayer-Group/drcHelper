@@ -106,6 +106,22 @@ NULL
 "DixonQ"
 
 
+#' Hamilton dose-response datasets
+#'
+#' Example dose-response data given in Hamilton (1977).
+#' Note that, as per Hamilton (1978), the confidence intervals
+#' given in Hamilton (1977) for these data sets are incorrect.
+#'
+#' @author B R S Recht
+#' @docType data
+#' @keywords datasets
+#' @format A list containing ten data frames: dr1a, dr1b, dr1c,
+#' dr1d, dr1e, dr4a, dr4b, dr4c, dr4d, dr4e
+#' @source Hamilton, 1977.
+#' @references \url{https://github.com/brsr/tsk}
+"hamilton"
+
+
 #' Fake data from collembola juveniles
 #'
 #' @docType data

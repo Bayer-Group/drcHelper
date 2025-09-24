@@ -2,20 +2,21 @@
 % Please edit documentation in R/drc_Helper.R
 \name{getModelName}
 \alias{getModelName}
-\title{Get Model Name}
+\title{Get Model Name and Description}
 \usage{
 getModelName(fname = NULL)
 }
 \arguments{
-\item{fname}{a character string contains the name of the fitted model.}
+\item{fname}{Character vector of model names (e.g., "LL.2", "LN.4"). If NULL, returns all available model names and descriptions.}
 }
 \value{
-the model name
+Character vector of model names and descriptions. For NULL, returns all available models. For vector input, returns corresponding descriptions for each name. Special handling for LN.* and LL.* models.
 }
 \description{
-Get Model Name
+Returns the model name and description for one or more fitted model names.
 }
 \examples{
-getModelName("LL.2")
-
+getModelName() # Returns all available model names and descriptions
+getModelName("LL.2") # Returns description for LL.2
+getModelName(c("LL.2", "LN.4")) # Returns descriptions for multiple models
 }

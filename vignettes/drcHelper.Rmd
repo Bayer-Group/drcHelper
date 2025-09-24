@@ -33,7 +33,7 @@ In this vignette, we demonstrate how to use the **{drcHelper}** package to creat
 
 ## Preliminary Summary
 
-```{r}
+```{r prelim-plot, fig.alt="Preliminary plot of dose-response data showing response vs. dose, with individual points and summary statistics."}
 data("dat_medium")
 dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose))) 
 dat_medium$Response[dat_medium$Response < 0] <- 0
@@ -64,7 +64,7 @@ edResTab
 
 ## Plot multiple models together
 
-```{r}
+```{r plot-models, fig.alt="Plot of three dose-response models fitted to the same data, showing the different curve shapes."}
 p <- plot.modList(modList[1:3])
 p
 ```
@@ -72,7 +72,7 @@ p
 
 ## Adding ECx and ECx CI's to the plots
 
-```{r}
+```{r plot-ecx, fig.alt="Dose-response plot with EC10, EC20, and EC50 values and their confidence intervals indicated on the graph."}
 p1 <- plot.modList(modList[1])
 addECxCI(p1,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respLev=c(10,20,50),
                      textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+ ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")

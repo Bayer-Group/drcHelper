@@ -4,6 +4,7 @@ title: "TSK and Probit Models"
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+source("../knitr-setup.R")
 ```
 
 ```{r setup}
