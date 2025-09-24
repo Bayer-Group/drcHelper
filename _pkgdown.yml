@@ -122,6 +122,10 @@ navbar:
         href: articles/TSK-and-Probit-Models.html
       - text: Which JT test to use
         href: articles/Verification_which_JT.html
+      - text: Verification of CA test
+        href: articles/Verification_CA_test.html
+      - text: Validation of MCP tests
+        href: articles/Validation_MCP_tests.html
       - text: Study Types and Templates
         href: articles/Test-Guidelines.html
     newissue:
