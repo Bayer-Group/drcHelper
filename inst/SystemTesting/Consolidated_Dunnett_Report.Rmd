@@ -9,7 +9,11 @@ output:
     theme: bootstrap
     code_folding: hide
     df_print: paged
+editor_options: 
+  chunk_output_type: console
 ---
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, results = 'asis')
@@ -21,14 +25,232 @@ library(dplyr)
 # Load test data
 data("test_cases_data")
 data("test_cases_res")
+# Tolerance settings
+tolerance <- 1e-6
+p_value_tolerance <- 1e-4
+two_sample <- FALSE ## not a two-sample test
+normalize_alternative <- function(alternative) {
+  a <- tolower(trimws(alternative))
+  a_norm <- gsub("[\\s._-]", "", a)
+  if (a_norm %in% c("less", "smaller", "lower")) {
+    "smaller"
+  } else if (a_norm %in% c("greater", "larger", "higher", "more")) {
+    "greater"
+  } else if (a_norm %in% c("twosided", "twoside", "twosides", "two.sided", "two-sided", "two_sided")) {
+    "two-sided"
+  } else {
+    NA_character_
+  }
+}
 
-# Define all function groups with Dunnett tests
-dunnett_fgs <- list(
-  list(id = "FG00220", name = "Plant height bioassay - DUNNETT", study = "MOCK0065"),
-  list(id = "FG00221", name = "Shoot dry weight bioassay - DUNNETT", study = "MOCK08/15-001"),
-  list(id = "FG00222", name = "Repellency bioassay - DUNNETT", study = "MOCK08/15-001"),
-  list(id = "FG00225", name = "Plant bioassay, two endpoints - DUNNETT", study = "MOCKSE21/001-1")
-)
+detect_alternative_in_text <- function(x) {
+  x <- tolower(x)
+  if (grepl("\\bsmaller\\b", x)) {
+    "smaller"
+  } else if (grepl("\\bgreater\\b", x)) {
+    "greater"
+  } else if (grepl("two[-\\.]?sided", x)) {
+    "two-sided"
+  } else {
+    NA_character_
+  }
+}
+
+build_dunnett_fgs <- function(test_cases_res, test_cases_data) {
+  # Only keep Dunnett rows
+  res_dunnett <- test_cases_res[grepl("Dunnett", test_cases_res[["Brief description"]], ignore.case = TRUE), ]
+  if (nrow(res_dunnett) == 0) return(list())
+
+  # Detect alternative per row
+  res_dunnett$alt <- vapply(res_dunnett[["Brief description"]], detect_alternative_in_text, FUN.VALUE = character(1))
+
+  # Keep rows with recognized alternatives
+  res_dunnett <- res_dunnett[!is.na(res_dunnett$alt), ]
+
+  # Restrict to studies that exist in data
+  studies_in_data <- unique(test_cases_data[["Study ID"]])
+  res_dunnett <- res_dunnett[res_dunnett[["Study ID"]] %in% studies_in_data, ]
+
+  # Build per (Function group ID, Study ID) object
+  # Choose a readable name: Test organism + Endpoint + " - Dunnett's Test"
+  # If multiple endpoints, name will reflect the first endpoint; you can customize as needed.
+  by_fg_study <- split(res_dunnett, list(res_dunnett[["Function group ID"]], res_dunnett[["Study ID"]]), drop = TRUE)
+
+  out <- lapply(by_fg_study, function(df) {
+    fg_id <- unique(df[["Function group ID"]])
+    study <- unique(df[["Study ID"]])
+    test_org <- na.omit(unique(df[["Test organism"]]))
+    endpoint <- na.omit(unique(df[["Endpoint"]]))
+    alts <- sort(unique(df[["alt"]]))
+    # Build a readable name
+    org_part <- if (length(test_org) > 0) test_org[1] else "Unknown organism"
+    ep_part <- if (length(endpoint) > 0) endpoint[1] else "Unknown endpoint"
+    name <- paste(org_part, ep_part, "- Dunnett's Test")
+    list(
+      id = fg_id[1],
+      name = name,
+      study = study[1],
+      alternatives = alts
+    )
+  })
+
+  # Ensure list structure is flat
+  # Split produced named list; unname it
+  unname(out)
+}
+
+dunnett_fgs <- build_dunnett_fgs(test_cases_res, test_cases_data)
+```
+
+
+## Test Plan: Dunnett’s Multiple Comparison Validation
+
+### Objective
+- Validate the drcHelper::dunnett_test implementation against reference “expected results” across relevant Function Group IDs (FGs), studies, endpoints, and alternatives.
+- Provide a consolidated report that highlights exact agreements, discrepancies, and data quality issues.
+
+### Scope
+- Test type: Dunnett’s many-to-one comparisons (control vs multiple treatment doses).
+- Data sources: test_cases_data and test_cases_res within the drcHelper package.
+- Coverage:
+  - All FG/Study pairs with “Dunnett” rows in test_cases_res and matching data in test_cases_data.
+  - Alternatives: “smaller”, “greater”, “two-sided”, as present in the reference or forced if configured.
+- Out of scope: Two-sample tests and Williams’ test (handled in separate plans/functions).
+
+### Test Case Discovery and Definition
+- Test cases are derived by scanning test_cases_res for “Dunnett” entries and identifying recognized alternatives in Brief description.
+- Each test case is defined by:
+  - Function group ID (FG)
+  - Study ID
+  - Human-readable name (built from Test organism and Endpoint, or curated)
+  - Alternatives (e.g., “smaller”, “greater”, “two-sided”)
+- Reference item groups are excluded (they are only for two-sample tests).
+
+### Preprocessing and Normalization
+- Dose normalization:
+  - convert_dose: vectorized parsing tolerant to decimal commas and scientific notation.
+  - dose_from_comparison: extracts the treatment dose from strings like “0.0448 - 0”.
+- Expected values:
+  - convert_numeric: parses “expected result value” tolerant to commas and scientific notation.
+- Alternatives:
+  - normalize_alternative maps user input and Brief description text to “smaller”, “greater”, “two-sided”.
+- Column inconsistencies:
+  - Measurement variable mismatches are tolerated; validation does not depend on this field outside specific workflows.
+
+### Validation Methodology
+- For each FG/study/alternative:
+  - Filter expected results to match FG, Study, and alternative keyword.
+  - Validate per endpoint independently.
+  - Compute actual Dunnett results via drcHelper::dunnett_test with numeric dose and chosen alternative.
+  - Build per-endpoint comparisons by metric:
+    - Mean: raw sample mean per numeric dose from endpoint_data.
+    - T-value: actual_results$results_table$statistic.
+    - P-value: adjusted single-step Dunnett p-values from actual_results$results_table$p.value.
+  - Join expected vs actual by numeric dose for each metric.
+  - Assign Status per metric:
+    - PASS if absolute difference ≤ tolerance (Mean/T) or ≤ p_value_tolerance (P).
+    - MISSING if either side is NA (not counted toward pass/fail rates).
+    - FAIL otherwise.
+
+### Tolerances
+- Numeric tolerance (Means and T-values): default 1e-6.
+- P-value tolerance: default 1e-4.
+- Configurable at the top of the validation function.
+
+### Outputs
+- Detailed, long-format per-endpoint table with:
+  - Test organism, Study ID, alternative, Endpoint, Dose (ordered ascending), metric (Mean/T-value/P-value), Actual, Expected, Status.
+- Display rules:
+  - Filter rows where both Actual and Expected are NA.
+  - Order by Test organism, Study ID, Endpoint, Dose, metric.
+  - Row coloring: PASS (light green), FAIL (light red), MISSING (light orange).
+- Consolidated summary across all FGs and alternatives:
+  - Function_Group, Study, Alternative, Endpoints_Tested, Total_Validations, Passed_Validations, Success_Rate, Overall_Status.
+
+### Pass/Fail Criteria
+- A test case (FG/study/alternative) is PASSED if there are no FAIL statuses among comparable rows.
+- MISSING rows do not count against pass/fail.
+
+### Handling Missing or Invalid Data
+- Exclude “Reference item” rows for Dunnett validation.
+- Non-numeric doses or malformed expected values are converted to NA; such comparisons are marked MISSING.
+- If expected rows are missing for a given alternative, the case is reported as ERROR.
+
+### Multi-Endpoint Support
+- Endpoints are discovered per FG/study from expected results and validated independently.
+- The report displays combined results across endpoints for each FG/study/alternative.
+
+### Alternatives
+- Detected from Brief description and normalized to “smaller”, “greater”, “two-sided”.
+- Validation loop runs all alternatives present per FG/study; can be configured to force all three.
+
+### Dose Ordering and Display
+- Dose is converted to numeric and sorted ascending for display.
+- Optional: a Dose_display string with consistent formatting for presentation.
+
+### Assumptions and Limitations
+- “Mean” expected values are compared to raw per-dose sample means; if LSMeans are intended, swap to emmeans.
+- Dunnett adjustment applies to p-values; t-statistics are typically unadjusted. “Adjusted T-value” requires clarification for strict handling.
+- Measurement variable mismatches across data/res are tolerated.
+
+### Reproducibility
+- Single R Markdown report with:
+  - Core validation logic and helpers
+  - Automated discovery of dunnett_fgs
+  - Execution loop over FGs and alternatives
+  - Consolidated summary
+- Dependencies: drcHelper, dplyr, knitr, kableExtra.
+- Timestamp and environment details included for auditability.
+
+### Maintenance and Extension
+- New FGs/studies: update test_cases_res; discovery will include them.
+- Williams’ test or two-sample tests can be added with parallel validation functions.
+- Tolerances configurable per metric.
+
+### Expected Deliverables
+- HTML report with per-FG/per-alternative detailed tables and consolidated summary.
+- Optional CSV exports of validation_results for further analysis.
+
+```{r test_plan_config, echo=TRUE, message=FALSE}
+# This chunk prints the current tolerances and discovered Dunnett test cases.
+# Assumes: tolerance, p_value_tolerance, dunnett_fgs already defined upstream.
+
+cat("Configuration at:", format(Sys.time()), "\n")
+cat("Numeric tolerance (Mean/T):", tolerance, "\n")
+cat("P-value tolerance:", p_value_tolerance, "\n\n")
+
+# Summarize discovered Dunnett test cases
+df_fgs <- dplyr::bind_rows(lapply(dunnett_fgs, function(x) {
+  data.frame(
+    `Function group ID` = x$id,
+    `Study ID` = x$study,
+    Name = x$name,
+    Alternatives = paste(x$alternatives, collapse = ", "),
+    stringsAsFactors = FALSE
+  )
+}))
+
+knitr::kable(df_fgs, caption = "Discovered Dunnett Test Cases (FG/Study/Alternatives)") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```{r how_to_run, echo=TRUE, message=FALSE,eval=FALSE}
+# Example execution loop (excerpt):
+# Iterates over each FG and its alternatives, runs validation, and prints summary lines.
+# Assumes run_consolidated_dunnett_validation is defined upstream.
+
+for (fg in dunnett_fgs) {
+  for (alt in fg$alternatives) {
+    res <- run_consolidated_dunnett_validation(fg$study, fg$id, alternative = alt)
+    status <- if (!is.null(res$error)) "ERROR" else if (res$passed) "PASSED" else "FAILED"
+    total <- if (!is.null(res$error)) 0 else res$n_comparisons
+    passed <- if (!is.null(res$error)) 0 else res$n_passed
+
+    cat(sprintf("FG %s | Study %s | Alt: %s | Endpoints: %s | Total: %d | Passed: %d | Status: %s\n",
+                fg$id, fg$study, alt, paste(res$endpoints_tested, collapse = ", "),
+                total, passed, status))
+  }
+}
 ```
 
 ## Executive Summary
@@ -44,25 +266,45 @@ The validation covers all identified Dunnett test cases and provides detailed co
 The following R code contains the complete, self-contained validation function used to generate this report. It handles multiple endpoints within a single study, data type conversions, and detailed result comparisons.
 
 ```{r core_functions, echo=TRUE, results='hide'}
-# Tolerance settings
-tolerance <- 1e-6
-p_value_tolerance <- 1e-4
 
 # Helper to convert dose strings to numeric, handling various formats
-convert_dose <- function(dose_str) {
-  if (is.na(dose_str) || dose_str == "n/a" || dose_str == "") return(0)
-  dose_str <- gsub(",", ".", as.character(dose_str))
-  return(as.numeric(dose_str))
+convert_dose <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  # Normalize decimal commas and keep scientific notation (e.g., "4,48E-2" -> "4.48E-2")
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  out <- suppressWarnings(as.numeric(xc))
+  return(out)
+}
+
+convert_numeric <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  suppressWarnings(as.numeric(xc))
+}
+
+dose_from_comparison <- function(comp_vec) {
+  if (length(comp_vec) == 0) return(numeric(0))
+  vapply(comp_vec, function(s) {
+    if (is.na(s)) return(NA_real_)
+    parts <- strsplit(s, " - ", fixed = TRUE)[[1]]
+    convert_dose(parts[1])
+  }, FUN.VALUE = numeric(1))
 }
 
 # The definitive multi-endpoint Dunnett validation function
-run_consolidated_dunnett_validation <- function(study_id, function_group_id, alternative = "less") {
+run_consolidated_dunnett_validation <- function(study_id, function_group_id, alternative = "less",two_sample=FALSE) {
   
   # Find all Dunnett test expected results for this study and function group
   expected_results_all <- test_cases_res[
     test_cases_res[['Study ID']] == study_id &
-    test_cases_res[['Function group ID']] == function_group_id &
-    grepl("Dunnett", test_cases_res[['Brief description']], ignore.case = TRUE), 
+      test_cases_res[['Function group ID']] == function_group_id &
+      grepl("Dunnett", test_cases_res[['Brief description']], ignore.case = TRUE), 
   ]
   
   if (nrow(expected_results_all) == 0) {
@@ -80,11 +322,16 @@ run_consolidated_dunnett_validation <- function(study_id, function_group_id, alt
   available_endpoints <- unique(expected_results_all[['Endpoint']])
   
   # Filter for the specified alternative (less/greater/two-sided)
-  alternative_pattern <- switch(alternative,
-                                "less" = "smaller",
-                                "greater" = "greater", 
-                                "two.sided" = "two-sided")
-  
+  # alternative_pattern <- switch(alternative,
+  #                               "less" = "smaller",
+  #                               "greater" = "greater",
+  #                               "two.sided" = "two-sided")
+  alternative_pattern <- alternative
+  alternative <- switch(alternative_pattern,
+                                "smaller" = "less",
+                                "greater" = "greater",
+                                "two-sided" = "two.sided")
+  message(paste(alternative_pattern, "check point"))
   expected_results <- expected_results_all[
     grepl(alternative_pattern, expected_results_all[['Brief description']], ignore.case = TRUE),
   ]
@@ -115,7 +362,7 @@ run_consolidated_dunnett_validation <- function(study_id, function_group_id, alt
   }
   
   # Convert dose to numeric
-  study_data$Dose_numeric <- sapply(study_data$Dose, convert_dose)
+  study_data$Dose_numeric <- convert_dose(study_data$Dose)
   study_data <- study_data[!is.na(study_data$Dose_numeric), ]
   
   # Process each endpoint separately
@@ -124,6 +371,9 @@ run_consolidated_dunnett_validation <- function(study_id, function_group_id, alt
   for (endpoint in available_endpoints) {
     # Get endpoint-specific data
     endpoint_data <- study_data[study_data[['Endpoint']] == endpoint, ]
+    # Exclude reference item groups (used for two-sample tests only)
+    if(!two_sample)endpoint_data <- endpoint_data[!grepl("reference", endpoint_data[["Test group"]], ignore.case = TRUE), ]
+    
     endpoint_expected <- expected_results[expected_results[['Endpoint']] == endpoint, ]
     
     if (nrow(endpoint_data) == 0 || nrow(endpoint_expected) == 0) next
@@ -132,116 +382,171 @@ run_consolidated_dunnett_validation <- function(study_id, function_group_id, alt
     actual_results <- tryCatch({
       drcHelper::dunnett_test(
         data = endpoint_data,
-        response_col = "Response", 
-        dose_col = "Dose_numeric",
+        response_var = "Response", 
+        dose_var = "Dose_numeric",
+        include_random_effect = FALSE,
         alternative = alternative
       )
     }, error = function(e) {
       data.frame(dose = numeric(0), statistic = numeric(0), p.value = numeric(0), mean = numeric(0))
     })
-    
-    # Create comparison table
-    if (nrow(actual_results) > 0) {
-      comparison_df <- endpoint_expected %>%
-        select(Dose = Dose, Expected_Value = `expected result value`) %>%
-        mutate(
-          Dose = sapply(Dose, convert_dose),
-          Expected_Value = suppressWarnings(as.numeric(gsub(",", ".", as.character(Expected_Value))))
+    # Actual Dunnett outputs as a data frame with numeric dose
+    actual_df <- as.data.frame(actual_results$results_table)
+    if (nrow(actual_df) > 0) {
+      actual_df <- actual_df %>%
+        dplyr::mutate(
+          Dose = dose_from_comparison(comparison)
+        ) %>%
+        dplyr::rename(
+          Actual_T = statistic,
+          Actual_P = p.value,
+          Actual_Diff = estimate
         )
-      
-      # Separate expected results by metric type
-      mean_expected <- comparison_df[grepl("Mean", endpoint_expected[['Brief description']]), ]
-      t_expected <- comparison_df[grepl("T-value|t-value", endpoint_expected[['Brief description']]), ]
-      p_expected <- comparison_df[grepl("p-value", endpoint_expected[['Brief description']]), ]
-      
-      # Join with actual results
-      if(nrow(mean_expected) > 0) {
-        mean_expected <- mean_expected %>%
-          left_join(actual_results, by = c("Dose" = "dose")) %>%
-          rename(Expected_Mean = Expected_Value, Actual_Mean = mean) %>%
-          mutate(
-            Endpoint = endpoint,
-            Mean_Diff = abs(Actual_Mean - Expected_Mean),
-            Mean_Status = case_when(
-              is.na(Expected_Mean) | is.na(Actual_Mean) ~ "MISSING",
-              Mean_Diff <= tolerance ~ "PASS",
-              TRUE ~ "FAIL"
-            )
-          ) %>%
-          select(Endpoint, Dose, Actual_Mean, Expected_Mean, Mean_Status)
-      }
-      
-      if(nrow(t_expected) > 0) {
-        t_expected <- t_expected %>%
-          left_join(actual_results, by = c("Dose" = "dose")) %>%
-          rename(Expected_T = Expected_Value, Actual_T = statistic) %>%
-          mutate(
-            T_Diff = abs(Actual_T - Expected_T),
-            T_Status = case_when(
-              is.na(Expected_T) | is.na(Actual_T) ~ "MISSING",
-              T_Diff <= tolerance ~ "PASS",
-              TRUE ~ "FAIL"
-            )
-          ) %>%
-          select(Dose, Actual_T, Expected_T, T_Status)
-      }
-      
-      if(nrow(p_expected) > 0) {
-        p_expected <- p_expected %>%
-          left_join(actual_results, by = c("Dose" = "dose")) %>%
-          rename(Expected_P = Expected_Value, Actual_P = p.value) %>%
-          mutate(
-            P_Diff = abs(Actual_P - Expected_P),
-            P_Status = case_when(
-              is.na(Expected_P) | is.na(Actual_P) ~ "MISSING",
-              P_Diff <= p_value_tolerance ~ "PASS",
-              TRUE ~ "FAIL"
-            )
-          ) %>%
-          select(Dose, Actual_P, Expected_P, P_Status)
-      }
-      
-      # Combine all metrics by dose
-      comparison_df <- mean_expected
-      if(nrow(t_expected) > 0) {
-        comparison_df <- comparison_df %>% left_join(t_expected, by = "Dose")
-      } else {
-        comparison_df$Actual_T <- NA
-        comparison_df$Expected_T <- NA
-        comparison_df$T_Status <- "MISSING"
-      }
-      
-      if(nrow(p_expected) > 0) {
-        comparison_df <- comparison_df %>% left_join(p_expected, by = "Dose")
-      } else {
-        comparison_df$Actual_P <- NA
-        comparison_df$Expected_P <- NA
-        comparison_df$P_Status <- "MISSING"
-      }
-      
-      all_comparisons[[endpoint]] <- comparison_df
     }
+    
+    # Observed group means by dose from the raw data
+    group_means <- endpoint_data %>%
+      dplyr::mutate(Dose = convert_dose(Dose)) %>%
+      dplyr::filter(!is.na(Dose)) %>%
+      dplyr::group_by(Dose) %>%
+      dplyr::summarise(Actual_Mean = mean(Response, na.rm = TRUE), .groups = "drop")
+    
+    # Prepare expected tables by metric
+    endpoint_expected <- endpoint_expected %>%
+      dplyr::mutate(
+        Dose = convert_dose(Dose),
+        Expected_Value = suppressWarnings(as.numeric(gsub(",", ".", as.character(`expected result value`))))
+      )
+    
+    mean_expected <- endpoint_expected %>%
+      dplyr::filter(grepl("Mean", `Brief description`, ignore.case = TRUE)) %>%
+      dplyr::select(Dose, Expected_Mean = Expected_Value)
+    
+    t_expected <- endpoint_expected %>%
+      dplyr::filter(grepl("T-value|t-value", `Brief description`, ignore.case = TRUE) &
+                      !grepl("p-value", `Brief description`, ignore.case = TRUE)) %>%
+      dplyr::select(Dose, Expected_T = Expected_Value)
+    
+    p_expected <- endpoint_expected %>%
+      dplyr::filter(grepl("p-value", `Brief description`, ignore.case = TRUE)) %>%
+      dplyr::select(Dose, Expected_P = Expected_Value)
+    
+    # Join actuals to expected by Dose
+    mean_join <- mean_expected %>%
+      dplyr::left_join(group_means, by = "Dose") %>%
+      dplyr::mutate(
+        Endpoint = endpoint,
+        Mean_Diff = abs(Actual_Mean - Expected_Mean),
+        Mean_Status = dplyr::case_when(
+          is.na(Expected_Mean) | is.na(Actual_Mean) ~ "MISSING",
+          Mean_Diff <= tolerance ~ "PASS",
+          TRUE ~ "FAIL"
+        )
+      ) %>%
+      dplyr::select(Endpoint, Dose, Actual_Mean, Expected_Mean, Mean_Status)
+    
+    t_join <- t_expected %>%
+      dplyr::left_join(actual_df %>% dplyr::select(Dose, Actual_T), by = "Dose") %>%
+      dplyr::mutate(
+        T_Diff = abs(Actual_T - Expected_T),
+        T_Status = dplyr::case_when(
+          is.na(Expected_T) | is.na(Actual_T) ~ "MISSING",
+          T_Diff <= tolerance ~ "PASS",
+          TRUE ~ "FAIL"
+        )
+      ) %>%
+      dplyr::select(Dose, Actual_T, Expected_T, T_Status)
+    
+    p_join <- p_expected %>%
+      dplyr::left_join(actual_df %>% dplyr::select(Dose, Actual_P), by = "Dose") %>%
+      dplyr::mutate(
+        P_Diff = abs(Actual_P - Expected_P),
+        P_Status = dplyr::case_when(
+          is.na(Expected_P) | is.na(Actual_P) ~ "MISSING",
+          P_Diff <= p_value_tolerance ~ "PASS",
+          TRUE ~ "FAIL"
+        )
+      ) %>%
+      dplyr::select(Dose, Actual_P, Expected_P, P_Status)
+    
+    # Combine all metrics row-wise by Dose (wide)
+    wide_df <- mean_join %>%
+      dplyr::full_join(t_join, by = "Dose") %>%
+      dplyr::full_join(p_join, by = "Dose")
+    
+    # Ensure Endpoint column exists and is first
+    if (!"Endpoint" %in% names(wide_df)) {
+      wide_df$Endpoint <- endpoint
+    }
+    wide_df <- dplyr::select(wide_df, Endpoint, dplyr::everything())
+    
+    # Build long format with metric column
+    mean_long <- wide_df %>%
+      dplyr::transmute(
+        Endpoint,
+        Dose,
+        metric = "Mean",
+        Actual  = Actual_Mean,
+        Expected = Expected_Mean,
+        Status  = Mean_Status
+      )
+    
+    t_long <- wide_df %>%
+      dplyr::transmute(
+        Endpoint,
+        Dose,
+        metric = "T-value",
+        Actual  = Actual_T,
+        Expected = Expected_T,
+        Status  = T_Status
+      )
+    
+    p_long <- wide_df %>%
+      dplyr::transmute(
+        Endpoint,
+        Dose,
+        metric = "P-value",
+        Actual  = Actual_P,
+        Expected = Expected_P,
+        Status  = P_Status
+      )
+    
+    comparison_long <- dplyr::bind_rows(mean_long, t_long, p_long)
+    
+    # Add metadata: Study ID, Test organism, alternative
+    test_org <- NA_character_
+    if ("Test organism" %in% names(endpoint_data)) {
+      u_to <- unique(endpoint_data[["Test organism"]])
+      u_to <- u_to[!is.na(u_to)]
+      if (length(u_to) > 0) test_org <- u_to[1]
+    }
+    comparison_long <- comparison_long %>%
+      dplyr::mutate(
+        `Study ID` = study_id,
+        `Test organism` = test_org,
+        alternative = alternative
+      ) %>%
+      dplyr::select(`Test organism`, `Study ID`, alternative, Endpoint, Dose, metric,
+                    Actual, Expected, Status) %>%
+      dplyr::arrange(Endpoint, Dose, factor(metric, levels = c("Mean", "T-value", "P-value")))
+    
+    # Store for this endpoint
+    all_comparisons[[endpoint]] <- comparison_long
   }
-  
   # Combine all endpoint results
   if (length(all_comparisons) > 0) {
-    combined_table <- do.call(rbind, all_comparisons)
+    combined_table <- dplyr::bind_rows(all_comparisons)
     
-    # Calculate summary statistics
-    total_comparisons <- nrow(combined_table) * 3  # Mean + T + P for each row
-    total_passed <- sum(combined_table$Mean_Status == "PASS", na.rm = TRUE) +
-                   sum(combined_table$T_Status == "PASS", na.rm = TRUE) +
-                   sum(combined_table$P_Status == "PASS", na.rm = TRUE)
-    
-    overall_passed <- all(combined_table$Mean_Status %in% c("PASS", "MISSING"), na.rm = TRUE) &&
-                     all(combined_table$T_Status %in% c("PASS", "MISSING"), na.rm = TRUE) &&
-                     all(combined_table$P_Status %in% c("PASS", "MISSING"), na.rm = TRUE)
+    # Count only comparable entries (Status PASS/FAIL)
+    total_validations <- sum(combined_table$Status %in% c("PASS", "FAIL"), na.rm = TRUE)
+    total_passed <- sum(combined_table$Status == "PASS", na.rm = TRUE)
+    overall_passed <- !any(combined_table$Status == "FAIL", na.rm = TRUE)
     
     return(list(
       passed = overall_passed,
       endpoints_tested = available_endpoints,
       validation_results = combined_table,
-      n_comparisons = total_comparisons,
+      n_comparisons = total_validations,
       n_passed = total_passed
     ))
   } else {
@@ -255,6 +560,7 @@ run_consolidated_dunnett_validation <- function(study_id, function_group_id, alt
     ))
   }
 }
+
 ```
 
 ## Comprehensive Validation Results
@@ -265,6 +571,7 @@ This section details the validation results for each function group. The `less` 
 summary_results <- data.frame(
   Function_Group = character(),
   Study = character(),
+  Alternative = character(),
   Endpoints_Tested = character(),
   Total_Validations = integer(),
   Passed_Validations = integer(),
@@ -274,9 +581,10 @@ summary_results <- data.frame(
 )
 
 for(fg in dunnett_fgs) {
-  cat("\n### ", fg$name, " (", fg$id, ")\n\n", sep="")
-  
-  result <- run_consolidated_dunnett_validation(fg$study, fg$id, alternative = "less")
+  if (length(fg$alternatives) == 0) next  # no recognized alternatives
+  for (alt in fg$alternatives) {
+    cat("\n### ", fg$name, " (", fg$id, ") — alternative: ", alt, "\n\n", sep = "")
+    result <- run_consolidated_dunnett_validation(fg$study, fg$id, alternative = alt)
   
   endpoints_str <- paste(result$endpoints_tested, collapse = ", ")
   
@@ -302,23 +610,37 @@ for(fg in dunnett_fgs) {
     # Always display the detailed comparison table if we have validation results
     if (!is.null(result$validation_results) && nrow(result$validation_results) > 0) {
       cat("**Detailed Validation Results:**\n\n")
+      # Filter out rows where both Actual and Expected are NA
+      display_df <- result$validation_results %>%
+        dplyr::filter(!(is.na(Actual) & is.na(Expected)))
+      # Order metrics consistently
+      display_df <- display_df %>%
+        dplyr::mutate(metric = factor(metric, levels = c("Mean", "T-value", "P-value")))
+      display_df <- display_df %>%
+        dplyr::arrange(`Test organism`, `Study ID`, Endpoint, metric,Dose)
+      # Style Status cells
+      display_df_styled <- display_df %>%
+        dplyr::mutate(
+          Status = tidyr::replace_na(Status, "MISSING"),
+          Status = kableExtra::cell_spec(
+            Status,
+            color = "white",
+            background = dplyr::case_when(
+              Status == "FAIL" ~ "#dc3545",   # red
+              Status == "PASS" ~ "#28a745",   # green
+              TRUE             ~ "#fd7e14"    # orange for MISSING/others
+            )
+          )
+        )
       
-      styled_table <- kable(result$validation_results, "html", 
-                            caption = paste("Validation Details for", fg$id),
-                            digits = 4) %>%
-        kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
-        column_spec(which(colnames(result$validation_results) == "Mean_Status"),
-                  color = "white",
-                  background = ifelse(result$validation_results$Mean_Status == "FAIL", "red", 
-                                    ifelse(result$validation_results$Mean_Status == "PASS", "green", "orange"))) %>%
-        column_spec(which(colnames(result$validation_results) == "T_Status"),
-                  color = "white", 
-                  background = ifelse(result$validation_results$T_Status == "FAIL", "red",
-                                    ifelse(result$validation_results$T_Status == "PASS", "green", "orange"))) %>%
-        column_spec(which(colnames(result$validation_results) == "P_Status"),
-                  color = "white",
-                  background = ifelse(result$validation_results$P_Status == "FAIL", "red",
-                                    ifelse(result$validation_results$P_Status == "PASS", "green", "orange")))
+      styled_table <- knitr::kable(
+        display_df_styled,
+        format = "html",
+        caption = paste("Validation Details for", fg$id),
+        digits = 6,
+        escape = FALSE  # allow HTML from cell_spec
+      ) %>%
+        kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
       
       print(styled_table)
       cat("\n")
@@ -326,7 +648,7 @@ for(fg in dunnett_fgs) {
       cat("**No validation results to display**\n\n")
     }
   }
-
+  
   summary_results <- rbind(summary_results, data.frame(
     Function_Group = fg$id,
     Study = fg$study,
@@ -339,7 +661,7 @@ for(fg in dunnett_fgs) {
   ))
   
   cat("\n---\n\n")
-}
+}}
 ```
 
 ## Overall Validation Summary
@@ -350,11 +672,11 @@ The table below summarizes the validation status across all Dunnett test functio
 cat("## Overall Validation Summary\n\n")
 
 print(kable(summary_results, caption = "Consolidated Validation Summary - All Dunnett Function Groups") %>%
-      kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
-      column_spec(7, bold = TRUE) %>%
-      row_spec(which(summary_results$Overall_Status == "✅ PASSED"), background = "#d4edda") %>%
-      row_spec(which(summary_results$Overall_Status == "❌ FAILED"), background = "#f8d7da") %>%
-      row_spec(which(summary_results$Overall_Status == "❌ ERROR"), background = "#f8d7da"))
+        kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+        column_spec(7, bold = TRUE) %>%
+        row_spec(which(summary_results$Overall_Status == "✅ PASSED"), background = "#d4edda") %>%
+        row_spec(which(summary_results$Overall_Status == "❌ FAILED"), background = "#f8d7da") %>%
+        row_spec(which(summary_results$Overall_Status == "❌ ERROR"), background = "#f8d7da"))
 
 total_validations <- sum(summary_results$Total_Validations)
 total_passed <- sum(summary_results$Passed_Validations)
@@ -381,3 +703,6 @@ The validation framework successfully executed all test cases. The failures obse
 ---
 **Report generated:** `r Sys.time()`
 ## Test Timestamp: Tue Sep 23 04:48:51 PM UTC 2025
+
+
+
