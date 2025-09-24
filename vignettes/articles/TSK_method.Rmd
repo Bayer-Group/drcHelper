@@ -2,6 +2,14 @@
 title: " Spearman-Karber method"
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+source("../knitr-setup.R")
+```
+
 ## Backaground
 
 Spearman-Karber method is still in use in regulatory Ecotox endpoints derivation. A more common approach would be derive a EC50 from interpolation by a smoothing line. 
@@ -40,14 +48,6 @@ log10 50% end point dilution = -[(total number of animals died/number of animals
 Formula 2 (if any accidental death occurred):
 
 log10 50% end point dilution = -(total death score + 0.5) × log dilution factor.
-
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
 
 ## Some Notes

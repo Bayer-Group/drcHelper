@@ -14,6 +14,7 @@ library(tidyverse)
 
 ```{r setup}
 library(drcHelper)
+source("../knitr-setup.R")
 ```
 
 Statistical methods are used to assess the effects of PPPs on
