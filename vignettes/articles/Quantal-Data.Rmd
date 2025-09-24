@@ -1,8 +1,5 @@
 ---
 title: "Quantal Data"
-resource_files:
-  - article_assets/quantal_NOEC.png
-  - article_assets/binomial_tank_effects_visualization.png
 editor_options: 
   chunk_output_type: console
 ---
@@ -29,7 +26,7 @@ Analysis of quantal data typically involves the following steps as shown in the 
 ```{r echo=FALSE,out.width="90%"}
 #| fig.alt: >
 #|   Quantal NOEC Flowchart
-knitr::include_graphics("article_assets/quantal_NOEC.png")
+knitr::include_graphics("../assets/quantal_NOEC.png")
 ```
 
 ## An example dataset
