@@ -1,0 +1,366 @@
+---
+title: "MDD in Regulatory Context"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+source("../knitr-setup.R")
+```
+
+
+In the regulatory context, MDD% stands for the minimum percent change (relative to the control mean) that would be deemed statistically significant given the test's critical value, the residual variability, and the replication. There are two common ways to define it; the often used way in ecotoxicology is ofent the significance-threshold version (no power term).
+
+## Key definitions
+
+- Absolute minimum detectable difference (MDD, on the response scale):
+  - For a control vs. dose comparison with pooled residual variance MSE and per-group sample sizes n_c (control) and n_t (treatment), the standard error of a difference is:
+    - $$SE_{diff} = \sqrt{MSE \cdot \left(\frac{1}{n_c} + \frac{1}{n_t}\right)}$$
+  - Given a one-sided critical value (e.g., Williams' Tcrit), the absolute MDD is:
+    - $$MDD = T_{crit} \cdot SE_{diff}$$
+- Percent MDD relative to control mean:
+  - If the control mean is μ_c, then
+    - $$MDD\% = 100 \cdot \frac{MDD}{\mu_c} = 100 \cdot \frac{T_{crit} \cdot SE_{diff}}{\mu_c}$$
+
+Notes
+
+- Significance-threshold vs. power-based:
+  - The above uses only Tcrit (significance threshold at alpha). Some literature calls this MSD (Minimum Significant Difference).
+  - A power-based MDD (to achieve power 1−β) adds a second quantile:
+    - $$MDD_{power} = \left(t_{1-\alpha,\ df} + t_{1-\beta,\ df}\right) \cdot SE_{diff}$$
+    - and $$MDD\%_{power} = 100 \cdot \frac{MDD_{power}}{\mu_c}$$
+  - Your Williams expected includes "Tcrit" per dose; this aligns with the significance-threshold version (no power term).
+- Which Tcrit to use:
+  - For Williams: use the Tcrit reported per dose/step from broom_williams(method = "Williams_PMCMRplus"), which you have available.
+  - For Dunnett: a true Dunnett critical value depends on the number of groups (multivariate t). If you don't have a reported Tcrit, computing an exact Dunnett Tcrit is more involved; for Williams, you already have it, so we can compute MDD% reliably.
+
+
+**What the function does**
+
+- Accepts a formula x of the form Response ~ Dose (Dose can be numeric or factor).
+- Ensures the control (reference) group is the first factor level (by default the lowest dose).
+- Computes the per-contrast standard error SE_diff using the appropriate method:
+  - Williams/Dunnett: pooled ANOVA MSE (or directly from glht sigma for Dunnett).
+  - Student’s t: pooled-variance SE.
+  - Welch: group-specific-variance SE and Welch–Satterthwaite df.
+- Determines the critical value Tcrit:
+  - Williams: from broom_williams t’-crit per contrast.
+  - Dunnett: from multcomp summary.glht test$qfunction at your alpha.
+  - Student’s t/Welch: qt with per-contrast df.
+- Computes MDD = Tcrit × SE_diff and MDD% = 100 × MDD / control_mean.
+- Returns a tidy tibble with dose, n_c, n_t, df (when applicable), SE_diff, Tcrit, MDD, MDD_pct, method, alpha, alternative, and control_mean.
+
+## Code: compute_mdd_generic
+
+```{r}
+compute_mdd_generic <- function(x, data,
+                                test = c("Williams_PMCMRplus", "Williams_JG", "Dunnett", "t", "Welch"),
+                                alpha = 0.05,
+                                alternative = c("smaller", "greater", "two-sided")) {
+  test <- match.arg(test)
+  alternative <- match.arg(alternative)
+
+  # Parse formula
+  if (!inherits(x, "formula")) stop("x must be a formula, e.g., Response ~ Dose")
+  terms_obj <- terms(x)
+  resp_name <- rownames(attr(terms_obj, "factors"))[1]
+  factor_name <- attr(terms_obj, "term.labels")[1]
+
+  df <- data
+  if (!is.data.frame(df)) stop("data must be a data.frame")
+
+  # Prepare dose factor with control first (lowest dose)
+  dose_raw <- df[[factor_name]]
+  dose_num <- suppressWarnings(as.numeric(gsub(",", ".", as.character(dose_raw))))
+  # If numeric conversion fails everywhere, treat as factor and try to sort levels by numeric content
+  if (all(is.na(dose_num))) {
+    # Attempt to parse numeric part from strings
+    dose_num <- suppressWarnings(as.numeric(gsub(",", ".", gsub("[^0-9.,-]", "", as.character(dose_raw)))))
+  }
+  # Build factor levels: sort unique numeric doses; fallback to existing factor levels
+  if (!all(is.na(dose_num))) {
+    levels_sorted <- sort(unique(dose_num))
+    df$Dose_factor <- factor(dose_num, levels = levels_sorted)
+  } else {
+    df$Dose_factor <- if (is.factor(dose_raw)) factor(dose_raw) else factor(dose_raw)
+    warning("Dose values not numeric; using existing factor levels. Ensure control is the first level.")
+  }
+
+  # Basic stats per group
+  resp <- df[[resp_name]]
+  ctrl_level <- levels(df$Dose_factor)[1]
+  ctrl_idx <- df$Dose_factor == ctrl_level
+  mu_c <- mean(resp[ctrl_idx], na.rm = TRUE)
+  n_c <- sum(ctrl_idx)
+
+  # One-way ANOVA for pooled MSE (used by Williams/Dunnett/t pooled)
+  aov_fit <- stats::aov(resp ~ df$Dose_factor)
+  mse <- tryCatch(summary(aov_fit)[[1]]["Residuals", "Mean Sq"], error = function(e) NA_real_)
+  df_resid <- tryCatch(summary(aov_fit)[[1]]["Residuals", "Df"], error = function(e) NA_real_)
+
+  # Per-dose counts and SDs
+  group_n <- aggregate(resp ~ df$Dose_factor, FUN = function(z) sum(!is.na(z)))
+  group_sd <- aggregate(resp ~ df$Dose_factor, FUN = stats::sd)
+  names(group_n) <- c("Dose_factor", "n_t")
+  names(group_sd) <- c("Dose_factor", "sd_t")
+
+  # Helper to compute one-/two-sided quantile tail
+  qtail <- function(df, alt, alpha) {
+    if (alt == "two-sided") stats::qt(1 - alpha / 2, df = df) else stats::qt(1 - alpha, df = df)
+  }
+
+  # Initialize result container
+  res_list <- list()
+
+  if (test %in% c("Williams_PMCMRplus", "Williams_JG")) {
+    # Direction for Williams
+    direction <- if (alternative == "smaller") "decreasing" else "increasing"
+    bw <- try(drcHelper::broom_williams(x, data = df, method = if (test == "Williams_PMCMRplus") "Williams_PMCMRplus" else "Williams_JG", direction = direction), silent = TRUE)
+    if (inherits(bw, "try-error") || nrow(bw) == 0) stop("broom_williams failed to produce results.")
+
+    bw <- as.data.frame(bw)
+    # Map Dose from comparison ("a - 0 <= 0" or "a - 0 >= 0")
+    comp_clean <- gsub("\\s*(<=|>=)\\s*0\\s*$", "", as.character(bw$comparison))
+    dose_contrast <- suppressWarnings(as.numeric(gsub(",", ".", sub(" - 0$", "", comp_clean))))
+    if (all(is.na(dose_contrast)) && test == "Williams_JG") {
+      # Fallback: assign ascending treatment doses excluding control
+      trt_levels <- levels(df$Dose_factor)[-1]
+      dose_contrast <- suppressWarnings(as.numeric(trt_levels))
+      dose_contrast <- dose_contrast[seq_len(min(length(dose_contrast), nrow(bw)))]
+      # If lengths mismatch, pad with NA
+      if (length(dose_contrast) < nrow(bw)) {
+        dose_contrast <- c(dose_contrast, rep(NA_real_, nrow(bw) - length(dose_contrast)))
+      }
+    }
+    names(bw)[names(bw) == "`t'-crit"] <- "Tcrit"
+    # Merge per-dose counts
+    trt_n <- merge(data.frame(Dose_factor = factor(dose_contrast, levels = levels(df$Dose_factor))),
+                   group_n, by = "Dose_factor", all.x = TRUE)
+    n_t <- trt_n$n_t
+    # SE_diff via pooled MSE
+    if (is.na(mse)) stop("Cannot compute pooled MSE from ANOVA; MDD cannot be computed.")
+    SE_diff <- sqrt(mse * (1 / n_c + 1 / n_t))  # $$SE_{diff} = \sqrt{MSE \cdot (1/n_c + 1/n_t)}$$
+    MDD <- bw$Tcrit * SE_diff                   # $$MDD = T_{crit} \cdot SE_{diff}$$
+    MDD_pct <- if (!is.na(mu_c) && mu_c != 0) 100 * MDD / mu_c else NA_real_  # $$MDD\% = 100 \cdot MDD / \mu_c$$
+    res_list <- list(
+      dose = dose_contrast,
+      n_c = rep(n_c, length(n_t)),
+      n_t = n_t,
+      df = rep(df_resid, length(n_t)),
+      SE_diff = SE_diff,
+      Tcrit = bw$Tcrit,
+      MDD = MDD,
+      MDD_pct = MDD_pct,
+      method = test
+    )
+  } else if (test == "Dunnett") {
+    # Need multcomp
+    if (!requireNamespace("multcomp", quietly = TRUE)) stop("Package 'multcomp' is required for Dunnett MDD.")
+    # Build Dunnett contrasts and glht
+    contrasts_call <- as.call(list(as.name("mcp")))
+    contrasts_call[[2]] <- "Dunnett"
+    names(contrasts_call)[2] <- factor_name
+    dunnett_contrasts <- eval(contrasts_call)
+    # Construct aov from formula x
+    aov_model <- stats::aov(x, data = df)
+    gl <- multcomp::glht(aov_model, linfct = dunnett_contrasts)
+    sm <- summary(gl)
+    # Dose from rownames of coefficients like "0.0448 - 0"
+    comp <- names(sm$test$coefficients)
+    dose_contrast <- suppressWarnings(as.numeric(gsub(",", ".", sub(" - 0$", "", comp))))
+    # Standard errors per contrast come from sigma in summary (vector)
+    SE_diff <- as.numeric(sm$test$sigma)
+    # Critical value from qfunction
+    qfun <- sm$test$qfunction
+    Tcrit <- tryCatch(as.numeric(qfun(conf.level = 1 - alpha, adjusted = TRUE)), error = function(e) NA_real_)
+    if (is.na(Tcrit)) {
+      warning("Could not obtain Dunnett adjusted critical value; using unadjusted qt with residual df.")
+      Tcrit <- qtail(df_resid, alternative, alpha)
+    }
+    MDD <- Tcrit * SE_diff
+    MDD_pct <- if (!is.na(mu_c) && mu_c != 0) 100 * MDD / mu_c else NA_real_
+    # n_t per contrast
+    trt_n <- merge(data.frame(Dose_factor = factor(dose_contrast, levels = levels(df$Dose_factor))),
+                   group_n, by = "Dose_factor", all.x = TRUE)
+    n_t <- trt_n$n_t
+    res_list <- list(
+      dose = dose_contrast,
+      n_c = rep(n_c, length(n_t)),
+      n_t = n_t,
+      df = rep(df_resid, length(SE_diff)),
+      SE_diff = SE_diff,
+      Tcrit = rep(Tcrit, length(SE_diff)),
+      MDD = MDD,
+      MDD_pct = MDD_pct,
+      method = "Dunnett_multcomp"
+    )
+  } else if (test == "t") {
+    # Pooled-variance per contrast (control vs each treatment)
+    # Compute control SD
+    sd_c <- stats::sd(resp[ctrl_idx])
+    trt_levels <- levels(df$Dose_factor)[-1]
+    out_rows <- lapply(trt_levels, function(lv) {
+      trt_idx <- df$Dose_factor == lv
+      n_t <- sum(trt_idx)
+      sd_t <- stats::sd(resp[trt_idx])
+      # pooled variance
+      sp2 <- ((n_c - 1) * sd_c^2 + (n_t - 1) * sd_t^2) / (n_c + n_t - 2)  # $$s_p^2 = ((n_c-1)s_c^2 + (n_t-1)s_t^2) / (n_c+n_t-2)$$
+      SE_diff <- sqrt(sp2 * (1 / n_c + 1 / n_t))                           # $$SE_{diff} = \sqrt{s_p^2 (1/n_c + 1/n_t)}$$
+      df_ct <- n_c + n_t - 2
+      Tcrit <- qtail(df_ct, alternative, alpha)
+      MDD <- Tcrit * SE_diff
+      MDD_pct <- if (!is.na(mu_c) && mu_c != 0) 100 * MDD / mu_c else NA_real_
+      data.frame(dose = suppressWarnings(as.numeric(lv)), n_c = n_c, n_t = n_t,
+                 df = df_ct, SE_diff = SE_diff, Tcrit = Tcrit, MDD = MDD, MDD_pct = MDD_pct,
+                 method = "Student_t")
+    })
+    res_df <- do.call(rbind, out_rows)
+    return(res_df)
+  } else if (test == "Welch") {
+    # Welch SE and df per contrast
+    sd_c <- stats::sd(resp[ctrl_idx])
+    trt_levels <- levels(df$Dose_factor)[-1]
+    out_rows <- lapply(trt_levels, function(lv) {
+      trt_idx <- df$Dose_factor == lv
+      n_t <- sum(trt_idx)
+      sd_t <- stats::sd(resp[trt_idx])
+      SE_diff <- sqrt(sd_c^2 / n_c + sd_t^2 / n_t)                         # $$SE_{diff} = \sqrt{s_c^2/n_c + s_t^2/n_t}$$
+      df_w <- (sd_c^2 / n_c + sd_t^2 / n_t)^2 /
+        ((sd_c^2 / n_c)^2 / (n_c - 1) + (sd_t^2 / n_t)^2 / (n_t - 1))     # $$df_{Welch} = \frac{(s_c^2/n_c + s_t^2/n_t)^2}{(s_c^2/n_c)^2/(n_c-1) + (s_t^2/n_t)^2/(n_t-1)}$$
+      Tcrit <- qtail(df_w, alternative, alpha)
+      MDD <- Tcrit * SE_diff
+      MDD_pct <- if (!is.na(mu_c) && mu_c != 0) 100 * MDD / mu_c else NA_real_
+      data.frame(dose = suppressWarnings(as.numeric(lv)), n_c = n_c, n_t = n_t,
+                 df = df_w, SE_diff = SE_diff, Tcrit = Tcrit, MDD = MDD, MDD_pct = MDD_pct,
+                 method = "Welch_t")
+    })
+    res_df <- do.call(rbind, out_rows)
+    return(res_df)
+  }
+
+  # Assemble and return tibble for Williams/Dunnett branches
+  res_df <- data.frame(
+    Dose = res_list$dose,
+    n_c = res_list$n_c,
+    n_t = res_list$n_t,
+    df = res_list$df,
+    SE_diff = res_list$SE_diff,
+    Tcrit = res_list$Tcrit,
+    MDD = res_list$MDD,
+    MDD_pct = res_list$MDD_pct,
+    method = res_list$method,
+    alpha = alpha,
+    alternative = alternative,
+    control_mean = mu_c
+  )
+  # Order by Dose ascending
+  res_df <- res_df[order(res_df$Dose), ]
+  res_df
+}
+
+```
+
+Usage examples
+
+- Williams PMCMRplus (your MOCK0065 Growth Rate):
+
+```{r eval=FALSE}
+w_ep <- test_cases_data %>% dplyr::filter(`Study ID` == "MOCK0065", Endpoint == "Growth Rate")
+w_ep$Dose_numeric <- convert_dose(w_ep$Dose)
+w_ep$Dose_factor <- factor(w_ep$Dose_numeric, levels = sort(unique(w_ep$Dose_numeric)))
+
+mdd_w_pm <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                test = "Williams_PMCMRplus", alpha = 0.05, alternative = "smaller")
+print(mdd_w_pm)
+```
+
+
+- Dunnett:
+```{r eval=FALSE}
+mdd_dunn <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                test = "Dunnett", alpha = 0.05, alternative = "smaller")
+print(mdd_dunn)
+```
+```{r eval=FALSE}
+- Student’s t (pooled, control vs each dose):
+
+mdd_t <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                             test = "t", alpha = 0.05, alternative = "smaller")
+print(mdd_t)
+```
+- Welch:
+```{r eval=FALSE}
+mdd_welch <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                 test = "Welch", alpha = 0.05, alternative = "two-sided")
+print(mdd_welch)
+```
+Notes and options
+- Alternative handling: MDD uses a critical value magnitude; the choice of one-sided vs two-sided changes the quantile. If your expected MDD% was computed with two-sided thresholds, set alternative = "two-sided".
+- For Dunnett, the adjusted Tcrit is taken from `summary(glht)$test$qfunction`. If unavailable, we fallback to unadjusted qt with residual df.
+- For `Williams_JG`, comparison strings might not carry doses; we assign doses in ascending order excluding control. If you need exact mapping, we can inspect the internal `williamsTest_JG` output via drcHelper to align rows to doses.
+- You can extend the test argument to include other tests (e.g., “Dunn”) once you define the appropriate Tcrit. Dunn typically uses z critical values; for MDD you would use zcrit × SE_diff on a rank-based scale, which is a different construct; unless your expected MDD% is defined explicitly for Dunn, I recommend sticking to parametric tests above.
+- If you’d like me to integrate this into your validation report, I can add an MDD% metric branch that uses compute_mdd_generic under the hood and compares to expected “MDD%” rows for Williams.
+
+
+
+# Implementation in the Validation for Williams
+
+Here's a self-contained helper to compute per-dose MDD% for Williams and return a tidy table. It uses your existing helpers and broom_williams output.
+
+
+How to integrate into your validation
+
+- In the Williams run_actual handler, compute the prelim summary as before (for Mean, SD, %Inhibition, CV), and also compute MDD%:
+
+prelim <- compute_prelim_summary(endpoint_data)
+mdd_tbl <- compute_mdd_williams(endpoint_data, alternative = alternative)
+
+# Return both; the generic runner can join MDD% when expected rows exist
+list(actual_df = actual_df, group_means = prelim, mdd = mdd_tbl)
+
+- In your expected parsing (parse_expected_metrics for Williams), you already capture "MDD%":
+
+`out$mdd <- pick("\\bMDD%\\b"); names(out$mdd)[2] <- "Expected_MDDpct"``
+
+- In the generic runner's join stage for Williams, add:
+
+```{r eval=FALSE}
+if (!is.null(exp_splits$mdd) && nrow(exp_splits$mdd)) {
+  mdd_join <- exp_splits$mdd %>%
+    dplyr::left_join(actual$mdd[, c("Dose", "Actual_MDDpct")], by = "Dose") %>%
+    dplyr::mutate(
+      Endpoint = endpoint,
+      Diff = abs(Actual_MDDpct - Expected_MDDpct),
+      Status = dplyr::case_when(
+        is.na(Expected_MDDpct) | is.na(Actual_MDDpct) ~ "MISSING",
+        Diff <= tolerance ~ "PASS", TRUE ~ "FAIL")
+    ) %>%
+    dplyr::transmute(Endpoint, Dose, metric = "MDD%", Actual = Actual_MDDpct, Expected = Expected_MDDpct, Status)
+  pieces <- c(pieces, list(mdd_join))
+}
+```
+
+
+### Handling "greater" vs "smaller"
+
+- The formula for MDD% doesn't change with direction; it's the minimum absolute difference required for significance. You typically compare magnitudes (positive values). If you want to encode a "directional" MDD% (signed), you can attach sign = ifelse(alternative=="greater", +1, -1) and report MDD%*sign, but most reports use a positive threshold.
+
+### Unequal sample sizes and heteroscedasticity
+
+- The SE_diff above already handles unequal n via 1/n_c + 1/n_t.
+- If variances are heterogeneous and a Welch-type approach is used, you would estimate SE_diff via group-specific variances. Williams is based on a pooled-variance ANOVA, so the pooled MSE is appropriate here.
+
+**Optional: power-based MDD%**
+
+- If you later need to compute a power-based MDD% (target power 1−β), use:
+  - $$MDD_{power} = \left(t_{1-\alpha,\ df} + t_{1-\beta,\ df}\right) \cdot SE_{diff}$$
+  - Then $$MDD\%_{power} = 100 \cdot MDD_{power} / \mu_c$$
+- df can be taken from the residual df of the ANOVA model. You can parameterize β (e.g., 0.2 for 80% power) and compute the quantiles using stats::qt.
+
+If you share one Williams study's expected MDD% values and your endpoint_data, I can quickly verify that the compute_mdd_williams output matches to within your tolerance and adjust if the expected MDD% uses a different SE (e.g., contrast-specific SE in Williams instead of the simple (1/n_c + 1/n_t) form).

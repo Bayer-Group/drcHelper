@@ -2,3 +2,4 @@
 
 /.quarto/
 **/*.quarto_ipynb
+*.R

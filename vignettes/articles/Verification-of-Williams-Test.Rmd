@@ -1,0 +1,79 @@
+---
+title: "Verification of Williams' Test"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+
+
+Short answer: Yes for the PMCMRplus method. broom_williams doesn’t have a formal alternative argument, but it forwards any extra arguments via ... to PMCMRplus::williamsTest, so you can pass alternative = "less" or alternative = "greater". For the Williams_JG method, you should use direction = "decreasing" or direction = "increasing" instead of alternative.
+
+How to verify with your dat_medium
+
+- Ensure the control is the first level of the dose factor (lowest dose first).
+- Call broom_williams with method = "Williams_PMCMRplus" and pass alternative via ...
+- Observe the "comparison" column: for alternative = "greater" you’ll see "<= 0"; for alternative = "less" you’ll see ">= 0".
+
+
+
+# Prepare the data: control first level
+```{r}
+dm <- dat_medium
+dm$Dose_factor <- factor(dm$Dose, levels = sort(unique(dm$Dose)))
+```
+
+
+#### PMCMRplus with alternative = "less" (one-sided, smaller/decreasing)
+```{r}
+bw_less <- drcHelper::broom_williams(Response ~ Dose_factor,
+                                     data = dm,
+                                     method = "Williams_PMCMRplus",
+                                     alternative = "less")
+print(bw_less)
+
+```
+
+#### PMCMRplus with alternative = "greater" (one-sided, increasing)
+```{r}
+bw_greater <- drcHelper::broom_williams(Response ~ Dose_factor,
+                                        data = dm,
+                                        method = "Williams_PMCMRplus",
+                                        alternative = "greater")
+print(bw_greater)
+```
+
+
+#### Williams_JG uses 'direction' instead of 'alternative'
+```{r}
+bw_dec <- drcHelper::broom_williams(Response ~ Dose_factor,
+                                    data = dm,
+                                    method = "Williams_JG",
+                                    direction = "decreasing")
+print(bw_dec)
+
+bw_inc <- drcHelper::broom_williams(Response ~ Dose_factor,
+                                    data = dm,
+                                    method = "Williams_JG",
+                                    direction = "increasing")
+print(bw_inc)
+```
+
+
+## What to look for
+
+- In the `PMCMRplus` outputs, the comparison strings will end with "<= 0" when alternative = "greater" and ">= 0" when alternative = "less". That reflects the one-sided hypothesis direction used inside `PMCMRplus::williamsTest`.
+- The JG outputs will reflect ">= 0" for direction = "decreasing" and "<= 0" for direction = "increasing".
+
+## Notes
+
+- If you try alternative = "two.sided" with PMCMRplus, it may work (depending on PMCMRplus::williamsTest implementation) but Williams is commonly used as a one-sided trend test. If you need two-sided, please run it and share the output so I can advise on how to interpret the result in your validation framework.
+- Always ensure the control group is the first factor level; Williams comparisons and Tcrit depend on the factor ordering.
