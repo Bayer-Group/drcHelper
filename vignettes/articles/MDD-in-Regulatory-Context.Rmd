@@ -1,5 +1,7 @@
 ---
 title: "MDD in Regulatory Context"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -271,10 +273,40 @@ Usage examples
 - Williams PMCMRplus (your MOCK0065 Growth Rate):
 
 ```{r eval=FALSE}
+# Helper to convert dose strings to numeric, handling various formats
+convert_dose <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  # Normalize decimal commas and keep scientific notation (e.g., "4,48E-2" -> "4.48E-2")
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  out <- suppressWarnings(as.numeric(xc))
+  return(out)
+}
+
+convert_numeric <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  suppressWarnings(as.numeric(xc))
+}
+
+dose_from_comparison <- function(comp_vec) {
+  if (length(comp_vec) == 0) return(numeric(0))
+  vapply(comp_vec, function(s) {
+    if (is.na(s)) return(NA_real_)
+    parts <- strsplit(s, " - ", fixed = TRUE)[[1]]
+    convert_dose(parts[1])
+  }, FUN.VALUE = numeric(1))
+}
 w_ep <- test_cases_data %>% dplyr::filter(`Study ID` == "MOCK0065", Endpoint == "Growth Rate")
 w_ep$Dose_numeric <- convert_dose(w_ep$Dose)
 w_ep$Dose_factor <- factor(w_ep$Dose_numeric, levels = sort(unique(w_ep$Dose_numeric)))
-
+res_william <- broom_williams(Response ~ Dose_factor, data = w_ep,
+               test = "Williams_PMCMRplus", alpha = 0.05, alternative = "less")
 mdd_w_pm <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
                                 test = "Williams_PMCMRplus", alpha = 0.05, alternative = "smaller")
 print(mdd_w_pm)
@@ -307,6 +339,19 @@ Notes and options
 - You can extend the test argument to include other tests (e.g., “Dunn”) once you define the appropriate Tcrit. Dunn typically uses z critical values; for MDD you would use zcrit × SE_diff on a rank-based scale, which is a different construct; unless your expected MDD% is defined explicitly for Dunn, I recommend sticking to parametric tests above.
 - If you’d like me to integrate this into your validation report, I can add an MDD% metric branch that uses compute_mdd_generic under the hood and compares to expected “MDD%” rows for Williams.
 
+# Implementation in `drcHelper`
+
+Reusing existing test objects and building a modular system around them is far more efficient and robust.
+
+```{r}
+library(drcHelper)
+Results <- broom_williams(Response ~ factor(Dose), data = dat_medium,
+               test = "Williams_JG", alpha = 0.05, alternative = "less")
+
+compute_mdd_williams(Results,data=dat_medium,formula = Response ~ factor(Dose))
+```
+
+
 
 
 # Implementation in the Validation for Williams
@@ -314,19 +359,25 @@ Notes and options
 Here's a self-contained helper to compute per-dose MDD% for Williams and return a tidy table. It uses your existing helpers and broom_williams output.
 
 
-How to integrate into your validation
+# How to integrate into the validation workflow
 
 - In the Williams run_actual handler, compute the prelim summary as before (for Mean, SD, %Inhibition, CV), and also compute MDD%:
 
+```r
 prelim <- compute_prelim_summary(endpoint_data)
 mdd_tbl <- compute_mdd_williams(endpoint_data, alternative = alternative)
 
 # Return both; the generic runner can join MDD% when expected rows exist
 list(actual_df = actual_df, group_means = prelim, mdd = mdd_tbl)
+```
 
 - In your expected parsing (parse_expected_metrics for Williams), you already capture "MDD%":
 
-`out$mdd <- pick("\\bMDD%\\b"); names(out$mdd)[2] <- "Expected_MDDpct"``
+```r
+out$mdd <- pick("\\bMDD%\\b"); 
+names(out$mdd)[2] <- "Expected_MDDpct"
+```
+
 
 - In the generic runner's join stage for Williams, add:
 
@@ -356,11 +407,13 @@ if (!is.null(exp_splits$mdd) && nrow(exp_splits$mdd)) {
 - The SE_diff above already handles unequal n via 1/n_c + 1/n_t.
 - If variances are heterogeneous and a Welch-type approach is used, you would estimate SE_diff via group-specific variances. Williams is based on a pooled-variance ANOVA, so the pooled MSE is appropriate here.
 
-**Optional: power-based MDD%**
+## Optional: power-based MDD%
 
-- If you later need to compute a power-based MDD% (target power 1−β), use:
+- If we later need to compute a power-based MDD% (target power 1−β), use:
   - $$MDD_{power} = \left(t_{1-\alpha,\ df} + t_{1-\beta,\ df}\right) \cdot SE_{diff}$$
   - Then $$MDD\%_{power} = 100 \cdot MDD_{power} / \mu_c$$
 - df can be taken from the residual df of the ANOVA model. You can parameterize β (e.g., 0.2 for 80% power) and compute the quantiles using stats::qt.
 
-If you share one Williams study's expected MDD% values and your endpoint_data, I can quickly verify that the compute_mdd_williams output matches to within your tolerance and adjust if the expected MDD% uses a different SE (e.g., contrast-specific SE in Williams instead of the simple (1/n_c + 1/n_t) form).
+## Notes
+
+We probably need to adjust if the expected MDD% uses a different SE (e.g., contrast-specific SE in Williams instead of the simple (1/n_c + 1/n_t) form).

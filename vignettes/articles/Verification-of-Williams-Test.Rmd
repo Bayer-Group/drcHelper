@@ -75,5 +75,5 @@ print(bw_inc)
 
 ## Notes
 
-- If you try alternative = "two.sided" with PMCMRplus, it may work (depending on PMCMRplus::williamsTest implementation) but Williams is commonly used as a one-sided trend test. If you need two-sided, please run it and share the output so I can advise on how to interpret the result in your validation framework.
+- If you try alternative = "two.sided" with PMCMRplus, it may work (depending on PMCMRplus::williamsTest implementation) but Williams is commonly used as a one-sided trend test. 
 - Always ensure the control group is the first factor level; Williams comparisons and Tcrit depend on the factor ordering.
