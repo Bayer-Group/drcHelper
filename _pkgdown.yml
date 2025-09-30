@@ -76,6 +76,8 @@ navbar:
         href: articles/Trend-Testing.html
       - text: NOEC ECx and BMD
         href: articles/NOEC_ECx_BMD.html
+      - text: MDD in Regulatory Context
+        href: articles/MDD-in-Regulatory-Context.html
     articles:
       text: Articles
       menu:
@@ -186,6 +188,7 @@ articles:
       - articles/NOEC_ECx_BMD
       - articles/OECD_ED_Assays
       - articles/Test-Guidelines
+      - articles/MDD-in-Regulatory-Context
 
   - title: "Validation"
     desc: >
