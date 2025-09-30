@@ -1,0 +1,459 @@
+---
+title: "SK_TSK"
+format: html
+---
+
+Great idea. Below are two deliverables:
+
+1) A minimal patch for drcHelper:::tsk_auto to auto-trim when use.log.doses = TRUE and there is a zero dose, so you avoid degenerate results from log10(0). I show exactly where to add it.
+
+2) A helper function to tidy outputs from multiple SK/TSK functions and return a single comparison table.
+
+PATCH: drcHelper:::tsk_auto.data.frame
+Where to add:
+- Open the source for tsk_auto.data.frame (the one you pasted).
+- Right after input <- x and the max.trim validation, insert the block labeled ADD THIS BLOCK.
+- Optional but recommended: sanitize ... to drop a user-supplied trim in tsk_auto (prevents “formal argument matched by multiple actual arguments”).
+
+Patched function body excerpt (only the changed/added lines shown)
+
+```{r}
+tsk_auto.data.frame <- function(x, control = 0, conf.level = 0.95, 
+                                use.log.doses = TRUE, max.trim = 0.45, ...) {
+  input <- x
+  
+  # Optional: strip 'trim' from ... to avoid duplicate matching if user passes it to tsk_auto
+  dots <- list(...)
+  if (!is.null(dots$trim)) {
+    warning("tsk_auto ignores 'trim'. Use drcHelper::tsk(...) for explicit trims. Removing 'trim' from ...")
+    dots$trim <- NULL
+  }
+  
+  # Validate max.trim
+  if (max.trim <= 0 || max.trim >= 0.5) {
+    stop("max.trim must be between 0 and 0.5 (exclusive).")
+  }
+  
+  # ADD THIS BLOCK: preemptively trim if log-doses requested and zero (or negative) doses exist
+  if (isTRUE(use.log.doses) && any(input$x <= 0, na.rm = TRUE)) {
+    # Minimal safe trim: roughly 1/min(total per dose), capped by max.trim
+    # Falls back to 0.001 if totals are missing
+    base_trim <- tryCatch(1 / max(input$n, na.rm = TRUE), error = function(e) NA_real_)
+    if (!is.finite(base_trim) || base_trim <= 0) base_trim <- 0.001
+    auto_trim <- min(base_trim, max.trim)
+    
+    message(sprintf("tsk_auto: zero dose with log transform detected; applying auto-trim = %.4f", auto_trim))
+    # Try trimmed call; if it fails with a “suggested trim” message, upgrade trim slightly (capped)
+    return(tryCatch(
+      do.call(tsk, c(list(input, control = control, trim = auto_trim, conf.level = conf.level,
+                          use.log.doses = use.log.doses), dots)),
+      error = function(e) {
+        if (grepl("consider using this trim:", e$message)) {
+          suggested_trim_match <- regmatches(e$message, regexpr("consider using this trim: [0-9.]+", e$message))
+          if (length(suggested_trim_match) > 0) {
+            suggested_trim <- as.numeric(sub("consider using this trim: ", "", suggested_trim_match))
+            auto_trim2 <- min(suggested_trim + 0.001, max.trim)
+            message(sprintf("tsk_auto: increasing auto-trim to %.4f due to suggestion", auto_trim2))
+            return(do.call(tsk, c(list(input, control = control, trim = auto_trim2, conf.level = conf.level,
+                                       use.log.doses = use.log.doses), dots)))
+          }
+        }
+        stop(e)
+      }
+    ))
+  }
+  
+  # ORIGINAL try with trim=0 (unchanged), but now use 'dots' to avoid duplicate arg names
+  result <- tryCatch({
+    do.call(tsk, c(list(input, control = control, trim = 0, conf.level = conf.level,
+                        use.log.doses = use.log.doses), dots))
+  }, error = function(e) {
+    # Only apply auto-trimming for specific trim-related errors
+    if (grepl("responses do not increase from trim to 1-trim", e$message)) {
+      suggested_trim_match <- regmatches(e$message, 
+                                         regexpr("consider using this trim: [0-9.]+", e$message))
+      if (length(suggested_trim_match) > 0) {
+        suggested_trim <- as.numeric(sub("consider using this trim: ", "", suggested_trim_match))
+        auto_trim <- min(suggested_trim + 0.001, max.trim)
+        message(paste("Auto-trimming applied: trim =", round(auto_trim, 4)))
+        message(paste("Reason: Responses don't span the full range from 0 to 1"))
+        do.call(tsk, c(list(input, control = control, trim = auto_trim, conf.level = conf.level,
+                            use.log.doses = use.log.doses), dots))
+      } else {
+        stop(e)
+      }
+    } else {
+      stop(e)
+    }
+  })
+  
+  return(result)
+}
+
+```
+
+Notes:
+- This patch:
+  - Detects use.log.doses = TRUE with x <= 0, and applies a minimal trim automatically: trim = min(1 / max(n), max.trim), with a lower safeguard of 0.001.
+  - If tsk() still suggests a larger trim, it bumps it to the suggested value + 0.001 (capped by max.trim).
+  - Prevents the “formal argument 'trim' matched by multiple actual arguments” error by stripping trim from ... at the start of tsk_auto.
+
+Comparison table helper (tidy)
+Below is a function that:
+- Runs your SpearmanKarber_modified
+- Runs drcHelper::tsk_auto twice (log and linear)
+- Optionally runs drcHelper::tsk with trim = 1/min(n) on the log scale
+- Optionally runs ecotoxicology::TSK with A rounded to integral percent to avoid the formatting bug
+- Optionally runs ecotoxicology::SpearmanKarber if totals are constant (N)
+
+It returns a data.frame with comparable columns.
+
+```{r}
+tidy_sk_compare <- function(x, n, r, conf.level = 0.95,
+                            run_tsk_auto_log = TRUE,
+                            run_tsk_auto_linear = TRUE,
+                            run_tsk_log_mintrim = TRUE,
+                            run_ecotox_TSK = TRUE,
+                            run_ecotox_SK = TRUE) {
+  stopifnot(length(x) == length(n), length(x) == length(r))
+  out_rows <- list()
+  add_row <- function(method, scale, trim_or_A, est, lcl, ucl, log10est = NA_real_, sd = NA_real_,
+                      gsd = NA_real_, notes = NA_character_) {
+    out_rows[[length(out_rows) + 1]] <<- data.frame(
+      method = method,
+      scale = scale,
+      trim_or_A = trim_or_A,
+      log10LC50 = log10est,
+      LC50 = est,
+      LCL = lcl,
+      UCL = ucl,
+      SD = sd,
+      GSD = gsd,
+      notes = notes,
+      stringsAsFactors = FALSE
+    )
+  }
+  # 1) Your modified
+  skm <- try(SpearmanKarber_modified(x, r, n, conf.level = conf.level, retData = TRUE), silent = TRUE)
+  if (!inherits(skm, "try-error")) {
+    add_row("SpearmanKarber_modified", "log-dose", NA,
+            est = skm$LC50,
+            lcl = skm$confidenceIntervalLC50[1],
+            ucl = skm$confidenceIntervalLC50[2],
+            log10est = skm$log10LC50,
+            sd = if (!is.null(skm$StandardDeviationOfm)) skm$StandardDeviationOfm else NA_real_,
+            notes = "")
+  } else {
+    add_row("SpearmanKarber_modified", "log-dose", NA, NA, NA, NA, NA, NA, NA, as.character(skm))
+  }
+  # Helper to extract from drcHelper::tsk/tsk_auto objects
+  extract_tsk_like <- function(obj) {
+    # Try common fields; fall back to NA
+    est <- obj$LD50 %||% obj$ED50 %||% obj$estimate %||% NA_real_
+    lcl <- (obj$conf.int %||% obj$ci %||% c(NA_real_, NA_real_))[1]
+    ucl <- (obj$conf.int %||% obj$ci %||% c(NA_real_, NA_real_))[2]
+    sd <- obj$sd %||% obj$SE %||% NA_real_
+    gsd <- obj$GSD %||% obj$gsd %||% NA_real_
+    list(est = as.numeric(est), lcl = as.numeric(lcl), ucl = as.numeric(ucl),
+         sd = as.numeric(sd), gsd = as.numeric(gsd))
+  }
+  `%||%` <- function(a, b) if (!is.null(a)) a else b
+  
+  # 2) tsk_auto (log-dose) - uses your patched behavior
+  if (isTRUE(run_tsk_auto_log)) {
+    o <- try(drcHelper::tsk_auto(data.frame(x = x, n = n, r = r),
+                                 control = 0, conf.level = conf.level,
+                                 use.log.doses = TRUE), silent = TRUE)
+    if (!inherits(o, "try-error")) {
+      ex <- extract_tsk_like(o)
+      add_row("tsk_auto", "log-dose", attr(o, "trim") %||% NA,
+              est = ex$est, lcl = ex$lcl, ucl = ex$ucl,
+              log10est = if (is.finite(ex$est) && ex$est > 0) log10(ex$est) else NA_real_,
+              sd = ex$sd, gsd = ex$gsd,
+              notes = "")
+    } else {
+      add_row("tsk_auto", "log-dose", NA, NA, NA, NA, NA, NA, NA, as.character(o))
+    }
+  }
+  # 3) tsk_auto (linear-dose)
+  if (isTRUE(run_tsk_auto_linear)) {
+    o <- try(drcHelper::tsk_auto(data.frame(x = x, n = n, r = r),
+                                 control = 0, conf.level = conf.level,
+                                 use.log.doses = FALSE), silent = TRUE)
+    if (!inherits(o, "try-error")) {
+      ex <- extract_tsk_like(o)
+      add_row("tsk_auto", "linear-dose", attr(o, "trim") %||% NA,
+              est = ex$est, lcl = ex$lcl, ucl = ex$ucl,
+              log10est = if (is.finite(ex$est) && ex$est > 0) log10(ex$est) else NA_real_,
+              sd = ex$sd, gsd = ex$gsd,
+              notes = "")
+    } else {
+      add_row("tsk_auto", "linear-dose", NA, NA, NA, NA, NA, NA, NA, as.character(o))
+    }
+  }
+  # 4) tsk with minimal trim on log-dose
+  if (isTRUE(run_tsk_log_mintrim)) {
+    trim_min <- 1 / max(n, na.rm = TRUE)
+    o <- try(drcHelper::tsk(x, n, r, trim = trim_min, use.log.doses = TRUE), silent = TRUE)
+    if (!inherits(o, "try-error")) {
+      ex <- extract_tsk_like(o)
+      add_row("tsk (min trim)", "log-dose", trim_min,
+              est = ex$est, lcl = ex$lcl, ucl = ex$ucl,
+              log10est = if (is.finite(ex$est) && ex$est > 0) log10(ex$est) else NA_real_,
+              sd = ex$sd, gsd = ex$gsd,
+              notes = "")
+    } else {
+      add_row("tsk (min trim)", "log-dose", trim_min, NA, NA, NA, NA, NA, NA, as.character(o))
+    }
+  }
+  # 5) ecotoxicology::TSK with A rounded to integer percent
+  if (isTRUE(run_ecotox_TSK)) {
+    A_intpct <- round(100 * (1 / max(n, na.rm = TRUE)))
+    A <- A_intpct / 100
+    o <- try(ecotoxicology::TSK(x, r, n, A = A, conf = conf.level), silent = TRUE)
+    if (!inherits(o, "try-error")) {
+      # Try common names used by ecotoxicology::TSK
+      est <- o$LD50 %||% o$ED50 %||% o$estimate %||% NA_real_
+      ci <- o$conf.int %||% o$ci %||% c(NA_real_, NA_real_)
+      add_row("ecotox::TSK", "log-dose", A,
+              est = as.numeric(est),
+              lcl = as.numeric(ci[1]),
+              ucl = as.numeric(ci[2]),
+              log10est = if (is.finite(est) && est > 0) log10(as.numeric(est)) else NA_real_,
+              sd = o$sd %||% o$SE %||% NA_real_,
+              notes = "")
+    } else {
+      add_row("ecotox::TSK", "log-dose", A, NA, NA, NA, NA, NA, NA, as.character(o))
+    }
+  }
+  # 6) ecotoxicology::SpearmanKarber (only if totals constant)
+  if (isTRUE(run_ecotox_SK) && length(unique(n)) == 1L) {
+    # Use positive x to avoid log10(0) inside; provide third column as r/N (observed prop)
+    use <- which(x > 0)
+    toxData <- cbind(x[use], r[use], r[use] / n[use])
+    o <- try(ecotoxicology::SpearmanKarber(toxData, N = unique(n)[1], retData = TRUE,
+                                           showOutput = FALSE, showPlot = FALSE), silent = TRUE)
+    if (!inherits(o, "try-error")) {
+      add_row("ecotox::SpearmanKarber", "log-dose", NA,
+              est = o$LC50,
+              lcl = o$confidenceInterval95LC50[1],
+              ucl = o$confidenceInterval95LC50[2],
+              log10est = o$log10LC50,
+              sd = if (!is.null(o$varianceOfm)) sqrt(o$varianceOfm) else NA_real_,
+              notes = "")
+    } else {
+      add_row("ecotox::SpearmanKarber", "log-dose", NA, NA, NA, NA, NA, NA, NA, as.character(o))
+    }
+  }
+  # Bind rows
+  do.call(rbind, out_rows)
+}
+```
+
+
+How to use:
+- After adding the tsk_auto patch, source both functions, then:
+  res <- tidy_sk_compare(x, n, r, conf.level = 0.95)
+  print(res)
+
+This will give you a single table with method, scale, trim/A, LC50, CI, and log10(LC50) where available, enabling quick side-by-side comparison.
+
+If you want me to extend the tidier to include the raw adjusted mortality vectors or more diagnostics (e.g., whether smoothing/trimming occurred), I can add those columns too.
+
+
+Thanks. I’ll give you two things:
+
+1) A corrected add_row plus a set of separate extract_* functions that return one standardized row each. You can rbind these rows to build your comparison table.
+
+2) A concise patch for drcHelper:::tsk_auto.data.frame to auto-trim when use.log.doses = TRUE and x includes 0 (or negative), with the exact spot to add it.
+
+Part 1: add_row and extract functions
+Use this add_row that returns the updated out_rows list (no <<-). Then use the extract_* functions below. Each returns a single-row data.frame with columns:
+method, scale, trim_or_A, log10LC50, LC50, LCL, UCL, SD, GSD, notes.
+
+```{r}
+add_row <- function(out_rows, method, scale, trim_or_A, est, lcl, ucl,
+                    log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                    notes = NA_character_) {
+  out_rows[[length(out_rows) + 1]] <- data.frame(
+    method = method,
+    scale = scale,
+    trim_or_A = trim_or_A,
+    log10LC50 = log10est,
+    LC50 = est,
+    LCL = lcl,
+    UCL = ucl,
+    SD = sd,
+    GSD = gsd,
+    notes = notes,
+    stringsAsFactors = FALSE
+  )
+  out_rows
+}
+
+# Single-row constructor (useful if you prefer not to manage an out_rows list)
+standard_row <- function(method, scale, trim_or_A, est, lcl, ucl,
+                         log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                         notes = NA_character_) {
+  data.frame(
+    method = method,
+    scale = scale,
+    trim_or_A = trim_or_A,
+    log10LC50 = log10est,
+    LC50 = est,
+    LCL = lcl,
+    UCL = ucl,
+    SD = sd,
+    GSD = gsd,
+    notes = notes,
+    stringsAsFactors = FALSE
+  )
+}
+
+extract_SpearmanKarber_modified <- function(skm) {
+  if (inherits(skm, "try-error")) {
+    return(standard_row("SpearmanKarber_modified", "log-dose", NA,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = as.character(skm)))
+  }
+  standard_row("SpearmanKarber_modified", "log-dose", NA,
+               est = skm$LC50,
+               lcl = skm$confidenceIntervalLC50[1],
+               ucl = skm$confidenceIntervalLC50[2],
+               log10est = skm$log10LC50,
+               sd = if (!is.null(skm$StandardDeviationOfm)) skm$StandardDeviationOfm else NA_real_,
+               notes = "")
+}
+
+extract_tsk_auto <- function(x, n, r, control = 0, conf.level = 0.95,
+                             use.log.doses = TRUE, max.trim = 0.45) {
+  obj <- try(drcHelper::tsk_auto(data.frame(x = x, n = n, r = r),
+                                 control = control, conf.level = conf.level,
+                                 use.log.doses = use.log.doses, max.trim = max.trim),
+             silent = TRUE)
+  if (inherits(obj, "try-error")) {
+    return(standard_row("tsk_auto", if (use.log.doses) "log-dose" else "linear-dose", NA,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = as.character(obj)))
+  }
+  est <- if (!is.null(obj$LD50)) obj$LD50 else if (!is.null(obj$ED50)) obj$ED50 else NA_real_
+  ci <- if (!is.null(obj$conf.int)) obj$conf.int else if (!is.null(obj$ci)) obj$ci else c(NA_real_, NA_real_)
+  sd <- if (!is.null(obj$sd)) obj$sd else if (!is.null(obj$SD)) obj$SD else NA_real_
+  gsd <- if (!is.null(obj$GSD)) obj$GSD else if (!is.null(obj$gsd)) obj$gsd else NA_real_
+  trim_val <- if (!is.null(obj$trim)) obj$trim else if (!is.null(attr(obj, "trim"))) attr(obj, "trim") else NA_real_
+  standard_row("tsk_auto", if (use.log.doses) "log-dose" else "linear-dose", trim_val,
+               est = est,
+               lcl = ci[1],
+               ucl = ci[2],
+               log10est = if (is.finite(est) && est > 0) log10(est) else NA_real_,
+               sd = sd,
+               gsd = gsd,
+               notes = "")
+}
+
+extract_tsk <- function(x, n, r, trim = 0, use.log.doses = TRUE) {
+  obj <- try(drcHelper::tsk(x, n, r, trim = trim, use.log.doses = use.log.doses), silent = TRUE)
+  if (inherits(obj, "try-error")) {
+    return(standard_row("tsk", if (use.log.doses) "log-dose" else "linear-dose", trim,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = as.character(obj)))
+  }
+  est <- if (!is.null(obj$LD50)) obj$LD50 else if (!is.null(obj$ED50)) obj$ED50 else NA_real_
+  ci <- if (!is.null(obj$conf.int)) obj$conf.int else if (!is.null(obj$ci)) obj$ci else c(NA_real_, NA_real_)
+  sd <- if (!is.null(obj$sd)) obj$sd else if (!is.null(obj$SD)) obj$SD else NA_real_
+  gsd <- if (!is.null(obj$GSD)) obj$GSD else if (!is.null(obj$gsd)) obj$gsd else NA_real_
+  standard_row("tsk", if (use.log.doses) "log-dose" else "linear-dose", trim,
+               est = est,
+               lcl = ci[1],
+               ucl = ci[2],
+               log10est = if (is.finite(est) && est > 0) log10(est) else NA_real_,
+               sd = sd,
+               gsd = gsd,
+               notes = "")
+}
+
+extract_ecotox_TSK <- function(x, n, r, A = NULL, conf = 0.95) {
+  if (is.null(A)) {
+    A_intpct <- round(100 * (1 / max(n, na.rm = TRUE)))
+    A <- A_intpct / 100
+  }
+  obj <- try(ecotoxicology::TSK(x, r, n, A = A, conf = conf), silent = TRUE)
+  if (inherits(obj, "try-error")) {
+    return(standard_row("ecotox::TSK", "log-dose", A,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = as.character(obj)))
+  }
+  est <- if (!is.null(obj$LD50)) obj$LD50 else if (!is.null(obj$ED50)) obj$ED50 else NA_real_
+  ci <- if (!is.null(obj$conf.int)) obj$conf.int else if (!is.null(obj$ci)) obj$ci else c(NA_real_, NA_real_)
+  sd <- if (!is.null(obj$sd)) obj$sd else if (!is.null(obj$SE)) obj$SE else NA_real_
+  standard_row("ecotox::TSK", "log-dose", A,
+               est = est,
+               lcl = ci[1],
+               ucl = ci[2],
+               log10est = if (is.finite(est) && est > 0) log10(est) else NA_real_,
+               sd = sd,
+               gsd = NA_real_,
+               notes = "")
+}
+
+extract_ecotox_SpearmanKarber <- function(x, n, r) {
+  if (length(unique(n)) != 1L) {
+    return(standard_row("ecotox::SpearmanKarber", "log-dose", NA,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = "Requires constant N"))
+  }
+  use <- which(x > 0)
+  toxData <- cbind(x[use], r[use], r[use] / n[use])
+  obj <- try(ecotoxicology::SpearmanKarber(toxData, N = unique(n)[1],
+                                           retData = TRUE, showOutput = FALSE, showPlot = FALSE),
+             silent = TRUE)
+  if (inherits(obj, "try-error")) {
+    return(standard_row("ecotox::SpearmanKarber", "log-dose", NA,
+                        est = NA_real_, lcl = NA_real_, ucl = NA_real_,
+                        log10est = NA_real_, sd = NA_real_, gsd = NA_real_,
+                        notes = as.character(obj)))
+  }
+  sd_log <- if (!is.null(obj$varianceOfm)) sqrt(obj$varianceOfm) else NA_real_
+  standard_row("ecotox::SpearmanKarber", "log-dose", NA,
+               est = obj$LC50,
+               lcl = obj$confidenceInterval95LC50[1],
+               ucl = obj$confidenceInterval95LC50[2],
+               log10est = obj$log10LC50,
+               sd = sd_log,
+               gsd = NA_real_,
+               notes = "")
+}
+
+# Example combining rows
+tidy_compare <- function(x, n, r, conf.level = 0.95) {
+  rows <- list()
+  # your modified (object creation)
+  skm <- try(SpearmanKarber_modified(x, r, n, conf.level = conf.level, retData = TRUE), silent = TRUE)
+  rows[[length(rows) + 1]] <- extract_SpearmanKarber_modified(skm)
+  rows[[length(rows) + 1]] <- extract_tsk_auto(x, n, r, control = 0, conf.level = conf.level, use.log.doses = TRUE)
+  rows[[length(rows) + 1]] <- extract_tsk_auto(x, n, r, control = 0, conf.level = conf.level, use.log.doses = FALSE)
+  rows[[length(rows) + 1]] <- extract_tsk(x, n, r, trim = 1 / max(n), use.log.doses = TRUE)
+  rows[[length(rows) + 1]] <- extract_ecotox_TSK(x, n, r, A = 1 / max(n), conf = conf.level)
+  rows[[length(rows) + 1]] <- extract_ecotox_SpearmanKarber(x, n, r)
+  do.call(rbind, rows)
+}
+```
+
+
+
+
+And in the original tryCatch that calls tsk with trim = 0, replace direct tsk(...) with do.call(tsk, c(list(...), dots)) so that any other arguments in ... are preserved without conflicting names.
+
+Where exactly to add:
+- In the body of tsk_auto.data.frame, after input <- x and the max.trim check, insert the patch block.
+- Also add the optional dots-handling lines at the same location (above the patch block).
+- In the existing result <- tryCatch({ ... }, ...), move from direct tsk(...) to do.call(tsk, c(list(...), dots)).
+
+This ensures:
+- tsk_auto automatically trims when log doses include zero, preventing degenerate estimates.
+- Users won’t hit the “formal argument 'trim' matched by multiple actual arguments” error in tsk_auto.

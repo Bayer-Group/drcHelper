@@ -29,6 +29,19 @@
 #'
 tsk <- function(...) UseMethod("tsk")
 
+## wrapper for extracting output. not used anymore, see @extract_tsk_auto
+extract_tsk_like <- function(obj) {
+  # Try common fields; fall back to NA
+  est <- obj$LD50 %||% obj$ED50 %||% obj$estimate %||% NA_real_
+  lcl <- (obj$conf.int %||% obj$ci %||% c(NA_real_, NA_real_))[1]
+  ucl <- (obj$conf.int %||% obj$ci %||% c(NA_real_, NA_real_))[2]
+  sd <- obj$sd %||% obj$SE %||% NA_real_
+  gsd <- obj$GSD %||% obj$gsd %||% NA_real_
+  list(est = as.numeric(est), lcl = as.numeric(lcl), ucl = as.numeric(ucl),
+       sd = as.numeric(sd), gsd = as.numeric(gsd))
+}
+
+
 #' Auto-trimmed TSK Analysis
 #'
 #' This function automatically determines the appropriate trim level for TSK analysis
@@ -40,15 +53,15 @@ tsk <- function(...) UseMethod("tsk")
 #' from the trim level to 1-trim level, which typically occurs when responses are
 #' too close to 0% or 100% at the extreme doses.
 #'
-#' @param x A numeric vector of doses (for numeric method) or a data frame 
+#' @param x A numeric vector of doses (for numeric method) or a data frame
 #'   containing columns 'x', 'n', and 'r' (for data.frame method).
 #' @param n A numeric vector of total counts (for numeric method only).
 #' @param r A numeric vector of response counts (for numeric method only).
 #' @param control A numeric value indicating the control dose (default is 0).
 #' @param conf.level A numeric value indicating the confidence level (default is 0.95).
-#' @param use.log.doses A logical value indicating whether to use log-transformed 
+#' @param use.log.doses A logical value indicating whether to use log-transformed
 #'   doses (default is TRUE).
-#' @param max.trim A numeric value indicating the maximum allowed trim level 
+#' @param max.trim A numeric value indicating the maximum allowed trim level
 #'   (default is 0.45, must be < 0.5).
 #' @param ... Additional arguments passed to the tsk function.
 #' @return The result of the TSK analysis with automatic trimming applied.
@@ -68,7 +81,7 @@ tsk <- function(...) UseMethod("tsk")
 #'   r = c(2, 5, 8, 12, 15, 17)
 #' )
 #' result <- tsk_auto(data)
-#' 
+#'
 #' # Using hamilton dataset (if available)
 #' if (exists("hamilton")) {
 #'   # Try with one of the hamilton datasets
@@ -82,7 +95,7 @@ tsk_auto <- function(x, ...) {
 #' @rdname tsk_auto
 #' @method tsk_auto numeric
 #' @export
-tsk_auto.numeric <- function(x, n, r, control = 0, conf.level = 0.95, 
+tsk_auto.numeric <- function(x, n, r, control = 0, conf.level = 0.95,
                              use.log.doses = TRUE, max.trim = 0.45, ...) {
   input <- data.frame(x = x, n = n, r = r)
   tsk_auto.data.frame(input, control = control, conf.level = conf.level,
@@ -92,15 +105,48 @@ tsk_auto.numeric <- function(x, n, r, control = 0, conf.level = 0.95,
 #' @rdname tsk_auto
 #' @method tsk_auto data.frame
 #' @export
-tsk_auto.data.frame <- function(x, control = 0, conf.level = 0.95, 
+tsk_auto.data.frame <- function(x, control = 0, conf.level = 0.95,
                                 use.log.doses = TRUE, max.trim = 0.45, ...) {
   input <- x
-  
+  # Optional: strip 'trim' from ... to avoid duplicate matching if user passes it to tsk_auto
+  dots <- list(...)
+  if (!is.null(dots$trim)) {
+    warning("tsk_auto ignores 'trim'. Use drcHelper::tsk(...) for explicit trims. Removing 'trim' from ...")
+    dots$trim <- NULL
+  }
+
   # Validate max.trim
   if (max.trim <= 0 || max.trim >= 0.5) {
     stop("max.trim must be between 0 and 0.5 (exclusive).")
   }
-  
+  # ADD THIS BLOCK: preemptively trim if log-doses requested and zero (or negative) doses exist
+  if (isTRUE(use.log.doses) && any(input$x <= 0, na.rm = TRUE)) {
+    # Minimal safe trim: roughly 1/min(total per dose), capped by max.trim
+    # Falls back to 0.001 if totals are missing
+    base_trim <- tryCatch(1 / max(input$n, na.rm = TRUE), error = function(e) NA_real_)
+    if (!is.finite(base_trim) || base_trim <= 0) base_trim <- 0.001
+    auto_trim <- min(base_trim, max.trim)
+
+    message(sprintf("tsk_auto: zero dose with log transform detected; applying auto-trim = %.4f", auto_trim))
+    # Try trimmed call; if it fails with a “suggested trim” message, upgrade trim slightly (capped)
+    return(tryCatch(
+      do.call(tsk, c(list(input, control = control, trim = auto_trim, conf.level = conf.level,
+                          use.log.doses = use.log.doses), dots)),
+      error = function(e) {
+        if (grepl("consider using this trim:", e$message)) {
+          suggested_trim_match <- regmatches(e$message, regexpr("consider using this trim: [0-9.]+", e$message))
+          if (length(suggested_trim_match) > 0) {
+            suggested_trim <- as.numeric(sub("consider using this trim: ", "", suggested_trim_match))
+            auto_trim2 <- min(suggested_trim + 0.001, max.trim)
+            message(sprintf("tsk_auto: increasing auto-trim to %.4f due to suggestion", auto_trim2))
+            return(do.call(tsk, c(list(input, control = control, trim = auto_trim2, conf.level = conf.level,
+                                       use.log.doses = use.log.doses), dots)))
+          }
+        }
+        stop(e)
+      }
+    ))
+  }
   # First try with no trimming
   result <- tryCatch({
     tsk(input, control = control, trim = 0, conf.level = conf.level,
@@ -109,18 +155,18 @@ tsk_auto.data.frame <- function(x, control = 0, conf.level = 0.95,
     # Only apply auto-trimming for specific trim-related errors
     if (grepl("responses do not increase from trim to 1-trim", e$message)) {
       # Extract suggested trim from error message
-      suggested_trim_match <- regmatches(e$message, 
+      suggested_trim_match <- regmatches(e$message,
                                         regexpr("consider using this trim: [0-9.]+", e$message))
-      
+
       if (length(suggested_trim_match) > 0) {
         suggested_trim <- as.numeric(sub("consider using this trim: ", "", suggested_trim_match))
-        
+
         # Apply a small buffer to ensure success, but cap at max.trim
         auto_trim <- min(suggested_trim + 0.001, max.trim)
-        
+
         message(paste("Auto-trimming applied: trim =", round(auto_trim, 4)))
         message(paste("Reason: Responses don't span the full range from 0 to 1"))
-        
+
         # Try again with calculated trim
         tsk(input, control = control, trim = auto_trim, conf.level = conf.level,
             use.log.doses = use.log.doses, ...)
@@ -133,7 +179,7 @@ tsk_auto.data.frame <- function(x, control = 0, conf.level = 0.95,
       stop(e)
     }
   })
-  
+
   return(result)
 }
 

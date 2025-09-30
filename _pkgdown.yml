@@ -76,6 +76,8 @@ navbar:
         href: articles/Trend-Testing.html
       - text: NOEC ECx and BMD
         href: articles/NOEC_ECx_BMD.html
+      - text: MDD in Regulatory Context
+        href: articles/MDD-in-Regulatory-Context.html
     articles:
       text: Articles
       menu:
@@ -143,7 +145,7 @@ articles:
       - drcHelper
       - Dunnetts_Test_for_Data_with_Hierarchical_Structure
       - Example_Analysis_Workflow
-  
+
   - title: "Core Statistical Methods"
     desc: >
       These articles cover the foundational statistical methods implemented in drcHelper
@@ -153,7 +155,7 @@ articles:
       - articles/Ordinal-Data
       - articles/Count_Data
       - articles/LMM-GLMM-and-GAMM
-  
+
   - title: "Advanced Topics"
     desc: >
       These articles cover more advanced statistical concepts and techniques
@@ -162,7 +164,7 @@ articles:
       - articles/Normality-Check
       - articles/Binomial_Extra_Variance
       - articles/Equivalence-Testing
-  
+
   - title: "Alternative Methods"
     desc: >
       These articles explore alternative statistical methods and approaches
@@ -173,7 +175,7 @@ articles:
       - articles/TSK_method
       - articles/MQJT
       - articles/Advanced_Fitting-a-biphasic-dose-reponse-model
-      
+
   - title: "Regulatory Statistics"
     desc: >
       Statistical methods for regulatory assessments
@@ -186,7 +188,8 @@ articles:
       - articles/NOEC_ECx_BMD
       - articles/OECD_ED_Assays
       - articles/Test-Guidelines
-      
+      - articles/MDD-in-Regulatory-Context
+
   - title: "Validation"
     desc: >
       Validation of statistical methods in the package
@@ -197,7 +200,8 @@ articles:
       - articles/Verification_which_JT
       - articles/Validation_MCP_tests
       - articles/Verification_CA_test
-      
+      - articles/Verification-of-Williams-Test
+
   - title: "Examples"
     desc: >
       Example applications of the package

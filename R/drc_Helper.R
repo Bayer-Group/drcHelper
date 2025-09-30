@@ -302,7 +302,7 @@ getModelName <- function(fname = NULL) {
 #' @rdname ED.plus
 #' @details
 #' Due to old ECxHelper development where ED.plus is defined as ED.ZG
-#' @seealso [ED.plus()] for the public version of usage
+#' @seealso [drcHelper::ED.plus()] for the public version of usage
 #' @export ED.ZG
 #' @keywords Deprecated
 ED.ZG <- function(...) {

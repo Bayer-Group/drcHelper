@@ -14,7 +14,7 @@ This document identifies structural redundancy issues in the drcHelper package a
   - `stepDownRSCABS()` - Internal step-down procedure
   - `stepKRSCABS()` - Internal helper
   - Documented as "for validation purpose"
-  - Uses older API design
+  - Uses older implementation design
 
 - **Current Implementation** (`R/RSCABS_AO.R`, 934 lines):
   - `step_down_RSCABS()` - Modern step-down procedure
@@ -24,13 +24,13 @@ This document identifies structural redundancy issues in the drcHelper package a
   - By Allen Olmstead, more modern design
 
 **Impact**: 
-- API confusion with similar function names
+- implementation confusion with similar function names
 - Maintenance burden of two codebases
 - Test suite covers both implementations
 
 **Recommendation**: 
 - Phase out legacy implementation gradually
-- Update tests to use modern API
+- Update tests to use modern implementation
 - Add deprecation warnings to legacy functions
 
 ### 2. Large Monolithic Files (MEDIUM PRIORITY)
@@ -61,7 +61,7 @@ This document identifies structural redundancy issues in the drcHelper package a
 - Cochran-Armitage: `stepdown_binom.R`, `RSCABS_AO.R` (different purposes)
 
 **Note**: Some apparent "duplication" serves different purposes:
-- `cochranArmitageTrendTest()` - General-purpose public API
+- `cochranArmitageTrendTest()` - General-purpose public implementation
 - `get_CA_Z()` - Internal utility for clustered data
 - These are NOT redundant
 
@@ -70,9 +70,9 @@ This document identifies structural redundancy issues in the drcHelper package a
 ### Phase 1: Documentation and Planning
 - [x] Create this analysis document
 - [ ] Add deprecation warnings to legacy functions
-- [ ] Document migration path from old to new API
+- [ ] Document migration path from old to new implementation
 
-### Phase 2: API Consolidation  
+### Phase 2: implementation Consolidation  
 - [ ] Update tests to prefer modern RSCA implementation
 - [ ] Add wrapper functions for backward compatibility
 - [ ] Mark legacy functions as deprecated in documentation
@@ -92,13 +92,13 @@ This document identifies structural redundancy issues in the drcHelper package a
 ### Completed in This Analysis
 - [x] **Removed empty placeholder file** (`R/MQJT.R`)
 - [x] **Added deprecation warnings** to `runRSCABS()` 
-- [x] **Updated documentation** to clearly distinguish legacy vs modern APIs
+- [x] **Updated documentation** to clearly distinguish legacy vs modern implementations
 - [x] **Created comprehensive analysis** of all redundancy issues
 
 ### Deferred for Future Work
 - [ ] **Breaking up large files**: Requires careful dependency analysis
 - [ ] **Removing deprecated functions**: Should wait for major version bump
-- [ ] **API consolidation**: Needs broader team discussion on backward compatibility
+- [ ] **implementation consolidation**: Needs broader team discussion on backward compatibility
 
 ## Impact Assessment
 
