@@ -38,6 +38,7 @@
     <li><a class="dropdown-item" href="articles/Example_RSCABS.html">RSCABS</a></li>
     <li><a class="dropdown-item" href="articles/Trend-Testing.html">Trend Testing</a></li>
     <li><a class="dropdown-item" href="articles/NOEC_ECx_BMD.html">NOEC ECx and BMD</a></li>
+    <li><a class="dropdown-item" href="articles/MDD-in-Regulatory-Context.html">MDD in Regulatory Context</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
@@ -69,6 +70,7 @@
     <li><a class="dropdown-item" href="articles/Validation_MCP_tests.html">Validation of MCP tests</a></li>
     <li><a class="dropdown-item" href="articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue" aria-label="New Issue"><span class="fa fa-bug"></span></a></li>
@@ -105,7 +107,7 @@
 <li>
 <code><a href="reference/stepKRSCABS.html">stepKRSCABS()</a></code> - Internal helper</li>
 <li>Documented as “for validation purpose”</li>
-<li>Uses older API design</li>
+<li>Uses older implementation design</li>
 </ul></li>
 <li>
 <strong>Current Implementation</strong> (<code>R/RSCABS_AO.R</code>, 934 lines):
@@ -119,8 +121,8 @@
 <code><a href="reference/run_all_threshold_tests.html">run_all_threshold_tests()</a></code> - Comprehensive testing</li>
 <li>By Allen Olmstead, more modern design</li>
 </ul></li>
-</ul><p><strong>Impact</strong>: - API confusion with similar function names - Maintenance burden of two codebases - Test suite covers both implementations</p>
-<p><strong>Recommendation</strong>: - Phase out legacy implementation gradually - Update tests to use modern API - Add deprecation warnings to legacy functions</p>
+</ul><p><strong>Impact</strong>: - implementation confusion with similar function names - Maintenance burden of two codebases - Test suite covers both implementations</p>
+<p><strong>Recommendation</strong>: - Phase out legacy implementation gradually - Update tests to use modern implementation - Add deprecation warnings to legacy functions</p>
 </div>
 <div class="section level3">
 <h3 id="id_2-large-monolithic-files-medium-priority">2. Large Monolithic Files (MEDIUM PRIORITY)<a class="anchor" aria-label="anchor" href="#id_2-large-monolithic-files-medium-priority"></a></h3>
@@ -137,7 +139,7 @@
 <div class="section level3">
 <h3 id="id_3-statistical-test-organization">3. Statistical Test Organization<a class="anchor" aria-label="anchor" href="#id_3-statistical-test-organization"></a></h3>
 <p><strong>Current State</strong>: Statistical tests are scattered across multiple files: - Tarone tests: <code>integrated_tarone.R</code>, <code>overdispersion_binom.R</code> - Trend tests: <code>TrendTest_JG.R</code>, <code>stepdown_binom.R</code> - Cochran-Armitage: <code>stepdown_binom.R</code>, <code>RSCABS_AO.R</code> (different purposes)</p>
-<p><strong>Note</strong>: Some apparent “duplication” serves different purposes: - <code><a href="reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest()</a></code> - General-purpose public API - <code><a href="reference/get_CA_Z.html">get_CA_Z()</a></code> - Internal utility for clustered data - These are NOT redundant</p>
+<p><strong>Note</strong>: Some apparent “duplication” serves different purposes: - <code><a href="reference/cochranArmitageTrendTest.html">cochranArmitageTrendTest()</a></code> - General-purpose public implementation - <code><a href="reference/get_CA_Z.html">get_CA_Z()</a></code> - Internal utility for clustered data - These are NOT redundant</p>
 </div>
 </div>
 <div class="section level2">
@@ -146,10 +148,10 @@
 <h3 id="phase-1-documentation-and-planning">Phase 1: Documentation and Planning<a class="anchor" aria-label="anchor" href="#phase-1-documentation-and-planning"></a></h3>
 <ul class="task-list"><li><label><input type="checkbox" checked>Create this analysis document</label></li>
 <li><label><input type="checkbox">Add deprecation warnings to legacy functions</label></li>
-<li><label><input type="checkbox">Document migration path from old to new API</label></li>
+<li><label><input type="checkbox">Document migration path from old to new implementation</label></li>
 </ul></div>
 <div class="section level3">
-<h3 id="phase-2-api-consolidation">Phase 2: API Consolidation<a class="anchor" aria-label="anchor" href="#phase-2-api-consolidation"></a></h3>
+<h3 id="phase-2-implementation-consolidation">Phase 2: implementation Consolidation<a class="anchor" aria-label="anchor" href="#phase-2-implementation-consolidation"></a></h3>
 <ul class="task-list"><li><label><input type="checkbox">Update tests to prefer modern RSCA implementation</label></li>
 <li><label><input type="checkbox">Add wrapper functions for backward compatibility</label></li>
 <li><label><input type="checkbox">Mark legacy functions as deprecated in documentation</label></li>
@@ -173,14 +175,14 @@
 <h3 id="completed-in-this-analysis">Completed in This Analysis<a class="anchor" aria-label="anchor" href="#completed-in-this-analysis"></a></h3>
 <ul class="task-list"><li><label><input type="checkbox" checked><strong>Removed empty placeholder file</strong> (<code>R/MQJT.R</code>)</label></li>
 <li><label><input type="checkbox" checked><strong>Added deprecation warnings</strong> to <code><a href="reference/runRSCABS.html">runRSCABS()</a></code></label></li>
-<li><label><input type="checkbox" checked><strong>Updated documentation</strong> to clearly distinguish legacy vs modern APIs</label></li>
+<li><label><input type="checkbox" checked><strong>Updated documentation</strong> to clearly distinguish legacy vs modern implementations</label></li>
 <li><label><input type="checkbox" checked><strong>Created comprehensive analysis</strong> of all redundancy issues</label></li>
 </ul></div>
 <div class="section level3">
 <h3 id="deferred-for-future-work">Deferred for Future Work<a class="anchor" aria-label="anchor" href="#deferred-for-future-work"></a></h3>
 <ul class="task-list"><li><label><input type="checkbox"><strong>Breaking up large files</strong>: Requires careful dependency analysis</label></li>
 <li><label><input type="checkbox"><strong>Removing deprecated functions</strong>: Should wait for major version bump</label></li>
-<li><label><input type="checkbox"><strong>API consolidation</strong>: Needs broader team discussion on backward compatibility</label></li>
+<li><label><input type="checkbox"><strong>implementation consolidation</strong>: Needs broader team discussion on backward compatibility</label></li>
 </ul></div>
 </div>
 <div class="section level2">

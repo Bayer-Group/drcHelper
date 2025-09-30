@@ -55,6 +55,7 @@
     <li><a class="dropdown-item" href="../articles/Example_RSCABS.html">RSCABS</a></li>
     <li><a class="dropdown-item" href="../articles/Trend-Testing.html">Trend Testing</a></li>
     <li><a class="dropdown-item" href="../articles/NOEC_ECx_BMD.html">NOEC ECx and BMD</a></li>
+    <li><a class="dropdown-item" href="../articles/MDD-in-Regulatory-Context.html">MDD in Regulatory Context</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -91,6 +92,7 @@
     <li><a class="dropdown-item" href="../articles/Test-Guidelines.html">Study Types and Templates</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -120,24 +122,852 @@
 
     
     
-<div class="section level2">
-<h2 id="backaground">Backaground<a class="anchor" aria-label="anchor" href="#backaground"></a>
-</h2>
+<div class="section level3">
+<h3 id="backaground">Backaground<a class="anchor" aria-label="anchor" href="#backaground"></a>
+</h3>
 <p>Spearman-Karber method is still in use in regulatory Ecotox endpoints
-derivation. A more common approach would be derive a EC50 from
-interpolation by a smoothing line.</p>
+derivation under certain scenarios. A more common approach would be
+derive a EC50 from interpolation by a smoothing line.</p>
 </div>
 <div class="section level2">
-<h2 id="method">Method<a class="anchor" aria-label="anchor" href="#method"></a>
+<h2 id="various-implementations">Various Implementations<a class="anchor" aria-label="anchor" href="#various-implementations"></a>
 </h2>
+<p>Here is a comparison between
+<code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code>, the original
+<code><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">ecotoxicology::SpearmanKarber</a></code>, and the
+<code><a href="../reference/tsk_auto.html">drcHelper::tsk_auto</a></code> (adaptive “trimmed
+Spearman–Karber”).</p>
+<div class="section level3">
+<h3 id="drchelperspearmankarber_modified-vs--ecotoxicologyspearmankarber">
+<code>drcHelper::SpearmanKarber_modified</code>
+vs. <code>ecotoxicology::SpearmanKarber</code><a class="anchor" aria-label="anchor" href="#drchelperspearmankarber_modified-vs--ecotoxicologyspearmankarber"></a>
+</h3>
+<p><code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code> is based on a
+function written by Sarah and Harold. I provided a fixed and refactored
+version. This revision corrected several subtle bugs related to loop
+indexing, unsafe handling of log10(0), and hard-coded data sizes, making
+the function more robust and reliable for generic data.</p>
+<p>In summary, key conceptual differences are:</p>
+<ul>
+<li>
+<strong>Monotonicity Handling:</strong> The original
+<code><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">ecotoxicology::SpearmanKarber</a></code> uses smoothing, while
+<code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code> uses a more complex
+method of pruning and pooling data based on an estimated background
+mortality rate (<code>c</code>) when control mortality is positive.</li>
+<li>
+<strong>Confidence Intervals:</strong>
+<code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code> incorporates Fieller’s
+Theorem for more accurate confidence intervals when control mortality is
+present, a feature the original lacks.</li>
+<li>
+<strong>Flexibility:</strong>
+<code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code> was designed to handle
+variable totals per dose (<code>n_i</code>), while the original assumes
+a constant <code>N</code>.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="tsk">TSK<a class="anchor" aria-label="anchor" href="#tsk"></a>
+</h3>
+<p>The first version of the wrapper function <code>tsk_auto</code> only
+auto-trims if <code><a href="../reference/tsk.html">tsk()</a></code> throws a specific trim error. In the
+case dose 0 is included in the data, tsk() didn’t error but returned a
+degenerate estimate (LD50=0, NaN CI). Turning off logs avoids
+that.During the comparison I also wrote a small code patch for
+<code>drcHelper:::tsk_auto.data.frame</code> that automatically detects
+when a log-transform is requested on data with a zero dose and applies a
+minimal trim to prevent errors.</p>
+<p><code>drcHelper:::tsk_auto</code> prioritizes a monotone,
+well-behaved response profile by trimming tails rather than smoothing
+(like the original) or pruning/pooling by a background-rate threshold
+(like <code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code>).</p>
+</div>
+<div class="section level3">
+<h3 id="core-estimator-all-three-are-spearmankarber-variants">Core estimator (all three are Spearman–Karber variants)<a class="anchor" aria-label="anchor" href="#core-estimator-all-three-are-spearmankarber-variants"></a>
+</h3>
+<ul>
+<li>Base SK trapezoid on log-dose:
+<ul>
+<li>
+<span class="math inline">\(m \equiv \sum_{i} \Delta p_i \cdot
+\frac{\log_{10} x_i + \log_{10} x_{i+1}}{2}\)</span>, where <span class="math inline">\(\Delta p_i = p_{i+1}-p_i\)</span>.</li>
+<li>
+<span class="math inline">\(\mathrm{LC50} = 10^{m}\)</span>.</li>
+</ul>
+</li>
+<li>Differences are how p is preprocessed (Abbott correction,
+trimming/pruning, smoothing), and how variance/CI are computed.</li>
+</ul>
+<div class="section level4">
+<h4 id="how-each-method-preprocesses-p-monotonicity-and-control-mortality">How each method preprocesses p (monotonicity and control
+mortality)<a class="anchor" aria-label="anchor" href="#how-each-method-preprocesses-p-monotonicity-and-control-mortality"></a>
+</h4>
+<ul>
+<li>ecotoxicology::SpearmanKarber (original):
+<ul>
+<li>If proportions aren’t monotone, it smooths them to a non-decreasing
+sequence, then applies Abbott’s correction.</li>
+<li>Single N assumed; uses that in the variance.</li>
+</ul>
+</li>
+<li>SpearmanKarber_modified (drcHelper):
+<ul>
+<li>Always does Abbott-like correction from the control (explicit).
+<ul>
+<li>
+<span class="math inline">\(p_i^{A} = \frac{p_i - p_0}{1 -
+p_0}\)</span>, with <span class="math inline">\(p_i =
+r_i/n_i\)</span>.</li>
+</ul>
+</li>
+<li>If p0=0: add “ghost” endpoints with p=0 and p=1 at extrapolated
+log-doses; integrate over the full [0,1].</li>
+<li>If p0&gt;0: estimate background mortality c by pooled cumulative
+minimum:
+<ul>
+<li>
+<span class="math inline">\(c = \min_k \frac{\sum_{i=1}^k
+r_i}{\sum_{i=1}^k n_i}\)</span>, with $n_c $the pooled denominator at
+the argmin.</li>
+<li>Pool doses with p_i&lt;c into the first group; then rescale the
+remaining to [0,1]:
+<ul>
+<li>
+<span class="math inline">\(\tilde{p}_1=0,\ \tilde{p}_{m+1}=1,\
+\tilde{p}_i=\frac{p_i-c}{1-c}\)</span> for interior points.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>drcHelper::tsk_auto (trimmed SK):
+<ul>
+<li>Applies no smoothing or pooling. It trims symmetric tails
+(proportion t at each end) to ensure monotone increase and adequate
+range.</li>
+<li>Over the retained window [L, U], renormalizes:
+<ul>
+<li>
+<span class="math inline">\(\tilde{p}_i = \frac{p_i - p_L}{p_U -
+p_L}\)</span>, with <span class="math inline">\(\tilde{p}_L=0,\
+\tilde{p}_U=1\)</span>.</li>
+</ul>
+</li>
+<li>The auto-trim tries the smallest t that allows monotone increase and
+full [0,1] span (as suggested by tsk’s own diagnostic), capped at
+max.trim.</li>
+</ul>
+</li>
+</ul>
+<div class="section level5">
+<h5 id="estimator-details-and-equations">Estimator details and equations<a class="anchor" aria-label="anchor" href="#estimator-details-and-equations"></a>
+</h5>
+<ul>
+<li>Original (after smoothing and Abbott):
+<ul>
+<li>
+<span class="math inline">\(m = \sum_{i=1}^{n-1} \Delta p_i \cdot
+\frac{\log_{10} x_i + \log_{10} x_{i+1}}{2}\)</span>, <span class="math inline">\(\mathrm{LC50} = 10^m\)</span>.</li>
+</ul>
+</li>
+<li>Modified (your function), control mortality = 0:
+<ul>
+<li>Add ghost endpoints: <span class="math inline">\(p_0=0,\
+p_{n+1}=1\)</span>, and extrapolated <span class="math inline">\(\log_{10}x_0,\ \log_{10}x_{n+1}\)</span>.</li>
+<li>
+<span class="math inline">\(\mu = \sum_{i=0}^{n} (p_{i+1}-p_i)\cdot
+\frac{\log_{10}x_i+\log_{10}x_{i+1}}{2}\)</span>, <span class="math inline">\(\mathrm{LC50}=10^{\mu}\)</span>.</li>
+</ul>
+</li>
+<li>Modified (your function), control mortality &gt; 0:
+<ul>
+<li>After pruning and rescaling to <span class="math inline">\(\tilde
+p\)</span>, compute raw trapezoid:
+<ul>
+<li>
+<span class="math inline">\(\mu^{\mathrm{raw}} = \sum_{i=1}^{m}
+(\tilde{p}_{i+1}-\tilde{p}_i)\cdot
+\frac{\log_{10}x_i+\log_{10}x_{i+1}}{2}\)</span>.</li>
+</ul>
+</li>
+<li>Adjust back for c using the first-segment midpoint <span class="math inline">\(a = \frac{\log_{10}x_0+\log_{10}x_1}{2}\)</span>:
+<ul>
+<li>
+<span class="math inline">\(\mu = \frac{\mu^{\mathrm{raw}} - c\,a}{1
+- c}\)</span>, <span class="math inline">\(\mathrm{LC50}=10^\mu\)</span>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>tsk_auto (trimmed SK):
+<ul>
+<li>With indices L..U after trim and renormalized <span class="math inline">\(\tilde p\)</span>:
+<ul>
+<li>
+<span class="math inline">\(\mu_{TSK} = \sum_{i=L}^{U-1}
+(\tilde{p}_{i+1}-\tilde{p}_i)\cdot
+\frac{\log_{10}x_i+\log_{10}x_{i+1}}{2}\)</span>,</li>
+<li>
+<span class="math inline">\(\mathrm{LC50}=10^{\mu_{TSK}}\)</span>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section level5">
+<h5 id="variance-and-confidence-intervals">Variance and confidence intervals<a class="anchor" aria-label="anchor" href="#variance-and-confidence-intervals"></a>
+</h5>
+<ul>
+<li>Original <code><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">ecotoxicology::SpearmanKarber</a></code>:
+<ul>
+<li>$V_m = _{i=2}^{n-1} p_i(1-p_i) $(constant N).</li>
+<li>95% CI: <span class="math inline">\(m \pm 2\sqrt{V_m}\)</span>;
+back-transform to LC50.</li>
+</ul>
+</li>
+<li>Modified <code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code>, p0=0:
+<ul>
+<li>Per-dose n_i: <span class="math inline">\(\operatorname{Var}(\mu) =
+\sum_{i=2}^{n-1} 0.25(\log_{10}x_{i-1}-\log_{10}x_{i+1})^2
+\frac{p_i(1-p_i)}{n_i}\)</span>.</li>
+<li>CI: <span class="math inline">\(\mu \pm
+z_{1-\alpha/2}\sqrt{\operatorname{Var}(\mu)}\)</span>.</li>
+</ul>
+</li>
+<li>Modified <code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code>, p0&gt;0
+(Fieller on log-scale):
+<ul>
+<li>Define <span class="math inline">\(V_{12} = \left(\frac{\log_{10}
+x_0 + \log_{10} x_1}{2}\right)^2 \frac{c(1-c)}{n_c}\)</span>, <span class="math inline">\(V_{22} = \frac{c(1-c)}{n_c}\)</span>, <span class="math inline">\(V_{11} =
+\operatorname{Var}(\mu)+V_{12}\)</span>.</li>
+<li>With <span class="math inline">\(z=z_{1-\alpha/2}\)</span>, <span class="math inline">\(B=1-c\)</span>, <span class="math inline">\(g=\frac{z^2V_{22}}{B^2}\)</span>:
+<ul>
+<li>
+<span class="math inline">\(\sigma = \frac{z}{B} \cdot
+\frac{\sqrt{V_{11}-2\mu
+V_{12}+\mu^2V_{22}-g\left(V_{11}-\frac{V_{12}^2}{V_{22}}\right)}}{1-g}\)</span>,</li>
+<li>CI: <span class="math inline">\(\mu - \frac{gV_{12}}{V_{22}} \pm
+\sigma\)</span>; back-transform.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>tsk_auto (<code><a href="../reference/tsk_auto.html">drcHelper::tsk_auto</a></code>, typical TSK):
+<ul>
+<li>Uses the same normal-approx SK variance as your p0=0 branch but on
+the trimmed-and-renormalized grid:
+<ul>
+<li>
+<span class="math inline">\(\operatorname{Var}(\mu_{TSK}) =
+\sum_{i=L+1}^{U-1} 0.25(\log_{10}x_{i-1}-\log_{10}x_{i+1})^2
+\frac{\tilde p_i(1-\tilde p_i)}{n_i}\)</span>,</li>
+<li>CI: <span class="math inline">\(\mu_{TSK} \pm
+z_{1-\alpha/2}\sqrt{\operatorname{Var}(\mu_{TSK})}\)</span>.</li>
+</ul>
+</li>
+<li>Fieller is generally not used in trimmed SK; CIs are normal-approx
+based on the trimmed segment.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section level4">
+<h4 id="key-contrasts-tsk_auto-vs-modified-vs-original">Key contrasts: tsk_auto vs modified vs original<a class="anchor" aria-label="anchor" href="#key-contrasts-tsk_auto-vs-modified-vs-original"></a>
+</h4>
+<ul>
+<li>Handling non-monotonicity:
+<ul>
+<li>tsk_auto: trims tails and renormalizes; data-driven trim chosen
+automatically.</li>
+<li>Modified: either uses ghost endpoints (p0=0) or prunes doses below a
+data-driven c and rescales (p0&gt;0).</li>
+<li>Original: smooths to enforce monotonic increase then applies
+Abbott.</li>
+</ul>
+</li>
+<li>Control mortality:
+<ul>
+<li>tsk_auto: supplies control dose (control=0 by default). The
+underlying tsk typically corrects via the control or excludes it when
+trimming. It does not estimate a background c via cumulative
+pooling.</li>
+<li>Modified: explicit Abbott correction and, if p0&gt;0, a pooled
+minimum estimator of background c, plus Fieller CIs.</li>
+<li>Original: Abbott after smoothing (single N).</li>
+</ul>
+</li>
+<li>Log transformation:
+<ul>
+<li>tsk_auto: can turn log-doses on/off via use.log.doses; practical
+when x includes a 0 dose (control).</li>
+<li>Modified: always uses log10; explicitly creates ghost endpoints to
+avoid depending on log10(0).</li>
+<li>Original: uses log10 internally; relies on na.rm=TRUE to avoid
+log10(0) breaks if present.</li>
+</ul>
+</li>
+<li>Variance/CI:
+<ul>
+<li>tsk_auto: normal-approx on the trimmed/renormalized grid, per-dose
+n_i.</li>
+<li>Modified: normal-approx for p0=0; Fieller when p0&gt;0.</li>
+<li>Original: constant-N variance and a fixed “2” multiplier for 95%
+CI.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="practical-guidance">Practical guidance<a class="anchor" aria-label="anchor" href="#practical-guidance"></a>
+</h4>
+<ul>
+<li>If you want robust, minimal-tuning monotone behavior with
+potentially messy tails: tsk_auto is convenient; it chooses a trim that
+makes the estimation feasible and stable, avoids over-influence of
+outlying tails, and respects variable n_i.</li>
+<li>If nonzero control mortality is a concern and you want a
+background-rate-aware estimate with Fieller CIs: your modified function
+targets that scenario directly.</li>
+<li>If your totals are constant and you prefer smoothing to trimming or
+pruning: the original function is simplest.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="how-results-will-typically-differ-from-tsk_auto">How results will typically differ from tsk_auto<a class="anchor" aria-label="anchor" href="#how-results-will-typically-differ-from-tsk_auto"></a>
+</h4>
+<ul>
+<li>When control mortality &gt; 0:
+<ul>
+<li>
+<code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code> estimates c by
+pooled cumulative minima and applies Fieller CIs; tsk_auto trims
+instead, then uses normal-approx CIs. Estimates and CIs will differ,
+especially if early-dose mortalities fluctuate around the
+background.</li>
+</ul>
+</li>
+<li>When tails are noisy:
+<ul>
+<li>tsk_auto will remove tail influence via trim; your modified (p0=0)
+keeps full range but adds ghost endpoints; the original smooths instead.
+Trimming usually reduces variance and sensitivity to extreme tail
+spacing.</li>
+</ul>
+</li>
+<li>With variable totals n_i:
+<ul>
+<li>Both tsk_auto and <code><a href="../reference/SpearmanKarber_modified.html">drcHelper::SpearmanKarber_modified</a></code>
+use per-dose n_i in variance; the
+<code>ecotoxicolog::SpearmanKarber</code> assumes constant N and may
+misstate precision when n_i vary.</li>
+</ul>
+</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## install.packages("isotone")</span></span>
+<span><span class="co">## devtools::install_github(repo="brsr/tsk")</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
+<span><span class="co">## library(tsk)</span></span>
+<span><span class="fu"><a href="../reference/tsk.html">tsk</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fl">20</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">17</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 0 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the logs of the doses</span></span>
+<span><span class="co">#&gt; Estimated LD50: 31.62278 GSD of estimate: 1.296928</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  18.99717 52.63942</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">hamilton</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0.2</span>,<span class="fl">0.3</span>,<span class="fl">0.375</span>,<span class="fl">0.625</span>,<span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">n</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>,<span class="fl">30</span>,<span class="fl">30</span>,<span class="fl">30</span>,<span class="fl">30</span>,<span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">r</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">16</span>,<span class="fl">24</span>,<span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">skm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SpearmanKarber_modified.html">SpearmanKarber_modified</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">r</span>,<span class="va">n</span><span class="op">)</span></span>
+<span><span class="va">skm</span></span>
+<span><span class="co">#&gt; $log10LC50</span></span>
+<span><span class="co">#&gt; [1] -0.3468666</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $varianceOfLog10LC50</span></span>
+<span><span class="co">#&gt; [1] 0.0009713409</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $StandardDeviationOfm</span></span>
+<span><span class="co">#&gt; [1] 0.03116634</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $confidenceIntervalLog10</span></span>
+<span><span class="co">#&gt; [1] -0.4079515 -0.2857817</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $LC50</span></span>
+<span><span class="co">#&gt; [1] 0.449918</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $confidenceIntervalLC50</span></span>
+<span><span class="co">#&gt; [1] 0.3908845 0.5178671</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $conf.level</span></span>
+<span><span class="co">#&gt; [1] 0.95</span></span>
+<span><span class="fu"><a href="../reference/tsk_auto.html">tsk_auto</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">n</span>,<span class="va">r</span>, use.log.doses <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 0 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the raw doses (no log transform) </span></span>
+<span><span class="co">#&gt; Estimated LD50: 0.5620833    SD of estimate: 0.06153895</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  0.4414692 0.6826975</span></span>
+<span><span class="fu"><a href="../reference/tsk_auto.html">tsk_auto</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">n</span>,<span class="va">r</span>, use.log.doses <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tsk_auto: zero dose with log transform detected; applying auto-trim = 0.0333</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 3.333333 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the logs of the doses</span></span>
+<span><span class="co">#&gt; Estimated LD50: 0.4438306    GSD of estimate: 1.079123</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  0.3822956 0.5152705</span></span>
+<span></span>
+<span><span class="fu">drcHelper</span><span class="fu">::</span><span class="fu"><a href="../reference/tsk.html">tsk</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, trim <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">30</span>, use.log.doses <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 3.333333 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the raw doses (no log transform) </span></span>
+<span><span class="co">#&gt; Estimated LD50: 0.5313244    SD of estimate: 0.06430354</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  0.4052918 0.6573570</span></span>
+<span><span class="fu">drcHelper</span><span class="fu">::</span><span class="fu"><a href="../reference/tsk.html">tsk</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, trim <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">30</span>, use.log.doses <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Trimmed Spearman-Karber method using 3.333333 percent trim</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Data was not smoothed</span></span>
+<span><span class="co">#&gt; Calculation done using the logs of the doses</span></span>
+<span><span class="co">#&gt; Estimated LD50: 0.4438306    GSD of estimate: 1.079123</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
+<span><span class="co">#&gt;  0.3822956 0.5152705</span></span>
+<span></span>
+<span></span>
+<span><span class="co">## ecotoxicology::TSK errored for A=0, suggesting A ≥ 1/30 ≈ 0.033333… to make the response span usable for trimming.</span></span>
+<span><span class="co">## A = 0.0333 failed due to a formatting bug in that version; use A that makes A*100 an integer (e.g., 0.04).</span></span>
+<span><span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/TSK.html" class="external-link">TSK</a></span><span class="op">(</span><span class="va">x</span><span class="op">*</span><span class="fl">100</span>, <span class="va">r</span>, <span class="va">n</span>, A <span class="op">=</span> <span class="fl">0.04</span>, conf <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
+<p><img src="TSK_method_files/figure-html/unnamed-chunk-3-1.png" alt="A plot generated from an R code chunk." width="700"></p>
+<pre><code><span><span class="co">#&gt; $mu</span></span>
+<span><span class="co">#&gt; [1] 44.21762</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $gsd</span></span>
+<span><span class="co">#&gt;        x </span></span>
+<span><span class="co">#&gt; 1.079643 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $left</span></span>
+<span><span class="co">#&gt;        x </span></span>
+<span><span class="co">#&gt; 38.05109 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $right</span></span>
+<span><span class="co">#&gt;       x </span></span>
+<span><span class="co">#&gt; 51.3835</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">r</span><span class="op">/</span><span class="va">n</span></span>
+<span><span class="va">x2</span> <span class="op">&lt;-</span> <span class="va">x</span> </span>
+<span><span class="va">x2</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1e-1</span> <span class="co">## replace it with very small values. </span></span>
+<span><span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">SpearmanKarber</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x2</span>,<span class="va">r</span>,<span class="va">p</span><span class="op">)</span>,N<span class="op">=</span><span class="fl">30</span>, retData <span class="op">=</span> <span class="cn">FALSE</span>, showOutput <span class="op">=</span> <span class="cn">TRUE</span>,showPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         x2  r          p smoothedAdjusted</span></span>
+<span><span class="co">#&gt; [1,] 0.100  0 0.00000000       0.00000000</span></span>
+<span><span class="co">#&gt; [2,] 0.200  1 0.03333333       0.03333333</span></span>
+<span><span class="co">#&gt; [3,] 0.300  3 0.10000000       0.10000000</span></span>
+<span><span class="co">#&gt; [4,] 0.375 16 0.53333333       0.53333333</span></span>
+<span><span class="co">#&gt; [5,] 0.625 24 0.80000000       0.80000000</span></span>
+<span><span class="co">#&gt; [6,] 2.000 30 1.00000000       1.00000000</span></span>
+<span><span class="co">#&gt; log10 LC50 = -0.3489489 </span></span>
+<span><span class="co">#&gt; estimated variance of m = 0.001146069 </span></span>
+<span><span class="co">#&gt; 95% confidence interval for m = -0.416656192612695 -0.281241619158308 </span></span>
+<span><span class="co">#&gt; estimated LC50 = 0.447766 </span></span>
+<span><span class="co">#&gt; estimated 95% confidence interval for the estimated LC50 = 0.383127924893929 0.523309213196528</span></span>
+<span><span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">SpearmanKarber</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x2</span>,<span class="va">r</span>,<span class="va">n</span><span class="op">)</span>,N<span class="op">=</span><span class="fl">30</span>, retData <span class="op">=</span> <span class="cn">FALSE</span>, showOutput <span class="op">=</span> <span class="cn">TRUE</span>,showPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         x2  r  n smoothedAdjusted</span></span>
+<span><span class="co">#&gt; [1,] 0.100  0 30                0</span></span>
+<span><span class="co">#&gt; [2,] 0.200  1 30                0</span></span>
+<span><span class="co">#&gt; [3,] 0.300  3 30                0</span></span>
+<span><span class="co">#&gt; [4,] 0.375 16 30                0</span></span>
+<span><span class="co">#&gt; [5,] 0.625 24 30                0</span></span>
+<span><span class="co">#&gt; [6,] 2.000 30 30                0</span></span>
+<span><span class="co">#&gt; log10 LC50 = 0 </span></span>
+<span><span class="co">#&gt; estimated variance of m = 0 </span></span>
+<span><span class="co">#&gt; 95% confidence interval for m = 0 0 </span></span>
+<span><span class="co">#&gt; estimated LC50 = 1 </span></span>
+<span><span class="co">#&gt; estimated 95% confidence interval for the estimated LC50 = 1 1</span></span>
+<span></span>
+<span><span class="co">## remove 0 dose</span></span>
+<span><span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">SpearmanKarber</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>,<span class="va">r</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>,<span class="va">p</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,N<span class="op">=</span><span class="fl">30</span>, retData <span class="op">=</span> <span class="cn">TRUE</span>, showOutput <span class="op">=</span> <span class="cn">TRUE</span>,showPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                          smoothedAdjusted</span></span>
+<span><span class="co">#&gt; [1,] 0.200  1 0.03333333       0.00000000</span></span>
+<span><span class="co">#&gt; [2,] 0.300  3 0.10000000       0.06896552</span></span>
+<span><span class="co">#&gt; [3,] 0.375 16 0.53333333       0.51724138</span></span>
+<span><span class="co">#&gt; [4,] 0.625 24 0.80000000       0.79310345</span></span>
+<span><span class="co">#&gt; [5,] 2.000 30 1.00000000       1.00000000</span></span>
+<span><span class="co">#&gt; log10 LC50 = -0.331689 </span></span>
+<span><span class="co">#&gt; estimated variance of m = 0.001126808 </span></span>
+<span><span class="co">#&gt; 95% confidence interval for m = -0.398824952238237 -0.264553128754662 </span></span>
+<span><span class="co">#&gt; estimated LC50 = 0.4659196 </span></span>
+<span><span class="co">#&gt; estimated 95% confidence interval for the estimated LC50 = 0.399185766700702 0.543809601530862</span></span>
+<span><span class="co">#&gt; $log10LC50</span></span>
+<span><span class="co">#&gt; [1] -0.331689</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $varianceOfm</span></span>
+<span><span class="co">#&gt; [1] 0.001126808</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $confidenceInterval95m</span></span>
+<span><span class="co">#&gt; [1] -0.3988250 -0.2645531</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $LC50</span></span>
+<span><span class="co">#&gt; [1] 0.4659196</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $confidenceInterval95LC50</span></span>
+<span><span class="co">#&gt; [1] 0.3991858 0.5438096</span></span>
+<span></span>
+<span></span>
+<span><span class="va">x</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">15.54</span>,<span class="fl">20.47</span>,<span class="fl">27.92</span>,<span class="fl">35.98</span>,<span class="fl">55.52</span><span class="op">)</span></span>
+<span><span class="va">n</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">40</span>,<span class="fl">40</span><span class="op">)</span></span>
+<span><span class="va">r</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">2</span>,<span class="fl">6</span>,<span class="fl">11</span>,<span class="fl">18</span>,<span class="fl">33</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ecotoxicology</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ecotoxicology/man/SpearmanKarber.html" class="external-link">SpearmanKarber</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">r</span>,<span class="va">n</span><span class="op">)</span>,N<span class="op">=</span><span class="fl">30</span>, retData <span class="op">=</span> <span class="cn">FALSE</span>, showOutput <span class="op">=</span> <span class="cn">TRUE</span>,showPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          x  r  n   smoothed smoothedAdjusted</span></span>
+<span><span class="co">#&gt; [1,]  0.00  3 40 0.08333333        0.0000000</span></span>
+<span><span class="co">#&gt; [2,] 15.54  2 40 0.08333333        0.0000000</span></span>
+<span><span class="co">#&gt; [3,] 20.47  6 40 0.20000000        0.1272727</span></span>
+<span><span class="co">#&gt; [4,] 27.92 11 40 0.36666667        0.3090909</span></span>
+<span><span class="co">#&gt; [5,] 35.98 18 40 0.60000000        0.5636364</span></span>
+<span><span class="co">#&gt; [6,] 55.52 33 40 1.10000000        1.1090909</span></span>
+<span><span class="co">#&gt; log10 LC50 = 1.692103 </span></span>
+<span><span class="co">#&gt; estimated variance of m = 0.0002847302 </span></span>
+<span><span class="co">#&gt; 95% confidence interval for m = 1.65835487286972 1.72585067406059 </span></span>
+<span><span class="co">#&gt; estimated LC50 = 49.2156 </span></span>
+<span><span class="co">#&gt; estimated 95% confidence interval for the estimated LC50 = 45.5359994197084 53.1925332910634</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Your data</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.375</span>, <span class="fl">0.625</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">16</span>, <span class="fl">24</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a master comparison function</span></span>
+<span><span class="va">tidy_compare</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, <span class="va">conf.level</span> <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="co"># A list to hold the output rows</span></span>
+<span>  <span class="va">all_rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Call each extract function and add the result to the list</span></span>
+<span>  <span class="va">all_rows</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_rows</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">drcHelper</span><span class="fu">:::</span><span class="fu">extract_SpearmanKarber_modified</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, <span class="va">conf.level</span><span class="op">)</span></span>
+<span>  <span class="va">all_rows</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_rows</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">drcHelper</span><span class="fu">:::</span><span class="fu">extract_tsk_auto</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, use.log.doses <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">conf.level</span><span class="op">)</span></span>
+<span>  <span class="va">all_rows</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_rows</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">drcHelper</span><span class="fu">:::</span><span class="fu">extract_tsk_auto</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, use.log.doses <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">conf.level</span><span class="op">)</span></span>
+<span>  <span class="va">all_rows</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_rows</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">drcHelper</span><span class="fu">:::</span><span class="fu">extract_ecotox_SpearmanKarber</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># You can easily add more functions here, e.g.:</span></span>
+<span>  <span class="co"># all_rows[[length(all_rows) + 1]] &lt;- extract_ecotox_TSK(x, n, r, conf = conf.level)</span></span>
+<span></span>
+<span>  <span class="co"># Combine all the single-row data frames into one table</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">all_rows</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Run the comparison</span></span>
+<span><span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="fu">tidy_compare</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tsk_auto: zero dose with log transform detected; applying auto-trim = 0.0333</span></span>
+<span></span>
+<span><span class="co"># Print the final result</span></span>
+<span><span class="co">## print(comparison_table)</span></span>
+<span><span class="va">comparison_table</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">.</span>,digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="23%">
+<col width="11%">
+<col width="9%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="9%">
+<col width="7%">
+<col width="8%">
+<col width="5%">
+<col width="5%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">method</th>
+<th align="left">scale</th>
+<th align="right">trim_or_A</th>
+<th align="right">LC50</th>
+<th align="right">LCL</th>
+<th align="right">UCL</th>
+<th align="right">log10LC50</th>
+<th align="right">SD_LC50</th>
+<th align="right">SD_log10</th>
+<th align="right">GSD</th>
+<th align="left">notes</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">SpearmanKarber_modified</td>
+<td align="left">log-dose</td>
+<td align="right">NA</td>
+<td align="right">0.450</td>
+<td align="right">0.391</td>
+<td align="right">0.518</td>
+<td align="right">-0.347</td>
+<td align="right">NA</td>
+<td align="right">0.031</td>
+<td align="right">NA</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">tsk_auto</td>
+<td align="left">log-dose</td>
+<td align="right">0.033</td>
+<td align="right">0.444</td>
+<td align="right">0.382</td>
+<td align="right">0.515</td>
+<td align="right">-0.353</td>
+<td align="right">NA</td>
+<td align="right">0.076</td>
+<td align="right">1.079</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">tsk_auto</td>
+<td align="left">linear-dose</td>
+<td align="right">0.000</td>
+<td align="right">0.562</td>
+<td align="right">0.441</td>
+<td align="right">0.683</td>
+<td align="right">-0.250</td>
+<td align="right">0.062</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">ecotox::SpearmanKarber</td>
+<td align="left">log-dose</td>
+<td align="right">NA</td>
+<td align="right">0.466</td>
+<td align="right">0.399</td>
+<td align="right">0.544</td>
+<td align="right">-0.332</td>
+<td align="right">NA</td>
+<td align="right">0.034</td>
+<td align="right">NA</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<div class="section level5">
+<h5 id="using-the-wrapper-analyze_sk-function">Using the wrapper <code>analyze_SK</code> function<a class="anchor" aria-label="anchor" href="#using-the-wrapper-analyze_sk-function"></a>
+</h5>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Your data</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.375</span>, <span class="fl">0.625</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">16</span>, <span class="fl">24</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define the methods you want to run</span></span>
+<span><span class="va">methods_to_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SK_modified"</span>, <span class="st">"tsk_auto_log"</span>, <span class="st">"tsk_auto_linear"</span>, <span class="st">"ecotox_SK"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use lapply to run the analysis for each method</span></span>
+<span><span class="va">all_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">methods_to_run</span>, <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># The ... argument lets you pass method-specific options here if needed</span></span>
+<span>  <span class="co"># e.g., analyze_SK(x, n, r, method = m, max.trim = 0.4)</span></span>
+<span>  <span class="fu"><a href="../reference/analyze_SK.html">analyze_SK</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span>, <span class="va">r</span>, method <span class="op">=</span> <span class="va">m</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tsk_auto: zero dose with log transform detected; applying auto-trim = 0.0333</span></span>
+<span></span>
+<span><span class="co"># Combine the list of single-row data frames into one final table</span></span>
+<span><span class="va">comparison_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">all_results</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Print the result</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison_table</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            method       scale  trim_or_A      LC50       LCL       UCL</span></span>
+<span><span class="co">#&gt; 1     SK_modified    log-dose         NA 0.4499180 0.3908845 0.5178671</span></span>
+<span><span class="co">#&gt; 2    tsk_auto_log    log-dose 0.03333333 0.4438306 0.3822956 0.5152705</span></span>
+<span><span class="co">#&gt; 3 tsk_auto_linear linear-dose 0.00000000 0.5620833 0.4414692 0.6826975</span></span>
+<span><span class="co">#&gt; 4       ecotox_SK    log-dose         NA 0.4659196 0.3991858 0.5438096</span></span>
+<span><span class="co">#&gt;    log10LC50    SD_LC50   SD_log10      GSD notes</span></span>
+<span><span class="co">#&gt; 1 -0.3468666         NA 0.03116634       NA      </span></span>
+<span><span class="co">#&gt; 2 -0.3527827         NA 0.07614879 1.079123      </span></span>
+<span><span class="co">#&gt; 3 -0.2501993 0.06153895         NA       NA      </span></span>
+<span><span class="co">#&gt; 4 -0.3316890         NA 0.03356796       NA</span></span></code></pre></div>
+<ul>
+<li>All three valid SK variants (your modified, TSK with A ≈ 0.0333 and
+use.log.doses = FALSE, and original SpearmanKarber with N = 30) should
+give very similar LC50 near 0.45 because responses increase cleanly from
+0 to 1 across doses.</li>
+<li>Minor differences can arise from:
+<ul>
+<li>Whether ghost endpoints or trimming are used,</li>
+<li>Variance/CI formulas (Fieller vs normal approximation),</li>
+<li>Whether logs are used with a zero-dose control.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="notes-on-gsd-and-sd_log10">Notes on GSD and SD_log10<a class="anchor" aria-label="anchor" href="#notes-on-gsd-and-sd_log10"></a>
+</h3>
+<p>This is related to how we describe uncertainty for log-normal data,
+and it’s a frequent point of confusion.</p>
+<p>In short: <strong>They both measure the exact same amount of
+uncertainty</strong>, but they express it on different scales.</p>
+<ul>
+<li>
+<code>SD_log10</code> is <strong>additive</strong> on the
+<strong>log10 scale</strong>.</li>
+<li>
+<code>GSD</code> is <strong>multiplicative</strong> on the
+<strong>original concentration scale</strong>.</li>
+</ul>
+<div class="section level4">
+<h4 id="sd_log10-the-standard-deviation-of-the-log10lc50">SD_log10: The Standard Deviation of the log10(LC50)<a class="anchor" aria-label="anchor" href="#sd_log10-the-standard-deviation-of-the-log10lc50"></a>
+</h4>
+<p>This is the more straightforward statistical measure. When we perform
+Spearman-Karber analysis, we are actually estimating the mean of the
+distribution of the <em>logarithms</em> of the toxic thresholds.</p>
+<ul>
+<li>
+<strong>What it is:</strong> The standard deviation of our
+<code>log10LC50</code> estimate. If our estimate is <span class="math inline">\(m = \log_{10}(\text{LC50})\)</span>, then
+<code>SD_log10</code> is the standard deviation of <span class="math inline">\(m\)</span>.</li>
+<li>
+<strong>How it’s used:</strong> It is used to construct a confidence
+interval <em>on the log10 scale</em>. You add and subtract this value
+(multiplied by a z-score like 1.96) to get your confidence limits. <span class="math inline">\(\text{95% CI for } \log_{10}(\text{LC50}) = m \pm
+1.96 \times \text{SD}_{\log_{10}}\)</span>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="gsd-the-geometric-standard-deviation">GSD: The Geometric Standard Deviation<a class="anchor" aria-label="anchor" href="#gsd-the-geometric-standard-deviation"></a>
+</h4>
+<p>The GSD is a more intuitive way to express this same uncertainty back
+on the original concentration scale. Since the underlying distribution
+is log-normal, the spread is multiplicative, not additive.</p>
+<ul>
+<li>
+<strong>What it is:</strong> A unitless factor that describes how
+spread out the data are on the original scale.</li>
+<li>
+<strong>How it’s derived:</strong> It is the exponentiated standard
+deviation from the log scale. The relationship depends on the base of
+the logarithm used.
+<ul>
+<li>If using natural log (<code>ln</code>), then <code>GSD</code> =
+<span class="math inline">\(e^{\text{SD}_{\ln}}\)</span>. The
+<code>drcHelper</code> package uses this convention.</li>
+<li>To be consistent with our <code>SD_log10</code>, we can define a
+base-10 GSD as: <span class="math inline">\(\text{GSD} =
+10^{\text{SD}_{\log_{10}}}\)</span> And conversely: <span class="math inline">\(\text{SD}_{\log_{10}} =
+\log_{10}(\text{GSD})\)</span>
+</li>
+</ul>
+</li>
+<li>
+<strong>How it’s used:</strong> It is used to construct a confidence
+interval by <strong>multiplying and dividing</strong> the LC50 estimate.
+<span class="math inline">\(\text{95% CI for LC50} = \text{LC50} \times
+/ \div (\text{GSD})^{1.96}\)</span> Which means the lower bound is $ /
+()^{1.96} $and the upper bound is <span class="math inline">\(\text{LC50} \times
+(\text{GSD})^{1.96}\)</span>.</li>
+<li>
+<strong>Analogy:</strong> Instead of saying “the true value is plus
+or minus 10 mg/L,” you’d say “the true value is likely within a
+<strong>factor of 2</strong> of our estimate.” In this case, the GSD
+would be 2.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="summary-table">Summary Table<a class="anchor" aria-label="anchor" href="#summary-table"></a>
+</h4>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Feature</th>
+<th align="left"><code>SD_log10</code></th>
+<th align="left">
+<code>GSD</code> (Geometric Standard Deviation)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Scale</strong></td>
+<td align="left">Logarithmic</td>
+<td align="left">Original (Concentration)</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Operation</strong></td>
+<td align="left">
+<strong>Additive</strong> (±)</td>
+<td align="left">
+<strong>Multiplicative</strong> (×/÷)</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Units</strong></td>
+<td align="left">log10(concentration units)</td>
+<td align="left">None (it’s a factor)</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CI on Log Scale</strong></td>
+<td align="left"><code>log(LC50) ± z * SD_log10</code></td>
+<td align="left">Not used directly</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CI on Original Scale</strong></td>
+<td align="left">Back-transform the log CI</td>
+<td align="left"><code>LC50 ×/÷ (GSD)^z</code></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Interpretation</strong></td>
+<td align="left">“The uncertainty is ±0.03 units on the log10
+scale.”</td>
+<td align="left">“The uncertainty is by a factor of 1.08 on the original
+scale.”</td>
+</tr>
+</tbody>
+</table>
+<p>The reason both columns exist in our summary table is that different
+functions naturally report one or the other.
+<code>SpearmanKarber_modified</code> calculates <code>SD_log10</code>,
+while <code><a href="../reference/tsk_auto.html">drcHelper::tsk_auto</a></code> reports the <code>GSD</code>. By
+calculating the corresponding value for each, our table allows for a
+direct, apples-to-apples comparison of the uncertainty calculated by
+each method.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="some-notes">Some Notes<a class="anchor" aria-label="anchor" href="#some-notes"></a>
+</h3>
+<p><code>tsk</code> function comes from the R package. Since it is a
+single function without dependencies, it is bundled into this helper
+package for the purpose of validation and verification.</p>
+<p>The original goal of this R package was to replicate the results of a
+DOS program that used to be provided by the EPA to perform the trimmed
+Spearman-Karber method. The list “expected” contains the results of that
+DOS program run on the data from Hamilton et al. Some of these are NA
+because the EPA program didn’t return a result. The EPA program uses a
+confidence of 2*pnorm(2)-1=0.9544997 (that is, exactly two sigmas on
+both sides).</p>
+</div>
+<div class="section level3">
+<h3 id="other-methods">Other Methods<a class="anchor" aria-label="anchor" href="#other-methods"></a>
+</h3>
 <p>Two commonly used methods for calculating 50% endpoint using serial
 dilutions are Spearman-Karber method and Reed and Muench method.</p>
 <p>The original paper written by Kärber was published in 1931 and is in
 German [Kärber, G. Archiv f. experiment. Pathol. u. Pharmakol (1931)
 162: 480-483 <a href="doi:10.1007/BF01863914" class="uri">doi:10.1007/BF01863914</a>].</p>
-<div class="section level3">
-<h3 id="reed-and-muench-method">Reed and Muench method<a class="anchor" aria-label="anchor" href="#reed-and-muench-method"></a>
-</h3>
+<div class="section level4">
+<h4 id="reed-and-muench-method">Reed and Muench method<a class="anchor" aria-label="anchor" href="#reed-and-muench-method"></a>
+</h4>
 <p>log10 50% end point dilution = log10 of dilution showing a mortality
 next above 50% - (difference of logarithms × logarithm of dilution
 factor).</p>
@@ -147,9 +977,9 @@ distance” or “interpolated value”): Difference of logarithms =
 [(mortality at dilution next above 50%)-50%]/[(mortality next above
 50%)-(mortality next below 50%)].</p>
 </div>
-<div class="section level3">
-<h3 id="spearman-karber-method">Spearman-Karber method<a class="anchor" aria-label="anchor" href="#spearman-karber-method"></a>
-</h3>
+<div class="section level4">
+<h4 id="spearman-karber-method">Spearman-Karber method<a class="anchor" aria-label="anchor" href="#spearman-karber-method"></a>
+</h4>
 <p>log10 50% end point dilution = <span class="math inline">\(- (x_0 -
 d/2 + d \sum r_i/n_i)\)</span></p>
 <p><span class="math inline">\(x_0\)</span> = log10 of the reciprocal of
@@ -170,52 +1000,9 @@ of animals inoculated per dilution) + 0.5] × log dilution factor.</p>
 dilution factor.</p>
 </div>
 </div>
-<div class="section level2">
-<h2 id="some-notes">Some Notes<a class="anchor" aria-label="anchor" href="#some-notes"></a>
-</h2>
-<p><code>tsk</code> function comes from the R package. Since it is a
-single function without dependencies, it is bundled into this helper
-package for the purpose of validation and verification.</p>
-<p>The original goal of this R package was to replicate the results of a
-DOS program that used to be provided by the EPA to perform the trimmed
-Spearman-Karber method. The list “expected” contains the results of that
-DOS program run on the data from Hamilton et al. Some of these are NA
-because the EPA program didn’t return a result. The EPA program uses a
-confidence of 2*pnorm(2)-1=0.9544997 (that is, exactly two sigmas on
-both sides).</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## install.packages("isotone")</span></span>
-<span><span class="co">## devtools::install_github(repo="brsr/tsk")</span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bayer-group.github.io/drcHelper/index.html">drcHelper</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: drc</span></span>
-<span><span class="co">#&gt; Loading required package: MASS</span></span>
-<span><span class="co">#&gt; Loading required package: drcData</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 'drc' has been loaded.</span></span>
-<span><span class="co">#&gt; Please cite R and 'drc' if used for a publication,</span></span>
-<span><span class="co">#&gt; for references type 'citation()' and 'citation('drc')'.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'drc'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     gaussian, getInitial</span></span>
-<span><span class="co">## library(tsk)</span></span>
-<span><span class="fu"><a href="../reference/tsk.html">tsk</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span><span class="op">)</span>, <span class="fl">20</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">17</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Trimmed Spearman-Karber method using 0 percent trim</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Data was not smoothed</span></span>
-<span><span class="co">#&gt; Calculation done using the logs of the doses</span></span>
-<span><span class="co">#&gt; Estimated LD50: 31.62278 GSD of estimate: 1.296928</span></span>
-<span><span class="co">#&gt; 95 percent confidence interval on LD50:</span></span>
-<span><span class="co">#&gt;  18.99717 52.63942</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">hamilton</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
+<div class="section level3">
+<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
 <ul>
 <li><p><a href="https://www.cureffi.org/2015/09/20/the-math-behind-spearman-karber-analysis/" class="external-link uri">https://www.cureffi.org/2015/09/20/the-math-behind-spearman-karber-analysis/</a></p></li>
 <li><p>Hamilton, M. A.; Russo, R. C.; Thurston, R. V. Trimmed
@@ -223,6 +1010,7 @@ Spearman-Karber Method for Estimating Median Lethal Concentrations in
 Toxicity Bioassays. Enviro. Sci. Tech. 1977, 11 (7), 714-719. <a href="http://dx.doi.org/10.1021/es60130a004" class="external-link uri">http://dx.doi.org/10.1021/es60130a004</a></p></li>
 <li><p>Ibid, 1978, 12 (4), 417. <a href="http://dx.doi.org/10.1021/es60140a017" class="external-link uri">http://dx.doi.org/10.1021/es60140a017</a></p></li>
 </ul>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

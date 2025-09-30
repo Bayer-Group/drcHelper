@@ -21,6 +21,7 @@ articles:
   Introduction: Introduction.html
   articles/Limit-Test: Limit-Test.html
   articles/LMM-GLMM-and-GAMM: LMM-GLMM-and-GAMM.html
+  articles/MDD-in-Regulatory-Context: MDD-in-Regulatory-Context.html
   articles/MQJT: MQJT.html
   articles/NOEC_ECx_BMD: NOEC_ECx_BMD.html
   articles/NOEC_Methods: NOEC_Methods.html
@@ -37,7 +38,8 @@ articles:
   articles/Validation_MCP_tests: Validation_MCP_tests.html
   articles/Verification_CA_test: Verification_CA_test.html
   articles/Verification_which_JT: Verification_which_JT.html
-last_built: 2025-09-25T14:49Z
+  articles/Verification-of-Williams-Test: Verification-of-Williams-Test.html
+last_built: 2025-09-30T17:31Z
 urls:
   reference: https://bayer-group.github.io/drcHelper/index.html/reference
   article: https://bayer-group.github.io/drcHelper/index.html/articles
