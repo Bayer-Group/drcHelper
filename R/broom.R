@@ -125,14 +125,21 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
         direction <- "increasing"
 
       }
-
-      wt <- drcHelper::williamsTest_JG(df=model_data,resp=resp_name, trt = factor_name, direction = direction)
+      ## Browse[1]> factor_name
+      ## [1] "factor(Dose)"
+      ## This is an edge case where the factor_name is not really included in the model_data frame.
+      # --- PATCH ---
+      # Clean the factor name to handle cases like "factor(Dose)"
+      # This removes "factor(" and the closing ")" to get the clean variable name.
+      clean_factor_name <- gsub("factor\\(|\\)", "", factor_name)
+      # --- END PATCH ---
+      wt <- drcHelper::williamsTest_JG(df=model_data,resp=resp_name, trt = clean_factor_name, direction = direction)
       if(is.null(list(...)$direction) || list(...)$direction == "decreasing"){
 
-        comparisons <- paste(wt$dose,"- 0 >= 0")
+        comparisons <- paste( wt[,clean_factor_name],"- 0 >= 0")
       }else{
 
-        comparisons <- paste(wt$dose,"- 0 <= 0")
+        comparisons <- paste( wt[,clean_factor_name],"- 0 <= 0")
       }
 
       wt <- wt[rev(seq_len(nrow(wt))), , drop = FALSE]
@@ -196,56 +203,56 @@ broom_williams <- function(x, method = c("Williams_PMCMRplus", "Williams_JG"), .
 #' @importFrom PMCMRplus dunnettTest
 #' @importFrom DescTools DunnettTest
 #' @export
-broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools", "Dunnett_PMCMRplus"), ...) {
+broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools", "Dunnett_PMCMRplus"),
+                          alternative = c("two.sided", "less", "greater"), alpha=0.05,...) {
   method <- match.arg(method)
+  alternative <- match.arg(alternative)
 
+  # ... (Dunnett_PMCMRplus and Dunnett_DescTools blocks are unchanged) ...
   if (method == "Dunnett_PMCMRplus") {
     result <- try({
-      dt <- PMCMRplus::dunnettTest(x, ...)
-
-      # Extract summary information
-      dt_summary <- summaryZG_dunnett(dt)
-      comparisons <- rownames(dt_summary)
-
-      # Create standardized output
+      dt <- PMCMRplus::dunnettTest(x, alternative = alternative, ...)
+      control_name <- colnames(dt$p.value)[1]
+      treatment_names <- rownames(dt$p.value)
+      if (alternative == "less") {
+        comparisons <- paste(treatment_names, "-", control_name, ">=", "0")
+      } else if (alternative == "greater") {
+        comparisons <- paste(treatment_names, "-", control_name, "<=", "0")
+      } else {
+        comparisons <- paste(treatment_names, "-", control_name, "==", "0")
+      }
       tibble::tibble(
         comparison = comparisons,
-        estimate = NA,
-        p.value = dt_summary$`Pr(>|t|)`,
-        conf.low = NA,
-        conf.high = NA,
+        estimate = NA_real_,
+        statistic = as.vector(dt$statistic),
+        p.value = as.vector(dt$p.value),
+        std.error = NA_real_,
+        conf.low = NA_real_,
+        conf.high = NA_real_,
         method = "Dunnett_PMCMRplus"
       )
     }, silent = TRUE)
   } else if (method == "Dunnett_DescTools") {
     result <- try({
-      dt <- DescTools::DunnettTest(x, ...)
-
-      # Extract the first element if it's a list (DescTools returns a list for multiple controls)
-      if (is.list(dt) && !is.data.frame(dt)) {
-        dt <- dt[[1]]
-      }
-
-      # Convert to tibble with standardized column names
+      if(alternative != "two.sided") stop("DescTools package does not accept one-sided test, try other methods instead. We recommend multcomp as the standard approach. ")
+      dt_list <- DescTools::DunnettTest(x, alternative = alternative, ...)
+      dt <- dt_list[[1]]
       tibble::tibble(
         comparison = rownames(dt),
         estimate = dt[, "diff"],
+        statistic = NA_real_,
         p.value = dt[, "pval"],
-        std.error = NA,
+        std.error = NA_real_,
         conf.low = dt[, "lwr.ci"],
         conf.high = dt[, "upr.ci"],
         method = "Dunnett_DescTools"
       )
     }, silent = TRUE)
   } else if (method == "Dunnett_multcomp") {
-    ##browser()
     result <- try({
-      # For multcomp, we need to create an aov model first
       if (inherits(x, "formula")) {
         model_data <- list(...)$data
-        if (is.null(model_data)) {
-          model_data <- environment(x)
-        }
+        if (is.null(model_data)) { model_data <- environment(x) }
         aov_model <- aov(x, data = model_data)
       } else if (inherits(x, c("aov", "lm"))) {
         aov_model <- x
@@ -253,44 +260,31 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
         stop("x must be a formula, aov, or lm object for Dunnett_multcomp method")
       }
 
-      # Extract the factor name from the formula
-      if (inherits(x, "formula")) {
-        terms <- terms(x)
-        factor_name <- attr(terms, "term.labels")[1]
-      } else {
-        factor_name <- names(aov_model$xlevels)[1]
-      }
+      factor_name <- names(aov_model$xlevels)[1]
 
-      # Get control level
-      control <- list(...)$control
-      if (!is.null(control)) {
-        ## control <- 1  # Default to first level
-        stop("Please make sure control is the first level of the dose group")
-      }
+      # --- THIS IS THE CORRECTED PART ---
+      # Create a named list where the name is the factor and the value is "Dunnett"
+      contrast_arg <- list("Dunnett")
+      names(contrast_arg) <- factor_name
 
-      # Create contrast matrix for Dunnett
-      contrasts_call <- call("mcp")
-      ##contrasts_call[[2]] <- as.name(factor_name)
-      contrasts_call[[2]] <- "Dunnett"
-      names(contrasts_call)[2] <- factor_name
-      ##contrasts_call$base <- control
+      # Now create the multiple comparison object
+      dunnett_mcp <- do.call(multcomp::mcp, contrast_arg)
+      # This correctly creates the equivalent of `mcp(Dose = "Dunnett")`
+      # ------------------------------------
 
-
-      dunnett_contrasts <- eval(contrasts_call)
-
-      # Run the test
-      glht_result <- multcomp::glht(aov_model, linfct = dunnett_contrasts)
+      glht_result <- multcomp::glht(aov_model, linfct = dunnett_mcp, alternative = alternative)
       summary_result <- summary(glht_result)
       conf_int <- confint(glht_result)
 
-      # Create standardized output
       tibble::tibble(
         comparison = names(summary_result$test$coefficients),
         estimate = summary_result$test$coefficients,
+        statistic = summary_result$test$tstat,
         p.value = summary_result$test$pvalues,
         std.error = summary_result$test$sigma,
         conf.low = conf_int$confint[, "lwr"],
         conf.high = conf_int$confint[, "upr"],
+        significant = summary_result$test$pvalues < alpha, # Basic significance flag
         method = "Dunnett_multcomp"
       )
     }, silent = TRUE)
@@ -298,15 +292,7 @@ broom_dunnett <- function(x, method = c("Dunnett_multcomp", "Dunnett_DescTools",
 
   if (inherits(result, "try-error")) {
     warning("Dunnett test failed. Error: ", attr(result, "condition")$message)
-    return(tibble::tibble(
-      comparison = character(),
-      estimate = numeric(),
-      p.value = numeric(),
-      std.error = numeric(),
-      conf.low = numeric(),
-      conf.high = numeric(),
-      method = character()
-    ))
+    return(tibble::tibble())
   }
 
   return(result)

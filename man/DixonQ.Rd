@@ -14,8 +14,8 @@ DixonQ
 Dixon's outlier test critical Q table
 }
 \references{
-DIXON, W. J. (1950) Analysis of extreme values. Ann. Math. Stat. 21, 488–506.
-DEAN, R. B., DIXON, W. J. (1951) Simplified statistics for small numbers of observation. Anal. Chem. 23, 636–638.
+DIXON, W. J. (1950) Analysis of extreme values. Ann. Math. Stat. 21, 488-506.
+DEAN, R. B., DIXON, W. J. (1951) Simplified statistics for small numbers of observation. Anal. Chem. 23, 636-638.
 }
 \author{
 Zhenglei Gao

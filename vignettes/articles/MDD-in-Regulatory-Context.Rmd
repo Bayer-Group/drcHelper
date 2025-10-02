@@ -17,7 +17,7 @@ source("../knitr-setup.R")
 ```
 
 
-In the regulatory context, MDD% stands for the minimum percent change (relative to the control mean) that would be deemed statistically significant given the test's critical value, the residual variability, and the replication. There are two common ways to define it; the often used way in ecotoxicology is ofent the significance-threshold version (no power term).
+In the regulatory context, MDD% stands for the minimum percent change (relative to the control mean) that would be deemed statistically significant given the test's critical value, the residual variability, and the replication. This **IS NOT** a power based MDD as we usually would have defined in statistical power analysis.  There are two common ways to define it; the often used way in ecotoxicology is ofent the significance-threshold version (no power term).
 
 ## Key definitions
 
@@ -346,61 +346,70 @@ Reusing existing test objects and building a modular system around them is far m
 ```{r}
 library(drcHelper)
 Results <- broom_williams(Response ~ factor(Dose), data = dat_medium,
-               test = "Williams_JG", alpha = 0.05, alternative = "less")
+               method = "Williams_PMCMRplus", alpha = 0.05, alternative = "less")
 
 compute_mdd_williams(Results,data=dat_medium,formula = Response ~ factor(Dose))
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "less")
+```
+
+
+```{r}
+Results <- broom_dunnett(Response ~ factor(Dose), data = dat_medium,
+               method = "Dunnett_multcomp", alpha = 0.05, alternative = "two.sided")
+
+Results
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "two.sided")
+Results
+
+
+Results <- broom_dunnett(Response ~ factor(Dose), data = dat_medium,
+               method = "Dunnett_multcomp", alpha = 0.05, alternative = "less")
+
+Results
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "less")
+compute_mdd_dunnett(Results,data = dat_medium,formula = Response~factor(Dose),alternative = "less")
+
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "two.sided")
+compute_mdd_dunnett(Results,data = dat_medium,formula = Response~factor(Dose),alternative = "two.sided")
+Results
+
+```
+
+### Overall reporting
+
+- both functions `dunnett_test` and `broom_dunnet` can be used now.
+- note `dunnett_test` has more options to perform test including random effect and inhomogeneous variance, while `broom_dunnet` is the simple version that is similar to Williams' test. 
+
+```{r}
+# This call will now work correctly for any alternative.
+final_dunnett_table <- report_dunnett_summary(
+  formula = Response ~ Dose, 
+  data = dat_medium, 
+  dunnett_test_func = "dunnett_test",
+  alternative = "less", 
+  alpha = 0.05
+)
+
+print(final_dunnett_table)
+
+
+# This call will now work correctly for any alternative.
+final_dunnett_table <- report_dunnett_summary(
+  formula = Response ~ Dose, 
+  data = dat_medium, 
+  dunnett_test_func = "broom_dunnett",
+  alternative = "less", 
+  alpha = 0.05
+)
+
+print(final_dunnett_table)
 ```
 
 
 
+### Handling "greater" vs "smaller" in Williams' test
 
-# Implementation in the Validation for Williams
-
-Here's a self-contained helper to compute per-dose MDD% for Williams and return a tidy table. It uses your existing helpers and broom_williams output.
-
-
-# How to integrate into the validation workflow
-
-- In the Williams run_actual handler, compute the prelim summary as before (for Mean, SD, %Inhibition, CV), and also compute MDD%:
-
-```r
-prelim <- compute_prelim_summary(endpoint_data)
-mdd_tbl <- compute_mdd_williams(endpoint_data, alternative = alternative)
-
-# Return both; the generic runner can join MDD% when expected rows exist
-list(actual_df = actual_df, group_means = prelim, mdd = mdd_tbl)
-```
-
-- In your expected parsing (parse_expected_metrics for Williams), you already capture "MDD%":
-
-```r
-out$mdd <- pick("\\bMDD%\\b"); 
-names(out$mdd)[2] <- "Expected_MDDpct"
-```
-
-
-- In the generic runner's join stage for Williams, add:
-
-```{r eval=FALSE}
-if (!is.null(exp_splits$mdd) && nrow(exp_splits$mdd)) {
-  mdd_join <- exp_splits$mdd %>%
-    dplyr::left_join(actual$mdd[, c("Dose", "Actual_MDDpct")], by = "Dose") %>%
-    dplyr::mutate(
-      Endpoint = endpoint,
-      Diff = abs(Actual_MDDpct - Expected_MDDpct),
-      Status = dplyr::case_when(
-        is.na(Expected_MDDpct) | is.na(Actual_MDDpct) ~ "MISSING",
-        Diff <= tolerance ~ "PASS", TRUE ~ "FAIL")
-    ) %>%
-    dplyr::transmute(Endpoint, Dose, metric = "MDD%", Actual = Actual_MDDpct, Expected = Expected_MDDpct, Status)
-  pieces <- c(pieces, list(mdd_join))
-}
-```
-
-
-### Handling "greater" vs "smaller"
-
-- The formula for MDD% doesn't change with direction; it's the minimum absolute difference required for significance. You typically compare magnitudes (positive values). If you want to encode a "directional" MDD% (signed), you can attach sign = ifelse(alternative=="greater", +1, -1) and report MDD%*sign, but most reports use a positive threshold.
+- The formula for MDD% doesn't change with direction for Williams' test; it's the minimum absolute difference required for significance. You typically compare magnitudes (positive values). If you want to encode a "directional" MDD% (signed), you can attach sign = ifelse(alternative=="greater", +1, -1) and report MDD%*sign, but most reports use a positive threshold.
 
 ### Unequal sample sizes and heteroscedasticity
 

@@ -7,9 +7,11 @@ knitr::opts_chunk$set(
   # e.g., for 'My-Vignette.Rmd', figures will be named 'My-Vignette-chunk-label-1.png'
   # and placed in the 'articles' directory during the pkgdown build.
   ## fig.path = paste0(tools::file_path_sans_ext(basename(knitr::current_input())), "-"),
-  
+
   # Provide a default, non-descriptive alt text.
   # This is better than no alt text, but it's highly recommended to
   # provide specific, descriptive alt text for each plot using fig.alt in the chunk options.
   fig.alt = "A plot generated from an R code chunk."
 )
+
+options(knitr.kable.NA = "")

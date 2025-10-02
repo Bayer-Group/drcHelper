@@ -7,6 +7,8 @@
 broom_dunnett(
   x,
   method = c("Dunnett_multcomp", "Dunnett_DescTools", "Dunnett_PMCMRplus"),
+  alternative = c("two.sided", "less", "greater"),
+  alpha = 0.05,
   ...
 )
 }
