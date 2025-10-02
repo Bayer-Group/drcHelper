@@ -72,7 +72,7 @@ compute_mdd_williams <- function(williams_obj, data, formula) {
 #' @param data The original dataframe used for the test.
 #' @param formula The formula used for the test.
 #' @return A tibble with Dose and MDD_pct.
-
+#' @export
 compute_mdd_dunnett <- function(dunnett_obj, alternative, data, formula) {
 
   # 1. Validate input
@@ -129,14 +129,58 @@ compute_mdd_dunnett <- function(dunnett_obj, alternative, data, formula) {
 }
 
 
-#' Generate a Comprehensive Dunnett Test Summary Report (Robust Version)
+#' Generate a Comprehensive Dunnett Test Summary Report
 #'
-#' @param formula The model formula, e.g., Response ~ Dose.
-#' @param data The dataframe containing the data.
-#' @param dunnett_test_func The dunnett_test function you use.
-#' @param alternative The alternative hypothesis to be used for the test.
-#' @param ... Additional arguments passed to your dunnett_test_func.
-#' @return A single tibble combining descriptive stats, test results, and MDD%.
+#' This high-level wrapper function performs a Dunnett's test to compare multiple
+#' treatment groups against a single control group. It is designed to be flexible,
+#' allowing for different underlying test functions and handling both standard
+#' fixed-effects (ANOVA) and mixed-effects models. The function combines the
+#' statistical test results with a calculated Minimum Detectable Difference (MDD%)
+#' into a single, formatted output table.
+#'
+#' @param formula A model formula, e.g., `Response ~ Dose` for a fixed-effects model,
+#'   or `Response ~ Dose + (1|Batch)` for a mixed-effects model.
+#' @param data A data frame containing the data specified in the formula.
+#' @param dunnett_test_func A function (passed as a character string or as a function object)
+#'   that performs the Dunnett test and is expected to return an object of class `glht`.
+#'   See `multcomp::glht` for details.
+#' @param alternative A character string specifying the alternative hypothesis. Must be one
+#'   of "two.sided", "less" (default), or "greater".
+#' @param include_random_effect A logical value. Set to `TRUE` if the `formula` includes
+#'   a random effect term (e.g., `(1|Batch)`), which requires a mixed-effects model.
+#'   Defaults to `FALSE`.
+#' @param ... Additional arguments to be passed to the function specified in
+#'   `dunnett_test_func`. A common argument is `alpha` to set the significance
+#'   level (e.g., `alpha = 0.05`).
+#'
+#' @return A data frame containing the comprehensive results for each comparison against
+#'   the control, with columns for the comparison name, estimate difference, test
+#'   statistic, critical value, standard error of the difference, MDD%, and p-value.
+#'
+#' @export
+#' @seealso [multcomp::glht()]
+#'
+#' @examples
+#' \dontrun{
+#' # Generate sample data
+#' set.seed(42)
+#' my_data <- data.frame(
+#'   Dose = factor(rep(c(0, 5, 20, 50), each = 6)),
+#'   Response = c(rnorm(6, 100, 10), rnorm(6, 90, 12),
+#'                rnorm(6, 85, 10), rnorm(6, 80, 11))
+#' )
+#'
+#' # Run the summary function for a one-sided test (less than control)
+#' summary_results <- report_dunnett_summary(
+#'   formula = Response ~ Dose,
+#'   data = my_data,
+#'   dunnett_test_func = "dunnett_test", # Your custom test function
+#'   alternative = "less",
+#'   alpha = 0.05
+#' )
+#'
+#' print(summary_results)
+#' }
 report_dunnett_summary <- function(formula, data, dunnett_test_func, alternative = "less",
                                    include_random_effect = FALSE,...) {
 
@@ -147,7 +191,7 @@ report_dunnett_summary <- function(formula, data, dunnett_test_func, alternative
   prelim_stats <- prelimSummary(data, dose_col = dose_name, response_col = resp_name)
 
   # 2. Run the Dunnett Test
-  if(dunnett_test_func == "dunnett_test ")dunnett_results_obj <- dunnett_test(
+  if(dunnett_test_func == "dunnett_test") dunnett_results_obj <- dunnett_test(
     data = data,
     response_var = resp_name,
     dose_var = dose_name,

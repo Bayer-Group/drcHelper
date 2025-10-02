@@ -513,3 +513,93 @@ result <- cochranArmitageTrendTest(successes = as.numeric(second_arcsin_data_2$I
 result
 ```
 
+
+## A Note on Implementation
+
+Of course! I can help you understand the differences between these two R functions.
+
+There are two wrapper function for performing many-to-one fisher's test: `many_to_one_fisher_test` and `compare_to_control_fisher`. Both functions are designed to solve a similar problem: performing multiple Fisher's exact tests to compare several treatment groups against a single control or reference group. However, they are written with different philosophies, accept different data formats, and use different underlying packages.
+
+Here is a detailed breakdown of their key differences:
+
+### 1. Input Data Format
+
+This is the most significant practical difference for a user.
+
+*   `many_to_one_fisher_test`: **Requires a pre-summarized contingency table** (a `matrix` or `data.frame`). The rows should represent your groups (e.g., `dose_0`, `dose_10`, `dose_50`), and the two columns should represent the counts of the two outcomes (e.g., `alive`, `dead`). You must aggregate your raw data into this table format *before* calling the function.
+
+*   `compare_to_control_fisher`: **Works directly with a "long" format data frame**. This data frame should have a column for your groups (e.g., `dose`), a column for success counts (e.g., `alive`), and a column for failure counts (e.g., `dead`). The function performs the necessary aggregation (summing counts for each group) internally.
+
+### 2. Dependencies & "Ecosystem"
+
+The functions are built upon different sets of tools.
+
+*   `many_to_one_fisher_test`: Is built as an extension of the **`rstatix` package** and the wider **Tidyverse**. It uses functions from `rstatix`, `dplyr`, and `purrr`. It is designed to fit seamlessly into a workflow that already uses these packages.
+
+*   `compare_to_control_fisher`: Is more of a **standalone, "base R" style function**. Although it uses a `%>%` pipe for clarity, its core statistical logic relies only on the built-in `stats` package (`fisher.test`, `p.adjust`). It has fewer external dependencies for its core functionality.
+
+### 3. Core Implementation
+
+The internal logic reflects their different dependencies.
+
+*   `many_to_one_fisher_test`:
+    *   It loops through the non-reference groups.
+    *   For each group, it creates a 2x2 table and passes it to **`rstatix::fisher_test()`**.
+    *   The `rstatix` function is a wrapper around the base `stats::fisher.test()`, but it formats the output into a tidy tibble.
+    *   It uses `rstatix::adjust_pvalue()` for p-value correction.
+
+*   `compare_to_control_fisher`:
+    *   It manually calculates the sum of successes and failures for the control group.
+    *   It then loops through the test groups, calculating their sums.
+    *   Inside the loop, it manually constructs a 2x2 `matrix`.
+    *   It passes this matrix directly to the base **`stats::fisher.test()`**.
+    *   It collects the results in a new data frame and then uses the base `stats::p.adjust()` for p-value correction.
+
+### 4. Output Format and Content
+
+The functions return differently structured results.
+
+*   `many_to_one_fisher_test`: Returns a **`tibble` with the special `rstatix_test` class**. This makes it compatible with other `rstatix` functions. The columns are standardized (`group1`, `group2`, `n`, `p`, `p.adj`). It does not return the odds ratio or confidence interval in the default output.
+
+*   `compare_to_control_fisher`: Returns a **standard `data.frame`**. The output is more detailed by default, including:
+    *   The group level being tested.
+    *   The raw p-value (`p_value`).
+    *   The adjusted p-value (`p_adjusted`).
+    *   The calculated **odds ratio** (`odds_ratio`).
+    *   The **confidence interval** for the odds ratio (`ci_lower`, `ci_upper`).
+
+### 5. Function Arguments and Flexibility
+
+*   `many_to_one_fisher_test`:
+    *   The reference group **must** be specified via `ref.group`.
+    *   It can pass additional arguments (like `alternative` or `conf.level`) to `fisher.test()` via the `...` parameter.
+    *   The `detailed = TRUE` argument can be used to get more information from the underlying `rstatix::fisher_test` call.
+
+*   `compare_to_control_fisher`:
+    *   Has a smart default for the `control_level` (it chooses the first level if not specified).
+    *   Has dedicated arguments for `alternative` and `conf.level`, making them more explicit.
+
+
+### Summary Table
+
+| Feature | `many_to_one_fisher_test` | `compare_to_control_fisher` |
+| :--- | :--- | :--- |
+| **Input Data** | **Contingency Table** (summarized counts) | **Long Data Frame** (raw counts per replicate) |
+| **Dependencies** | Tidyverse: `rstatix`, `dplyr`, `purrr` | Primarily `stats` (Base R) |
+| **Core Function Call** | `rstatix::fisher_test()` | `stats::fisher.test()` |
+| **Output Object** | `rstatix_test` tibble | Standard `data.frame` |
+| **Output Content** | `p`, `p.adj` | `p_value`, `p_adjusted`, **odds ratio**, **CI** |
+| **Reference Group** | Must be specified | Defaults to first level if not specified |
+
+### Which One Should You Use?
+
+*   Choose **`many_to_one_fisher_test`** if:
+    *   You are already heavily using the `rstatix` package and Tidyverse workflow.
+    *   Your data is already summarized into a contingency table.
+    *   You prefer the standardized output format of `rstatix`.
+
+*   Choose **`compare_to_control_fisher`** if:
+    *   You have your data in a long format with columns for successes and failures.
+    *   You prefer a self-contained function with fewer package dependencies.
+    *   You want the odds ratio and its confidence interval directly in your results table.
+

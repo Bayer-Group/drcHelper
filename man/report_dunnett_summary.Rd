@@ -2,7 +2,7 @@
 % Please edit documentation in R/MDD.R
 \name{report_dunnett_summary}
 \alias{report_dunnett_summary}
-\title{Generate a Comprehensive Dunnett Test Summary Report (Robust Version)}
+\title{Generate a Comprehensive Dunnett Test Summary Report}
 \usage{
 report_dunnett_summary(
   formula,
@@ -14,19 +14,64 @@ report_dunnett_summary(
 )
 }
 \arguments{
-\item{formula}{The model formula, e.g., Response ~ Dose.}
+\item{formula}{A model formula, e.g., \code{Response ~ Dose} for a fixed-effects model,
+or \code{Response ~ Dose + (1|Batch)} for a mixed-effects model.}
 
-\item{data}{The dataframe containing the data.}
+\item{data}{A data frame containing the data specified in the formula.}
 
-\item{dunnett_test_func}{The dunnett_test function you use.}
+\item{dunnett_test_func}{A function (passed as a character string or as a function object)
+that performs the Dunnett test and is expected to return an object of class \code{glht}.
+See \code{multcomp::glht} for details.}
 
-\item{alternative}{The alternative hypothesis to be used for the test.}
+\item{alternative}{A character string specifying the alternative hypothesis. Must be one
+of "two.sided", "less" (default), or "greater".}
 
-\item{...}{Additional arguments passed to your dunnett_test_func.}
+\item{include_random_effect}{A logical value. Set to \code{TRUE} if the \code{formula} includes
+a random effect term (e.g., \code{(1|Batch)}), which requires a mixed-effects model.
+Defaults to \code{FALSE}.}
+
+\item{...}{Additional arguments to be passed to the function specified in
+\code{dunnett_test_func}. A common argument is \code{alpha} to set the significance
+level (e.g., \code{alpha = 0.05}).}
 }
 \value{
-A single tibble combining descriptive stats, test results, and MDD\%.
+A data frame containing the comprehensive results for each comparison against
+the control, with columns for the comparison name, estimate difference, test
+statistic, critical value, standard error of the difference, MDD\%, and p-value.
 }
 \description{
-Generate a Comprehensive Dunnett Test Summary Report (Robust Version)
+This high-level wrapper function performs a Dunnett's test to compare multiple
+treatment groups against a single control group. It is designed to be flexible,
+allowing for different underlying test functions and handling both standard
+fixed-effects (ANOVA) and mixed-effects models. The function combines the
+statistical test results with a calculated Minimum Detectable Difference (MDD\%)
+into a single, formatted output table.
+}
+\examples{
+\dontrun{
+# Assuming `dunnett_test` and helper functions are defined in your environment
+# and the 'multcomp' package is loaded.
+
+# Generate sample data
+set.seed(42)
+my_data <- data.frame(
+  Dose = factor(rep(c(0, 5, 20, 50), each = 6)),
+  Response = c(rnorm(6, 100, 10), rnorm(6, 90, 12),
+               rnorm(6, 85, 10), rnorm(6, 80, 11))
+)
+
+# Run the summary function for a one-sided test (less than control)
+summary_results <- report_dunnett_summary(
+  formula = Response ~ Dose,
+  data = my_data,
+  dunnett_test_func = "dunnett_test", # Your custom test function
+  alternative = "less",
+  alpha = 0.05
+)
+
+print(summary_results)
+}
+}
+\seealso{
+\code{\link[multcomp:glht]{multcomp::glht()}}
 }
