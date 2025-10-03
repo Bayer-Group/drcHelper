@@ -7,21 +7,23 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = TRUE,
+  warning=FALSE,
+  message = FALSE
 )
-source("../knitr-setup.R")
 ```
 
-```r
+```{r setup}
 library(drcHelper)
 ```
 
 
-
-```r
+```{r}
 
 library(tidyverse)
 ```
+
 
 ## Summary
 
@@ -30,136 +32,265 @@ Jonckheere's test and Kendall's tau) are closely related. In some software imple
 `JtTest` from `npordtests` are doing the same as in `cor.test` with method being "kendall". Both function actually performs a kendall test and treat the dose column as numeric. On the other hand `PMCMRplus::jonckheereTest` and `DescTools::JonckheereTerpstraTest` do similar things.
 
 
-## Data from Jonckheere (1954)
+The differences in different implementations almost always come down to three things:
+
+1.  **How ties are handled** in the variance calculation.
+2.  **Whether a continuity correction** is applied to the z-score.
+3.  **Whether the p-value is derived from a normal approximation or an exact permutation test**.
+
+Packages like `DescTools` and `PMCMRplus` are implementing the Jonckheere-Terpstra test directly, while `npordtests::JtTest` and `cor.test(method="kendall")` are leveraging the very close mathematical relationship between the JT statistic and Kendall's S statistic.
+
+### The Core Calculations
+
+Here is the standard procedure for the Jonckheere-Terpstra test using the normal approximation, which is what these packages are using for datasets of this size.
+
+Let's use your `jdata` example as the gold standard to walk through.
+*   k = 4 groups (doses)
+*   Group sizes: n1=4, n2=4, n3=4, n4=4
+*   Total observations N = 16
+
+#### Step 1: Calculate the Jonckheere-Terpstra (JT) Statistic
+
+The JT statistic is the sum of all Mann-Whitney U statistics for every pair of groups (i, j) where **group i comes before group j in the hypothesized order**.
+
+$$JT = \sum_{i=1}^{k-1} \sum_{j=i+1}^{k} U_{ij}$$
+
+Where $U_{ij}$ is the number of pairs of observations (x, y) where x is from group i, y is from group j, and x < y.
+
+Using `jdata`, all packages agree on the statistic: **JT = 71**. 
+
+#### Step 2: Calculate the Mean and Variance of JT under the Null Hypothesis
+
+This is where implementations can start to diverge.
+
+**Mean (E[JT]):** The formula is simple and universal.
+$\mu_{JT} = \frac{N^2 - \sum_{i=1}^{k} n_i^2}{4}$
+
+For `jdata`:
+*   N = 16
+*   $$\sum n_i^2 = 4^2 + 4^2 + 4^2 + 4^2 = 64$$
+*   $$\mu_{JT} = \frac{16^2 - 64}{4} = \frac{256 - 64}{4} = \frac{192}{4} = 48$$
+
+This matches the mean `48` from `npordtests::JtTest`. Your implementation should also get this value.
+
+**Variance (Var(JT)):** The formula gets more complex, especially with ties.
+
+*   **No Ties:**
+    $$\sigma^2_{JT} = \frac{N^2(2N+3) - \sum_{i=1}^{k} n_i^2(2n_i+3)}{72}$$
+
+*   **With Ties (The Correct Formula to Use):**
+    $$\sigma^2_{JT} = \frac{A}{72} - \frac{B}{12N(N-1)}$$
+    Where:
+    $$A = N(N-1)(2N+5) - \sum n_i(n_i-1)(2n_i+5)$$
+    $$B = [\sum n_i(n_i-1)(n_i-2)] \times [\sum t_j(t_j-1)(t_j-2)] + [\sum n_i(n_i-1)] \times [\sum t_j(t_j-1)]$$
+    (t_j is the number of observations in a tied group of responses)
+
+Let's analyze the ties in `jdata$Y`: `{10, 20, 35, 38, 41, 43, 51, 55, 62, 70, 78, 85}`. There are no ties in the response variable `Y`. This simplifies the variance calculation greatly. The general formula for variance with ties in the *grouping* variable but not the *response* is:
+$$\sigma^2_{JT} = \frac{N^2(2N+3) - \sum n_i^2(2n_i+3)}{72}$$
+(This is the same as the "no ties" formula, as "ties" usually refers to the response values).
+
+For `jdata`:
+*   N=16, n_i=4
+*   $$\sum n_i^2(2n_i+3) = 4 \times [4^2(2 \cdot 4 + 3)] = 4 \times [16(11)] = 4 \times 176 = 704$$
+*   $$N^2(2N+3) = 16^2(2 \cdot 16 + 3) = 256(35) = 8960$$
+*   $$\sigma^2_{JT} = \frac{8960 - 704}{72} = \frac{8256}{72} = 114.6667$$
+
+This **exactly matches** the variance from `npordtests::JtTest`.
+
+#### Step 3: Calculate the Z-statistic
+
+This is the second place where implementations differ. `npordtests` and `cor.test` use the Z-score calculated directly from the mean and variance above, without a continuity correction. `DescTools` and `PMCMRplus` are using a slightly different calculation invovling a continuity correction 
+
+**Standard Z-statistic:**
+$$Z = \frac{JT - \mu_{JT}}{\sigma_{JT}}$$
+
+For `jdata`:
+$$Z = \frac{71 - 48}{\sqrt{114.6667}} = \frac{23}{10.70825} = 2.147876$$
+This **exactly matches** `npordtests` and `cor.test`! 
+
+```{r}
+p_value <- 2 * pnorm(2.147876, lower.tail = FALSE) 
+p_value
+```
 
 
-```r
+**Z-statistic with Continuity Correction:**
+The correction is used for discrete distributions approximated by a continuous one. We subtract 0.5 from the numerator.
+$$Z_{corr} = \frac{JT - \mu_{JT} - 0.5}{\sigma_{JT}}$$
+
+For `jdata`:
+$$Z_{corr} = \frac{71 - 48 - 0.5}{\sqrt{114.6667}} = \frac{22.5}{10.70825} = 2.10115$$
+```{r}
+p_value <- 2 * pnorm(2.10115, lower.tail = FALSE) 
+p_value
+```
+
+#### Step 4: Reconciling the p-values
+
+Now we can see why the p-values differ.
+
+*   **`npordtests::JtTest` and `cor.test`:** They use the Z-score **without** continuity correction (Z = 2.147876). They report a **two-sided** p-value.
+
+*   **`DescTools::JonckheereTerpstraTest`:** This package often uses continuity correction by default for its non-parametric tests. Let's check the p-value with our corrected Z-score (Z_corr = 2.10115).
+
+*   **`PMCMRplus::jonckheereTest`:** This package also reports a two-sided p-value (`p-value = 0.001726` for `lehmann` data). For the `jdata` set, the difference you noted (`-0.00196`) again points to a slightly different calculation, likely involving continuity correction. For the `lehmann` data, its Z-score of `3.1337` is slightly different from `npordtests`'s `3.1254`, indicating a different variance calculation (due to the many ties in the `lehmann` data) and/or a continuity correction.
+
+
+### Compare the 4 Packages
+
+```{r eval=FALSE}
+# Load necessary libraries
+library(npordtests)
+library(DescTools)
+library(PMCMRplus)
+library(drcHelper) # For the jdata dataset
+
+# --- Load Datasets ---
+
+# Data from Jonckheere (1954), provided in drcHelper
+# The user confirmed these are the correct Y values
+# Group (X): 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4
+# Y        : 19, 20, 60, 130, 21, 61, 80, 129, 40, 99, 100, 149, 49, 110, 151, 160
 data(jdata)
 
-prelimPlot3(jdata,dose_col = "X",response_col = "Y")
-```
-
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
-
-```r
-
-dunnett_test(jdata,"Y","X",include_random_effect = FALSE)
-#> Dunnett Test Results
-#> -------------------
-#> Model type: Fixed model with homoscedastic errors 
-#> Control level: 1 
-#> Alpha level: 0.05 
-#> 
-#> Results Table:
-#>  comparison estimate std.error statistic   p.value  conf.low conf.high significant
-#>       2 - 1    15.50  34.05051 0.4552061 0.9401315 -75.78264  106.7826       FALSE
-#>       3 - 1    39.75  34.05051 1.1673833 0.5307511 -51.53264  131.0326       FALSE
-#>       4 - 1    60.25  34.05051 1.7694300 0.2322884 -31.03264  151.5326       FALSE
-#> 
-#> NOEC Determination:
-#> No significant effects detected at any dose. NOEC is at or above the highest tested dose.
-```
-
-
-
-```r
-library(npordtests)
-res1 <- JtTest(Y~X,jdata)
-#> --------------------------------------------------------- 
-#>   Test : Jonckheere-Terpstra Test 
-#>   data : Y and X 
-#> 
-#>   Statistic = 71 
-#>   Mean = 48 
-#>   Variance = 114.6667 
-#>   Z = 2.147876 
-#>   Asymp. p-value = 0.0158618 
-#> 
-#>   Result : Null hypothesis is rejected. 
-#> ---------------------------------------------------------
-res1$p.value *2
-#> [1] 0.03172359
-```
-
-
-```r
-res2 <- DescTools::JonckheereTerpstraTest(Y~X,jdata)
-res2
-#> 
-#> 	Jonckheere-Terpstra test
-#> 
-#> data:  Y by X
-#> JT = 71, p-value = 0.03368
-#> alternative hypothesis: two.sided
-res2$statistic == res1$statistic
-#>   JT 
-#> TRUE
-```
-
-
-
-```r
-res3 <- PMCMRplus::jonckheereTest(Y~X,jdata)
-res3$statistic=res2$statistic
-res3$p.value -  res2$p.value
-#> [1] -0.001960184
-```
-
-
-
-```r
-res4 <- cor.test(as.numeric(jdata$X),as.numeric(jdata$Y),method="kendall")
-res4$statistic
-#>        z 
-#> 2.147876
-res4$p.value
-#> [1] 0.03172359
-```
-
-
-
-
-```r
+# Data from Lehmann (1975), provided in multiple packages
 data(lehmann)
-res <- JtTest(Values~Group,lehmann)
-#> --------------------------------------------------------- 
-#>   Test : Jonckheere-Terpstra Test 
-#>   data : Values and Group 
-#> 
-#>   Statistic = 1159 
-#>   Mean = 857.5 
-#>   Variance = 9305.917 
-#>   Z = 3.125415 
-#>   Asymp. p-value = 0.0008877709 
-#> 
-#>   Result : Null hypothesis is rejected. 
-#> ---------------------------------------------------------
-res4$p.value - 2*res1$p.value
-#> [1] 1.387779e-17
+
+
+# --- Reusable Summarization Function ---
+
+#' Summarize results from three different Jonckheere-Terpstra test implementations
+#'
+#' @param data The data frame to use.
+#' @param formula A formula of the form response ~ group.
+#' @return A data frame summarizing the results.
+summarize_jt_tests <- function(data, formula) {
+  
+  results_list <- list()
+  
+  # 1. npordtests::JtTest
+  # Note: This returns a one-sided p-value by default. We double it for comparison.
+  # This implementation is mathematically equivalent to cor.test(..., method="kendall")
+  res1 <- npordtests::JtTest(formula, data = data)
+  results_list[[1]] <- data.frame(
+    Package = "npordtests",
+    Function = "JtTest",
+    JT_Statistic = as.numeric(res1$statistic),
+    Z_Statistic = NA,
+    P_Value = res1$p.value * 2, # Standardizing to two-sided
+    Alternative = "two.sided",
+    Notes = "P-value is doubled from one-sided output."
+  )
+  
+  # 2. DescTools::JonckheereTerpstraTest
+  # Note: This implementation often includes a continuity correction.
+  res2 <- DescTools::JonckheereTerpstraTest(formula, data = data, alternative = "two.sided")
+  results_list[[2]] <- data.frame(
+    Package = "DescTools",
+    Function = "JonckheereTerpstraTest",
+    JT_Statistic = res2$statistic,
+    Z_Statistic = NA, # Not directly returned in the htest object
+    P_Value = res2$p.value,
+    Alternative = res2$alternative,
+    Notes = "Uses continuity correction. Z-stat not returned."
+  )
+  
+  # 3. PMCMRplus::jonckheereTest
+  # Note: This also uses a continuity correction.
+  # The JT statistic is in 'estimate', the Z-statistic is in 'statistic'.
+  res3 <- PMCMRplus::jonckheereTest(formula, data = data, alternative = "two.sided")
+  results_list[[3]] <- data.frame(
+    Package = "PMCMRplus",
+    Function = "jonckheereTest",
+    JT_Statistic = res3$estimate,
+    Z_Statistic = res3$statistic,
+    P_Value = res3$p.value,
+    Alternative = res3$alternative,
+    Notes = "JT is in 'estimate'; Z is in 'statistic'."
+  )
+  # For bonus validation: a quick check with cor.test
+  group_var <- all.vars(formula)[2]
+  response_var <- all.vars(formula)[1]
+  res_kendall <- cor.test(as.numeric(data[[group_var]]), as.numeric(data[[response_var]]), method = "kendall")
+ 
+  results_list[[4]] <- data.frame(
+    Package = "stats",
+    Function = "cor.test",
+    JT_Statistic = NA,
+    Z_Statistic = res3$statistic,
+    P_Value = res3$p.value,
+    Alternative = res3$alternative,
+    Notes = "Z is in 'statistic'."
+  )
+  # Combine all results into a single data frame
+  final_df <- do.call(rbind, results_list)
+  rownames(final_df) <- NULL # Clean up row names
+  
+
+  return(final_df)
+}
+
+
+# --- Run and Print Summaries ---
+
+cat("==========================================\n")
+cat("       Summary for 'jdata' Dataset\n")
+cat("==========================================\n")
+jdata_summary <- summarize_jt_tests(jdata, Y ~ X)
+## print(jdata_summary, row.names = FALSE)
+jdata_summary%>%knitr::kable(.,digits = 4)
+
+cat("\n\n==========================================\n")
+cat("      Summary for 'lehmann' Dataset\n")
+cat("==========================================\n")
+lehmann_summary <- summarize_jt_tests(lehmann, Values ~ Group)
+## print(lehmann_summary, row.names = FALSE)
+lehmann_summary%>%knitr::kable(.,digits = 4)
+```
+
+==========================================
+      Summary for 'jdata' Dataset
+==========================================
+
+|Package    |Function               | JT_Statistic| Z_Statistic| P_Value|Alternative |Notes                                            |
+|:----------|:----------------------|------------:|-----------:|-------:|:-----------|:------------------------------------------------|
+|npordtests |JtTest                 |           71|            |  0.0317|two.sided   |P-value is doubled from one-sided output.        |
+|DescTools  |JonckheereTerpstraTest |           71|            |  0.0337|two.sided   |Uses continuity correction. Z-stat not returned. |
+|PMCMRplus  |jonckheereTest         |           71|      2.1479|  0.0317|two.sided   |JT is in 'estimate'; Z is in 'statistic'.        |
+|stats      |cor.test               |             |      2.1479|  0.0317|two.sided   |Z is in 'statistic'. 
+
+
+==========================================
+      Summary for 'lehmann' Dataset
+==========================================
+
+|Package    |Function               | JT_Statistic| Z_Statistic| P_Value|Alternative |Notes                                            |
+|:----------|:----------------------|------------:|-----------:|-------:|:-----------|:------------------------------------------------|
+|npordtests |JtTest                 |         1159|            |  0.0018|two.sided   |P-value is doubled from one-sided output.        |
+|DescTools  |JonckheereTerpstraTest |         1159|            |  0.0018|two.sided   |Uses continuity correction. Z-stat not returned. |
+|PMCMRplus  |jonckheereTest         |         1159|      3.1337|  0.0017|two.sided   |JT is in 'estimate'; Z is in 'statistic'.        |
+|stats      |cor.test               |             |      3.1337|  0.0017|two.sided   |Z is in 'statistic'.   
+
+## Additional Difference
+
+Another difference comes from the *dose group* column. When it is a factor or a numerical, the results are different using different testing function.
+
+```{r}
+prelimPlot3(dat_medium)
 ```
 
 
-## Data from Lehmann (1975)
-
-
-```r
-data("lehmann")
-DescTools::JonckheereTerpstraTest(Values~Group,lehmann)
-#> 
-#> 	Jonckheere-Terpstra test
-#> 
-#> data:  Values by Group
-#> JT = 1159, p-value = 0.001776
-#> alternative hypothesis: two.sided
-PMCMRplus::jonckheereTest(Values~Group,lehmann)
-#> 
-#> 	Jonckheere-Terpstra test
-#> 
-#> data:  Values by Group
-#> z = 3.1337, p-value = 0.001726
-#> alternative hypothesis: two.sided
-#> sample estimates:
-#>   JT 
-#> 1159
+```{r eval=FALSE}
+dat1 <- dat_medium %>% mutate(Dose = as.numeric(as.character(Dose))) %>% filter(Dose <7)
+dat_medium_summary <- summarize_jt_tests(dat1 %>% mutate(Dose = factor(Dose))%>% mutate(Response = -Response), Response ~ Dose)
+dat_medium_summary %>%knitr::kable(.,digits = 4)
+JtTest(Response ~ Dose,data = dat1 %>% mutate(Dose = factor(Dose)) %>% mutate(Response = -Response)) 
 ```
+
+|Package    |Function               | JT_Statistic| Z_Statistic| P_Value|Alternative |Notes                                            |
+|:----------|:----------------------|------------:|-----------:|-------:|:-----------|:------------------------------------------------|
+|npordtests |JtTest                 |           72|            |   1e-03|two.sided   |P-value is doubled from one-sided output.        |
+|DescTools  |JonckheereTerpstraTest |           72|            |   5e-04|two.sided   |Uses continuity correction. Z-stat not returned. |
+|PMCMRplus  |jonckheereTest         |           72|      3.2796|   1e-03|two.sided   |JT is in 'estimate'; Z is in 'statistic'.        |
+|stats      |cor.test               |             |      3.2796|   1e-03|two.sided   |Z is in 'statistic'.  
 

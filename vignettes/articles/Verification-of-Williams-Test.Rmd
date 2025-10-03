@@ -15,17 +15,17 @@ library(drcHelper)
 
 
 
-Short answer: Yes for the PMCMRplus method. broom_williams doesn’t have a formal alternative argument, but it forwards any extra arguments via ... to PMCMRplus::williamsTest, so you can pass alternative = "less" or alternative = "greater". For the Williams_JG method, you should use direction = "decreasing" or direction = "increasing" instead of alternative.
+## Which Package to Use
 
-How to verify with your dat_medium
+Short answer: Use `drcHelper::broom_williams` with the PMCMRplus method. It handles formula gracefully.  `broom_williams` doesn't have a formal alternative argument, but it forwards any extra arguments via ... to PMCMRplus::williamsTest, so you can pass alternative = "less" or alternative = "greater". For the Williams_JG method, you should use direction = "decreasing" or direction = "increasing" instead of alternative.
+
+### How to use the function with dat_medium
 
 - Ensure the control is the first level of the dose factor (lowest dose first).
 - Call broom_williams with method = "Williams_PMCMRplus" and pass alternative via ...
 - Observe the "comparison" column: for alternative = "greater" you’ll see "<= 0"; for alternative = "less" you’ll see ">= 0".
 
-
-
-# Prepare the data: control first level
+###  Prepare the data: control first level
 ```{r}
 dm <- dat_medium
 dm$Dose_factor <- factor(dm$Dose, levels = sort(unique(dm$Dose)))
@@ -67,6 +67,7 @@ bw_inc <- drcHelper::broom_williams(Response ~ Dose_factor,
 print(bw_inc)
 ```
 
+**Note that the t'-stat output from StatCharms can be of incorrect signs at it returns the absolute value of the Williams' t-statistic, which should match the sign of the estimated differences**
 
 ## What to look for
 

@@ -164,6 +164,7 @@ articles:
       - articles/Normality-Check
       - articles/Binomial_Extra_Variance
       - articles/Equivalence-Testing
+      - articles/A-Notes-on-Power
 
   - title: "Alternative Methods"
     desc: >
