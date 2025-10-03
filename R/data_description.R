@@ -166,3 +166,26 @@ NULL
 #' @docType data
 #' @keywords datasets
 "metaldata"
+
+
+#' Jonckheere's Synthetic Dataset
+#'
+#' This dataset is used by Jonckheere (1954) to illustrate a distribution-free k-sample test against ordered alternatives.
+#'
+#' @format A data frame with 16 rows and 2 columns:
+#' \describe{
+#'   \item{X}{Number of samples, indicating the group each observation belongs to.}
+#'   \item{Y}{Value of the observation.}
+#' }
+#'
+#' @source Jonckheere, A. R. (1954). A Distribution-Free k-Sample Test Against Ordered Alternatives. \emph{Biometrika}, 41, 133-145.
+#'
+#' @usage data(jdata)
+#'
+#' @examples
+#' data(jdata)
+#' str(jdata)
+#' summary(jdata)
+#'
+#' @name jdata
+NULL

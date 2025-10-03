@@ -49,9 +49,6 @@ into a single, formatted output table.
 }
 \examples{
 \dontrun{
-# Assuming `dunnett_test` and helper functions are defined in your environment
-# and the 'multcomp' package is loaded.
-
 # Generate sample data
 set.seed(42)
 my_data <- data.frame(

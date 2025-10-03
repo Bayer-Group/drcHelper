@@ -1,5 +1,7 @@
 ---
 title: "Trend Testing"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -61,7 +63,65 @@ A step-down trend test is a sequential testing procedure used to identify the lo
 
 This approach helps identify the No Observed Effect Concentration (NOEC) or Lowest Observed Effect Concentration (LOEC) in dose-response studies.
 
-The function `PMCMRplus::stepDownTrendTest` PMCMRplus implements this strategy for continuous data using various trend tests. For binomial survival data, we adapt this approach using the Cochran-Armitage test, which is specifically designed for binary outcomes across ordered groups, the function for performing step-down CA is called `drcHelper::stepDownTrendTestBinom`. There is also `drcHelper::step_down_RSCABS` and `drcHelper::stepDownRSCABS` for oridinal data. Please refere to the relevant data page for usage demo and explanations. 
+The function `PMCMRplus::stepDownTrendTest` PMCMRplus implements this strategy for continuous data using various trend tests. However, the stepDownTrendTest function does not follow the NOEC testing paradigm of starting with a full model and removing the highest dose. Instead, it builds the model upwards from the control. For binomial survival data, we adapt this approach using the Cochran-Armitage test, which is specifically designed for binary outcomes across ordered groups, the function for performing step-down CA is called `drcHelper::stepDownTrendTestBinom`. There is also `drcHelper::step_down_RSCABS` and `drcHelper::stepDownRSCABS` for ordinal data. Please refere to the relevant data page for usage demo and explanations. 
 
 
+```{r echo=FALSE}
+data(jdata)
+jdata$X <- factor(jdata$X)
+
+# --- 1. The Official PMCMRplus::stepDownTrendTest ---
+# This is our reference.
+official_result <- PMCMRplus::stepDownTrendTest(Y ~ X, data = jdata, test = "jonckheereTest")
+cat("--- PMCMRplus::stepDownTrendTest Output ---\n")
+print(official_result)
+```
+```{r}
+# --- 2. Manually Recreating the PMCMRplus "Step-Up" Logic ---
+# This manually implements the logic inside the function to prove our understanding.
+cat("\n--- Manual Recreation of PMCMRplus 'Step-Up' Logic ---\n")
+levels_X <- levels(jdata$X)
+# Loop from i=2 to 4
+for (i in 2:length(levels_X)) {
+  # Create a subset of data with groups from 1 to i
+  subset_data <- subset(jdata, X %in% levels_X[1:i])
+  
+  # Run the test on this subset
+  res <- PMCMRplus::jonckheereTest(Y ~ X, data = subset_data)
+  
+  cat(sprintf("Test on Groups %s vs 1: p-value = %.6f\n", i, res$p.value))
+}
+
+
+# --- 3. The Ecotoxicology "Step-Down" Logic (Your Manual Approach) ---
+# This starts with all doses and removes the highest.
+cat("\n--- Manual Recreation of Ecotoxicology 'Step-Down' Logic ---\n")
+# Loop from i=4 down to 2
+for (i in length(levels_X):2) {
+  # Create a subset of data with groups from 1 to i
+  subset_data <- subset(jdata, X %in% levels_X[1:i])
+  
+  # Run the test on this subset
+  res <- PMCMRplus::jonckheereTest(Y ~ X, data = subset_data)
+  
+  cat(sprintf("Test on Groups 1 to %s: p-value = %.6f\n", i, res$p.value))
+}
+```
+Therefore, in the `drcHelper`, a wrapper function is implemented to give the results in correct meaningful order. 
+
+
+```{r}
+
+# --- Run our NEW WRAPPER function ---
+cat("\n=========================================\n")
+cat("   Output from our NEW WRAPPER function\n")
+cat("=========================================\n")
+wrapper_output <- stepDownTrendTest_NOEC(Y ~ X, data = jdata, test = "jonckheereTest")
+print(wrapper_output)
+```
+
+```{r}
+noec_output <- noec_from_trend_test(Response ~ Dose, data = dat_medium, test = "jonckheereTest")
+print(noec_output)
+```
 
