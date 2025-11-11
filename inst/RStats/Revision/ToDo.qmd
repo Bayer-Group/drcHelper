@@ -1,0 +1,7 @@
+---
+title: "ToDo"
+format: html
+---
+
+- C:/Users/gbbfx/GitProjects/LTO_EnSa/inst/ssd/SSD_questions.Rmd
+- Quantal problem

@@ -23,7 +23,7 @@ conflict_prefer("select","dplyr")
 source("../knitr-setup.R")
 ```
 
-## Background
+#### Background
 
 One very standard procedure for dealing with binomial or quantal data in Ecotox area is to test first if extra-binomial variation exists when there are replications, if no, continue with Cochran-Armitage trend test to derive NOEC;  if yes, then use the Cochran-Armitage test with Rao-Scott correction. The question is, are we going to use replicate data or are we going to use pooled data in the following Cochran-Armitage test. If the latter, testing within-group overdispersion is necessary for pooling the data together; if the former, the overdispersion should be designed to test for extra-binomial variation (overdispersion) in the context of dose-response data, specifically:
 
@@ -40,7 +40,7 @@ It is used to validate the Cochran-Armitage trend test assumptions. This actuall
 | **Equally spaced** | Exploratory analysis | Simple interpretation | May not reflect true spacing |
 
 
-### Test Statistic Calculation
+##### Test Statistic Calculation
 
 Going back to standard Cochran-Armitage test. The core calculation follows the standard Cochran-Armitage formula:
 
@@ -61,7 +61,7 @@ On a separate note, the default implementation of Cochran-Armitage test usually 
 
 
 
-## The Ben O'Neill's version of Tarone's Test
+#### The Ben O'Neill's version of Tarone's Test
 
 The  implementation of Ben O'Neill's Tarone's test takes ..
 1. It pools all the data and calculates an **overall proportion**: `estimate <- sum(M)/sum(N)`
@@ -85,11 +85,11 @@ Tarone.test(N, M)
 ```
 
 
-## Comparison with Trend-Based Tarone's Test:
+#### Comparison with Trend-Based Tarone's Test:
 
 Trend-based Tarone's test can be implemented by excluding a trend first followed by the z-test or chi-square test. Details please see the example below. 
 
-## Which Should You Use?
+#### Which Should You Use?
 
 The O'Neill's version is simpler and tests for basic **heterogeneity between groups**. However, things become more complicated when there are replicates, how do we derive a $p_i$ for $i_{th}$ dose level? Are there within group overdispersion already? Do we use incidence occurred for each replicate, or use an average of incidence rates from each replicate, or do we pool all incidences from all replicates to calculate a pooled average? 
 
@@ -100,7 +100,7 @@ If we have one "average" proportion for each dose group, then what is the total 
 For **NOEC determination with Cochran-Armitage**, the **trend-based version** is more theoretically appropriate since CA test assumes a dose-response trend.
 
 
-## Example Data
+#### Example Data
 
 We do a comparison of various approaches using an example dataset.
 
@@ -133,21 +133,21 @@ second_arcsin_data <- quantal_dat_nested$data[[2]] %>% mutate(arcsin_prop = asin
 
 
 ```{r}
-# Full comparison
+### Full comparison
 comparison_results <- drcHelper:::compare_tarone_scoring(
     successes = second_arcsin_data$Immobile,
     totals = second_arcsin_data$Total,
     doses = second_arcsin_data$Dose
 )
 
-# Create publication-ready summary
+### Create publication-ready summary
 summary_table <- drcHelper:::create_summary_table(comparison_results)
 ```
 
 Perform Tarone's test followed by stepdown CA test and compare the results
 
 ```{r}
-# Test the fixed function
+### Test the fixed function
 phi_comparison_ranks <- drcHelper:::compare_phi_methods(
   successes = second_arcsin_data$Immobile,
   totals = second_arcsin_data$Total,
@@ -155,7 +155,7 @@ phi_comparison_ranks <- drcHelper:::compare_phi_methods(
   scoring = "ranks"
 )
 
-# Comprehensive comparison
+### Comprehensive comparison
 comprehensive_results <- drcHelper:::comprehensive_phi_comparison(
   successes = second_arcsin_data$Immobile,
   totals = second_arcsin_data$Total,
@@ -165,7 +165,7 @@ comprehensive_results <- drcHelper:::comprehensive_phi_comparison(
 
 
 ```{r}
-# Step-down test with simple phi method
+### Step-down test with simple phi method
 stepdown_simple <- stepDownTrendTestBinom(
   successes = second_arcsin_data$Immobile,
   totals = second_arcsin_data$Total,
@@ -176,7 +176,7 @@ stepdown_simple <- stepDownTrendTestBinom(
   phi_method = "simple"
 )
 
-# Step-down test with trend-adjusted phi method
+### Step-down test with trend-adjusted phi method
 stepdown_trend <- stepDownTrendTestBinom(
   successes = second_arcsin_data$Immobile,
   totals = second_arcsin_data$Total,
@@ -193,7 +193,7 @@ stepdown_trend <- stepDownTrendTestBinom(
 
 
 ```{r}
-# Test with ranks scoring and trend-adjusted phi
+### Test with ranks scoring and trend-adjusted phi
 analysis_ranks_trend <- drcHelper:::complete_trend_analysis(
   successes = second_arcsin_data$Immobile,
   totals = second_arcsin_data$Total,
@@ -208,7 +208,7 @@ print(analysis_ranks_trend)
 
 
 
-## The False Significance Problem
+#### The False Significance Problem
 
 The traditional CA trend test may not be the best tool for some dose-response patterns. In particular, CA test ignores within-group dispersion - it's purely about group means. Even if over-dispersion is corrected within each group, it is not adjusted by the corresponding trend that is assumed in the testing procedure. It could happen that there is no over-dispersion within each treatment group, but the residuals after the trend removal are actually overdispersed,  which is exactly what happened in the specific data example. Secondly, Scoring systems can mask biological reality - equal weight to unequal biological changes. Thirdly, linear trend assumption fails with cliff data - the 40 mg a.i./L "significance" can be an artifact of the testing assumption and procedure. 
 
@@ -236,7 +236,7 @@ Given these limitations, there could be more suitable approaches.
 3. BMD
 4. Other custom threshold tests
 
-### Pairwise Comparison with Control
+##### Pairwise Comparison with Control
 
 ```{r}
 second_arcsin_data <- second_arcsin_data %>% mutate(Active = Total-Immobile)
@@ -247,7 +247,7 @@ res2 <- compare_to_control_fisher(second_arcsin_data,factor_col = "Treatment",su
 res2
 ```
 
-### Exact Cochran-Armitage on replicate averages
+##### Exact Cochran-Armitage on replicate averages
 
 Another important aspect is the difference between the exact test p-value and the asymptotic p-value, apart from the sample size being used. 
 
@@ -279,7 +279,7 @@ rbind(data.frame(Dose=40,a1,sampe.size=6),
 ```
 
 
-### Change Point Analysis
+##### Change Point Analysis
 
 ```{r}
 #' Detect change points in dose-response
@@ -298,7 +298,7 @@ detect_change_point <- function(successes, totals, doses) {
   cat("Change Point Analysis:\n")
   cat("=====================\n")
   
-  # Look for largest jump in proportions
+  ### Look for largest jump in proportions
   prop_diffs <- diff(group_data$proportion)
   max_jump_idx <- which.max(prop_diffs)
   
@@ -328,6 +328,175 @@ change_point <- detect_change_point(
   second_arcsin_data$Dose
 )
 ```
+
+
+#### Bias-reduced logistic regression
+
+A logistic GLM with Treatment as a factor will hit separation: some treatment levels have all 0s, others have mostly 1s. We will typically see "fitted probabilities 0 or 1 occurred", huge SEs, and unstable p-values.
+
+Here is how we can fix it with bias-reduced logistic regression.
+
+
+##### (48 h table with columns: Treatment, Dose, Immobile, Total)
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(brglm2)    ### bias-reduced logistic + separation detection
+  library(broom)
+})
+```
+
+
+##### 1) Show the pattern that causes separation
+
+```{r}
+dat <- second_arcsin_data
+by_trt <- dat %>%
+  group_by(Treatment) %>%
+  summarize(total_immob = sum(Immobile), total_n = sum(Total),
+            prop_immob = total_immob / total_n, .groups = "drop")
+print(by_trt)
+```
+
+##### Visual: proportion immobile by treatment (points with 95% binomial CI)
+
+```{r}
+ggplot(by_trt, aes(x = as.factor(Treatment), y = prop_immob)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = prop_immob - 1.96*sqrt(prop_immob*(1-prop_immob)/total_n),
+                    ymax = prop_immob + 1.96*sqrt(prop_immob*(1-prop_immob)/total_n)),
+                width = 0.2) +
+  theme_bw() +
+  labs(x = "Treatment", y = "Proportion immobile", title = "Quantal responses by treatment (separation visible)")
+```
+
+
+
+##### 2) Fit logistic GLM with Treatment as factor (expect huge SEs)
+
+```{r}
+m_glm_trt <- glm(cbind(Immobile, Total - Immobile) ~ Treatment,
+                 data = dat, family = binomial)
+summary(m_glm_trt)
+```
+
+### 3) Detect separation formally
+
+```{r}
+## sep <- brglm2::detect_separation(cbind(Immobile, Total - Immobile) ~ Treatment,
+##                                 data = dat, family = binomial("logit"))
+### 'brglm2::detect_separation' has been removed from 'brglm2' at version 0.8.0. A new version of 'brglm2::detect_separation' is now maintained in the 'detectseparation' package. 
+library(detectseparation)
+update(m_glm_trt,method="detect_separation")
+```
+
+This indicates which coefficients diverge (complete or quasi-complete separation).
+
+### 4) Bias-reduced (penalized) logistic to obtain finite, stable estimates
+
+```{r}
+library(brglm2)
+m_br_trt <- glm(cbind(Immobile, Total - Immobile) ~ Treatment,
+                          data = dat, family = binomial("logit"),method = "brglmFit",
+                          type = "AS_median")
+summary(m_br_trt)
+```
+
+
+
+```{r}
+sjPlot::tab_model(m_br_trt, m_glm_trt, transform = "exp", show.ci = TRUE)
+```
+
+Now we build a comparison table manually from coefficients and SEs
+- Extract coef/SE from brglm2::brglmFit and glm, compute z and p, then use sjPlot::tab_df (or knitr::kable) to display.
+
+```{r}
+library(dplyr)
+
+# From brglm2::brglmFit
+cf_br <- coef(m_br_trt)
+se_br <- sqrt(diag(vcov(m_br_trt)))
+z_br  <- cf_br / se_br
+p_br  <- 2 * pnorm(-abs(z_br))
+
+tab_br <- data.frame(
+  Model = "Bias-reduced (brglm2)",
+  Term  = names(cf_br),
+  Estimate = cf_br,
+  SE       = se_br,
+  z        = z_br,
+  p        = p_br,
+  OR       = exp(cf_br),
+  OR_low   = exp(cf_br - 1.96 * se_br),
+  OR_high  = exp(cf_br + 1.96 * se_br)
+)
+
+# From glm (MLE)
+cf_mle <- coef(m_glm_trt)
+se_mle <- sqrt(diag(vcov(m_glm_trt)))
+z_mle  <- cf_mle / se_mle
+p_mle  <- 2 * pnorm(-abs(z_mle))
+
+tab_mle <- data.frame(
+  Model = "GLM (MLE)",
+  Term  = names(cf_mle),
+  Estimate = cf_mle,
+  SE       = se_mle,
+  z        = z_mle,
+  p        = p_mle,
+  OR       = exp(cf_mle),
+  OR_low   = exp(cf_mle - 1.96 * se_mle),
+  OR_high  = exp(cf_mle + 1.96 * se_mle)
+)
+
+tab_both <- bind_rows(tab_br, tab_mle)
+```
+
+
+# Present with sjPlot::tab_df (or knitr::kable/gt/modelsummary)
+```{r}
+sjPlot::tab_df(tab_both, title = "Bias-reduced vs MLE logistic (Treatment model)")
+```
+
+Notes
+- Option 1 is simplest if you want sjPlot::tab_model output with consistent formatting.
+- Option 2 works regardless of model class and lets you show odds ratios and CIs even when sjPlot can’t handle the object.
+
+### 5) Plot fitted curves (classical GLM vs bias-reduced) over raw proportions
+### Aggregate proportions per dose for plotting
+```{r}
+agg <- dat %>% group_by(Dose) %>%
+  summarize(prop = sum(Immobile)/sum(Total), n = sum(Total), .groups = "drop")
+newd <- data.frame(Dose = sort(unique(dat$Dose)))
+newd$logdose <- log10(pmax(newd$Dose, 1e-6))
+newd$Treatment <- unique(dat$Treatment)
+newd$pred_glm <- plogis(predict(m_glm_trt, newdata = newd, type = "link"))
+newd$pred_br  <- plogis(predict(m_br_trt,  newdata = newd, type = "link"))
+
+ggplot(agg, aes(Dose, prop)) +
+  geom_point(size = 2) +
+  geom_line(data = newd, aes(Dose, pred_glm, color = "GLM (MLE)")) +
+  geom_line(data = newd, aes(Dose, pred_br,  color = "Bias-reduced (brglm2)"), linetype = "dashed") +
+  scale_color_manual(values = c("GLM (MLE)" = "#1f77b4", "Bias-reduced (brglm2)" = "#d62728")) +
+  theme_bw() +
+  labs(y = "Proportion immobile", color = "Fit",
+       title = "Dose–response logistic fits: MLE vs bias-reduced")
+```
+
+
+### Summary
+
+- Why separation occurs here
+  - Several treatments have 0 immobility in every replicate, while high dose has consistent immobility; the design perfectly (or quasi-perfectly) separates outcomes by treatment/dose.
+- Symptoms in GLM
+  - Warnings about fitted probabilities 0 or 1, huge standard errors, unstable or infinite estimates, and misleading p-values.
+- Remedies
+  - Bias-reduced/Firth logistic (brglm2, logistf) produces finite, stable estimates and CIs.
+  - Consider modeling dose as a numeric covariate (log-dose), but if overlap is absent, bias-reduction is still recommended.
+  - For extra-binomial variation, a beta-binomial or a binomial GLMM with an observation-level random effect can address overdispersion—but note: GLMMs do not "fix" separation by themselves; separation can persist in mixed models.
 
 
 

@@ -11,6 +11,8 @@ knitr::opts_chunk$set(
   # Provide a default, non-descriptive alt text.
   # This is better than no alt text, but it's highly recommended to
   # provide specific, descriptive alt text for each plot using fig.alt in the chunk options.
+  message = FALSE,
+  warning = FALSE,
   fig.alt = "A plot generated from an R code chunk."
 )
 

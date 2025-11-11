@@ -1,5 +1,7 @@
 ---
 title: "A Notes on Power"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -11,6 +13,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(drcHelper)
+library(dplyr)
 ```
 
 
@@ -104,39 +107,128 @@ library(PMCMRplus)
 ## Data set PlantGrowth
 ## Global test
 
-prelimPlot1(PlantGrowth %>% mutate(Dose=group,Response=weight))
+prelimPlot3(PlantGrowth %>% mutate(Dose=group,Response=weight))
 kruskalTest(weight ~ group, data = PlantGrowth)
-
-## Conover's many-one comparison test
-## single-step means p-value from multivariate t distribution
-ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
-                             p.adjust.method = "single-step")
-summary(ans)
-
-## Conover's many-one comparison test
-ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
-                             p.adjust.method = "holm")
-summary(ans)
-
-## Dunn's many-one comparison test
-ans <- kwManyOneDunnTest(weight ~ group, data = PlantGrowth,
-                             p.adjust.method = "holm")
-summary(ans)
-
-## Nemenyi's many-one comparison test
-ans <- kwManyOneNdwTest(weight ~ group, data = PlantGrowth,
-                        p.adjust.method = "holm")
-summary(ans)
-
-## Many one U test
-ans <- manyOneUTest(weight ~ group, data = PlantGrowth,
-                        p.adjust.method = "holm")
-summary(ans)
-
-## Chen Test
-ans <- chenTest(weight ~ group, data = PlantGrowth,
-                    p.adjust.method = "holm")
-summary(ans)
 ```
+The global test is significant (p < 0.05), so post-hoc tests are justified.
+
+```{r}
+# --- 2. Run All Requested Many-to-One Comparison Tests ---
+
+# We will suppress warnings about ties, as they are expected and handled by the functions.
+# Each function returns an object where the p-values are stored.
+
+# Conover's test with "single-step" adjustment (specific for many-to-one)
+ans_conover_ss <- suppressWarnings(
+  kwManyOneConoverTest(weight ~ group, data = PlantGrowth, p.adjust.method = "single-step")
+)
+
+# Conover's test with "holm" adjustment (general-purpose)
+ans_conover_holm <- suppressWarnings(
+  kwManyOneConoverTest(weight ~ group, data = PlantGrowth, p.adjust.method = "holm")
+)
+
+# Dunn's test with "holm" adjustment
+ans_dunn <- suppressWarnings(
+  kwManyOneDunnTest(weight ~ group, data = PlantGrowth, p.adjust.method = "holm")
+)
+
+# Nemenyi's test with "holm" adjustment
+ans_nemenyi <- suppressWarnings(
+  kwManyOneNdwTest(weight ~ group, data = PlantGrowth, p.adjust.method = "holm")
+)
+
+# Many-one U-test (based on Mann-Whitney U) with "holm" adjustment
+ans_utest <- suppressWarnings(
+  manyOneUTest(weight ~ group, data = PlantGrowth, p.adjust.method = "holm")
+)
+
+# Chen's test (for heteroscedastic data) with "holm" adjustment
+ans_chen <- suppressWarnings(
+  chenTest(weight ~ group, data = PlantGrowth, p.adjust.method = "holm")
+)
+
+
+# --- 3. Extract and Combine Results into a Single Table ---
+
+# Create a list of the result objects with descriptive names
+test_results <- list(
+  Conover_SingleStep = ans_conover_ss,
+  Conover_Holm = ans_conover_holm,
+  Dunn_Holm = ans_dunn,
+  Nemenyi_Holm = ans_nemenyi,
+  ManyOneU_Holm = ans_utest,
+  Chen_Holm = ans_chen
+)
+
+# Use `purrr::map` to iterate through the list, extracting p-values into data frames
+# `tibble::rownames_to_column` is used to turn the comparison names (e.g., "trt1") into a proper column.
+#p_value_list <- purrr::imap(test_results, ~ .x$p.value %>% 
+#                       as.data.frame() %>%
+#                      tibble::rownames_to_column("Comparison") %>%
+#                       rename(!!.y := ctrl)) # Rename the p-value column to the test name
+
+# Get the standard comparison group names from the data
+# This will be c("trt1", "trt2")
+comparison_levels <- setdiff(levels(PlantGrowth$group), "ctrl")
+
+# Create a list to store the cleaned data frames
+cleaned_p_value_list <- list()
+
+# Loop through each test result to extract p-values robustly
+# --- 2. THE CORRECTED EXTRACTION AND COMBINING LOGIC ---
+
+p_value_list <- purrr::imap(test_results, ~ {
+  # Start with a clean data frame with just the comparison names
+  df <- data.frame(Comparison = comparison_levels)
+  
+  # Extract the p-value matrix and get the value column name
+  p_matrix <- .x$p.value
+  p_col_name <- colnames(p_matrix)[1]
+
+  # --- This is the crucial fix ---
+  # Convert the p-value matrix to a data frame and use pull() to ensure 
+  # it becomes a simple vector, not a matrix-column.
+  p_vector <- as.data.frame(p_matrix) %>% 
+                pull(!!p_col_name)
+  
+  # Add the clean p-value vector to our data frame under the correct test name
+  df[[.y]] <- p_vector
+  
+  return(df)
+})
+
+# Use `purrr::reduce` to join all the cleaned data frames by the 'Comparison' column
+
+summary_table <- purrr::reduce(p_value_list, full_join, by = "Comparison")
+summary_table
+```
+
+
+```{r echo=FALSE}
+# --- 4. Display the Final Summary Table ---
+
+cat("=================================================================\n")
+cat("      Combined P-Values from Various Many-to-One Tests\n")
+cat("=================================================================\n")
+cat("Data: weight ~ group from PlantGrowth dataset\n")
+cat("Control group: 'ctrl'\n\n")
+# Explicitly round all numeric columns to a reasonable precision (e.g., 5 digits)
+# This removes the floating-point noise.
+cleaned_summary_table <- summary_table %>%
+  mutate(across(where(is.numeric), ~ round(.x, 5)))
+# --- The Definitive Fix ---
+# Instead of rounding to a number, we format to a string with 3 decimal places.
+# This creates clean character strings ("0.355", "0.216", "0.009", etc.)
+formatted_summary_table <- summary_table %>%
+  mutate(across(where(is.numeric), ~ sprintf("%.3f", .x)))
+# Now, kable's digit formatting will work as expected
+formatted_summary_table %>% 
+  knitr::kable(digits = 3)
+# print(summary_table)
+
+```
+
+- Note that `manyOneUTest` is a function that systematically performs a Wilcoxon/Mann-Whitney U test for each treatment versus control and then corrects the resulting p-values for multiple testing.
 
 

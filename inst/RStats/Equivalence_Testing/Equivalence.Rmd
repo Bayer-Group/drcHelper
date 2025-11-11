@@ -1,0 +1,663 @@
+---
+title: "Equivalence Testing Example"
+output:
+  word_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+
+## Purpose 
+
+This supplementary document provides example calculations following the EFSA bee guidance framework for non-inferiority testing, accompanied by R code that:
+
+1. **Demonstrates the statistical requirements** for one-sided α = 0.20 non-inferiority testing with a 10% reduction margin under log-normal assumptions with realistic variance (CV = 20%)
+
+2. **Computes confidence intervals** at multiple sample sizes to show when non-inferiority can or cannot be demonstrated for small observed effects (5% reduction)
+
+3. **Illustrates the sample size asymmetry** between:
+   - **Non-inferiority testing** (proving an effect is not meaningfully harmful) 
+   - **Difference testing** (detecting that an effect is significantly different from control)
+
+4. **Provides comprehensive sample size tables** comparing:
+   - **5% reduction scenario**: appropriate for non-inferiority testing to demonstrate NO meaningful harm (effect is within acceptable margin)
+   - **15% reduction scenario**: appropriate for difference testing to demonstrate significant harm exists
+   
+5. **Clarifies the distinction** between minimum sample sizes (which just meet the α criterion) and power-adjusted sample sizes (which ensure adequate statistical power for reliable conclusions)
+
+The analysis shows that under EFSA's lenient α = 0.20 framework, demonstrating non-inferiority for a 5% reduction still requires substantially larger samples (~77 per arm for 80% power) than conventional difference testing for a 15% reduction (~24 per arm). This reflects the fundamental statistical challenge: proving safety (ruling out harm beyond a margin) is more demanding than detecting harm.
+
+## Mapping between α and CIs
+
+- One-sided non-inferiority at level α against a −10% margin on a ratio scale is equivalent to requiring the lower bound of the two-sided CI at level 1 − 2α to exceed 0.90 (i.e., no more than 10% reduction).
+- With α = 0.2, that CI is two-sided 60%. So you're effectively checking the lower bound of a 60% CI against the 0.90 margin.
+
+
+Equivalence (non-inferiority) criterion: 
+Reject $H0: θ ≤ \ln(0.90)$  in favor of $H1: θ > \ln(0.90)$ 
+if  $L_{60\%\,CI}(θ) > \ln(0.90)$, 
+where $θ = \ln(\text{treated/control})$.
+
+
+—-- 
+
+## Worked example design and CIs under a log-normal assumption
+
+Assumptions (parameterized in code below):
+- Control mean = 20,000 organisms (e.g., colony size)
+- Treated mean = 5% reduction → 19,000; ratio = 0.95
+- Coefficient of variation (CV) = 20%
+- Log-normal model with equal CV across arms
+- Replicates per arm nC = nT (we'll explore n = 6, 12, 20)
+
+Mapping CV to the log scale:
+$$
+\sigma^2 = \ln(1+\text{CV}^2), \quad \sigma = \sqrt{\ln(1+\text{CV}^2)}.
+$$
+On the log scale, if X_C, X_T are normal with common variance σ^2, the standard error for the difference in means is:
+$$
+SE(\hat{\theta}) = \sigma \sqrt{\frac{1}{n_T} + \frac{1}{n_C}},\quad \hat{\theta} = \ln(0.95).
+$$
+
+Two-sided CI for θ at level 1 − 2α:
+$$
+\hat{\theta} \pm z_{1-\alpha}\, SE(\hat{\theta}),
+$$
+transform back with exp() to obtain the CI for the ratio treated/control. Compare the CI lower bound to 0.90.
+
+— 
+
+## R code to compute 60% and 95% CIs, and the sample size needed
+
+```{r}
+# Inputs
+mean_control <- 20000
+ratio_true    <- 0.95           # 5% reduction
+mean_treated  <- mean_control * ratio_true
+cv            <- 0.20           # 20% CV (on original scale)
+alpha_one_sided <- 0.20         # EFSA example for non-inferiority
+margin_ratio    <- 0.90         # 10% reduction margin
+
+# Helper: log-scale sigma from CV
+sigma_log <- sqrt(log(1 + cv^2))
+
+# CI function for the log ratio under equal-variance log-normal model
+ci_ratio_lognormal <- function(nC, nT, ratio_hat, sigma_log, conf_level_two_sided) {
+  theta_hat <- log(ratio_hat)
+  alpha_two_sided <- 1 - conf_level_two_sided
+  z <- qnorm(1 - alpha_two_sided/2)   # two-sided critical value
+  SE <- sigma_log * sqrt(1/nC + 1/nT)
+  lower <- exp(theta_hat - z * SE)
+  upper <- exp(theta_hat + z * SE)
+  c(lower = lower, upper = upper)
+}
+
+# Non-inferiority pass/fail at one-sided alpha (equivalently 2-sided CI with 1 - 2*alpha)
+noninferiority_pass <- function(nC, nT, ratio_hat, sigma_log, margin_ratio, alpha_one_sided) {
+  conf_two_sided <- 1 - 2*alpha_one_sided
+  ci <- ci_ratio_lognormal(nC, nT, ratio_hat, sigma_log, conf_two_sided)
+  list(pass = (ci["lower"] > margin_ratio),
+       ci_lower = ci["lower"],
+       ci_upper = ci["upper"],
+       conf_level = conf_two_sided)
+}
+
+# Sample size per arm required to pass non-inferiority (approximate, equal n)
+# Solve for n in: log(ratio_hat) - z * sigma * sqrt(2/n) > log(margin)
+sample_size_noninf_equal_n <- function(ratio_hat, margin_ratio, sigma_log, alpha_one_sided) {
+  z <- qnorm(1 - alpha_one_sided)     # one-sided
+  gap <- log(ratio_hat) - log(margin_ratio)  # must be positive to be feasible
+  if (gap <= 0) return(Inf)
+  n_per_arm <- ceiling( 2 * ( (z * sigma_log) / gap )^2 )
+  n_per_arm
+}
+
+# Demonstration for n = 6, 12, 20 per arm
+for (n in c(6, 12, 20)) {
+  ci60 <- ci_ratio_lognormal(n, n, ratio_true, sigma_log, conf_level_two_sided = 0.60)
+  ci95 <- ci_ratio_lognormal(n, n, ratio_true, sigma_log, conf_level_two_sided = 0.95)
+  res_noninf <- noninferiority_pass(n, n, ratio_true, sigma_log, margin_ratio, alpha_one_sided)
+  cat(sprintf("\n\n== nC = nT = %d ==\n\n", n))
+  cat(sprintf("60%% two-sided CI for ratio: [%.3f, %.3f]\n\n", ci60["lower"], ci60["upper"]))
+  cat(sprintf("95%% two-sided CI for ratio: [%.3f, %.3f]\n\n", ci95["lower"], ci95["upper"]))
+  cat(sprintf("Non-inferiority (one-sided alpha = %.1f, margin = %.2f): %s; lower=%.3f (two-sided CI level = %.0f%%)\n\n",
+              alpha_one_sided, margin_ratio, ifelse(res_noninf$pass, "PASS", "FAIL"),
+              res_noninf$ci_lower, 100*res_noninf$conf_level))
+}
+
+# What n per arm is needed (approximate) to PASS non-inferiority with alpha=0.2 (60% CI)?
+n_needed_60 <- sample_size_noninf_equal_n(ratio_true, margin_ratio, sigma_log, alpha_one_sided)
+# And with a more stringent 95% two-sided CI (equiv. alpha_one_sided = 0.025)?
+n_needed_95 <- sample_size_noninf_equal_n(ratio_true, margin_ratio, sigma_log, alpha_one_sided = 0.025)
+cat(sprintf("\n\nApproximate n per arm needed to pass at alpha=0.20 (60%% CI): %s\n\n", n_needed_60))
+cat(sprintf("Approximate n per arm needed to pass at ~95%% two-sided criterion: %s\n\n", n_needed_95))
+```
+
+The results show: 
+
+- With CV = 20% and an observed 5% reduction (ratio = 0.95), the 60% CI is still often too wide at modest n.
+- For example, with n = 6 per arm, the 60% CI lower bound is typically below 0.90, so non-inferiority (α = 0.2; margin = 10%) fails.
+- The approximate n per arm required to pass at α = 0.2 (60% CI) is about 20 (per arm) under these assumptions; at a 95% two-sided standard it exceeds 100 per arm. This illustrates that even with a lenient α, demonstrating "≤10% reduction" can be empirically challenging at realistic replication.
+
+
+Using a one-sided α = 0.2 non-inferiority test with a 10% reduction margin is equivalent to requiring the lower bound of a two-sided 60% CI for the treated/control ratio to exceed 0.90. Under a log-normal model with CV = 20% and modest replication, an observed 5% reduction (ratio = 0.95) typically fails this test unless n ≈ 20 per group or larger; at conventional 95% CI levels the replication burden is substantially higher.
+
+This example highlights that the prescribed α and margin may not be empirically verifiable under typical variance and replication, motivating feasibility assessment alongside methodological selection.
+
+# Comparing Difference Test and Equivalence Test
+
+## Considering alpha only vs Real Power
+
+**Original formula (gives ~20):** Only ensures the test *can* reject H0 at α level when data are exactly as expected, but doesn't specify power:
+
+$$n = 2 \left(\frac{z_\alpha \cdot \sigma}{\delta}\right)^2$$
+
+**Corrected formula (gives ~77):** Includes power specification (standard for sample size calculations):
+
+$$n = 2 \left(\frac{(z_\alpha + z_\beta) \cdot \sigma}{\delta}\right)^2$$
+
+where:
+- $z_\alpha = \text{qnorm}(1-\alpha)$ for one-sided test
+- $z_\beta = \text{qnorm}(\text{power})$ 
+- $\delta = \ln(0.95) - \ln(0.90) \approx 0.0541$
+
+For α = 0.20, power = 0.80:
+- $z_{0.20} \approx 0.842$
+- $z_{0.80} \approx 0.842$
+- Without power: $n = 2 \times (0.842 \times 0.198 / 0.0541)^2 \approx 19$
+- With power: $n = 2 \times (1.684 \times 0.198 / 0.0541)^2 \approx 76$
+
+
+## Summary of Design and Key Results
+
+### Study Design
+**Model**: Log-normal with equal variance; CV = 20%; equal sample sizes per arm  
+**Scenarios**: 
+- **5% reduction** (ratio = 0.95): goal is to demonstrate NO meaningful harm (non-inferiority)
+- **15% reduction** (ratio = 0.85): goal is to detect significant harm (difference test)
+
+**Non-inferiority margin**: 10% (ratio ≥ 0.90)  
+**Test types**: One-sided non-inferiority (α = 0.05 or 0.20) vs. two-sided difference test (α = 0.05 or 0.20)
+
+---
+
+### Key Findings
+
+#### 1. **5% Reduction Scenario** (proving safety)
+**Appropriate test**: Non-inferiority  
+
+| Alpha | Power | n per arm | Total n | Notes |
+|-------|-------|-----------|---------|-------|
+| **0.20** (EFSA) | 80% | **77** | **154** | **Recommended for EFSA compliance** |
+| 0.20 (EFSA) | 90% | 121 | 242 | Higher confidence |
+| 0.05 (stringent) | 80% | 166 | 332 | 2.2× more samples than EFSA |
+
+**Minimum n (no power)**: 20 per arm (just meets α = 0.20 criterion)
+
+#### 2. **15% Reduction Scenario** (detecting harm)
+**Appropriate test**: Difference test  
+
+| Alpha | Power | n per arm | Total n | Notes |
+|-------|-------|-----------|---------|-------|
+| **0.05** | **80%** | **24** | **48** | **Conventional approach** |
+| 0.05 | 90% | 32 | 64 | Higher confidence |
+| 0.20 | 80% | 14 | 28 | More lenient alternative |
+
+**Minimum n (no power)**: 12 per arm (α = 0.05)
+
+---
+
+### Critical Comparisons
+
+**1. Non-inferiority vs. Difference Testing**  
+- Proving safety (5%, non-inferiority, α=0.20): **77 per arm**  
+- Detecting harm (15%, difference test, α=0.05): **24 per arm**  
+- **Non-inferiority requires 3.2× more samples** despite more lenient α
+
+**2. Impact of Alpha Level** (for non-inferiority, 5% reduction, 80% power)  
+- α = 0.20 (EFSA): **77 per arm**  
+- α = 0.05 (stringent): **166 per arm**  
+- **Reducing α from 0.20→0.05 increases sample size by 116%**
+
+**3. Minimum vs. Power-adjusted Sample Sizes**  
+- **Minimum n** (just meets α criterion): typically 25-35% of power-adjusted n
+- **Power-adjusted n** (ensures 80% power): recommended for proper study design
+- For EFSA framework: minimum n = 20, but **n = 77 needed for 80% power**
+
+
+
+### Practical Implications
+
+-**EFSA framework (α=0.20, one-sided, 10% margin)** is more lenient than conventional testing  
+-**But still demanding**: requires ~75-80 colonies per arm for 80% power with CV=20%  
+-**Proving safety is harder than detecting harm**: non-inferiority needs 3-4× more samples than difference testing  
+-**Minimum sample sizes (no power)** are inadequate—power-adjusted calculations essential  
+-**Higher CV or narrower margins** would increase sample size requirements further
+
+**Overall conculusion**: Field studies should be designed with n≈75-100 per arm minimum to reliably demonstrate non-inferiority under EFSA guidance when CV=20% and true effect is ≤5%.
+
+
+## R Code and Result Table
+
+<!---```{r echo=FALSE,results='asis'} --->
+```{r echo=TRUE,results='hide'}
+# ============================================================================
+# EFSA Bee Guidance: Non-inferiority vs. Difference Testing
+# COMPLETE VERSION: Minimum vs. Power-adjusted sample sizes for both test types
+# ============================================================================
+
+library(knitr)
+
+# ============================================================================
+# INPUT PARAMETERS
+# ============================================================================
+mean_control <- 20000
+cv            <- 0.20           # 20% CV (on original scale)
+margin_ratio    <- 0.90         # 10% reduction margin
+
+# Helper: log-scale sigma from CV
+sigma_log <- sqrt(log(1 + cv^2))
+
+cat(sprintf("\nLog-scale sigma: %.4f (CV = %.0f%%)\n\n", sigma_log, cv*100))
+cat(sprintf("Margin on log scale: ln(0.90) = %.4f\n\n", log(margin_ratio)))
+cat(sprintf("Effect (5%% reduction) on log scale: ln(0.95) = %.4f\n\n", log(0.95)))
+cat(sprintf("Gap for non-inferiority: %.4f\n\n", log(0.95) - log(margin_ratio)))
+
+# ============================================================================
+# CI FUNCTION FOR LOG RATIO (LOG-NORMAL MODEL)
+# ============================================================================
+ci_ratio_lognormal <- function(nC, nT, ratio_hat, sigma_log, conf_level_two_sided) {
+  theta_hat <- log(ratio_hat)
+  alpha_two_sided <- 1 - conf_level_two_sided
+  z <- qnorm(1 - alpha_two_sided/2)   # two-sided critical value
+  SE <- sigma_log * sqrt(1/nC + 1/nT)
+  lower <- exp(theta_hat - z * SE)
+  upper <- exp(theta_hat + z * SE)
+  c(lower = lower, upper = upper)
+}
+
+# ============================================================================
+# NON-INFERIORITY TEST (ONE-SIDED α)
+# ============================================================================
+noninferiority_pass <- function(nC, nT, ratio_hat, sigma_log, margin_ratio, alpha_one_sided) {
+  conf_two_sided <- 1 - 2*alpha_one_sided
+  ci <- ci_ratio_lognormal(nC, nT, ratio_hat, sigma_log, conf_two_sided)
+  list(pass = (ci["lower"] > margin_ratio),
+       ci_lower = ci["lower"],
+       ci_upper = ci["upper"],
+       conf_level = conf_two_sided)
+}
+
+# ============================================================================
+# DIFFERENCE TEST (TWO-SIDED)
+# ============================================================================
+difference_test <- function(nC, nT, ratio_hat, sigma_log, alpha_two_sided = 0.05) {
+  theta_hat <- log(ratio_hat)
+  SE <- sigma_log * sqrt(1/nC + 1/nT)
+  z_stat <- theta_hat / SE
+  p_value <- 2 * pnorm(-abs(z_stat))  # two-sided p-value
+  reject <- p_value < alpha_two_sided
+  
+  ci <- ci_ratio_lognormal(nC, nT, ratio_hat, sigma_log, 1 - alpha_two_sided)
+  
+  list(reject = reject,
+       p_value = p_value,
+       z_stat = z_stat,
+       ci_lower = ci["lower"],
+       ci_upper = ci["upper"])
+}
+
+# ============================================================================
+# SAMPLE SIZE FOR NON-INFERIORITY - VERSION 1: MINIMUM (NO POWER)
+# This gives the MINIMUM n where the test CAN reject at α level if data = expectation
+# Formula: n = 2 * (z_α * σ / δ)²
+# ============================================================================
+sample_size_noninf_minimum <- function(ratio_hat, margin_ratio, sigma_log, alpha_one_sided) {
+  z_alpha <- qnorm(1 - alpha_one_sided)     # one-sided
+  gap <- log(ratio_hat) - log(margin_ratio)  # must be positive to be feasible
+  if (gap <= 0) return(Inf)
+  n_per_arm <- ceiling( 2 * ( (z_alpha * sigma_log) / gap )^2 )
+  n_per_arm
+}
+
+# ============================================================================
+# SAMPLE SIZE FOR NON-INFERIORITY - VERSION 2: WITH POWER
+# This is the STANDARD formula for proper study design
+# Formula: n = 2 * ((z_α + z_β) * σ / δ)²
+# ============================================================================
+sample_size_noninf_with_power <- function(ratio_hat, margin_ratio, sigma_log, alpha_one_sided, power = 0.80) {
+  z_alpha <- qnorm(1 - alpha_one_sided)     # one-sided
+  z_beta <- qnorm(power)
+  gap <- log(ratio_hat) - log(margin_ratio)  # must be positive to be feasible
+  if (gap <= 0) return(Inf)
+  n_per_arm <- ceiling( 2 * ( ((z_alpha + z_beta) * sigma_log) / gap )^2 )
+  n_per_arm
+}
+
+# ============================================================================
+# SAMPLE SIZE FOR DIFFERENCE TEST - VERSION 1: MINIMUM (NO POWER)
+# This gives the MINIMUM n where the test CAN reject at α level if data = expectation
+# Formula: n = 2 * (z_{α/2} * σ / |effect|)²
+# ============================================================================
+sample_size_diff_minimum <- function(ratio_hat, sigma_log, alpha_two_sided = 0.05) {
+  z_alpha <- qnorm(1 - alpha_two_sided/2)   # two-sided
+  effect <- abs(log(ratio_hat))  # effect size on log scale
+  if (effect <= 0) return(Inf)
+  n_per_arm <- ceiling( 2 * ( (z_alpha * sigma_log) / effect )^2 )
+  n_per_arm
+}
+
+# ============================================================================
+# SAMPLE SIZE FOR DIFFERENCE TEST - VERSION 2: WITH POWER
+# This is the STANDARD formula for proper study design
+# Formula: n = 2 * ((z_{α/2} + z_β) * σ / |effect|)²
+# ============================================================================
+sample_size_diff_with_power <- function(ratio_hat, sigma_log, alpha_two_sided = 0.05, power = 0.80) {
+  z_alpha <- qnorm(1 - alpha_two_sided/2)   # two-sided
+  z_beta <- qnorm(power)
+  effect <- abs(log(ratio_hat))  # effect size on log scale
+  if (effect <= 0) return(Inf)
+  n_per_arm <- ceiling( 2 * ( ((z_alpha + z_beta) * sigma_log) / effect )^2 )
+  n_per_arm
+}
+
+# ============================================================================
+# DEMONSTRATION: 5% REDUCTION (ratio = 0.95)
+# ============================================================================
+cat("\n\n")
+cat("============================================================\n\n")
+cat("SCENARIO 1: 5% REDUCTION (ratio = 0.95)\n\n")
+cat("Goal: Show NO meaningful difference from control\n\n")
+cat("============================================================\n\n")
+
+ratio_5pct <- 0.95
+
+for (n in c(6, 12, 20, 30, 40, 80)) {
+  ci60 <- ci_ratio_lognormal(n, n, ratio_5pct, sigma_log, conf_level_two_sided = 0.60)
+  ci90 <- ci_ratio_lognormal(n, n, ratio_5pct, sigma_log, conf_level_two_sided = 0.90)
+  ci95 <- ci_ratio_lognormal(n, n, ratio_5pct, sigma_log, conf_level_two_sided = 0.95)
+  
+  res_noninf_20 <- noninferiority_pass(n, n, ratio_5pct, sigma_log, margin_ratio, alpha_one_sided = 0.20)
+  res_noninf_05 <- noninferiority_pass(n, n, ratio_5pct, sigma_log, margin_ratio, alpha_one_sided = 0.05)
+  res_diff_05 <- difference_test(n, n, ratio_5pct, sigma_log, alpha_two_sided = 0.05)
+  res_diff_20 <- difference_test(n, n, ratio_5pct, sigma_log, alpha_two_sided = 0.20)
+  
+  cat(sprintf("n = %d per arm:\n", n))
+  cat(sprintf("  Non-inferiority α=0.20 (60%% CI): %s | Lower=%.3f vs margin=%.2f\n",
+              ifelse(res_noninf_20$pass, "PASS  ", "FAIL  "),
+              res_noninf_20$ci_lower, margin_ratio))
+  cat(sprintf("  Non-inferiority α=0.05 (90%% CI): %s | Lower=%.3f vs margin=%.2f\n\n",
+              ifelse(res_noninf_05$pass, "PASS  ", "FAIL  "),
+              res_noninf_05$ci_lower, margin_ratio))
+  cat(sprintf("  Difference test α=0.05 (95%% CI): %s | p=%.3f | CI=[%.3f, %.3f]\n\n",
+              ifelse(res_diff_05$reject, "REJECT", "ACCEPT"),
+              res_diff_05$p_value, res_diff_05$ci_lower, res_diff_05$ci_upper))
+  cat(sprintf("  Difference test α=0.20 (80%% CI): %s | p=%.3f | CI=[%.3f, %.3f]\n\n",
+              ifelse(res_diff_20$reject, "REJECT", "ACCEPT"),
+              res_diff_20$p_value, res_diff_20$ci_lower, res_diff_20$ci_upper))
+  cat("\n\n")
+}
+
+# ============================================================================
+# DEMONSTRATION: 15% REDUCTION (ratio = 0.85)
+# ============================================================================
+cat("\n\n")
+cat("==============================================================\n\n")
+cat("SCENARIO 2: 15% REDUCTION (ratio = 0.85)\n\n")
+cat("Goal: Show meaningful difference from control\n\n")
+cat("==============================================================\n\n")
+
+ratio_15pct <- 0.85
+
+for (n in c(6, 12, 20, 30)) {
+  ci60 <- ci_ratio_lognormal(n, n, ratio_15pct, sigma_log, conf_level_two_sided = 0.60)
+  ci90 <- ci_ratio_lognormal(n, n, ratio_15pct, sigma_log, conf_level_two_sided = 0.90)
+  ci95 <- ci_ratio_lognormal(n, n, ratio_15pct, sigma_log, conf_level_two_sided = 0.95)
+  
+  res_noninf_20 <- noninferiority_pass(n, n, ratio_15pct, sigma_log, margin_ratio, alpha_one_sided = 0.20)
+  res_noninf_05 <- noninferiority_pass(n, n, ratio_15pct, sigma_log, margin_ratio, alpha_one_sided = 0.05)
+  res_diff_05 <- difference_test(n, n, ratio_15pct, sigma_log, alpha_two_sided = 0.05)
+  res_diff_20 <- difference_test(n, n, ratio_15pct, sigma_log, alpha_two_sided = 0.20)
+  
+  cat(sprintf("n = %d per arm:\n\n", n))
+  cat(sprintf("  Non-inferiority α=0.20 (60%% CI): %s | Lower=%.3f vs margin=%.2f\n\n",
+              ifelse(res_noninf_20$pass, "PASS  ", "FAIL  "),
+              res_noninf_20$ci_lower, margin_ratio))
+  cat(sprintf("  Non-inferiority α=0.05 (90%% CI): %s | Lower=%.3f vs margin=%.2f\n\n",
+              ifelse(res_noninf_05$pass, "PASS  ", "FAIL  "),
+              res_noninf_05$ci_lower, margin_ratio))
+  cat(sprintf("  Difference test α=0.05 (95%% CI): %s | p=%.3f | CI=[%.3f, %.3f]\n\n",
+              ifelse(res_diff_05$reject, "REJECT", "ACCEPT"),
+              res_diff_05$p_value, res_diff_05$ci_lower, res_diff_05$ci_upper))
+  cat(sprintf("  Difference test α=0.20 (80%% CI): %s | p=%.3f | CI=[%.3f, %.3f]\n\n",
+              ifelse(res_diff_20$reject, "REJECT", "ACCEPT"),
+              res_diff_20$p_value, res_diff_20$ci_lower, res_diff_20$ci_upper))
+  cat("\n\n")
+}
+
+# ============================================================================
+# COMPREHENSIVE SAMPLE SIZE COMPARISON TABLE
+# ============================================================================
+cat("\n\n")
+cat("==============================================================\n\n")
+cat("COMPREHENSIVE SAMPLE SIZE COMPARISON\n\n")
+cat("Minimum n: Uses only z_α (just meets significance criterion)\n\n")
+cat("Power-adjusted n: Uses z_α + z_β (ensures specified power)\n\n")
+cat("==============================================================\n\n")
+
+# Calculate required sample sizes for 5% reduction
+# NON-INFERIORITY
+n_noninf_5pct_a20_min <- sample_size_noninf_minimum(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.20)
+n_noninf_5pct_a05_min <- sample_size_noninf_minimum(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.05)
+
+n_noninf_5pct_a20_80 <- sample_size_noninf_with_power(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.20, power = 0.80)
+n_noninf_5pct_a20_90 <- sample_size_noninf_with_power(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.20, power = 0.90)
+n_noninf_5pct_a05_80 <- sample_size_noninf_with_power(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.05, power = 0.80)
+n_noninf_5pct_a05_90 <- sample_size_noninf_with_power(ratio_5pct, margin_ratio, sigma_log, alpha_one_sided = 0.05, power = 0.90)
+
+# DIFFERENCE TEST (5%)
+n_diff_5pct_a05_min <- sample_size_diff_minimum(ratio_5pct, sigma_log, alpha_two_sided = 0.05)
+n_diff_5pct_a20_min <- sample_size_diff_minimum(ratio_5pct, sigma_log, alpha_two_sided = 0.20)
+
+n_diff_5pct_a05_80 <- sample_size_diff_with_power(ratio_5pct, sigma_log, alpha_two_sided = 0.05, power = 0.80)
+n_diff_5pct_a20_80 <- sample_size_diff_with_power(ratio_5pct, sigma_log, alpha_two_sided = 0.20, power = 0.80)
+
+# Calculate required sample sizes for 15% reduction
+# DIFFERENCE TEST (15%)
+n_diff_15pct_a05_min <- sample_size_diff_minimum(ratio_15pct, sigma_log, alpha_two_sided = 0.05)
+n_diff_15pct_a20_min <- sample_size_diff_minimum(ratio_15pct, sigma_log, alpha_two_sided = 0.20)
+
+n_diff_15pct_a05_80 <- sample_size_diff_with_power(ratio_15pct, sigma_log, alpha_two_sided = 0.05, power = 0.80)
+n_diff_15pct_a05_90 <- sample_size_diff_with_power(ratio_15pct, sigma_log, alpha_two_sided = 0.05, power = 0.90)
+n_diff_15pct_a20_80 <- sample_size_diff_with_power(ratio_15pct, sigma_log, alpha_two_sided = 0.20, power = 0.80)
+n_diff_15pct_a20_90 <- sample_size_diff_with_power(ratio_15pct, sigma_log, alpha_two_sided = 0.20, power = 0.90)
+
+# Create comprehensive comparison table
+comparison_table <- data.frame(
+  Scenario = c(
+    # 5% reduction - Non-inferiority tests (MINIMUM)
+    "5% reduction",
+    "5% reduction",
+    # 5% reduction - Non-inferiority tests (WITH POWER)
+    "5% reduction",
+    "5% reduction",
+    "5% reduction",
+    "5% reduction",
+    # 5% reduction - Difference tests (MINIMUM)
+    "5% reduction",
+    "5% reduction",
+    # 5% reduction - Difference tests (WITH POWER)
+    "5% reduction",
+    "5% reduction",
+    # 15% reduction - Difference tests (MINIMUM)
+    "15% reduction",
+    "15% reduction",
+    # 15% reduction - Difference tests (WITH POWER)
+    "15% reduction",
+    "15% reduction",
+    "15% reduction",
+    "15% reduction"
+  ),
+  
+  Objective = c(
+    "Show NO meaningful harm",
+    "Show NO meaningful harm",
+    "Show NO meaningful harm",
+    "Show NO meaningful harm",
+    "Show NO meaningful harm",
+    "Show NO meaningful harm",
+    "Detect difference (wrong goal)",
+    "Detect difference (wrong goal)",
+    "Detect difference (wrong goal)",
+    "Detect difference (wrong goal)",
+    "Detect significant harm",
+    "Detect significant harm",
+    "Detect significant harm",
+    "Detect significant harm",
+    "Detect significant harm",
+    "Detect significant harm"
+  ),
+  
+  Test_Type = c(
+    "Non-inferiority",
+    "Non-inferiority",
+    "Non-inferiority",
+    "Non-inferiority",
+    "Non-inferiority",
+    "Non-inferiority",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test",
+    "Difference test"
+  ),
+  
+  Alpha = c(
+    "α=0.20 (one-sided)",
+    "α=0.05 (one-sided)",
+    "α=0.20 (one-sided)",
+    "α=0.20 (one-sided)",
+    "α=0.05 (one-sided)",
+    "α=0.05 (one-sided)",
+    "α=0.05 (two-sided)",
+    "α=0.20 (two-sided)",
+    "α=0.05 (two-sided)",
+    "α=0.20 (two-sided)",
+    "α=0.05 (two-sided)",
+    "α=0.20 (two-sided)",
+    "α=0.05 (two-sided)",
+    "α=0.05 (two-sided)",
+    "α=0.20 (two-sided)",
+    "α=0.20 (two-sided)"
+  ),
+  
+  CI_Level = c(
+    "60%",
+    "90%",
+    "60%",
+    "60%",
+    "90%",
+    "90%",
+    "95%",
+    "80%",
+    "95%",
+    "80%",
+    "95%",
+    "80%",
+    "95%",
+    "95%",
+    "80%",
+    "80%"
+  ),
+  
+  Power = c(
+    "—",
+    "—",
+    "80%",
+    "90%",
+    "80%",
+    "90%",
+    "—",
+    "—",
+    "80%",
+    "80%",
+    "—",
+    "—",
+    "80%",
+    "90%",
+    "80%",
+    "90%"
+  ),
+  
+  n_per_arm = c(
+    n_noninf_5pct_a20_min,
+    n_noninf_5pct_a05_min,
+    n_noninf_5pct_a20_80,
+    n_noninf_5pct_a20_90,
+    n_noninf_5pct_a05_80,
+    n_noninf_5pct_a05_90,
+    n_diff_5pct_a05_min,
+    n_diff_5pct_a20_min,
+    n_diff_5pct_a05_80,
+    n_diff_5pct_a20_80,
+    n_diff_15pct_a05_min,
+    n_diff_15pct_a20_min,
+    n_diff_15pct_a05_80,
+    n_diff_15pct_a05_90,
+    n_diff_15pct_a20_80,
+    n_diff_15pct_a20_90
+  ),
+  
+  Total_n = c(
+    2*n_noninf_5pct_a20_min,
+    2*n_noninf_5pct_a05_min,
+    2*n_noninf_5pct_a20_80,
+    2*n_noninf_5pct_a20_90,
+    2*n_noninf_5pct_a05_80,
+    2*n_noninf_5pct_a05_90,
+    2*n_diff_5pct_a05_min,
+    2*n_diff_5pct_a20_min,
+    2*n_diff_5pct_a05_80,
+    2*n_diff_5pct_a20_80,
+    2*n_diff_15pct_a05_min,
+    2*n_diff_15pct_a20_min,
+    2*n_diff_15pct_a05_80,
+    2*n_diff_15pct_a05_90,
+    2*n_diff_15pct_a20_80,
+    2*n_diff_15pct_a20_90
+  ),
+  
+  Notes = c(
+    "Minimum n (EFSA α)",
+    "Minimum n (stringent α)",
+    "EFSA recommended",
+    "EFSA + high power",
+    "Stringent α",
+    "Stringent α + power",
+    "Minimum n (conventional)",
+    "Minimum n (lenient)",
+    "Inappropriate test",
+    "Inappropriate test",
+    "Minimum n (conventional)",
+    "Minimum n (lenient)",
+    "Conventional approach",
+    "Conventional + high power",
+    "More lenient",
+    "More lenient + power"
+  )
+)
+```
+
+
+```{r}
+
+knitr::kable(comparison_table,booktabs=TRUE) ##|> kableExtra::kable_classic()
+```
+
+
