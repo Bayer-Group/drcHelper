@@ -18,7 +18,7 @@ response_fn <- function(dose, max_effect) {
   rep(100, length(dose))
 }
 # Generate data
-sim_data <- simulate_dose_response(
+sim_data <- drcHelper::simulate_dose_response(
   n_doses = 5,
   dose_range = c(0,20),
   m_tanks = 4,
@@ -41,7 +41,16 @@ ggplot(sim_data, aes(x = factor(Dose), y = Response, color = factor(Tank))) +
        color = "Tank") +
   theme_bw()+theme(legend.position = "bottom")+ggthemes::scale_color_solarized()
 ggsave("~/Projects/drcHelper/inst/RStats/sim7/LMM_typeIerror.png",dpi=300, width = 6,height =5)
-
+source("inst/RStats/RStats_Sim_Engine.R")
+source("inst/RStats/RStats_wrapper_tests.R")
+library(lme4)
+## Treating "Tank" as block effect!!
+sim_data <- sim_data |> dplyr::mutate(Dose = factor(Dose),Tank =factor(Tank))
+res_error <- lmer(Response~Dose+(1|Tank),sim_data)
+library(multcomp)
+summary(glht(res_error,linfct = mcp(Dose="Dunnett")))
+## Treating it as random effect
 result <- lmm_dunnett_homo(sim_data)
+result
 saveRDS(sim_data,"example_type1error_data.rds")
 if(any(result$significant)) print("stop")

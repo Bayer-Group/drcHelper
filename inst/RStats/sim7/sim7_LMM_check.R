@@ -1,3 +1,5 @@
+## If applied wrongly to include Tank as block effect!
+
 setwd("~/Projects/drcHelper/inst/RStats/sim7/")
 library(parallel)
 library(doParallel)
