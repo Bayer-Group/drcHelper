@@ -1,6 +1,10 @@
 Package: drcHelper
 Title: Collection and verification of helper functions for dose-response analysis
+<<<<<<< HEAD
 Version: 0.0.4.9000
+=======
+Version: 0.0.5
+>>>>>>> 8ba481ada1f40737b2949b25a8537ebabb1019a2
 Authors@R: c(
     person("Zhenglei", "Gao",  email="zhenglei.gao@bayer.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4042-310X")),
@@ -9,19 +13,20 @@ Description: Helper functions for drc package and other dose-response analysis f
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     knitr,
     rmarkdown,
     Iso,
     plyr,
     tidyr,
-    drcData,
+    MCPMod,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
     drc,
+    drcData,
     R (>= 2.10)
 LazyData: true
 URL: https://bayer-group.github.io/drcHelper/index.html
@@ -50,3 +55,4 @@ Remotes:
     DoseResponse/bmd@a3bd9c6113e35d43e0990614469dabb10cd409bd,
     DoseResponse/drc,
     DoseResponse/drcData
+Config/Needs/website: rmarkdown

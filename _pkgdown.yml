@@ -15,12 +15,12 @@ repo:
 news:
   cran_dates: yes
 development:
-  mode: auto
+  mode: release  # Change from 'auto' to 'release' sot that the articles are always built to /docs/ instead of /docs/dev/, making your current navigation URLs work correctly.
   version_label: default
 authors:
   before: We define *authors* as those who are actively maintaining the code base,
     and *contributors* as those who made a significant contribution in the past. For
-    all acknowledgements, see the section in the [Home Page](https://bayer-group.github.io/drcHelper/index.html).
+    all acknowledgements, see the section in the [Home Page](https://bayer-group.github.io/drcHelper).
   footer:
     roles:
     - aut
@@ -50,8 +50,6 @@ navbar:
       menu:
       - text: Introduction
         href: articles/Introduction.html
-      - text: Example Analysis Workflow
-        href: articles/Example_Analysis_Workflow.html
       - text: Example ECx Helper Functions Usage
         href: articles/drcHelper.html
       - text: Example NOEC Helper Functions Usage
@@ -78,40 +76,58 @@ navbar:
         href: articles/Trend-Testing.html
       - text: NOEC ECx and BMD
         href: articles/NOEC_ECx_BMD.html
+      - text: MDD in Regulatory Context
+        href: articles/MDD-in-Regulatory-Context.html
     articles:
       text: Articles
       menu:
-      - text: Quantal Data
+      - text: Core Statistical Methods Overview
+        href: articles/core_statistical_methods.html
+      - text: Quantal Data Analysis
         href: articles/Quantal-Data.html
-      - text: Ordinal Data
+      - text: Ordinal Data Analysis
         href: articles/Ordinal-Data.html
-      - text: Count Data
+      - text: Count Data Analysis
         href: articles/Count_Data.html
-      - text: Understanding Mixed Models
+      - text: LMM, GLMM, and GAMM Models
         href: articles/LMM-GLMM-and-GAMM.html
-      - text: Normality Check
+      - text: "-------------"
+      - text: Advanced Topics Overview
+        href: articles/advanced_topics.html
+      - text: Normality Checks
         href: articles/Normality-Check.html
-      - text: Extra Binomial Variance and Trend Test
+      - text: Binomial Extra Variance
         href: articles/Binomial_Extra_Variance.html
-      - text: -------
-      - text: More Topics
-      - text: NLS
+      - text: Equivalence Testing
+        href: articles/Equivalence-Testing.html
+      - text: "-------------"
+      - text: Alternative Methods Overview
+        href: articles/alternative_methods.html
+      - text: NLS Examples
         href: articles/Examples using NLS.html
-      - text: drda
+      - text: DRDA Examples
         href: articles/Examples_using_drda.html
-      - text: TSK method
+      - text: TSK Method
         href: articles/TSK_method.html
       - text: MQJT
         href: articles/MQJT.html
-      - text: Fitting A biphasic dose response model
+      - text: Biphasic Dose Response Models
         href: articles/Advanced_Fitting-a-biphasic-dose-reponse-model.html
     validation:
       text: Validation
       menu:
       - text: System Testing
         href: articles/System_Testing.html
+      - text: ED Calculation Consistency
+        href: articles/val_ED_plus.html
+      - text: TSK and Probit Model
+        href: articles/TSK-and-Probit-Models.html
       - text: Which JT test to use
         href: articles/Verification_which_JT.html
+      - text: Verification of CA test
+        href: articles/Verification_CA_test.html
+      - text: Validation of MCP tests
+        href: articles/Validation_MCP_tests.html
       - text: Study Types and Templates
         href: articles/Test-Guidelines.html
     newissue:
@@ -119,3 +135,77 @@ navbar:
       href: https://github.com/Bayer-Group/drcHelper/issues/new?template=Blank+issue
       aria-label: New Issue
 
+# Article index page section organization
+articles:
+  - title: "Get Started"
+    desc: >
+      Introduction to the package and basic usage
+    contents:
+      - Introduction
+      - drcHelper
+      - Dunnetts_Test_for_Data_with_Hierarchical_Structure
+      - Example_Analysis_Workflow
+
+  - title: "Core Statistical Methods"
+    desc: >
+      These articles cover the foundational statistical methods implemented in drcHelper
+    contents:
+      - core_statistical_methods
+      - articles/Quantal-Data
+      - articles/Ordinal-Data
+      - articles/Count_Data
+      - articles/LMM-GLMM-and-GAMM
+
+  - title: "Advanced Topics"
+    desc: >
+      These articles cover more advanced statistical concepts and techniques
+    contents:
+      - advanced_topics
+      - articles/Normality-Check
+      - articles/Binomial_Extra_Variance
+      - articles/Equivalence-Testing
+      - articles/A-Notes-on-Power
+
+  - title: "Alternative Methods"
+    desc: >
+      These articles explore alternative statistical methods and approaches
+    contents:
+      - alternative_methods
+      - "articles/Examples using NLS"
+      - articles/Examples_using_drda
+      - articles/TSK_method
+      - articles/MQJT
+      - articles/Advanced_Fitting-a-biphasic-dose-reponse-model
+
+  - title: "Regulatory Statistics"
+    desc: >
+      Statistical methods for regulatory assessments
+    contents:
+      - articles/NOEC_Methods
+      - articles/Limit-Test
+      - articles/EFSA-Criteria
+      - articles/Example_RSCABS
+      - articles/Trend-Testing
+      - articles/NOEC_ECx_BMD
+      - articles/OECD_ED_Assays
+      - articles/Test-Guidelines
+      - articles/MDD-in-Regulatory-Context
+
+  - title: "Validation"
+    desc: >
+      Validation of statistical methods in the package
+    contents:
+      - articles/System_Testing
+      - articles/val_ED_plus
+      - articles/TSK-and-Probit-Models
+      - articles/Verification_which_JT
+      - articles/Validation_MCP_tests
+      - articles/Verification_CA_test
+      - articles/Verification-of-Williams-Test
+
+  - title: "Examples"
+    desc: >
+      Example applications of the package
+    contents:
+      - articles/Examples_drc
+      - articles/Examples_oecd201

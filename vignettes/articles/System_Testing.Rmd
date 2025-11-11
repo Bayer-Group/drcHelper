@@ -6,6 +6,15 @@ date: December 4, 2024
 author: "Zhenglei Gao"
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+source("../knitr-setup.R")
+```
 
 ## Purpose of Testing
 

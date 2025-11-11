@@ -168,6 +168,8 @@ This workflow will only run when working with release branches, not during norma
 
 ## Contribution Notes
 
+- If a code space is used, Use 'postCreateCommand' to run commands after the container is created. It is rather fast. 
+     `"postCreateCommand": "R -q -e 'install.packages("tidyverse")'"`,
 - Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the `gh pr create` command. 
 
 ```

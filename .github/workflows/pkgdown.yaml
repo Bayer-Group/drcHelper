@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [dev]
+    branches: [main, dev]
   pull_request:
   release:
     types: [published]
@@ -33,12 +33,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, any::tidyverse, any::drda, any::pander, any::metafor, any::kableExtra, any::plyr, any::ggprism, any::ggnewscale, any::GLMcat, any::quarto,any::Hmisc,any::outliers, any::multcomp, any::emmeans, any::patchwork, any::here, local::.
+          extra-packages: any::pkgdown, any::tidyverse, any::drda, any::pander, any::metafor, any::kableExtra, any::plyr, any::ggprism, any::ggnewscale, any::GLMcat, any::quarto,any::Hmisc,any::outliers, any::multcomp, any::emmeans, any::patchwork, any::here, any::ecotoxicology, local::.
           needs: website
 
-      - name: Build site
+      - name: Build site with verbose output
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
+        env:
+          PKGDOWN_VERBOSE: true
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'

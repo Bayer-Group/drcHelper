@@ -15,15 +15,7 @@
   ...
 )
 
-\method{ED}{ZG}(
-  object,
-  respLev,
-  maxEff = TRUE,
-  trend = "Increase",
-  range = "Percentage",
-  CI = c("delta", "inv", "bmd-inv"),
-  ...
-)
+\method{ED}{ZG}(...)
 }
 \arguments{
 \item{object}{fitted model using drc::drm}

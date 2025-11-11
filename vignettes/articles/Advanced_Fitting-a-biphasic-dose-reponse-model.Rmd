@@ -18,6 +18,12 @@ library(drc)
 ## Stackoverflow
 
 ```{r}
+#| fig.alt: >
+#|   Scatter plot and fitted curves of a biphasic dose-response model
+#| fig.cap: >
+#|   Scatter plot and fitted curves of a biphasic dose-response model
+#| fig.align: "center"
+#| out.width: "70%"
 dat <- structure(list(Concn = c(1e-05, 4e-06, 1.5e-06, 7.5e-07, 2.5e-07, 
 1e-07, 3.75e-08, 1.63e-08, 6.25e-09, 2.5e-09, 1.06e-09, 4.06e-10, 
 1.56e-10, 6.25e-11, 2.66e-11, 1.09e-11), CompoundX = c(0.309967, 
@@ -36,9 +42,12 @@ plot(m0, type = "all", col= "black", log = "")
 
 
 ```
+
 ## Defining 
 
 ```{r}
+#| fig.alt: >
+#|   fitted against residuals for Zn data in the metaldata
 data(metaldata)
 #Make a subset with the Zn data
 Zn <- metaldata[metaldata$metal=="Zn",]
@@ -50,12 +59,23 @@ summary(Zn.gau)
 #Model checking 
 plot(fitted(Zn.gau), residuals(Zn.gau), ylim = c(-20, 20))
 
+
+```
+
+```{r}
+#| fig.alt: >
+#|   fitted against residuals for Zn data in the metaldata with Box-Cox transformation
 # Gaussian function with Box-Cox transform
 Zn.gau2 <- drm(IR~conc, data=Zn, fct=gaussian(), na.action=na.omit, bcVal = 0, bcAdd = 10)
 summary(Zn.gau2)
 #Model checking 
 plot(fitted(Zn.gau2), residuals(Zn.gau2), ylim = c(-0.4, 0.4))
 
+```
+
+```{r}
+#| fig.alt: >
+#|   fitted against residuals for Zn data in the metaldata with lgaussian function
 #lgaussian function
 Zn.lgau <- drm(IR~conc, data=Zn, fct=lgaussian(), na.action=na.omit)
 summary(Zn.lgau)

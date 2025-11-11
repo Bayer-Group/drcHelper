@@ -285,7 +285,8 @@ compare_to_control_fisher <- function(data, factor_col, success_col, failure_col
 #'
 #' @author \href{https://stats.stackexchange.com/users/173082/reinstate-monica}{Ben O'Neill}
 #' @references \url{https://stats.stackexchange.com/a/410376/6378} and
-#' R. E. TARONE, Testing the goodness of fit of the binomial distribution, Biometrika, Volume 66, Issue 3, December 1979, Pages 585–590, \url{https://doi.org/10.1093/biomet/66.3.585}
+#' R. E. TARONE, Testing the goodness of fit of the binomial distribution, Biometrika, V
+#' olume 66, Issue 3, December 1979, Pages 585-590, \url{https://doi.org/10.1093/biomet/66.3.585}
 #' @importFrom stats pnorm
 #' @export
 #' @examples

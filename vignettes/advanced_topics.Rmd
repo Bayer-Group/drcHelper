@@ -1,0 +1,23 @@
+---
+title: "Advanced Statistical Topics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced Statistical Topics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This index page provides access to advanced statistical topics covered in drcHelper.
+
+## Available Topics
+
+- [Normality Check](Normality-Check.html)
+- [Extra Binomial Variance and Trend Test](Binomial_Extra_Variance.html)
+- [Equivalence Testing](Equivalence-Testing.html)

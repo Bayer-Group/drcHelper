@@ -216,3 +216,21 @@ result4$results_table$estimate -s4$test$coefficients
 result4$results_table$p.value - s4$test$pvalues < 1e-05
 ```
 
+## Dunnett's Test with Different R Packages
+
+We recommend to use the `multcomp` package to perform the routine Dunnett's test. 
+
+```{r}
+# Define Methods and Run All
+methods_to_test <- c("Dunnett_PMCMRplus", "Dunnett_DescTools", "Dunnett_multcomp")
+
+all_results <- purrr::map_dfr(methods_to_test, ~ broom_dunnett(
+  x = Response ~ factor(Dose), 
+  data = dat_medium,
+  method = .x, 
+  alternative = "two.sided"
+))
+
+all_results %>% knitr::kable(.,digits = 3)
+```
+

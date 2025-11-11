@@ -15,7 +15,7 @@ library(tidyverse)
 
 ```{r setup}
 library(drcHelper)
-
+source("../knitr-setup.R")
 ```
 
 In certain situations, such as when a test chemical is anticipated to have low toxicity or is poorly soluble, a limit test may be conducted. This test aims to show that the No Observed Effect Concentration (NOEC) is greater than or equal to the tested limit concentration, and that the LD50 or EC50 is also greater than the tested limit dose, provided no effects are observed during the study.

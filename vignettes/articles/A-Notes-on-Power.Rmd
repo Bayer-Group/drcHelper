@@ -1,0 +1,142 @@
+---
+title: "A Notes on Power"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+```
+
+
+## Concepts 
+
+In statistical analysis, tests can be categorized as liberal or conservative based on their propensity to reject the null hypothesis. Here are examples of both types of tests:
+
+### Liberal Tests
+
+1. **Least Significant Difference (LSD) Test**:
+   - Used for pairwise comparisons following ANOVA.
+   - Does not adjust for multiple comparisons, making it more prone to Type I errors.
+
+2. **Unadjusted t-tests for Multiple Comparisons**:
+   - Performing multiple t-tests without any correction for multiple testing increases the chance of Type I errors.
+
+3. **Chi-Square Test Without Yates' Continuity Correction**:
+   - In small sample sizes, not applying Yates' continuity correction can make the test more liberal.
+
+### Conservative Tests
+
+1. **Bonferroni Correction**:
+   - Adjusts the significance level for multiple comparisons by dividing the alpha level by the number of tests.
+   - Reduces the likelihood of Type I errors but can be overly conservative, increasing the risk of Type II errors.
+
+2. **Tukey's Honest Significant Difference (HSD) Test**:
+   - Used for multiple comparisons following ANOVA.
+   - Controls the family-wise error rate, making it more conservative than LSD.
+
+3. **Holm-Bonferroni Method**:
+   - A stepwise approach to control the family-wise error rate.
+   - Less conservative than Bonferroni but still provides strong control over Type I errors.
+
+4. **Yates' Continuity Correction for Chi-Square Tests**:
+   - Applied to 2x2 contingency tables to make the test more conservative, especially with small sample sizes.
+
+### Implications of Choosing Liberal vs. Conservative Tests
+
+- **Liberal Tests**: These are useful when the primary concern is maximizing the power to detect differences, and the cost of Type I errors is low. However, they should be used with caution when multiple comparisons are involved.
+
+- **Conservative Tests**: These are preferred when controlling for Type I errors is crucial, such as in confirmatory studies where false positives could lead to incorrect scientific conclusions. However, they may increase the risk of Type II errors, potentially missing true effects.
+
+Choosing between liberal and conservative tests depends on the research context, study design, and the balance between Type I and Type II error risks. Researchers should carefully consider these factors when selecting statistical methods for their analyses.
+
+
+## A Powerful Test
+
+No, a more powerful test is not necessarily the same as a more liberal test. These terms refer to different aspects of statistical testing:
+
+### Power of a Test
+
+- **Definition**: The power of a statistical test is the probability that the test correctly rejects a false null hypothesis (i.e., it detects an effect when there is one). Higher power means a greater ability to detect true effects.
+- **Factors Influencing Power**: Larger sample sizes, larger effect sizes, and lower variability increase the power of a test. The significance level (alpha) also affects power; a higher alpha can increase power but also increases the risk of Type I errors.
+
+### Liberal Test
+
+- **Definition**: A liberal test is one that has a higher probability of rejecting the null hypothesis, which can lead to more Type I errors (false positives). It is less stringent in terms of controlling for these errors.
+- **Characteristics**: Typically, liberal tests have a higher Type I error rate than the nominal level, making them more prone to finding statistically significant results even when there is no true effect.
+
+### Differences Between Power and Liberalism
+
+1. **Power**:
+   - Focuses on the test's ability to detect true effects (avoiding Type II errors, or false negatives).
+   - A test can be powerful without being liberal if it maintains the correct Type I error rate while maximizing the ability to detect true effects.
+
+2. **Liberalism**:
+   - Focuses on the test's tendency to reject the null hypothesis, potentially at the expense of increasing Type I errors.
+   - A liberal test may appear more "powerful" in terms of rejecting the null hypothesis, but this can be misleading because it might also reject the null when it is true.
+
+### Conclusion
+
+While both power and liberalism relate to the outcomes of hypothesis testing, they address different types of errors and have different implications for statistical decision-making. Ideally, a test should be both powerful and correctly control the Type I error rate, achieving a balance between detecting true effects and avoiding false positives.
+
+
+## Nonparametric Tests
+
+### Many-to-one Wilcoxon v.s. Dunn
+
+The many-to-one version of Dunn's test is more powerful compaired to multiple wilcoxon rank sum test because it maintains the relationship between all groups throughout the analysis by using ranks from the complete dataset to compute test statistics. This integrated approach provides better statistical efficiency compared to the separate pairwise comparisons in Wilcoxon tests.
+
+1. uses complete ranking information rather than pairwise rankings.
+2. more efficiently uses the data structure by considering all groups simultaneously
+3. reduced multiple comparison penalty in many-to-one setup
+4. Dunn's test handles tied ranks more efficiently across the entire dataset, while Wilcoxon rank sum test processes ties separately for each comparison.
+
+This reminds me of how ANOVA is generally more powerful than multiple t-tests - it's a similar principle of using all available information simultaneously rather than breaking it into pieces.
+
+
+```{r}
+library(PMCMRplus)
+## Data set PlantGrowth
+## Global test
+
+prelimPlot1(PlantGrowth %>% mutate(Dose=group,Response=weight))
+kruskalTest(weight ~ group, data = PlantGrowth)
+
+## Conover's many-one comparison test
+## single-step means p-value from multivariate t distribution
+ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "single-step")
+summary(ans)
+
+## Conover's many-one comparison test
+ans <- kwManyOneConoverTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "holm")
+summary(ans)
+
+## Dunn's many-one comparison test
+ans <- kwManyOneDunnTest(weight ~ group, data = PlantGrowth,
+                             p.adjust.method = "holm")
+summary(ans)
+
+## Nemenyi's many-one comparison test
+ans <- kwManyOneNdwTest(weight ~ group, data = PlantGrowth,
+                        p.adjust.method = "holm")
+summary(ans)
+
+## Many one U test
+ans <- manyOneUTest(weight ~ group, data = PlantGrowth,
+                        p.adjust.method = "holm")
+summary(ans)
+
+## Chen Test
+ans <- chenTest(weight ~ group, data = PlantGrowth,
+                    p.adjust.method = "holm")
+summary(ans)
+```
+
+

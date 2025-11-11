@@ -20,6 +20,7 @@ library(conflicted)
 conflict_prefer("filter","dplyr")
 conflict_prefer("group_by","dplyr")
 conflict_prefer("select","dplyr")
+source("../knitr-setup.R")
 ```
 
 ## Background

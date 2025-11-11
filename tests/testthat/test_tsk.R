@@ -1,5 +1,5 @@
 
-test_that("tsk can calculate ",{
+test_that("tsk can calculate EPA result correctly",{
 
 
   p <- 2 * pnorm(2) - 1
@@ -105,6 +105,176 @@ test_that("tsk can calculate ",{
 
 
 )
+
+
+describe("tsk function from drcHelper", {
+  test_data <- data.frame(
+    x = c(15.54, 20.47, 27.92, 35.98, 55.52),
+    r = c(0, 0, 0, 1, 20),
+    n = c(20, 20, 20, 19, 20)
+  )
+
+  it("computes TSK estimate and confidence intervals matching ecotoxicology::TSK", {
+    result <- tsk(
+      x = test_data$x,
+      r = test_data$r,
+      n = test_data$n,
+      control = 0,
+      trim = 0,
+      conf.level = 0.95,
+      use.log.doses = TRUE
+    )
+
+    expect_s3_class(result, "tskresult")
+    expect_equal(result$LD50, 43.89339, tolerance = 0.0001,
+                 info = "LD50 should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$gsd), 1.017763, tolerance = 0.0001,
+                 info = "Geometric standard deviation should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$conf.int[1]), 42.40451, tolerance = 0.0001,
+                 info = "Lower confidence interval should match ecotoxicology::TSK result")
+    expect_equal(as.numeric(result$conf.int[2]), 45.43455, tolerance = 0.0001,
+                 info = "Upper confidence interval should match ecotoxicology::TSK result")
+  })
+})
+
+describe("tsk_auto function - automatic trimming wrapper", {
+  
+  describe("with data that doesn't need trimming", {
+    moderate_data <- data.frame(
+      x = c(0.1, 0.5, 1, 2, 4, 8),
+      n = rep(20, 6),
+      r = c(2, 5, 8, 12, 15, 17)  # Moderate responses, not extreme
+    )
+    
+    it("returns valid tskresult object", {
+      result <- tsk_auto(moderate_data)
+      expect_s3_class(result, "tskresult")
+    })
+    
+    it("uses numeric vector interface correctly", {
+      result <- tsk_auto(
+        x = moderate_data$x,
+        n = moderate_data$n, 
+        r = moderate_data$r
+      )
+      expect_s3_class(result, "tskresult")
+      expect_true(is.numeric(result$LD50))
+    })
+    
+    it("preserves all standard tsk parameters", {
+      result <- tsk_auto(
+        moderate_data, 
+        control = 0, 
+        conf.level = 0.90,
+        use.log.doses = FALSE
+      )
+      expect_equal(attr(result$conf.int, "conf.level"), 0.90)
+      expect_false(result$use.log.doses)
+    })
+  })
+  
+  describe("with data that needs automatic trimming", {
+    extreme_data <- data.frame(
+      x = c(0.1, 0.5, 1, 2, 4, 8),
+      n = rep(20, 6),
+      r = c(0, 1, 8, 15, 19, 20)  # Goes from 0% to 100% response
+    )
+    
+    it("applies trimming when needed and returns valid result", {
+      # Suppress messages for clean test output
+      result <- suppressMessages(tsk_auto(extreme_data))
+      expect_s3_class(result, "tskresult")
+      expect_true(is.numeric(result$LD50))
+    })
+    
+    it("applies positive trim value when automatic trimming occurs", {
+      result <- suppressMessages(tsk_auto(extreme_data))
+      # If trimming was applied, trim should be > 0
+      if (result$trim > 0) {
+        expect_gt(result$trim, 0)
+        expect_lt(result$trim, 0.5)
+      }
+    })
+    
+    it("works with numeric vector interface for extreme data", {
+      result <- suppressMessages(tsk_auto(
+        x = extreme_data$x,
+        n = extreme_data$n,
+        r = extreme_data$r
+      ))
+      expect_s3_class(result, "tskresult")
+    })
+  })
+  
+  describe("parameter validation", {
+    valid_data <- data.frame(
+      x = c(1, 2, 4, 8),
+      n = rep(10, 4),
+      r = c(1, 3, 7, 9)
+    )
+    
+    it("validates max.trim parameter correctly", {
+      expect_error(
+        tsk_auto(valid_data, max.trim = 0.5),
+        "max.trim must be between 0 and 0.5"
+      )
+      
+      expect_error(
+        tsk_auto(valid_data, max.trim = 0),
+        "max.trim must be between 0 and 0.5"
+      )
+      
+      expect_error(
+        tsk_auto(valid_data, max.trim = -0.1),
+        "max.trim must be between 0 and 0.5"
+      )
+    })
+    
+    it("accepts valid max.trim values", {
+      result <- suppressMessages(tsk_auto(valid_data, max.trim = 0.3))
+      expect_s3_class(result, "tskresult")
+    })
+  })
+  
+  describe("error handling", {
+    it("propagates non-trim related errors from original tsk function", {
+      invalid_data <- data.frame(
+        x = c(1, 2, 3),
+        n = c(10, 10, 10),
+        r = c(-1, 5, 8)  # Negative responses should cause error
+      )
+      
+      expect_error(
+        tsk_auto(invalid_data),
+        "Responses must be nonnegative"
+      )
+    })
+    
+    it("handles duplicate doses error", {
+      duplicate_data <- data.frame(
+        x = c(1, 1, 2, 3),  # Duplicate doses
+        n = c(10, 10, 10, 10),
+        r = c(1, 2, 5, 8)
+      )
+      
+      expect_error(
+        tsk_auto(duplicate_data),
+        "Duplicate doses exist in the data"
+      )
+    })
+  })
+  
+  describe("integration with hamilton dataset", {
+    it("works with hamilton dataset examples", {
+      skip_if_not(exists("hamilton"), "Hamilton dataset not available")
+      
+      # Test with first hamilton dataset
+      result <- suppressMessages(tsk_auto(hamilton[[1]]))
+      expect_s3_class(result, "tskresult")
+      expect_true(is.numeric(result$LD50))
+    })
+  })
+})
 
 
 

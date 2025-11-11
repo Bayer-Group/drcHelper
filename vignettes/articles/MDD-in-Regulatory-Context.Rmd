@@ -1,0 +1,317 @@
+---
+title: "MDD in Regulatory Context"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drcHelper)
+source("../knitr-setup.R")
+```
+
+
+In the regulatory context, MDD% stands for the minimum percent change (relative to the control mean) that would be deemed statistically significant given the test's critical value, the residual variability, and the replication. This **IS NOT** a power based MDD as we usually would have defined in statistical power analysis.  There are two common ways to define it; the often used way in ecotoxicology is ofent the significance-threshold version (no power term).
+
+## Key definitions
+
+- Absolute minimum detectable difference (MDD, on the response scale):
+  - For a control vs. dose comparison with pooled residual variance MSE and per-group sample sizes n_c (control) and n_t (treatment), the standard error of a difference is:
+    - $$SE_{diff} = \sqrt{MSE \cdot \left(\frac{1}{n_c} + \frac{1}{n_t}\right)}$$
+  - Given a one-sided critical value (e.g., Williams' Tcrit), the absolute MDD is:
+    - $$MDD = T_{crit} \cdot SE_{diff}$$
+- Percent MDD relative to control mean:
+  - If the control mean is μ_c, then
+    - $$MDD\% = 100 \cdot \frac{MDD}{\mu_c} = 100 \cdot \frac{T_{crit} \cdot SE_{diff}}{\mu_c}$$
+
+Notes
+
+- Significance-threshold vs. power-based:
+  - The above uses only Tcrit (significance threshold at alpha). Some literature calls this MSD (Minimum Significant Difference).
+  - A power-based MDD (to achieve power 1−β) adds a second quantile:
+    - $$MDD_{power} = \left(t_{1-\alpha,\ df} + t_{1-\beta,\ df}\right) \cdot SE_{diff}$$
+    - and $$MDD\%_{power} = 100 \cdot \frac{MDD_{power}}{\mu_c}$$
+  - Your Williams expected includes "Tcrit" per dose; this aligns with the significance-threshold version (no power term).
+- Which Tcrit to use:
+  - For Williams: use the Tcrit reported per dose/step from broom_williams(method = "Williams_PMCMRplus"), which you have available.
+  - For Dunnett: a true Dunnett critical value depends on the number of groups (multivariate t). If you don't have a reported Tcrit, computing an exact Dunnett Tcrit is more involved; for Williams, you already have it, so we can compute MDD% reliably.
+
+
+**What the function does**
+
+- Accepts a formula x of the form Response ~ Dose (Dose can be numeric or factor).
+- Ensures the control (reference) group is the first factor level (by default the lowest dose).
+- Computes the per-contrast standard error SE_diff using the appropriate method:
+  - Williams/Dunnett: pooled ANOVA MSE (or directly from glht sigma for Dunnett).
+  - Student’s t: pooled-variance SE.
+  - Welch: group-specific-variance SE and Welch–Satterthwaite df.
+- Determines the critical value Tcrit:
+  - Williams: from broom_williams t’-crit per contrast.
+  - Dunnett: from multcomp summary.glht test$qfunction at your alpha.
+  - Student’s t/Welch: qt with per-contrast df.
+- Computes MDD = Tcrit × SE_diff and MDD% = 100 × MDD / control_mean.
+- Returns a tidy tibble with dose, n_c, n_t, df (when applicable), SE_diff, Tcrit, MDD, MDD_pct, method, alpha, alternative, and control_mean.
+
+## Usage examples
+
+
+### Notes and options
+- Alternative handling: MDD uses a critical value magnitude; the choice of one-sided vs two-sided changes the quantile. If your expected MDD% was computed with two-sided thresholds, set alternative = "two-sided".
+- For Dunnett, the adjusted Tcrit is taken from `summary(glht)$test$qfunction`. If unavailable, we fallback to unadjusted qt with residual df.
+- For `Williams_JG`, comparison strings might not carry doses; we assign doses in ascending order excluding control. If you need exact mapping, we can inspect the internal `williamsTest_JG` output via drcHelper to align rows to doses.
+- You can extend the test argument to include other tests (e.g., “Dunn”) once you define the appropriate Tcrit. Dunn typically uses z critical values; for MDD you would use zcrit × SE_diff on a rank-based scale, which is a different construct; unless your expected MDD% is defined explicitly for Dunn, I recommend sticking to parametric tests above.
+- If you’d like me to integrate this into your validation report, I can add an MDD% metric branch that uses compute_mdd_generic under the hood and compares to expected “MDD%” rows for Williams.
+
+# Implementation in `drcHelper`
+
+Reusing existing test objects and building a modular system around them is far more efficient and robust.
+
+
+## Williams' Test MDD
+
+```{r}
+library(drcHelper)
+Results <- broom_williams(Response ~ factor(Dose), data = dat_medium,
+               method = "Williams_PMCMRplus", alpha = 0.05, alternative = "less")
+
+compute_mdd_williams(Results,data=dat_medium,formula = Response ~ factor(Dose))
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "less")
+```
+
+## Dunnett's Test MDD
+
+```{r}
+Results <- broom_dunnett(Response ~ factor(Dose), data = dat_medium,
+               method = "Dunnett_multcomp", alpha = 0.05, alternative = "two.sided")
+
+Results
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "two.sided")
+Results
+
+
+Results <- broom_dunnett(Response ~ factor(Dose), data = dat_medium,
+               method = "Dunnett_multcomp", alpha = 0.05, alternative = "less")
+
+Results
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "less")
+compute_mdd_dunnett(Results,data = dat_medium,formula = Response~factor(Dose),alternative = "less")
+
+Results <- dunnett_test(data = dat_medium,response_var = "Response",tank_var = NULL,include_random_effect = FALSE,dose_var = "Dose", alpha = 0.05, alternative = "two.sided")
+compute_mdd_dunnett(Results,data = dat_medium,formula = Response~factor(Dose),alternative = "two.sided")
+Results
+
+```
+
+### Overall reporting
+
+- both functions `dunnett_test` and `broom_dunnet` can be used now.
+- note `dunnett_test` has more options to perform test including random effect and inhomogeneous variance, while `broom_dunnet` is the simple version that is similar to Williams' test. 
+
+```{r}
+# This call will now work correctly for any alternative.
+final_dunnett_table <- report_dunnett_summary(
+  formula = Response ~ Dose, 
+  data = dat_medium, 
+  dunnett_test_func = "dunnett_test",
+  alternative = "less", 
+  alpha = 0.05
+)
+
+print(final_dunnett_table)
+
+
+# This call will now work correctly for any alternative.
+final_dunnett_table <- report_dunnett_summary(
+  formula = Response ~ Dose, 
+  data = dat_medium, 
+  dunnett_test_func = "broom_dunnett",
+  alternative = "less", 
+  alpha = 0.05
+)
+
+print(final_dunnett_table)
+```
+
+## Welch's t-test (Multiple Comparison)
+
+Before we explain the MDD calculation for Welch's t-test implemented in `drcHelper`, we need to explain the difference between test sensitivity (power) and error rate control.
+
+### 1. What MDD Represents: The Power of a *Single* Test
+
+The Minimum Detectable Difference (MDD) is a measure of statistical power. It answers the question:
+
+> "For a **single pairwise comparison**, given its specific sample sizes and data variability, what is the smallest true difference between means that I would have a high probability of detecting as statistically significant at a given alpha level (e.g., $\alpha = 0.05$)?"
+
+The calculation reflects this focus on a single test:
+$MDD = t_{critical} \times SE_{diff}$
+
+*   **$SE_{diff} $(Standard Error of the Difference):** This depends only on the standard deviations and sample sizes of the two groups being compared. It's a property of the data.
+*   **$t_{critical} $(Critical Value):** This is derived from the t-distribution using two parameters:
+    1.  The degrees of freedom (determined by the sample sizes and variances).
+    2.  The chosen significance level for that **single test** (`alpha`, usually 0.05).
+
+Notice that nowhere in this calculation is there a parameter for the *total number of tests being performed*. The MDD is an intrinsic property of the individual test's design and sensitivity.
+
+### 2. What P-Value Adjustment Represents: Controlling Error Across *Multiple* Tests
+
+P-value adjustment methods (like Holm or Bonferroni) are designed to solve a different problem: controlling the **Family-Wise Error Rate (FWER)**. They answer the question:
+
+> "Now that I have performed **many tests at once**, how can I adjust my significance threshold to ensure the probability of making even one false positive (Type I error) across the *entire family* of tests remains low (e.g., at 0.05)?"
+
+These methods work by making it "harder" for any individual test to be declared significant. They do this by either:
+*   Decreasing the p-value threshold for significance (e.g., Bonferroni's $\alpha_{adj} = \alpha / k$).
+*   Increasing the raw p-values to create `p_adjusted` values, which are then compared to the original `alpha` of 0.05.
+
+The key takeaway is that p-value adjustment is a **post-hoc correction** applied to the *results* of the tests, not a change to the *design or inherent power* of the individual tests themselves.
+
+### Could You Calculate an "Adjusted MDD"?
+
+Theoretically, yes. You could calculate a more stringent MDD by using an adjusted critical value based on a Bonferroni-corrected alpha (e.g., $\alpha_{adj} = 0.05 / k$). This would result in a larger $t_{critical} $and therefore a larger MDD.
+
+However, this is **not standard practice** and can be confusing. The value of the MDD is in understanding the sensitivity of your experimental design for a given pairwise comparison. It tells you the inherent power of your test. Mixing in the multi-comparison adjustment muddies this clear interpretation.
+
+**Conclusion:** The function `compare_to_control_welch` implements the standard and most useful approach:
+
+1.  It calculates the **MDD** based on the properties of each **individual t-test** (using the single-test `alpha` of 0.05). This tells you about the sensitivity of your experiment.
+2.  It then **separately** calculates the **adjusted p-values**. This provides a corrected measure for making final conclusions about significance while controlling the overall error rate.
+
+```{r}
+# Generate example data
+set.seed(42)
+my_data <- data.frame(
+  treatment = rep(c("Control", "Dose1", "Dose2", "Dose3"), each = 5),
+  response = c(rnorm(5, 10, 1.5), rnorm(5, 9, 2),
+               rnorm(5, 11, 1.8), rnorm(5, 13, 2.2))
+)
+
+# Run Welch's t-test comparing each dose to "Control"
+welch_results <- compare_to_control_welch(
+  data = my_data,
+  factor_col = "treatment",
+  response_col = "response",
+  control_level = "Control"
+)
+
+print(welch_results)
+```
+
+### Run two-sample Welch's t-test
+
+```{r}
+## Two sample test!
+welch_results <- compare_to_control_welch(
+  data = my_data%>%filter(treatment %in% c("Control","Dose1")),
+  factor_col = "treatment",
+  response_col = "response",
+  control_level = "Control"
+)
+print(welch_results)
+```
+
+
+```{r}
+# Run Welch's t-test comparing each dose to "Control"
+welch_results <- compare_to_control_welch(
+  data = dat_medium,
+  factor_col = "Dose",
+  response_col = "Response",
+  control_level = "0"
+)
+
+# print(welch_results)
+welch_results %>% knitr::kable(.,digits = 2)
+```
+
+
+## Notes
+
+### Handling "greater" vs "smaller" in Williams' test
+
+- The formula for MDD% doesn't change with direction for Williams' test; it's the minimum absolute difference required for significance. You typically compare magnitudes (positive values). If you want to encode a "directional" MDD% (signed), you can attach sign = ifelse(alternative=="greater", +1, -1) and report MDD%*sign, but most reports use a positive threshold.
+
+### Unequal sample sizes and heteroscedasticity
+
+- The SE_diff above already handles unequal n via 1/n_c + 1/n_t.
+- If variances are heterogeneous and a Welch-type approach is used, you would estimate SE_diff via group-specific variances. Williams is based on a pooled-variance ANOVA, so the pooled MSE is appropriate here.We  probably need to adjust if the expected MDD% uses a different SE (e.g., contrast-specific SE in Williams instead of the simple (1/n_c + 1/n_t) form).
+
+## Optional: power-based MDD%
+
+- If we later need to compute a power-based MDD% (target power 1−β), use:
+  - $$MDD_{power} = \left(t_{1-\alpha,\ df} + t_{1-\beta,\ df}\right) \cdot SE_{diff}$$
+  - Then $$MDD\%_{power} = 100 \cdot MDD_{power} / \mu_c$$
+- df can be taken from the residual df of the ANOVA model. You can parameterize β (e.g., 0.2 for 80% power) and compute the quantiles using stats::qt.
+
+
+
+
+# In test cases validation
+
+- Williams PMCMRplus (your MOCK0065 Growth Rate):
+
+```{r eval=FALSE}
+# Helper to convert dose strings to numeric, handling various formats
+convert_dose <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  # Normalize decimal commas and keep scientific notation (e.g., "4,48E-2" -> "4.48E-2")
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  out <- suppressWarnings(as.numeric(xc))
+  return(out)
+}
+
+convert_numeric <- function(x) {
+  if (length(x) == 0) return(numeric(0))
+  xc <- as.character(x)
+  xc <- trimws(xc)
+  xc[xc %in% c("", "n/a", "NA")] <- NA_character_
+  xc <- gsub(",", ".", xc, fixed = TRUE)
+  suppressWarnings(as.numeric(xc))
+}
+
+dose_from_comparison <- function(comp_vec) {
+  if (length(comp_vec) == 0) return(numeric(0))
+  vapply(comp_vec, function(s) {
+    if (is.na(s)) return(NA_real_)
+    parts <- strsplit(s, " - ", fixed = TRUE)[[1]]
+    convert_dose(parts[1])
+  }, FUN.VALUE = numeric(1))
+}
+w_ep <- test_cases_data %>% dplyr::filter(`Study ID` == "MOCK0065", Endpoint == "Growth Rate")
+w_ep$Dose_numeric <- convert_dose(w_ep$Dose)
+w_ep$Dose_factor <- factor(w_ep$Dose_numeric, levels = sort(unique(w_ep$Dose_numeric)))
+res_william <- broom_williams(Response ~ Dose_factor, data = w_ep,
+               test = "Williams_PMCMRplus", alpha = 0.05, alternative = "less")
+mdd_w_pm <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                test = "Williams_PMCMRplus", alpha = 0.05, alternative = "smaller")
+print(mdd_w_pm)
+```
+
+
+- Dunnett:
+```{r eval=FALSE}
+mdd_dunn <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                test = "Dunnett", alpha = 0.05, alternative = "smaller")
+print(mdd_dunn)
+```
+```{r eval=FALSE}
+- Student’s t (pooled, control vs each dose):
+
+mdd_t <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                             test = "t", alpha = 0.05, alternative = "smaller")
+print(mdd_t)
+```
+- Welch:
+```{r eval=FALSE}
+mdd_welch <- compute_mdd_generic(Response ~ Dose_factor, data = w_ep,
+                                 test = "Welch", alpha = 0.05, alternative = "two-sided")
+print(mdd_welch)
+```
+
