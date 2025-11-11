@@ -43,6 +43,7 @@ ggplot(dat,aes(x=Treatment,y=Response)) + geom_point() + geom_point(data = datsu
 geom_errorbar(data = datsum, aes(x=as.numeric(Treatment)+0.2,y=mean,ymin = Lower, ymax = Upper),col="red",position=position_dodge(width = 0.9),width = .2)
 
 ggsave("JT_example.png",width = 5 ,height =3.5,dpi=300 )
+ggsave("JT_example.pdf",width = 5 ,height =3.5,dpi=300 )
 ```
 
 - https://www.tandfonline.com/doi/full/10.1080/03610920601041556#:~:text=This%20article%20examines%20the%20variance

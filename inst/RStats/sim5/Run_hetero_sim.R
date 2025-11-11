@@ -126,6 +126,8 @@ if(plotit){
                       aes(x=Dose_Level,y=1.15,label=paste("Var=",Variance)), size=2.5,col= "black" )
           ggsave(paste0("SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.png"),
                  dpi=300, width = 6,height = 6)
+          ggsave(paste0("SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.pdf"),
+                 dpi=300, width = 6,height = 6)
 
         }
 
