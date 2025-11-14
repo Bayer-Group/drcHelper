@@ -4,31 +4,15 @@ format: html
 editor: source
 ---
 
-## Results
 
-"削足适履" translates to "to cut the feet to fit the shoes" and describes a situation where you force something to fit a preconceived or unsuitable mold, often resulting in an impractical or inelegant solution. It can also be expressed as "to act in a Procrustean manner" or, more generally, as a situation where you "force something to fit". 
-
-- Literal meaning: To cut one's feet to make them fit a shoe.
-- Figurative meaning: Forcing a situation to conform to a rigid or inappropriate standard, despite the negative consequences.
-- English equivalents:
-  - To cut the feet to fit the shoes
-  - To act in a Procrustean manner
-  - To force something to fit
-  - An impractical or inelegant solution 
-
-## My major Arguments:
-
-### Questions to answer:
-
--	Under what conditions can standard decision flowcharts recommend analyses that yield misleading NOEC inferences, and how should analysts respond when visual patterns contradict flowchart‑prescribed tests
 
 ## To Dos:
 
-- [ ] Fix figure numbers and cross‑references; add explicit links from Figures 3–4 to Figure 1 (design/variance patterns).
+- [x] Fix figure numbers and cross‑references; add explicit links from Figures 3–4 to Figure 1 (design/variance patterns).
 - [x] Replace underscores in method names in running text (e.g., LM_Hetero → LM‑Hetero) while keeping underscores in code blocks to match R objects.
 - [x] Spell out OECD on first mention and keep consistent thereafter.
 - [x] Move the long Table 5 to SI; 
-- [ ] keep a streamlined summary table of Table 5 (now table s3) or narrative in the main text.
+- [x] keep a streamlined summary table of Table 5 (now table s3) or narrative in the main text.
 - [ ] Replace underscores in Figures?
 - [x] Reviewer 1 request, 4.2.3: In Section 4.2.3, start with “Influence of Experimental Design Parameters” (explicitly referencing Figure 1), then “Power to detect small effects,” then “Power to detect large effects.”
 - [x] Add one sentence in Methods: you modeled treatment as fixed and tank as a random intercept in the individual‑level LMM, with individuals at the residual level; ICC is computed from variance components. Also note the caution about mislabeling replicate IDs across treatments and how that inflates Type I error.
@@ -52,6 +36,7 @@ editor: source
 - Konietschke, F., Placzek, M., Schaarschmidt F., Hothorn, L.A. (2015). nparcomp: An R Software  Package for Nonparametric Multiple Comparisons and Simultaneous Confidence Intervals. Journal of Statistical Software, 64(9), 1-17. URL http://www.jstatsoft.org/v64/i09/. 
 
 - Fox D.R. (2010). A Bayesian approach for determining the no effect concentration and hazardous concentration in ecotoxicology. Ecotoxicol Environ Saf. 73(2):123-31. doi: 10.1016/j.ecoenv.2009.09.012. PMID: 19836077.
+
 ## CPCAT
 
 the reality of ecotoxicological count data, where over-dispersion, under-dispersion, non-independence, inhomogeneous variance without a pattern, and small sample size are common challenges. 
@@ -61,181 +46,29 @@ the reality of ecotoxicological count data, where over-dispersion, under-dispers
 quote for the revised EFSA bee guidance document: 
 The statistical analysis should be conducted according to the general approach for higher tier studies (see Annex C of the guidance document and Chapter 10.1). The applicant should apply a one-sided equivalence test (α = 0.2) for each endpoint, with an equivalence limit corresponding to a 10% reduction in the treated test compared to the control, to prove that there are no adverse effects on foraging behaviour. 
 
-This, in our opinion, is to cut the feet to fit the shoes. Just to use a seemingly better approach, , without verifying. ... To put it plainly, using α = 0.2 is checking if the lower limit of 60% confidence interval is greater than 10% reduction. ..... An example of honeybee colony size of 20,000, with a coefficient of variation of 20%, Suppose the reduction is 5%, smaller than 10% reduction, assumming a log-normal distribution, the 95% CI for this difference is .. 
+This, in our opinion, is to cut the feet to fit the shoes. Just to use a seemingly better approach, without considering is the method switch requires complete experiment re-design and whether the scientific goal is verifiable. 
 
 
-The regulatory goal may be empirically unverifiable with the proposed framework under standard use of alpha.
+In fact, the regulatory goal may be empirically unverifiable with the proposed framework under standard use of alpha.
 
 
-## Decision Letter
+## Other Thoughts
 
-From:
+"削足适履" translates to "to cut the feet to fit the shoes" and describes a situation where you force something to fit a preconceived or unsuitable mold, often resulting in an impractical or inelegant solution. It can also be expressed as "to act in a Procrustean manner" or, more generally, as a situation where you "force something to fit". 
 
-ieam_editor@setac.org
+- Literal meaning: To cut one's feet to make them fit a shoe.
+- Figurative meaning: Forcing a situation to conform to a rigid or inappropriate standard, despite the negative consequences.
+- English equivalents:
+  - To cut the feet to fit the shoes
+  - To act in a Procrustean manner
+  - To force something to fit
+  - An impractical or inelegant solution 
 
-To:
+## Goal
 
-zhenglei.gao@bayer.com
+### Questions to answer:
 
-CC:
-
-mgcains@ucar.edu, zhenglei.gao@bayer.com, ludwig@hothorn.de, luke.settles@bayer.com, John@JohnWGreen-ecostats.com
-
-Subject:
-
-Decision on Manuscript ID IEAM-2025-273-OA [email ref: DL-SW-3-a]
-
-Body:
-
-28-Aug-2025
-
-Dear Zhenglei Gao,
-
-Manuscript ID IEAM-2025-273-OA titled "The Role of Statistical Power in Context: Implications for Regulatory Practices" which you submitted to Integrated Environmental Assessment and Management (IEAM), has been reviewed and judged: Major revisions recommended.
-
-Should you decide to revise the manuscript for further consideration, please carefully consider the comments of the reviewers and modify the manuscript as appropriate.  The comments of the reviewers are included at the bottom of this letter.
-
-Revision Requirements:
-Please submit the revised manuscript with a point-by-point response to reviewer comments letter that states the disposition on each of the reviewers' suggestions. Submit two versions of your revised manuscript:
-1) a Word file showing all revisions in Track Changes, and
-2) a clean copy with all changes accepted.
-
-Include the date and "Revised" in the header on each page of manuscript text, tables, and figures. Take care to remove your identity from the track changes file before submitting. Instructions for how to do this can easily be found online, or you may contact the Editorial Office for assistance.
-
-The full version of manuscript formatting guidelines is attached to this email. Please read these and follow the guidelines to ensure that your revised paper is able to be quickly passed along to the editors and (if needed) reviewers. Papers that do not follow the guidelines will be returned for correction.
-
-
-
-Uploading Your Revised Paper:
-Submit only the latest revised form of the manuscript.  To submit your revised manuscript, log into https://mc.manuscriptcentral.com/ieam and enter your Author Center, where you will find your manuscript title listed under "Manuscripts with Decisions."  Under "Actions," click on "Create a Revision."  Your manuscript number has been appended to denote a revision.  Please DO NOT upload your revised manuscripts as a new submission.
-
-Second Review:
-Revisions will be reviewed by the Associate Editor and may be sent to one or more independent reviewers for additional peer review, if considered warranted by the Editor.  If a revised manuscript is not received within 2 months, the paper will be considered withdrawn and may be subject to full peer review as a new submission to the journal.
-
-We aim to facilitate timely publication of manuscripts submitted to IEAM, so please submit your revised manuscript as soon as possible.  If you feel that you will be unable to submit your revision within the time allowed please contact us to discuss the possibility of extending the revision time.
-
-Author Contribution Indication
-The contributions of each author to this work must now be indicated when you submit your revised manuscript using CRediT taxonomy (http://credit.niso.org/contributor-roles-defined/). If not provided already you MUST provide this information as part of the revision process. Author Contributions will be published with the accepted article and cannot be edited after article acceptance. Therefore you must ensure the Author Contribution information you provide is accurate prior to final acceptance.
-
-
-
-Once again, thank you for submitting your manuscript to IEAM and we look forward to receiving your revision.
-
-
-Sincerely,
-Dr. Mariana Cains
-Associate Editor
-Integrated Environmental Assessment and Management (IEAM)
-
-
-IEAM Editorial Office
-ieam_editor@setac.org
-
-Submit manuscripts online at http://mc.manuscriptcentral.com/ieam
-
-Access IEAM at https://academic.oup.com/ieam
-
-
-
-Associate Editor
-Comments to the Author:
-Thank you for submitting your manuscript to IEAM. Both reviewers noted that the manuscript is well written. They each offer areas of further clarity or justifications for the statements made in the manuscript. Please review both reviewers' comments and pay particular attention to 1) justifying (with citations or data) the criticisms made of CPCAT and equivalence testing, and 2) focusing the discussion and conclusion sections to tie back to the hypothesis testing thesis introduced in the beginning of the paper.
-
-
-
-**************************
-Reviewers' Comments to Author:
-
-Please refer to the attached “PDF_Proof” if a reviewer has listed page and line numbers for specific comments.
-
-Reviewer: 1
-
-Comments to the Author
-Review to The Role of Statistical Power in Context: Implications for Regulatory Practices
-
-The manuscript gives an introduction to power calculation for different hypotheses tests in ecotoxicology. The authors deliver R code and example data set. They have done a great job. The manuscript is nicely written and it is easy to follow. However, in the chapter 2 current statistical practices in ecotoxicology 2.4 “suggested methodological improvements” the CPCAT and equivalence testing are addressed and criticised as inappropriate for the experimental design of traditional null hypotheses significant tests and data sets. All their mentioned critics might be true. But they have to be proven with data which would be an additional manuscript.  Both methods are in the presented manuscript not scientifically analysed and the blocks should be removed.
-Chapter needs some reorganisation 4.2.3. Before the power is examined in detail. The two figures 3 and 4 have to be explained with block “Influence of Experimental Design Parameters” with links to figure 1 and then followed by “Power to detect small effects” and “Power to detect large effects.”
-For figure 3 and 4 it would be interesting to see the effect over the ICC range for the different tests for the decreasing trend as a best case, especially how the tests preform with increasing variance.
-
-Specific comments:
-
-I would replace underlines “_” with minus “-“
-Line 501: What kind of random effect have they used for the LMM
-
-
-
-Reviewer: 2
-
-Comments to the Author
-This is a well-written paper and the thoroughness of the supplemental materials provided is greatly appreciated. In general, especially for audiences less familiar with the statistical methods, linking observations and conclusions back to central hypothesis testing as proposed in lines 301 to 307 would helpful.
-
-By Line:
-
-Line 55: Spell out acronym Organization for Economic Co-Operation and Development (OECD)
-
-Line 203 to 220: There are a variety of assertions in this paragraph that would benefit from citations. For instance, an “…often criticized point is that count data is handled as continuous data…”. Additional citations in this paragraph would be helpful.
-
-Line 260: Suggest new paragraph that “The deep connection…” as there’s a shift in content.
-
-Lines 357: Since potential readers may be less familiar with statistics but more familiar with ecotoxicology testing experimental design, suggest expanding here to describe experimental design more to relate to potential “real world” set ups – examples of testing scenarios, animals involved, etc.
-
-Lines 370-372: Suggest mirroring language more clearly in Lines 301-307 concerning key questions – these recommendations do not mirror the questions but could be reorganized to do so.
-
-Lines 378 onward:  The results discussion starts with a discussion of how following guidance flowcharts can be misleading. This isn’t explicit in the 3 questions guiding the experimental design. Suggest reframing as addressing the part of question 1 – “simpler approaches” and pointing out these examples illustrate where “simpler, conventional approaches can be wrong”. This will help reader follow the experimental design to results discussions more clearly.
-
-Line 480 onward: Similarly, in Section 4.2, mirroring language from lines 301 to 307 would be ideal and help more lay readers follow how the discussions relate back to experimental design.
-
-Suggest combining Section 5.2 and 5.4 (Practical recommendations and Conclusions) in interest of space and duplication. Future Directions could be a closing Section.
-
-Figures:
-
-Figure numbers unclear in formatting.
-
-Tables:
-
-Table 5 is particularly long, suggest considering moving to supplemental materials and presenting a streamlined version – although that may be a challenge given the content.
-
-
-## Mirror Questions:
-
-To address these 2 points: 
-
-Lines 370-372: Suggest mirroring language more clearly in Lines 301-307 concerning key questions – these recommendations do not mirror the questions but could be reorganized to do so.
-
-Line 480 onward: Similarly, in Section 4.2, mirroring language from lines 301 to 307 would be ideal and help more lay readers follow how the discussions relate back to experimental design.
-
-## My Original Text:
-
-301 We designed a comprehensive simulation study addressing three key questions:
-302 1. How do variance patterns in hierarchical dose-response designs affect the performance of testing
-303 procedures based on mixed-effects models using individual data versus simpler tank-level analyses?
-304 2. How reliable are different tests, especially trend tests recommended in decision flowcharts under
-305 various dose-response and variance patterns?
-306 3. What advantages do robust approaches, such as Welch-type Dunnett tests, offer compared to
-307 standard procedures?
-
-
-368 Through this systematic evaluation on power and type I error control, we aim to provide practical 
-369 recommendations on:
-
-370 - When mixed models offer meaningful advantages over simpler approaches
-371 - Whether robust methods like Welch-type Dunnett tests should become standard practice
-372 - How to balance statistical power against practical constraints
-373 Through our simulation studies, we examine the power gains achieved by switching to more complex
-374 models or more powerful trend tests. However, we also pose a crucial question: are these potential
-375 power improvements worth the added complexity and possible reduction in interpretability and
-376 transparency?
-
-
-## My tried modifications according to Reviewer 2's suggestion:
-
-Maybe I should just modify the three key questions from line 301, and refer to it in line 308?
-
-Consistent with regulatory guidance, decision flowcharts are starting points that should be accompanied with visual checks and complementary assumption diagnostics; our framing(?) explicitly compares flowchart‑prescribed ‘simpler’ analyses to robust alternatives. We pose the following questions: 
-
--	Q1: Compared with flowchart‑prescribed simpler approaches (e.g., tank‑mean analyses and rank/trend tests), how do mixed‑effects models and robust many‑to‑one procedures perform across realistic variance patterns and clustered designs?
--	Q2: How reliable are trend and nonparametric tests under diverse dose‑response shapes (including non‑monotonic and oscillating patterns) and variance heterogeneity?
--	Q3: Do robust methods such as Welch‑type Dunnett tests maintain superior power and Type I error control across both homogeneous and heterogeneous variance scenarios?
-
+-	Under what conditions can standard decision flowcharts recommend analyses that yield misleading NOEC inferences, and how should analysts respond when visual patterns contradict flowchart‑prescribed tests
+- Power vs. design, practical constraints, reliability and intuitiveness, and the scientific goal. 
 
 
