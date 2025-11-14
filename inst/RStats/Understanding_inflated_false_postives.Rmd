@@ -1,6 +1,6 @@
-# Understanding False Positives in RCBD Designs: A Mathematical Decomposition
+# Understanding False Positives in CRD and RCBD Designs: A Mathematical Decomposition
 
-During the simulation study, due to my labeling of  high false positive rates in a Randomized Complete Block Design (RCBD) with positional effects.
+One often encountered error in practice is the labeling of replicates, which can cause the random effect being modelled as a block effect. 
 
 ## The Experimental Setup
 
