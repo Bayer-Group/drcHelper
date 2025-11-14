@@ -33,6 +33,25 @@ editor: source
 - [x] Reviewer 1 request, 4.2.3: In Section 4.2.3, start with “Influence of Experimental Design Parameters” (explicitly referencing Figure 1), then “Power to detect small effects,” then “Power to detect large effects.”
 - [x] Add one sentence in Methods: you modeled treatment as fixed and tank as a random intercept in the individual‑level LMM, with individuals at the residual level; ICC is computed from variance components. Also note the caution about mislabeling replicate IDs across treatments and how that inflates Type I error.
 
+## References that are not cited but could be useful
+
+- Shan, G., Young, D., and Kang, L. (2014) A new powerful nonparametric rank test for ordered alternative problem. PLoS One https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0112924
+
+- Ritz  C. (2010) Toward a unified approach to dose-response modeling in ecotoxicology. Environ Toxicol Chem, 29(1):220-9. https://doi.org/10.1002/etc.7. PMID: 20821438.
+- Bruce , R..D. and Versteeg,, D.J.(1992) A Statistical Procedure for Modelling Continuous Ecotoxicity Data. Environ. Toxicol. Chem.11, 1485-1494 
+
+- Munzel. U., Hothorn, L.A. (2001). A unified Approach to Simultaneous Rank Tests Procedures in the Unbalanced One-way Layout. Biometric Journal, 43, 553-569.
+
+- Zeileis, A., Köll, S., & Graham, N. (2020). Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. Journal of Statistical Software, 95(1), 1–36. https://doi.org/10.18637/jss.v095.i01
+
+
+- Hothorn, T., F. Bretz, P.H.Westfall, R. M. Heiberger, A. Schuetzenmeister, and S. Scheibe. (2021). multcomp: Simultaneous Inference in General Parametric Models. R Package Version 1.4-16. http://CRAN.R-project.org/package=multcomp.
+- Hothorn, T., Bretz, F, Westfall, P. (2008). “Simultaneous Inference in General Parametric Models.” Biometrical Journal, 50(3), 346-363.
+- Hothorn, T., F. Bretz, P.H.Westfall, R. M. Heiberger, A. Schuetzenmeister, and S. Scheibe. (2021). multcomp: Simultaneous Inference in General Parametric Models. R Package Version 1.4-16. http://CRAN.R-project.org/package=multcomp.
+
+- Konietschke, F., Placzek, M., Schaarschmidt F., Hothorn, L.A. (2015). nparcomp: An R Software  Package for Nonparametric Multiple Comparisons and Simultaneous Confidence Intervals. Journal of Statistical Software, 64(9), 1-17. URL http://www.jstatsoft.org/v64/i09/. 
+
+- Fox D.R. (2010). A Bayesian approach for determining the no effect concentration and hazardous concentration in ecotoxicology. Ecotoxicol Environ Saf. 73(2):123-31. doi: 10.1016/j.ecoenv.2009.09.012. PMID: 19836077.
 ## CPCAT
 
 the reality of ecotoxicological count data, where over-dispersion, under-dispersion, non-independence, inhomogeneous variance without a pattern, and small sample size are common challenges. 
