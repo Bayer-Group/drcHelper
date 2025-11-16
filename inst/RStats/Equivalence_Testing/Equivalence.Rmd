@@ -8,7 +8,7 @@ editor_options:
 ---
 
 
-## Purpose 
+# Purpose 
 
 This supplementary document provides example calculations following the EFSA bee guidance framework for non-inferiority testing, accompanied by R code that:
 
@@ -26,7 +26,9 @@ This supplementary document provides example calculations following the EFSA bee
    
 5. **Clarifies the distinction** between minimum sample sizes (which just meet the α criterion) and power-adjusted sample sizes (which ensure adequate statistical power for reliable conclusions)
 
-The analysis shows that under EFSA's lenient α = 0.20 framework, demonstrating non-inferiority for a 5% reduction still requires substantially larger samples (~77 per arm for 80% power) than conventional difference testing for a 15% reduction (~24 per arm). This reflects the fundamental statistical challenge: proving safety (ruling out harm beyond a margin) is more demanding than detecting harm.
+The analysis shows that under EFSA's lenient $\alpha$ = 0.20 framework, demonstrating non-inferiority for a 5% reduction still requires substantially larger samples (~77 per group for 80% power) than conventional difference testing for a 15% reduction (~14 per arm under $\alpha$ = 0.20). This reflects the fundamental statistical challenge: proving safety (ruling out harm beyond a margin) is more demanding than detecting harm.
+
+# Methods
 
 ## Mapping between α and CIs
 
@@ -34,39 +36,40 @@ The analysis shows that under EFSA's lenient α = 0.20 framework, demonstrating 
 - With α = 0.2, that CI is two-sided 60%. So you're effectively checking the lower bound of a 60% CI against the 0.90 margin.
 
 
-Equivalence (non-inferiority) criterion: 
-Reject $H0: θ ≤ \ln(0.90)$  in favor of $H1: θ > \ln(0.90)$ 
-if  $L_{60\%\,CI}(θ) > \ln(0.90)$, 
-where $θ = \ln(\text{treated/control})$.
+Equivalence (non-inferiority) criterion:
+
+- Reject $H0: θ ≤ \ln(0.90)$  in favor of $H1: θ > \ln(0.90)$ 
+- if  $L_{60\%\,CI}(θ) > \ln(0.90)$, 
+- where $θ = \ln(\text{treated/control})$.
 
 
-—-- 
 
 ## Worked example design and CIs under a log-normal assumption
 
 Assumptions (parameterized in code below):
+
 - Control mean = 20,000 organisms (e.g., colony size)
 - Treated mean = 5% reduction → 19,000; ratio = 0.95
 - Coefficient of variation (CV) = 20%
 - Log-normal model with equal CV across arms
-- Replicates per arm nC = nT (we'll explore n = 6, 12, 20)
+- Replicates per group nC = nT (we'll explore n = 6, 12, 20)
 
 Mapping CV to the log scale:
 $$
 \sigma^2 = \ln(1+\text{CV}^2), \quad \sigma = \sqrt{\ln(1+\text{CV}^2)}.
 $$
-On the log scale, if X_C, X_T are normal with common variance σ^2, the standard error for the difference in means is:
+On the log scale, if $X_C, X_T$ are normal with common variance $\sigma^2$, the standard error for the difference in means is:
 $$
 SE(\hat{\theta}) = \sigma \sqrt{\frac{1}{n_T} + \frac{1}{n_C}},\quad \hat{\theta} = \ln(0.95).
 $$
 
-Two-sided CI for θ at level 1 − 2α:
+Two-sided CI for θ at level 1 − 2$\alpha$:
 $$
 \hat{\theta} \pm z_{1-\alpha}\, SE(\hat{\theta}),
 $$
 transform back with exp() to obtain the CI for the ratio treated/control. Compare the CI lower bound to 0.90.
 
-— 
+
 
 ## R code to compute 60% and 95% CIs, and the sample size needed
 
@@ -130,24 +133,25 @@ for (n in c(6, 12, 20)) {
 n_needed_60 <- sample_size_noninf_equal_n(ratio_true, margin_ratio, sigma_log, alpha_one_sided)
 # And with a more stringent 95% two-sided CI (equiv. alpha_one_sided = 0.025)?
 n_needed_95 <- sample_size_noninf_equal_n(ratio_true, margin_ratio, sigma_log, alpha_one_sided = 0.025)
-cat(sprintf("\n\nApproximate n per arm needed to pass at alpha=0.20 (60%% CI): %s\n\n", n_needed_60))
-cat(sprintf("Approximate n per arm needed to pass at ~95%% two-sided criterion: %s\n\n", n_needed_95))
+cat(sprintf("\n\nApproximate n per group  needed to pass at alpha=0.20 (60%% CI): %s\n\n", n_needed_60))
+cat(sprintf("Approximate n per group  needed to pass at ~95%% two-sided criterion: %s\n\n", n_needed_95))
 ```
 
 The results show: 
 
 - With CV = 20% and an observed 5% reduction (ratio = 0.95), the 60% CI is still often too wide at modest n.
-- For example, with n = 6 per arm, the 60% CI lower bound is typically below 0.90, so non-inferiority (α = 0.2; margin = 10%) fails.
-- The approximate n per arm required to pass at α = 0.2 (60% CI) is about 20 (per arm) under these assumptions; at a 95% two-sided standard it exceeds 100 per arm. This illustrates that even with a lenient α, demonstrating "≤10% reduction" can be empirically challenging at realistic replication.
+- For example, with n = 6 per arm, the 60% CI lower bound is typically below 0.90, so non-inferiority ($\alpha$ = 0.2; margin = 10%) fails.
+- The approximate n per group  required to pass at $\alpha$ = 0.2 (60% CI) is about 20 (per arm) under these assumptions; at a 95% two-sided standard it exceeds 100 per arm. This illustrates that even with a lenient $\alpha$, demonstrating "≤10% reduction" can be empirically challenging at realistic replication.
 
 
-Using a one-sided α = 0.2 non-inferiority test with a 10% reduction margin is equivalent to requiring the lower bound of a two-sided 60% CI for the treated/control ratio to exceed 0.90. Under a log-normal model with CV = 20% and modest replication, an observed 5% reduction (ratio = 0.95) typically fails this test unless n ≈ 20 per group or larger; at conventional 95% CI levels the replication burden is substantially higher.
+Using a one-sided $\alpha$ = 0.2 non-inferiority test with a 10% reduction margin is equivalent to requiring the lower bound of a two-sided 60% CI for the treated/control ratio to exceed 0.90. Under a log-normal model with CV = 20% and modest replication, an observed 5% reduction (ratio = 0.95) typically fails this test unless n ≈ 20 per group or larger; at conventional 95% CI levels the replication burden is substantially higher.
 
-This example highlights that the prescribed α and margin may not be empirically verifiable under typical variance and replication, motivating feasibility assessment alongside methodological selection.
+This example highlights that the prescribed $\alpha$ and margin may not be empirically verifiable under typical variance and replication, motivating feasibility assessment alongside methodological selection.
+
 
 # Comparing Difference Test and Equivalence Test
 
-## Considering alpha only vs Real Power
+## Considering alpha only (MDD) vs Real Power
 
 **Original formula (gives ~20):** Only ensures the test *can* reject H0 at α level when data are exactly as expected, but doesn't specify power:
 
@@ -162,7 +166,7 @@ where:
 - $z_\beta = \text{qnorm}(\text{power})$ 
 - $\delta = \ln(0.95) - \ln(0.90) \approx 0.0541$
 
-For α = 0.20, power = 0.80:
+For $\alpha$ = 0.20, power = 0.80:
 - $z_{0.20} \approx 0.842$
 - $z_{0.80} \approx 0.842$
 - Without power: $n = 2 \times (0.842 \times 0.198 / 0.0541)^2 \approx 19$
@@ -172,56 +176,54 @@ For α = 0.20, power = 0.80:
 ## Summary of Design and Key Results
 
 ### Study Design
-**Model**: Log-normal with equal variance; CV = 20%; equal sample sizes per arm  
+**Model**: Log-normal with equal variance; CV = 20%; equal sample sizes per group   
 **Scenarios**: 
 - **5% reduction** (ratio = 0.95): goal is to demonstrate NO meaningful harm (non-inferiority)
 - **15% reduction** (ratio = 0.85): goal is to detect significant harm (difference test)
 
 **Non-inferiority margin**: 10% (ratio ≥ 0.90)  
-**Test types**: One-sided non-inferiority (α = 0.05 or 0.20) vs. two-sided difference test (α = 0.05 or 0.20)
+**Test types**: One-sided non-inferiority ($\alpha$ = 0.05 or 0.20) vs. two-sided difference test ($\alpha$ = 0.05 or 0.20)
 
----
 
 ### Key Findings
 
 #### 1. **5% Reduction Scenario** (proving safety)
 **Appropriate test**: Non-inferiority  
 
-| Alpha | Power | n per arm | Total n | Notes |
+| Alpha | Power | n per group  | Total n | Notes |
 |-------|-------|-----------|---------|-------|
 | **0.20** (EFSA) | 80% | **77** | **154** | **Recommended for EFSA compliance** |
 | 0.20 (EFSA) | 90% | 121 | 242 | Higher confidence |
 | 0.05 (stringent) | 80% | 166 | 332 | 2.2× more samples than EFSA |
 
-**Minimum n (no power)**: 20 per arm (just meets α = 0.20 criterion)
+**Minimum n (no power)**: 20 per group (just meets $\alpha$ = 0.20 criterion)
 
 #### 2. **15% Reduction Scenario** (detecting harm)
 **Appropriate test**: Difference test  
 
-| Alpha | Power | n per arm | Total n | Notes |
+| Alpha | Power | n per group | Total n | Notes |
 |-------|-------|-----------|---------|-------|
 | **0.05** | **80%** | **24** | **48** | **Conventional approach** |
 | 0.05 | 90% | 32 | 64 | Higher confidence |
 | 0.20 | 80% | 14 | 28 | More lenient alternative |
 
-**Minimum n (no power)**: 12 per arm (α = 0.05)
+**Minimum n (no power)**: 12 per group ($\alpha$ = 0.05)
 
----
 
 ### Critical Comparisons
 
 **1. Non-inferiority vs. Difference Testing**  
-- Proving safety (5%, non-inferiority, α=0.20): **77 per arm**  
-- Detecting harm (15%, difference test, α=0.05): **24 per arm**  
-- **Non-inferiority requires 3.2× more samples** despite more lenient α
+- Proving safety (5%, non-inferiority, $\alpha$=0.20): **77 per arm**  
+- Detecting harm (15%, difference test, $\alpha$=0.05): **24 per arm**  
+- **Non-inferiority requires 3.2× more samples** despite more lenient $\alpha$
 
 **2. Impact of Alpha Level** (for non-inferiority, 5% reduction, 80% power)  
-- α = 0.20 (EFSA): **77 per arm**  
-- α = 0.05 (stringent): **166 per arm**  
-- **Reducing α from 0.20→0.05 increases sample size by 116%**
+- $\alpha$ = 0.20 (EFSA): **77 per arm**  
+- $\alpha$ = 0.05 (stringent): **166 per arm**  
+- **Reducing $\alpha$ from 0.20→0.05 increases sample size by 116%**
 
 **3. Minimum vs. Power-adjusted Sample Sizes**  
-- **Minimum n** (just meets α criterion): typically 25-35% of power-adjusted n
+- **Minimum n** (just meets $\alpha$ criterion): typically 25-35% of power-adjusted n
 - **Power-adjusted n** (ensures 80% power): recommended for proper study design
 - For EFSA framework: minimum n = 20, but **n = 77 needed for 80% power**
 
@@ -229,13 +231,13 @@ For α = 0.20, power = 0.80:
 
 ### Practical Implications
 
--**EFSA framework (α=0.20, one-sided, 10% margin)** is more lenient than conventional testing  
--**But still demanding**: requires ~75-80 colonies per arm for 80% power with CV=20%  
+-**EFSA framework ($\alpha$=0.20, one-sided, 10% margin)** is more lenient than conventional testing  
+-**But still demanding**: requires ~75-80 colonies per group for 80% power with CV=20%  
 -**Proving safety is harder than detecting harm**: non-inferiority needs 3-4× more samples than difference testing  
 -**Minimum sample sizes (no power)** are inadequate—power-adjusted calculations essential  
 -**Higher CV or narrower margins** would increase sample size requirements further
 
-**Overall conculusion**: Field studies should be designed with n≈75-100 per arm minimum to reliably demonstrate non-inferiority under EFSA guidance when CV=20% and true effect is ≤5%.
+**Overall conclusion**: Field studies should be designed with n≈75-100 per group minimum to reliably demonstrate non-inferiority under EFSA guidance when CV=20% and true effect is ≤5%.
 
 
 ## R Code and Result Table

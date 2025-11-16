@@ -1,0 +1,563 @@
+---
+title: "Manuscript Rvision"
+format: html
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+## To Dos:
+
+- [x] Fix figure numbers and cross‑references; add explicit links from Figures 3–4 to Figure 1 (design/variance patterns).
+- [x] Replace underscores in method names in running text (e.g., LM_Hetero → LM‑Hetero) while keeping underscores in code blocks to match R objects.
+- [x] Spell out OECD on first mention and keep consistent thereafter.
+- [x] Move the long Table 5 to SI; 
+- [x] keep a streamlined summary table of Table 5 (now table s3) or narrative in the main text.
+- [x] Replace underscores in Figures?
+- [x] Reviewer 1 request, 4.2.3: In Section 4.2.3, start with “Influence of Experimental Design Parameters” (explicitly referencing Figure 1), then “Power to detect small effects,” then “Power to detect large effects.”
+- [x] Add one sentence in Methods: you modeled treatment as fixed and tank as a random intercept in the individual‑level LMM, with individuals at the residual level; ICC is computed from variance components. Also note the caution about mislabeling replicate IDs across treatments and how that inflates Type I error.
+
+## Regenerate the Figures
+
+```{r}
+sim4_decreasing_results <- readRDS("~/Projects/drcHelper/inst/RStats/sim4/decreasing_only/sim4_decreasing_results.rds")
+test_methods <- list(
+  "LMM_Homo" = lmm_dunnett_homo,
+  "LMM_Hetero" = lmm_dunnett_hetero,
+  "LM_Homo" = lm_dunnett_agg,
+  "LM_Hetero" = gls_dunnett_agg,
+  "Williams" = williams_test,
+  "Jonckheere" = jonckheere_test,
+  "Dunns" = manyone_dunns_test
+)
+
+
+# ICC values to explore
+icc_values <- c(0.1, 0.3, 0.5, 0.7, 0.9)  # Low to high ICC
+
+# Total variance (keeping this constant helps with interpretation)
+total_variance <- 10
+
+# Function to calculate variance components from ICC
+calculate_variance_components <- function(icc, total_variance) {
+  var_tank <- icc * total_variance
+  var_individual <- (1 - icc) * total_variance
+  return(list(var_tank = var_tank, var_individual = var_individual))
+}
+
+# Create variance component values for each ICC
+variance_components <- lapply(icc_values, calculate_variance_components,
+                              total_variance = total_variance)
+
+# Extract as vectors for parameter grid
+var_tank_values <- sapply(variance_components, function(x) x$var_tank)
+var_individual_values <- sapply(variance_components, function(x) x$var_individual)
+
+# Create named vectors for better readability in results
+names(var_tank_values) <- paste0("ICC_", icc_values)
+names(var_individual_values) <- paste0("ICC_", icc_values)
+
+# Display the variance components
+variance_table <- data.frame(
+  ICC = icc_values,
+  var_tank = var_tank_values,
+  var_individual = var_individual_values,
+  total_variance = total_variance
+)
+print(variance_table)
+
+
+# Define parameter grid for full simulation
+param_grid_1 <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4, 6),
+  k_individuals = c(3,6,10),
+  # var_tank = c(2, 4),
+  # var_individual = c(4,6),
+  max_effect = c(5, 20),
+  response_type = c("decreasing"),
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+
+param_grid_2 <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4, 6),
+  k_individuals = c(3,6,10),
+  # var_tank = c(2, 4),
+  # var_individual = c(4,6),
+  max_effect = c(20),
+  response_type = c("none"),
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+
+nrow(param_grid_1)
+nrow(param_grid_2)
+param_grid_1 <- rbind(param_grid_1,param_grid_2)
+(36+6)*5 ## 180 scenarios, 4 non-control, ,
+param_grid <- dplyr::cross_join(param_grid_1,variance_table)
+dim(param_grid)
+sim4_decreasing_results <-  dplyr::left_join(param_grid,sim4_decreasing_results)
+sim4_decreasing_results_1 <- sim4_decreasing_results ##%>% dplyr::filter(!(response_type == "none"))
+dim(sim4_decreasing_results_1)
+```
+
+
+```{r}
+dim(sim4_decreasing_results_1)
+sim4_full_results <- readRDS("~/Projects/drcHelper/inst/RStats/sim4/sim4_full_results.rds")
+# Define test methods to compare
+test_methods <- list(
+  "LMM_Homo" = lmm_dunnett_homo,
+  "LMM_Hetero" = lmm_dunnett_hetero,
+  "LM_Homo" = lm_dunnett_agg,
+  "LM_Hetero" = gls_dunnett_agg,
+  "Williams" = williams_test,
+  "Jonckheere" = jonckheere_test,
+  "Dunns" = manyone_dunns_test
+)
+
+
+# ICC values to explore
+icc_values <- c(0.1, 0.3, 0.5, 0.7, 0.9)  # Low to high ICC
+
+# Total variance (keeping this constant helps with interpretation)
+total_variance <- 10
+
+# Function to calculate variance components from ICC
+calculate_variance_components <- function(icc, total_variance) {
+  var_tank <- icc * total_variance
+  var_individual <- (1 - icc) * total_variance
+  return(list(var_tank = var_tank, var_individual = var_individual))
+}
+
+# Create variance component values for each ICC
+variance_components <- lapply(icc_values, calculate_variance_components,
+                              total_variance = total_variance)
+
+# Extract as vectors for parameter grid
+var_tank_values <- sapply(variance_components, function(x) x$var_tank)
+var_individual_values <- sapply(variance_components, function(x) x$var_individual)
+
+# Create named vectors for better readability in results
+names(var_tank_values) <- paste0("ICC_", icc_values)
+names(var_individual_values) <- paste0("ICC_", icc_values)
+
+# Display the variance components
+variance_table <- data.frame(
+  ICC = icc_values,
+  var_tank = var_tank_values,
+  var_individual = var_individual_values,
+  total_variance = total_variance
+)
+print(variance_table)
+
+
+# Define parameter grid for full simulation
+param_grid_1 <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4, 6),
+  k_individuals = c(3,6,10),
+  # var_tank = c(2, 4),
+  # var_individual = c(4,6),
+  max_effect = c(5, 20),
+  response_type = c("threshold","non_monotonic","oscillating"),
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+
+param_grid_2 <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4, 6),
+  k_individuals = c(3,6,10),
+  # var_tank = c(2, 4),
+  # var_individual = c(4,6),
+  max_effect = c(5),
+  response_type = c("none"),
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+
+nrow(param_grid_1)
+nrow(param_grid_2)
+param_grid_1 <- rbind(param_grid_1,param_grid_2)
+(36+6)*5 ## 180 scenarios, 4 non-control, ,
+param_grid <- dplyr::cross_join(param_grid_1,variance_table)
+dim(param_grid)
+
+sim4_full_results <- dplyr::left_join(param_grid,sim4_full_results)
+```
+
+
+
+```{r}
+full_results <- rbind(sim4_full_results,sim4_decreasing_results_1)
+wide_res <- full_results %>% tidyr::pivot_wider(names_from = Method,values_from = Power)
+
+wide_res %>% filter(Expected_Response ==100) %>% reframe(LMM_Homo=summary(LMM_Homo),
+                                                         LMM_Hetero=summary(LMM_Hetero),
+                                                         LM_Homo = summary(LM_Homo),
+                                                         LM_Hetero = summary(LM_Hetero),
+                                                         Jonckheere = summary(Jonckheere),
+                                                         Williams = summary(Williams),
+                                                         Dunns = summary(Dunns)
+) %>% pander::pander(.)
+
+
+wide_res %>% filter(Expected_Response ==95) %>% reframe(LMM_Homo=summary(LMM_Homo),
+                                                        LMM_Hetero=summary(LMM_Hetero),
+                                                        LM_Homo = summary(LM_Homo),
+                                                        LM_Hetero = summary(LM_Hetero),
+                                                        Jonckheere = summary(Jonckheere),
+                                                        Williams = summary(Williams)
+)
+
+wide_res %>% filter(Expected_Response ==90) %>% reframe(LMM_Homo=summary(LMM_Homo),
+                                                        LMM_Hetero=summary(LMM_Hetero),
+                                                        LM_Homo = summary(LM_Homo),
+                                                        LM_Hetero = summary(LM_Hetero),
+                                                        Jonckheere = summary(Jonckheere),
+                                                        Williams = summary(Williams)
+)
+
+out <- wide_res %>% group_by(Expected_Response) %>% nest() %>% mutate(power_summary=map(data,function(x){
+  out <- data.frame(stat=c("Min","Q1","Mean","Median","Q3","Max"))
+  out1 <- x %>% reframe(LMM_Homo=summary(LMM_Homo),
+                        LMM_Hetero=summary(LMM_Hetero),
+                        LM_Homo = summary(LM_Homo),
+                        LM_Hetero = summary(LM_Hetero),
+                        Jonckheere = summary(Jonckheere),
+                        Williams = summary(Williams)
+  )
+  cbind(out,out1)
+  
+})) %>% dplyr::select(-data) %>% unnest(c(power_summary))
+
+out %>% mutate(across(where(is.table),
+                      as.numeric)) %>% knitr::kable(.,digits = 3) %>% kableExtra::kable_classic()
+```
+
+```{r}
+out2 <- wide_res %>% filter(m_tanks ==4, k_individuals ==6, max_effect == 5) %>% dplyr::select(-c(n_doses,min_dose,max_dose,
+                                                                                                  m_tanks,k_individuals,alpha,
+                                                                                                  alternative,
+                                                                                                  max_effect,
+                                                                                                  total_variance))
+out2 %>% filter(Expected_Response <100) %>% summarise(nJ=sum(Jonckheere>Williams),n=length(Jonckheere))%>% mutate(pnJ = nJ/n)
+wide_res %>% filter(max_effect == 5) %>% filter(Expected_Response <100, max_effect == 5) %>% summarise(nJ=sum(Jonckheere>Williams),n=length(Jonckheere))%>% mutate(pnJ = nJ/n)
+wide_res %>% filter(max_effect == 20) %>% filter(Expected_Response <100, max_effect == 20) %>% summarise(nJ=sum(Jonckheere>Williams),n=length(Jonckheere))%>% mutate(pnJ = nJ/n)
+wide_res %>% filter(max_effect > 5) %>% filter(Expected_Response <100) %>% summarize(loss= max(Williams-Jonckheere))
+
+wide_res %>% filter(max_effect > 5) %>% filter(Expected_Response <100, Dose_Level=="Dose_3") %>% summarize(loss= max(Williams-Jonckheere))
+```
+
+
+### Figures
+
+```{r}
+full_results <- rbind(sim4_full_results,sim4_decreasing_results_1)
+full_results_1 <- full_results %>% dplyr::mutate(response_type = case_match(response_type,"decreasing"~"Decreasing","non_monotonic"~"Non-monotonic","none"~"No Effect","oscillating"~"Oscillating","threshold"~"Threshold")) %>% 
+  mutate(Method = gsub("_","-",Method)) %>% mutate(Dose_Level= gsub("_","-",Dose_Level))
+unique(full_results_1$response_type)
+unique(full_results_1$Method)
+unique(full_results_1$Dose_Level)
+full_results <- full_results_1
+design_effect <- full_results %>% group_by(max_effect,response_type,Dose_Level) %>%
+  reframe(neffect=length(unique(Expected_Response)), Reduction = paste0(100-Expected_Response[1],"%"))
+tempdata <- full_results
+design_effect_temp <- design_effect
+```
+
+
+```{r}
+# Theme with 12 pt text and 1 pt lines
+publication_theme_pdf_12 <- function(base = theme_bw(), line_pt = 1.0) {
+  base + theme(
+    plot.title    = element_text(size = 12, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    plot.caption  = element_text(size = 12),
+    axis.title.x  = element_text(size = 12),
+    axis.title.y  = element_text(size = 12),
+    axis.text.x   = element_text(size = 12),
+    axis.text.y   = element_text(size = 12),
+    legend.title  = element_text(size = 12),
+    legend.text   = element_text(size = 12),
+    strip.text.x  = element_text(size = 12),
+    strip.text.y  = element_text(size = 12),
+    axis.line     = element_line(linewidth = line_pt / ggplot2::.pt),
+    axis.ticks    = element_line(linewidth = line_pt / ggplot2::.pt),
+    panel.grid    = element_line(linewidth = (line_pt * 0.75) / ggplot2::.pt)
+  )
+}
+
+# Set defaults for geom text and lines
+update_geom_defaults("text",    list(size = 12 / ggplot2::.pt))
+update_geom_defaults("label",   list(size = 12 / ggplot2::.pt))
+update_geom_defaults("line",    list(linewidth = 1.0 / ggplot2::.pt))
+update_geom_defaults("segment", list(linewidth = 1.0 / ggplot2::.pt))
+update_geom_defaults("smooth",  list(linewidth = 1.0 / ggplot2::.pt))
+update_geom_defaults("point",   list(stroke    = 1.0 / ggplot2::.pt))
+
+# theme_set(theme_bw(base_size = 18))
+for(max_effect0 in c(5,20)){
+  for(m_tank0 in c(4,6)){
+    for(k_individuals0 in c(3,6,10)){
+      
+      ggplot(tempdata%>%
+               dplyr::filter(m_tanks==m_tank0, k_individuals==k_individuals0,
+                             max_effect==max_effect0),aes(x=ICC,y=Power,color=Method))+ geom_point(aes(pch=Method))+
+        scale_shape_manual(values = 1:7)+
+        facet_grid(response_type ~ Dose_Level,scales = "free")  +
+        geom_line(alpha=0.5)+
+        geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+ publication_theme_pdf_12()+
+        theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+        ggthemes::scale_color_solarized()+ggtitle(paste0("4 tanks, ", k_individuals0, " individuals, maximum effect: ", max_effect0, "%"))+
+        geom_text(data=design_effect_temp%>%dplyr::filter(max_effect==max_effect0), aes(x=0.5,y=1.01,label=Reduction),col= "black" ) 
+      ##ggsave(paste0("SimPower_",m_tank0, "_tank_",k_individuals0,"_ind_",max_effect0,"_effect.png"),dpi=300, width = 6,height =6)
+      ggsave(paste0(here::here(),"/inst/RStats/Revision/SimPower_",m_tank0, "_tank_",k_individuals0,"_ind_",max_effect0,"_effect.pdf"),dpi=300, width = 7.5,height = 9)
+    }
+  }
+}## finish here
+```
+
+
+```{r}
+
+```
+
+
+## Heterogeneous Variance
+
+```{r}
+sim5_results <- readRDS("~/Projects/drcHelper/inst/RStats/sim5/archive/sim5_results.rds")
+
+sim5_results %>% filter(response_type =="none") %>% filter(Method=="Jonckheere") -> tmp
+sum(tmp$Power>0.05)/nrow(tmp)
+sim5_results %>% filter(response_type =="none") %>% filter(Method=="Williams") -> tmp
+sum(tmp$Power>0.05)/nrow(tmp)
+
+# Variance pattern generator functions
+variance_patterns <- list(
+  homogeneous = function(n_doses, base_var = 4) {
+    rep(base_var, n_doses)
+  },
+  
+  increasing = function(n_doses, base_var = 4) {
+    base_var * seq(0.5, 2, length.out = n_doses)
+  },
+  
+  decreasing = function(n_doses, base_var = 4) {
+    base_var * seq(2, 0.5, length.out = n_doses)
+  },
+  
+  v_shaped = function(n_doses, base_var = 4) {
+    mid_point <- ceiling(n_doses/2)
+    c(
+      base_var * seq(2, 1, length.out = mid_point),
+      base_var * seq(1, 2, length.out = n_doses - mid_point + 1)[-1]
+    )
+  }
+)
+
+tank_level_methods <- list(
+  "LM_Homo" = lm_dunnett_agg_simple,
+  "LM_Hetero" = gls_dunnett_agg_simple,
+  "Williams" = williams_test,
+  "Jonckheere" = jonckheere_test,
+  "Dunns" = manyone_dunns_test
+)
+
+# Visualize the variance patterns
+# variance_plot <- plot_variance_patterns(n_doses = 5, base_variance = 2)
+# print(variance_plot)
+
+# Parameter grid for heterogeneous variance question
+param_grid_hetero <- expand.grid(
+  n_doses = 5,
+  min_dose = 0,
+  max_dose = 20,
+  m_tanks = c(4,6,10),
+  variance_pattern = c("homogeneous", "increasing", "decreasing", "v_shaped"),
+  base_variance = c(4, 6),
+  max_effect = c(5, 20),  # Null and moderate effect
+  response_type = c("none", "threshold", "oscillating"),  # Focus on null and decreasing
+  alpha = 0.05,
+  alternative = "less",
+  stringsAsFactors = FALSE
+)
+
+nrow(param_grid_hetero)
+## 120 ## 24*2*3
+param_grid_hetero <- param_grid_hetero %>% dplyr::filter(max_effect == 5 | (max_effect == 20 & response_type !="none"))
+
+sim5_results$Method[sim5_results$Method=="GLS_Hetero"] <- "LM_Hetero"
+sim5_results$Method[sim5_results$Method=="LM_Hetero"] <- "LM-Hetero"
+sim5_results$Method[sim5_results$Method=="LM_Homo"] <- "LM-Homo"
+base_variance_names <- c("4" = "Base variance: 4",
+                         "6" = "Base variance: 6")
+sim5_results$variance_pattern <- gsub("_","-",sim5_results$variance_pattern )
+sim5_results$Dose_Level <- gsub("Dose_","Dose-",paste0(sim5_results$Dose_Level,"\n",(100-sim5_results$Expected_Response),"%"))
+
+sim5_results <- sim5_results %>% dplyr::mutate(response_type = case_match(response_type,"decreasing"~"Decreasing","non_monotonic"~"Non-monotonic","none"~"No Effect","oscillating"~"Oscillating","threshold"~"Threshold"))
+design_effect <- sim5_results %>% group_by(max_effect,response_type,Dose_Level,variance_pattern,base_variance) %>%
+  reframe(neffect=length(unique(Expected_Response)), Reduction = paste0(100-Expected_Response[1],"%"),
+          nvar=length(unique(Variance)),Variance=Variance[1])
+
+tempdata <- sim5_results
+
+for(max_effect0 in c(5,20)){
+  for(m_tank0 in c(4,6,10)){
+    for(response_type0 in c("No Effect","Oscillating","Threshold")){
+      if(max_effect0 == 20 && response_type0 =="No Effect"){}else{
+        ggplot(tempdata%>%
+                 dplyr::filter(m_tanks==m_tank0, response_type == response_type0,
+                               max_effect==max_effect0)%>%droplevels(.),
+               aes(x=Dose_Level,y=Power,color=Method))+
+          geom_point(aes(pch=Method))+
+          # facet_grid( variance_pattern~base_variance,scales = "free")  +
+          facet_grid( variance_pattern~base_variance,scales = "free",labeller = labeller(base_variance=base_variance_names)) +
+          #geom_line()+
+          geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+          scale_y_continuous(breaks = seq(0, 1, by = 0.2),limits = c(0, 1.15)) + publication_theme_pdf_12()+
+          theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+          ggthemes::scale_color_solarized()+ggtitle(paste0("Response type: ", response_type0,", ", m_tank0, " tanks, ", "maximum effect: ", max_effect0, "%"))+
+          geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0,response_type == response_type0)%>%droplevels(.),
+                    aes(x=Dose_Level,y=1.1,label=paste("Var=",Variance)), col= "black" ) + xlab("Dose Level")
+        #ggsave(paste0(here::here(),"/inst/RStats/Revision/SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.png"),
+        #dpi=300, width = 6,height = 6)
+        ggsave(paste0(here::here(),"/inst/RStats/Revision/SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.pdf"),
+               dpi=300, width = 7,height = 7)
+        
+      }
+      
+      
+    }
+  }
+}
+
+
+for(max_effect0 in c(5,20)){
+  for(m_tank0 in c(4,6,10)){
+    for(response_type0 in c("No Effect")){
+      if(max_effect0 == 20 && response_type0 =="No Effect"){}else{
+        ggplot(tempdata%>%
+                 dplyr::filter(m_tanks==m_tank0, response_type == response_type0,
+                               max_effect==max_effect0)%>%droplevels(.),
+               aes(x=Dose_Level,y=Power,color=Method))+
+          geom_point(aes(pch=Method))+
+          # facet_grid( variance_pattern~base_variance,scales = "free")  +
+          facet_grid( variance_pattern~base_variance,scales = "free",labeller = labeller(base_variance=base_variance_names)) +
+          #geom_line()+
+          geom_hline(yintercept = c(0.05,0.8),lty=2,alpha=0.3)+
+          scale_y_continuous(breaks = seq(0, 1, by = 0.2),limits = c(0, 0.12)) + publication_theme_pdf_12()+
+          theme(legend.position = "bottom")+ ## ggplot2::scale_color_viridis_d(direction = 1)
+          ggthemes::scale_color_solarized()+ggtitle(paste0("Response type: ", response_type0,", ", m_tank0, " tanks, ", "maximum effect: ", max_effect0, "%"))+
+          geom_text(data=design_effect%>%dplyr::filter(max_effect==max_effect0,response_type == response_type0)%>%droplevels(.),
+                    aes(x=Dose_Level,y=0.1,label=paste("Var=",Variance)), col= "black" ) + xlab("Dose Level")
+        ggsave(paste0(here::here(),"/inst/RStats/Revision/SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.png"),dpi=300, width = 7.5,height = 7)
+        ggsave(paste0(here::here(),"/inst/RStats/Revision/SimHetero_",m_tank0, "_tank_","response_", response_type0,max_effect0,"_effect.pdf"),
+               dpi=300, width = 7,height = 7)
+        
+      }
+      
+      
+    }
+  }
+}
+
+```
+
+## References that are not cited in revised manuscript but could be useful
+
+- Shan, G., Young, D., and Kang, L. (2014) A new powerful nonparametric rank test for ordered alternative problem. PLoS One https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0112924
+
+- Ritz  C. (2010) Toward a unified approach to dose-response modeling in ecotoxicology. Environ Toxicol Chem, 29(1):220-9. https://doi.org/10.1002/etc.7. PMID: 20821438.
+- Bruce , R..D. and Versteeg,, D.J.(1992) A Statistical Procedure for Modelling Continuous Ecotoxicity Data. Environ. Toxicol. Chem.11, 1485-1494 
+
+- Munzel. U., Hothorn, L.A. (2001). A unified Approach to Simultaneous Rank Tests Procedures in the Unbalanced One-way Layout. Biometric Journal, 43, 553-569.
+
+- Zeileis, A., Köll, S., & Graham, N. (2020). Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. Journal of Statistical Software, 95(1), 1–36. https://doi.org/10.18637/jss.v095.i01
+
+
+- Hothorn, T., F. Bretz, P.H.Westfall, R. M. Heiberger, A. Schuetzenmeister, and S. Scheibe. (2021). multcomp: Simultaneous Inference in General Parametric Models. R Package Version 1.4-16. http://CRAN.R-project.org/package=multcomp.
+- Hothorn, T., Bretz, F, Westfall, P. (2008). “Simultaneous Inference in General Parametric Models.” Biometrical Journal, 50(3), 346-363.
+- Hothorn, T., F. Bretz, P.H.Westfall, R. M. Heiberger, A. Schuetzenmeister, and S. Scheibe. (2021). multcomp: Simultaneous Inference in General Parametric Models. R Package Version 1.4-16. http://CRAN.R-project.org/package=multcomp.
+
+- Konietschke, F., Placzek, M., Schaarschmidt F., Hothorn, L.A. (2015). nparcomp: An R Software  Package for Nonparametric Multiple Comparisons and Simultaneous Confidence Intervals. Journal of Statistical Software, 64(9), 1-17. URL http://www.jstatsoft.org/v64/i09/. 
+
+- Fox D.R. (2010). A Bayesian approach for determining the no effect concentration and hazardous concentration in ecotoxicology. Ecotoxicol Environ Saf. 73(2):123-31. doi: 10.1016/j.ecoenv.2009.09.012. PMID: 19836077.
+
+## CPCAT
+
+The reality of ecotoxicological count data, where over-dispersion, under-dispersion, non-independence, inhomogeneous variance without a pattern, and small sample size are common challenges. 
+
+## Equivalence Testing
+
+quote for the revised EFSA bee guidance document: 
+
+> The statistical analysis should be conducted according to the general approach for higher tier studies (see Annex C of the guidance document and Chapter 10.1). The applicant should apply a one-sided equivalence test (α = 0.2) for each endpoint, with an equivalence limit corresponding to a 10% reduction in the treated test compared to the control, to prove that there are no adverse effects on foraging behaviour. 
+
+This, in our opinion, is to cut the feet to fit the shoes. Just to use a seemingly better approach, without considering is the method switch requires complete experiment re-design and whether the scientific goal is verifiable. In fact, the regulatory goal may be empirically unverifiable with the proposed framework under standard use of alpha.
+
+
+## Trend Tests
+
+The redundancy arises because a **trend test** (like the Jonckheere-Terpstra test or Williams' test) is specifically designed to test the null hypothesis of *no trend* versus the alternative hypothesis of a **monotonic trend** (e.g., increasing or decreasing response with dose).
+
+### 1. The Trend Test Implies Monotonicity
+
+The alternative hypothesis of a one-sided **trend test** directly assumes the response is either monotonically increasing or monotonically decreasing across dose groups.
+
+* If you **reject the null hypothesis** of *no difference*, you are accepting the alternative: there is a significant monotonic trend.
+* If you **fail to reject the null hypothesis**, it suggests there's no sufficient evidence of the monotonic trend the test is looking for.
+
+### 2. What does the monotonicity test do?
+
+A separate "monotonicity test" only tells you *if the assumption is plausible*, but it doesn't perform the final test of interest (i.e., whether the trend is statistically significant). The trend test is the ultimate goal.
+
+### 3. The Williams' Test Example
+
+For tests like the **Williams' test**, the procedure is even more explicitly tied to monotonicity: it uses the **Pool Adjacent Violators Algorithm (PAVA)** to impose a monotonic fit on the data before calculating the statistic. This means the test is *already enforcing* the assumption it needs, regardless of what a pre-test might say. The test statistic is calculated specifically to look for the best monotonic fit.
+
+### Why Flowcharts Include Monotonicity Test before a Trend Test (The Justification?)
+
+Despite the logical redundancy, flowcharts sometimes include a separate check for monotonicity for pedagogical or overly cautious reasons:
+
+1.  **Guiding Test Selection:** It serves as a clear decision point to distinguish between **trend tests** (monotonic alternatives) and **any-difference tests** (non-monotonic alternatives, like ANOVA or Dunnett's test for many-to-one comparison).
+2.  **Addressing Model Validity:** Some researchers want to ensure that if they run a powerful trend test, the data *visually and statistically* support the underlying structure (monotonicity) before applying the trend test, especially if the data are non-normal or highly variable.
+
+## Other Thoughts
+
+"削足适履" translates to "to cut the feet to fit the shoes" and describes a situation where you force something to fit a preconceived or unsuitable mold, often resulting in an impractical or inelegant solution. It can also be expressed as "to act in a Procrustean manner" or, more generally, as a situation where you "force something to fit". 
+
+- Literal meaning: To cut one's feet to make them fit a shoe.
+- Figurative meaning: Forcing a situation to conform to a rigid or inappropriate standard, despite the negative consequences.
+- English equivalents:
+- To cut the feet to fit the shoes
+- To act in a Procrustean manner
+- To force something to fit
+- An impractical or inelegant solution 
+
+## Goal of the Paper
+
+### Questions to answer:
+
+-	Under what conditions can standard decision flowcharts recommend analyses that yield misleading NOEC inferences, and how should analysts respond when visual patterns contradict flowchart‑prescribed tests
+- Power vs. design, practical constraints, reliability and intuitiveness, and the scientific goal. 
+
+

@@ -185,4 +185,4 @@ out1 <- wide_res %>% filter(m_tanks ==4, k_individuals ==6, max_effect == 20) %>
 out1 %>% filter(response_type =="non_monotonic", Dose_Level == "Dose_4")
 out1 %>% filter(Expected_Response <100) %>% summarise(nJ=sum(Jonckheere>Williams),n=length(Jonckheere))%>% mutate(pnJ = nJ/n)
 out1 %>% filter(response_type =="oscillating", Dose_Level == "Dose_4")
-out1 %>% filter(Dose_Level == "Dose_3") %>% group_by(response_type) %>% summarise(a=mean(Jonckheere))
+out1 %>% filter(Dose_Level == "Dose_3") %>% group_by(response_type,Expected_Response) %>% summarise(a=mean(Jonckheere))

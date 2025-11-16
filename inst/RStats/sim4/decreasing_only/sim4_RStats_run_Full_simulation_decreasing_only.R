@@ -78,7 +78,7 @@ param_grid_2 <- expand.grid(
   k_individuals = c(3,6,10),
   # var_tank = c(2, 4),
   # var_individual = c(4,6),
-  max_effect = c(5),
+  max_effect = c(20),
   response_type = c("none"),
   alpha = 0.05,
   alternative = "less",
