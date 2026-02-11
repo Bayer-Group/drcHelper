@@ -125,3 +125,89 @@ noec_output <- noec_from_trend_test(Response ~ Dose, data = dat_medium, test = "
 print(noec_output)
 ```
 
+
+# Mon
+
+In regulatory ecotox and pharma settings, the logic “test monotonicity first, then apply a trend test to derive a NOEC/MED” comes from how these procedures are constructed and what they are trying to protect you from statistically. 
+
+**References**
+
+- Amaratunga, D., & Ge, N. (1998). Step-down trend tests for identifying the minimum effective dose. Journal of Biopharmaceutical Statistics, 8(1), 151–162. https://doi.org/10.1080/10543409808835228
+- https://www.tandfonline.com/doi/abs/10.1080/10543409808835228
+- https://rdrr.io/cran/PMCMRplus/man/tamhaneDunnettTest.html
+
+---
+
+## 1. Context: NOEC/MED from multiple doses
+
+**The problem:**  
+You have several dose groups and a control, and you want to determine the **NOEC** (No Observed Effect Concentration) or **MED** (Minimum Effective Dose). This is typically done via:
+
+- Multiple comparisons vs. control (e.g., Dunnett-type tests), or  
+- Step-down procedures that incorporate a **trend test** across doses.
+
+Tamhane, Hochberg, and Dunnett (and follow‑up work) studied procedures that:
+
+1. Order doses from high to low.
+2. Test for an effect starting at the highest dose.
+3. Step down until you reach the first dose that is not significantly different from control → that dose is the NOEC (or one step above is the MED, depending on convention).
+
+Amaratungs and Ge (2007) discussed some variants of this idea:
+
+- **SD2L**: step-down procedure using a **simple linear contrast–based trend test** at each step.  
+- **SD2B**: same step-down structure, but replaces the linear trend test with **Bartholomew’s test** (a more powerful ordered-mean test).  
+- **SD2W**: replaces the trend test with **Welch’s test** to handle heteroscedasticity.
+
+They show that SD2B (Bartholomew) and SD2W (Welch) often outperform SD2L, sometimes by >10% in efficiency.
+
+---
+
+## 2. Why a monotonicity / trend test at all?
+
+The key assumption behind these step-down NOEC/MED procedures is that the **true dose–response is monotone** (typically non-decreasing with dose). Under monotonicity:
+
+- Higher doses should not have *smaller* mean responses than lower doses (for a harmful effect).
+- A “trend test” (linear contrast, Bartholomew, Williams, etc.) is specifically designed to detect such **ordered** alternatives more efficiently than general ANOVA-type tests.
+
+If the response is monotone, a trend test:
+
+- Has higher power to detect a dose–response relationship.
+- Produces a more interpretable pattern for defining a minimum effective dose.
+
+If the response is **not** monotone (e.g., U‑shaped, hormesis, random fluctuations), then:
+
+- A monotone trend test is mis-specified and may be misleading.
+- The step-down logic (“once you lose significance, all lower doses are assumed non-effective”) can fail.
+
+Hence, one important methodological question is:  
+**Should we first check whether the data are consistent with a monotone pattern before applying a monotone trend-based step-down procedure to derive NOEC/MED?**
+
+---
+
+## 3. The role of a monotonicity test before a trend-based NOEC procedure
+
+Performing a monotonicity test before the trend test serves several purposes:
+
+### 3.1. Model check: Is a monotone dose–response plausible?
+
+Trend-based step-down procedures (SD2L, SD2B, SD2W, Williams-type tests, etc.) assume that:
+
+- The expected means are ordered by dose (e.g., μ₀ ≤ μ₁ ≤ μ₂ ≤ … for an increasing effect).
+
+A **monotonicity test** (e.g., Bartholomew’s test, Williams’ test, or an order-restricted test) is effectively a test of:
+
+- H₀: μ₀ = μ₁ = … = μ_k  
+  vs.  
+- H₁: μ₀ ≤ μ₁ ≤ … ≤ μ_k with at least one strict inequality.
+
+If monotonicity is rejected, then:
+
+- The data do not support the assumption of a simple monotone dose–response.
+- Using a monotone trend-based step-down NOEC procedure becomes questionable.
+- You might instead:
+  - Use general multiple comparisons vs. control (e.g., Dunnett, Tamhane–Dunnett, or heteroscedastic variants), or  
+  - Move to model-based approaches (e.g., parametric dose–response models, non-monotone models).
+
+### 3.2. Control of Type I error under the intended model
+
+The Tamhane et al. paper and the follow-up (Amaratungs and Ge 2007) evaluate procedures under **balanced normal homoscedastic** (and later unbalanced/heteroscedastic) designs, assuming

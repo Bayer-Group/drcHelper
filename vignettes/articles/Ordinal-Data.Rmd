@@ -28,15 +28,52 @@ library(drcHelper)
 source("../knitr-setup.R")
 ```
 
+## Executive Summary
+
+### Purpose
+The article demonstrates various statistical approaches for analyzing ordinal data (ranked categorical data like injury levels: 0, A, B, C, D, E, F) from dose-response studies, focusing on deriving endpoints like ER50 (effective rate causing 50% injury).
+
+### Main Approaches Covered
+
+**1. Regression with continuous dose variable:**
+- **Ordinal regression** (proportional odds model) - most theoretically appropriate but complex to implement for ER50 calculation
+- **Logistic regression with quasibinomial likelihood** - treats injury percentages as proportions
+- **Nonlinear log-logistic regression** - assumes normal errors, flexible for dose-response curves
+
+**2. Testing approaches (for NOEC calculation):**
+- RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test)
+- MQJT (Multiquantal Jonckheere-Terpstra)
+- Non-parametric tests treating dose as categorical
+
+### Key Findings
+- For well-behaved full dose-response data, different methods produce similar ER50 estimates (around 12.2 in their example)
+- Quasibinomial and nonlinear log-logistic approaches perform comparably with limited dose groups
+- Ordinal regression requires bootstrap methods for confidence intervals and custom optimization for ER50
+- Each method has limitations regarding assumptions about variance, category spacing, and data distribution
+
+### Practical Guidance
+
+The article includes extensive R code examples using packages like `drc`, `MASS`, and `GLMcat`, plus simulation studies demonstrating model performance under different scenarios. Regardless of the method, it is essential to:
+
+- Check model assumptions, and
+- Assess agreement between model and data before interpreting results.
+
+
 ## Background
 
-There is no routine procedures in regulatory frameworks for ordinal data analysis yet. For histopathological data, it is recommended to use RSCABS (Rao-Scott Adjusted Cochran-Armitage Trend Test by Slices) to derive NOEALs. An alternative is MQJT(Multiquantal Jonckheere–Terpstra), which is mentioned in OECD TG 231 for AMA life stage analysis.
+There are currently no standardized regulatory procedures for ordinal data analysis. For histopathology data, RSCABS is frequently recommended to derive NOEALs. MQJT is mentioned in OECD TG 231 for AMA life stage analysis as an alternative.
 
-Plant visual injury data has been evaluated qualitatively and it is possible to analyze them quantitatively. 
+Plant visual injury (PVI) data are usually evaluated qualitatively, but can also be analyzed quantitatively.
 
-For well-behaving data (full clear dose-response), most approaches will produce very similar results as long as the target endpoint (the test rate or concentration where the average injury is reaching 50% or is medium injury category) is the same. In this article, we will explain how several regression modelling can be applied, focusing on nonlinear regression with sigmoid shaped curve, logistic regression with quasibinomial likelihood, and the conventional proportional odds logistic regression. Other approaches with a different endpoint type are demonstrated as well, including BMD for ordinal data using `bmdordinal`, RSCABS, etc.  
+For well-behaved data (a clear, complete dose–response), most approaches give very similar results if they target the same endpoint (e.g. the dose at which average injury is 50% or corresponds to a “medium” injury category). This article focuses on:
 
-All approaches have its own limitations and need to be treated with caution. For example, for nonlinear model with a normal error assumption behind, issues could occur with inhomogeneous variance, uncertain considerations is critical when the data is over-spread across many categories close to the estimated ER50. I think whichever method to choose, careful evaluation the assumptions of the model and check the model data agreement are always necessary.
+- Nonlinear regression with a sigmoidal curve,
+- Logistic regression with quasibinomial likelihood, and
+- Proportional odds ordinal regression.
+- Other approaches with different endpoint definitions (e.g. BMD for ordinal data via bmdordinal, RSCABS) are also illustrated.
+
+All approaches have limitations and must be used with care. For example, nonlinear models with normal errors may perform poorly when variance is heterogeneous or when observations are spread across many categories near the estimated ER50. Whatever method is used, model assumptions and model–data agreement must be checked.
+
 
 ## Ordinal Data in General
 
@@ -50,8 +87,7 @@ Ordinal Regression is a somewhat complex method that can predict outcomes based 
 - Continuation Ratio Model: Model cumulative odds ratios.
 - Adjacent Categories Model: useful when neighboring categories influence each other. 
 
-Due to the limited information and potentially unequal intervals, it requires a clear understanding of its subtleties and complexities, and careful attentions when implementing regression modelling. 
-
+Due to the limited information and potentially unequal spacing, it requires a clear understanding of its subtleties and complexities, and careful attentions when implementing regression modelling. 
 
 In the ecotoxicology area, histopathology assessment and visual injury data are ranked categorical data. We focus on the plant visual injury data (PVI). 
 

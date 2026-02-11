@@ -1,0 +1,663 @@
+---
+title: "Limitations of Williams' Test"
+format: html
+---
+
+
+We first creates simulated data with exaggerated non-monotonicity and variability to clearly illustrate the problem:
+
+```{r}
+# ── Simulated data illustrating Williams' test limitations ──
+# Mimics OECD 219 development rate: 6 treatments, 4 replicates
+# Deliberately non-monotonic: hormetic bump at low doses, dip at mid-dose
+
+set.seed(2026)
+trt_levels <- c("Control", "6.25", "12.5", "25", "50", "100")
+
+# True pattern: hormesis (stimulation at low dose) + effect at high dose
+true_means <- c(
+  Control = 0.0520,
+  `6.25`  = 0.0540,   # ← stimulation (higher than control)
+  `12.5`  = 0.0545,   # ← stimulation continues
+  `25`    = 0.0530,   # ← starts declining
+  `50`    = 0.0480,   # ← clear effect
+  `100`   = 0.0500    # ← partial recovery (non-monotonic)
+)
+
+# Generate replicate data with realistic within-group SD (~0.002)
+sd_within <- 0.002
+
+df_fake <- purrr::imap_dfr(true_means, \(mu, dose) {
+  tibble::tibble(
+    Dose      = factor(dose, levels = trt_levels),
+    Replicate = 1:4,
+    Response  = rnorm(4, mean = mu, sd = sd_within)
+  )
+})
+
+# ── 1. Visualise the raw data ──
+library(ggplot2)
+
+group_summary <- df_fake |>
+  dplyr::group_by(Dose) |>
+  dplyr::summarise(
+    mean = mean(Response),
+    se   = sd(Response) / sqrt(dplyr::n()),
+    n    = dplyr::n(),
+    .groups = "drop"
+  )
+
+p_raw <- ggplot(group_summary, aes(x = Dose, y = mean)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se),
+                width = 0.2) +
+  geom_point(data = df_fake, aes(y = Response),
+             alpha = 0.4, size = 2, color = "steelblue") +
+  labs(
+    title = "Simulated Development Rate — observed means",
+    subtitle = "Non-monotonic pattern: hormesis + partial recovery",
+    y = "Development rate (1/day)"
+  ) +
+  theme_bw()
+
+# ── 2. Run PAVA and show what Williams sees ──
+pava_decreasing <- function(means, weights) {
+  n <- length(means)
+  block_val <- means
+  block_wt  <- weights
+  block_id  <- as.list(seq_len(n))
+  
+  log <- list()
+  iter <- 0
+  
+  repeat {
+    violation <- NA
+    for (i in seq_len(length(block_val) - 1)) {
+      if (block_val[i] < block_val[i + 1]) {
+        violation <- i
+        break
+      }
+    }
+    if (is.na(violation)) break
+    
+    iter <- iter + 1
+    i <- violation
+    new_val <- (block_val[i] * block_wt[i] + block_val[i + 1] * block_wt[i + 1]) /
+      (block_wt[i] + block_wt[i + 1])
+    
+    log[[iter]] <- list(
+      iteration = iter,
+      merged    = c(block_id[[i]], block_id[[i + 1]]),
+      from      = c(block_val[i], block_val[i + 1]),
+      to        = new_val
+    )
+    
+    block_val  <- c(block_val[-(i:(i+1))],  NA)  # placeholder
+    block_wt   <- c(block_wt[-(i:(i+1))],   NA)
+    block_id   <- c(block_id[-(i:(i+1))],   list(NULL))
+    # Insert merged block at position i
+    block_val  <- append(block_val[-length(block_val)], new_val, after = i - 1)
+    block_wt   <- append(block_wt[-length(block_wt)], block_wt[i] + block_wt[i + 1], after = i - 1)
+    # Fix: recompute properly
+    block_val  <- block_val  # already correct
+    block_wt[i] <- sum(unlist(log[[iter]]$merged) |> length()) * weights[1]  
+    block_id   <- append(block_id[-length(block_id)], 
+                         list(unlist(log[[iter]]$merged)), after = i - 1)
+  }
+  
+  # Expand back to original group positions
+  iso_means <- rep(NA_real_, length(means))
+  for (j in seq_along(block_val)) {
+    iso_means[unlist(block_id[[j]])] <- block_val[j]
+  }
+  
+  list(isotonised = iso_means, n_iterations = iter, log = log)
+}
+
+# ── Reusable function: PAVA summary table + plot ──
+summarise_pava <- function(group_summary, title_suffix = "") {
+  obs_means <- group_summary$mean
+  iso_fit   <- isoreg(-obs_means)
+  iso_means <- -iso_fit$yf
+
+  # Comparison table
+  comparison <- group_summary |>
+    dplyr::mutate(
+      observed_mean   = mean,
+      isotonised_mean = iso_means,
+      changed         = abs(observed_mean - isotonised_mean) > 1e-10,
+      pct_change      = (isotonised_mean - observed_mean) / observed_mean * 100
+    ) |>
+    dplyr::select(Dose, n, observed_mean, isotonised_mean, changed, pct_change)
+
+  # Identify PAVA blocks (runs of identical isotonised means)
+  n_changed  <- sum(comparison$changed)
+  n_blocks   <- length(rle(iso_means)$values)
+
+  # Plot data
+  plot_data <- group_summary |>
+    dplyr::mutate(isotonised = iso_means) |>
+    tidyr::pivot_longer(cols = c(mean, isotonised),
+                        names_to = "type", values_to = "value") |>
+    dplyr::mutate(
+      type = dplyr::if_else(type == "mean", "Observed", "PAVA (isotonised)")
+    )
+
+  p <- ggplot(plot_data, aes(x = Dose, y = value, color = type, group = type)) +
+    geom_point(size = 3) +
+    geom_line() +
+    scale_color_manual(
+      values = c("Observed" = "black", "PAVA (isotonised)" = "red")
+    ) +
+    labs(
+      title    = paste0("Observed vs PAVA-isotonised means", title_suffix),
+      subtitle = sprintf(
+        "%d of %d means changed; %d blocks after amalgamation",
+        n_changed, nrow(comparison), n_blocks
+      ),
+      y     = "Development rate (1/day)",
+      color = NULL
+    ) +
+    theme_bw() +
+    theme(legend.position = "top")
+
+  list(comparison = comparison, plot = p,
+       n_changed = n_changed, n_blocks = n_blocks)
+}
+
+# ── Apply to Scenario A ──
+pava_a <- summarise_pava(group_summary, title_suffix = " — Scenario A")
+
+p_raw
+pava_a$plot
+pava_a$comparison
+```
+
+
+
+The simulated data has two features that break monotonicity:
+
+1. **Hormesis** at 6.25 and 12.5 mg/L — response *increases* above control before declining
+2. **Partial recovery** at 100 mg/L — the highest dose has a higher response than 50 mg/L
+
+PAVA will amalgamate multiple groups to force monotonicity.
+
+
+## Williams' step-down procedure
+
+Williams' test uses a **step-down procedure starting from the highest dose**:
+
+1. Compare the highest dose (100) vs Control using the PAVA-isotonised mean
+2. If significant → reject, move to the next lower dose (50)
+3. If significant → reject, move to 25
+4. Continue until a dose is **not** significant → **stop**. That dose is the NOEC, and all lower doses are automatically accepted (not tested)
+
+
+
+- **50 mg/L** has a genuine effect (low observed mean), but PAVA pools it with 100 mg/L (which recovered), pulling the isotonised mean *up*
+- This can make the 50 mg/L comparison *less* significant than it should be, because the amalgamated mean is diluted by the recovery at 100
+- Conversely, the **100 mg/L** comparison uses that same pooled mean, so it may appear more affected than the raw data suggests
+
+
+
+| Limitation | What happens |
+|-----------|-------------|
+| **Loss of group identity** | Multiple dose groups get the same isotonised mean |
+| **Biased estimates** | Amalgamated means can be far from any individual group's true mean |
+| **Hormesis masked** | Stimulatory effects at low doses are averaged away with Control |
+| **Diluted effects** | A genuine effect at dose $k$ can be masked if PAVA pools it with a recovered dose $k+1$ |
+| **Step-down stops early** | If the highest dose is non-significant (e.g., due to recovery), the step-down stops immediately → all doses are declared non-significant, even if mid-range doses have real effects |
+| **Reduced specificity** | Cannot determine which specific dose is the LOEC within an amalgamated block |
+
+The **step-down stopping** point is the most critical issue for this dataset: if the PAVA-pooled {50+100} mean is not significant against Control, Williams would declare NOEC ≥ 100 and never even test 50 mg/L individually — despite 50 mg/L having a statistically significant effect under Dunnett (p = 0.025).
+
+
+## Fragility of the monotonicity pre-test
+
+ToxRat's decision tree uses `drcHelper::monotonicityTest()` — a linear + quadratic contrast on ranks — to decide whether Williams or Dunnett is appropriate. The logic is:
+
+- **Linear significant + Quadratic not significant** → monotonic → Williams
+- **Quadratic significant** → non-monotonic → Dunnett
+
+But this pre-test has limited power with small sample sizes (typically $n = 4$ replicates). We can demonstrate this fragility by applying multiple trend tests to the same simulated data.
+
+```{r}
+#| label: monotonicity-pretest
+
+# drcHelper monotonicity test (linear + quadratic contrasts on ranks)
+mono_result <- drcHelper::monotonicityTest(
+  Data      = as.data.frame(df_fake),
+  Treatment = "Dose",
+  Response  = "Response"
+)
+
+mono_result
+```
+
+The linear contrast may detect the net downward slope, but the quadratic contrast — which should flag the non-monotonic bump — often lacks power to reach significance.
+
+### Corroborating trend tests
+
+We apply three additional tests to assess whether the evidence for a monotone trend is robust:
+
+```{r}
+#| label: trend-tests
+
+library(tukeytrend)
+library(multcomp)
+
+# Numeric dose for trend models
+df_trend <- as.data.frame(df_fake) |>
+  dplyr::mutate(
+    DoseNum = dplyr::if_else(
+      as.character(Dose) == "Control", 0,
+      suppressWarnings(as.numeric(as.character(Dose)))
+    )
+  )
+
+# 1. Tukey Trend Test (multiple dose scalings, multiplicity-adjusted)
+fit_lm <- lm(Response ~ DoseNum, data = df_trend)
+
+tt_fit <- tukeytrendfit(
+  fit_lm,
+  dose    = "DoseNum",
+  scaling = c("ari", "ord", "arilog"),
+  ddf     = "residual"
+)
+
+tt_result <- summary(glht(
+  model       = tt_fit$mmm,
+  linfct      = tt_fit$mlf,
+  alternative = "less"
+))
+
+# 2. Jonckheere-Terpstra (nonparametric ordered alternative)
+jt_result <- PMCMRplus::jonckheereTest(
+  Response ~ Dose,
+  data        = df_trend,
+  alternative = "less"
+)
+
+# 3. Compile comparison
+tt_pvals <- tt_result$test$pvalues
+tt_names <- names(tt_result$test$tstat)
+
+trend_comparison <- tibble::tibble(
+  Test = c(
+    "monotonicityTest — Linear",
+    "monotonicityTest — Quadratic",
+    paste0("Tukey Trend — ", c("ari", "ord", "arilog")),
+    "Jonckheere-Terpstra"
+  ),
+  p_value = round(c(
+    mono_result$`Pr(>|t|)`[1],
+    mono_result$`Pr(>|t|)`[2],
+    tt_pvals,
+    jt_result$p.value
+  ), 4),
+  Significant = dplyr::if_else(p_value < 0.05, "Yes", "No")
+)
+
+trend_comparison
+```
+
+This table typically reveals inconsistency: the linear contrast may be significant while the Tukey ordinal scaling is not, or vice versa. When trend tests disagree about whether a monotone trend exists, the decision between Williams and Dunnett becomes **arbitrary** — it depends on which test you chose as gatekeeper. This is a fundamental fragility in the two-stage procedure.
+
+### Scenario A summary
+
+In the data above (seed 2026), the monotonicity pre-test finds the linear contrast **borderline non-significant** (p ≈ 0.052) — ToxRat would select Dunnett. Yet the Tukey trend test detects a significant decreasing trend under all three dose scalings (p < 0.025). The tests contradict each other.
+
+### Scenario B: Linear significant, Tukey inconsistent
+
+We now generate a second dataset where the *opposite* happens: `monotonicityTest` finds a significant linear trend (borderline, p ≈ 0.03–0.04), but the Tukey trend test is split — only some dose scalings reach significance.
+
+```{r}
+#| label: scenario-b-data
+
+# Scenario B: very mild monotonic decline with a bump at one mid-dose
+# The overall slope is weak enough that the linear contrast is borderline,
+# while the bump at 12.5 disrupts ordinal/arilog scalings.
+
+set.seed(42)
+
+true_means_b <- c(
+  Control = 0.0525,
+  `6.25`  = 0.0523,
+  `12.5`  = 0.0535,   # ← bump (higher than both neighbours)
+  `25`    = 0.0520,
+  `50`    = 0.0518,
+  `100`   = 0.0515
+)
+
+df_fake_b <- purrr::imap_dfr(true_means_b, \(mu, dose) {
+  tibble::tibble(
+    Dose      = factor(dose, levels = trt_levels),
+    Replicate = 1:4,
+    Response  = rnorm(4, mean = mu, sd = 0.0018)
+  )
+})
+
+# Visualise
+group_summary_b <- df_fake_b |>
+  dplyr::group_by(Dose) |>
+  dplyr::summarise(
+    mean = mean(Response),
+    se   = sd(Response) / sqrt(dplyr::n()),
+    n    = dplyr::n(),
+    .groups = "drop"
+  )
+
+ggplot(group_summary_b, aes(x = Dose, y = mean)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = mean - 1.96 * se, ymax = mean + 1.96 * se),
+                width = 0.2) +
+  geom_point(data = df_fake_b, aes(y = Response),
+             alpha = 0.4, size = 2, color = "steelblue") +
+  labs(
+    title = "Scenario B — very mild decline with mid-dose bump",
+    subtitle = "Weak overall trend; bump disrupts ordinal/arilog scalings",
+    y = "Development rate (1/day)"
+  ) +
+  theme_bw()
+
+# PAVA summary for Scenario B
+pava_b <- summarise_pava(group_summary_b, title_suffix = " — Scenario B")
+pava_b$plot
+pava_b$comparison
+```
+
+```{r}
+#| label: scenario-b-trend-tests
+
+# Monotonicity pre-test
+mono_b <- drcHelper::monotonicityTest(
+  Data      = as.data.frame(df_fake_b),
+  Treatment = "Dose",
+  Response  = "Response"
+)
+
+# Tukey trend test
+df_trend_b <- as.data.frame(df_fake_b) |>
+  dplyr::mutate(
+    DoseNum = dplyr::if_else(
+      as.character(Dose) == "Control", 0,
+      suppressWarnings(as.numeric(as.character(Dose)))
+    )
+  )
+
+fit_lm_b <- lm(Response ~ DoseNum, data = df_trend_b)
+
+tt_fit_b <- tukeytrendfit(
+  fit_lm_b,
+  dose    = "DoseNum",
+  scaling = c("ari", "ord", "arilog"),
+  ddf     = "residual"
+)
+
+tt_result_b <- summary(glht(
+  model       = tt_fit_b$mmm,
+  linfct      = tt_fit_b$mlf,
+  alternative = "less"
+))
+
+# Jonckheere-Terpstra
+jt_b <- PMCMRplus::jonckheereTest(
+  Response ~ Dose,
+  data        = df_trend_b,
+  alternative = "less"
+)
+
+# Comparison table
+tt_pvals_b <- tt_result_b$test$pvalues
+tt_names_b <- names(tt_result_b$test$tstat)
+
+trend_comparison_b <- tibble::tibble(
+  Test = c(
+    "monotonicityTest — Linear",
+    "monotonicityTest — Quadratic",
+    paste0("Tukey Trend — ", c("ari", "ord", "arilog")),
+    "Jonckheere-Terpstra"
+  ),
+  p_value = round(c(
+    mono_b$`Pr(>|t|)`[1],
+    mono_b$`Pr(>|t|)`[2],
+    tt_pvals_b,
+    jt_b$p.value
+  ), 4),
+  Significant = dplyr::if_else(p_value < 0.05, "Yes", "No")
+)
+
+trend_comparison_b
+```
+
+### Two scenarios, opposite conclusions
+
+| | Scenario A (seed 2026) | Scenario B (seed 42) |
+|--|----------------------|---------------------|
+| **Data pattern** | Hormesis + recovery | Very mild decline + mid-dose bump |
+| **monotonicityTest Linear** | Not significant (p ≈ 0.052) | Borderline / depends on realisation |
+| **Tukey Trend** | All significant | Weakened by bump (depends on scaling) |
+| **ToxRat decision** | → Dunnett | Ambiguous |
+| **Reality** | Data is clearly non-monotonic | Data is also non-monotonic |
+
+The same underlying problem (non-monotonicity) leads to opposite gatekeeper decisions depending on the specific data pattern and random variation. This demonstrates that the two-stage approach (pre-test monotonicity → choose test) is fragile and can be misleading.
+
+
+## Comparison: Williams vs Dunnett (one-sided and two-sided)
+
+Now we run all three tests on both simulated datasets and compare their conclusions.
+
+### Scenario A
+
+```{r}
+#| label: williams-vs-dunnett-a
+
+# Williams' test (uses PAVA-isotonised means, step-down from highest dose)
+williams_res <- drcHelper::broom_williams(
+  Response ~ Dose,
+  data      = as.data.frame(df_fake),
+  method    = "Williams_JG",
+  direction = "decreasing"
+)
+
+# Dunnett's test — one-sided (decreasing)
+dunnett_1s <- drcHelper::dunnett_test(
+  data                  = as.data.frame(df_fake),
+  response_var          = "Response",
+  dose_var              = "Dose",
+  tank_var              = "Replicate",
+  include_random_effect = FALSE,
+  alternative           = "less"
+)
+
+# Dunnett's test — two-sided
+dunnett_2s <- drcHelper::dunnett_test(
+  data                  = as.data.frame(df_fake),
+  response_var          = "Response",
+  dose_var              = "Dose",
+  tank_var              = "Replicate",
+  include_random_effect = FALSE,
+  alternative           = "two.sided"
+)
+
+# ── Build clean comparison table ──
+dose_levels <- c("6.25", "12.5", "25", "50", "100")
+
+tbl_williams <- williams_res |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Williams",
+    Estimate  = round(estimate, 6),
+    Statistic = round(`t'-stat`, 3),
+    p_value   = NA_character_,
+    Decision  = decision
+  )
+
+tbl_dunnett_1s <- dunnett_1s$results_table |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Dunnett (one-sided)",
+    Estimate  = round(estimate, 6),
+    Statistic = round(statistic, 3),
+    p_value   = format(round(p.value, 4), nsmall = 4),
+    Decision  = dplyr::if_else(significant, "reject", "accept")
+  )
+
+tbl_dunnett_2s <- dunnett_2s$results_table |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Dunnett (two-sided)",
+    Estimate  = round(estimate, 6),
+    Statistic = round(statistic, 3),
+    p_value   = format(round(p.value, 4), nsmall = 4),
+    Decision  = dplyr::if_else(significant, "reject", "accept")
+  )
+
+comparison_table <- dplyr::bind_rows(
+  tbl_williams, tbl_dunnett_1s, tbl_dunnett_2s
+) |>
+  dplyr::arrange(
+    factor(Dose, levels = dose_levels),
+    factor(Test, levels = c("Williams", "Dunnett (one-sided)", "Dunnett (two-sided)"))
+  )
+
+comparison_table
+```
+
+```{r}
+#| label: noec-helper
+
+# Helper: derive NOEC from Williams step-down result
+derive_noec_williams <- function(williams_res) {
+  if (is.null(williams_res) || nrow(williams_res) == 0) return(NA)
+  decisions <- williams_res$decision
+  doses_chr <- gsub(" - 0.*", "", williams_res$comparison)
+  if (all(decisions == "accept")) return(paste(">=", doses_chr[length(doses_chr)]))
+  if (all(decisions == "reject")) return(paste("<", doses_chr[1]))
+  reject_idx <- which(decisions == "reject")
+  first_reject <- min(reject_idx)
+  if (first_reject == 1) return(paste("<", doses_chr[1]))
+  doses_chr[first_reject - 1]
+}
+```
+
+```{r}
+#| label: noec-summary-a
+
+# Extract NOEC from each test
+noec_williams <- derive_noec_williams(williams_res)
+noec_dunnett_1s <- dunnett_1s$noec
+noec_dunnett_2s <- dunnett_2s$noec
+
+tibble::tibble(
+  Test = c("Williams", "Dunnett (one-sided)", "Dunnett (two-sided)"),
+  NOEC = c(noec_williams, noec_dunnett_1s, noec_dunnett_2s)
+)
+```
+
+### Scenario B
+
+```{r}
+#| label: williams-vs-dunnett-b
+
+williams_res_b <- drcHelper::broom_williams(
+  Response ~ Dose,
+  data      = as.data.frame(df_fake_b),
+  method    = "Williams_JG",
+  direction = "decreasing"
+)
+
+dunnett_1s_b <- drcHelper::dunnett_test(
+  data                  = as.data.frame(df_fake_b),
+  response_var          = "Response",
+  dose_var              = "Dose",
+  tank_var              = "Replicate",
+  include_random_effect = FALSE,
+  alternative           = "less"
+)
+
+dunnett_2s_b <- drcHelper::dunnett_test(
+  data                  = as.data.frame(df_fake_b),
+  response_var          = "Response",
+  dose_var              = "Dose",
+  tank_var              = "Replicate",
+  include_random_effect = FALSE,
+  alternative           = "two.sided"
+)
+
+tbl_williams_b <- williams_res_b |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Williams",
+    Estimate  = round(estimate, 6),
+    Statistic = round(`t'-stat`, 3),
+    p_value   = NA_character_,
+    Decision  = decision
+  )
+
+tbl_dunnett_1s_b <- dunnett_1s_b$results_table |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Dunnett (one-sided)",
+    Estimate  = round(estimate, 6),
+    Statistic = round(statistic, 3),
+    p_value   = format(round(p.value, 4), nsmall = 4),
+    Decision  = dplyr::if_else(significant, "reject", "accept")
+  )
+
+tbl_dunnett_2s_b <- dunnett_2s_b$results_table |>
+  dplyr::transmute(
+    Dose      = stringr::str_extract(comparison, "^[\\d.]+"),
+    Test      = "Dunnett (two-sided)",
+    Estimate  = round(estimate, 6),
+    Statistic = round(statistic, 3),
+    p_value   = format(round(p.value, 4), nsmall = 4),
+    Decision  = dplyr::if_else(significant, "reject", "accept")
+  )
+
+comparison_table_b <- dplyr::bind_rows(
+  tbl_williams_b, tbl_dunnett_1s_b, tbl_dunnett_2s_b
+) |>
+  dplyr::arrange(
+    factor(Dose, levels = dose_levels),
+    factor(Test, levels = c("Williams", "Dunnett (one-sided)", "Dunnett (two-sided)"))
+  )
+
+comparison_table_b
+```
+
+```{r}
+#| label: noec-summary-b
+
+noec_williams_b <- derive_noec_williams(williams_res_b)
+noec_dunnett_1s_b <- dunnett_1s_b$noec
+noec_dunnett_2s_b <- dunnett_2s_b$noec
+
+tibble::tibble(
+  Test = c("Williams", "Dunnett (one-sided)", "Dunnett (two-sided)"),
+  NOEC = c(noec_williams_b, noec_dunnett_1s_b, noec_dunnett_2s_b)
+)
+```
+
+### Key observations
+
+1. **Williams uses amalgamated estimates**: doses within the same PAVA block share the same estimate, so their test statistics are identical — the test cannot distinguish among them.
+
+2. **Dunnett one-sided vs two-sided**: the one-sided test has more power (lower p-values) because it tests only $H_1: \mu_i < \mu_0$. The two-sided test is more conservative but can also detect stimulatory effects at low doses.
+
+3. **Step-down vs per-dose**: Williams' step-down can miss mid-range effects if the highest dose has recovered (PAVA dilutes the effect). Dunnett tests each dose independently.
+
+4. **NOEC discrepancies**: when the dose-response is non-monotonic, the three tests may yield different NOECs — the choice of test drives the regulatory conclusion.
+
+5. **Scenario comparison**: Scenario A (hormesis + partial recovery) and Scenario B (mild decline + mid-dose bump) illustrate that small changes in the shape of the dose–response can flip which tests are significant and which NOECs result. Monotonicity pre-tests and trend tests may disagree, and the Williams vs Dunnett NOEC can diverge — all depending on the specific non-monotonic pattern present in the data.
+
+
+## Notes
+
+### Terminology
+
+**Amalgamated mean** = the pooled weighted average produced by PAVA. When two adjacent groups violate the monotonicity constraint, their means are "amalgamated" (merged) into a single value. The term comes from the original Williams (1971, 1972) papers. 
+
+**Isotonised** = forced to satisfy an isotonic (monotone) constraint. "Isotonic regression" is the general statistical term for fitting a monotone function to data by minimizing squared error subject to an ordering constraint. PAVA is the algorithm that solves this. The isotonised means are the PAVA output — the closest monotone sequence to the observed means.
+
+So: **amalgamated mean = isotonised mean = PAVA-adjusted mean**. 

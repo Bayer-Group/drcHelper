@@ -1,0 +1,34 @@
+---
+title: "DRC_Background"
+output: html_document
+---
+
+
+As pointed out in Seber and Wild (1989), there exist two different parameterisations of the Weibull model. They do not yield the same fitted curve for a given dataset (see under Examples).
+
+The four-parameter Weibull type 1 model ('weibull1') is
+
+f(x)=c+(d−c)exp(−exp(b(log(x)−log(e)))).
+
+The four-parameter Weibull type 2 model ('weibull2') is
+
+f(x)=c+(d−c)(1−exp(−exp(b(log(x)−log(e))))).
+
+Both four-parameter model functions are asymmetric with inflection point at the dose equal e
+
+The three-parameter Weibull type 1 model is given by the expression
+
+f(x)=0+(d−0)exp(−exp(b(log(x)−log(e)))).
+
+The model function is asymmetric about the inflection point, which is the parameter 
+exp(e).
+
+The three-parameter Weibull type 1 model with upper limit 1 is given by the expression
+
+f(x)=0+(1−0)exp(−exp(b(log(x)−log(e)))).
+
+
+```{r}
+url <- "https://login.microsoftonline.com/fcb2b37b-5da0-466b-9b83-0014b67a7c78/oauth2/v2.0/authorize ?client_id=c2626e75-2b10-4ee7-b9ec-caee239bd95a&redirect_uri=https%3A%2F%2Foidcdebugger.com%2Fdebug&scope=openid%20%20https%3A%2F%2Fapi.vcop-test.int.bayer.com%2Fbackend&response_type=token&response_mode=form_post&state=vs63ezfqncl&nonce=gysgs3p6x9"
+```
+

@@ -1,53 +1,31 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # drcHelper
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Bayer-Group/drcHelper/actions/workflows/R-CMD-check.yaml) 
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html) 
+<!-- Potentially useful ones.
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) 
+-->
 <!-- badges: end -->
 
-The goal of **drcHelper** is to assist with routine dose-response
-analysis by providing a collection of helper functions and standalone
-functions that are generic and may be useful beyond our organization.
+The goal of **drcHelper** is to assist with routine dose-response analysis by providing a collection of helper functions and standalone functions that are generic and may be useful beyond our organization.
 
-As part of the GLP stat pilot project, this package serves as a
-cornerstone for the second use case, EFX Statistics. It will streamline
-GLP statistical analyses for various dose-response studies and test
-assays within our registration data package. This ensures that the
-analyses remain current, state-of-the-art, and flexible enough to adapt
-to new regulatory requirements while complying with GLP standards.
+As part of the GLP stat pilot project, this package serves as a cornerstone for the second use case, EFX Statistics. It will streamline GLP statistical analyses for various dose-response studies and test assays within our registration data package. This ensures that the analyses remain current, state-of-the-art, and flexible enough to adapt to new regulatory requirements while complying with GLP standards.
 
-The package also includes test cases and examples to help the regulatory
-statistical community understand the reasons behind different outcomes.
-For instance, point estimations and p-values may vary depending on the
-parties involved, the functions used, or the packages selected. It aims
-to promote a harmonized understanding of methodologies and provide a
-foundation for standardized practices in the regulatory statistics field
-for plant protection product registration. Additionally, it is hoped
-that this project will contribute to the ongoing OECD 54 revision
-process.
+The package also includes test cases and examples to help the regulatory statistical community understand the reasons behind different outcomes. For instance, point estimations and p-values may vary depending on the parties involved, the functions used, or the packages selected. It aims to promote a harmonized understanding of methodologies and provide a foundation for standardized practices in the regulatory statistics field for plant protection product registration. Additionally, it is hoped that this project will contribute to the ongoing OECD 54 revision process.
 
-Some of the functions are adapted from archived packages or single
-functions of a bigger package so that the loaded namespace is not too
-big for small calculations. Some of the functions are included for
-testing and validation purposes. All third-party code with a different
-license are specified in the relevant source files with the license name
-and the relevant copyright texts.
+Some of the functions are adapted from archived packages or single functions of a bigger package so that the loaded namespace is not too big for small calculations. Some of the functions are included for testing and validation purposes. All third-party code with a different license are specified in the relevant source files with the license name and the relevant copyright texts.
 
-This package is open source, and any contributions or improvements,
-especially on the documentation side, are welcome.
+This package is open source, and any contributions or improvements, especially on the documentation side, are welcome.
 
-*Please note that the documentation website for this package is
-currently under development. Some articles are still placeholders, and
-many more are on the way. However, the ongoing development of the
-website does not impact the usage of this R package. *
+*Please note that the documentation website for this package is currently under development. Some articles are still placeholders, and many more are on the way. However, the ongoing development of the website does not impact the usage of this R package.*
 
 ## Installation
 
-You can install the development version of drcHelper from
-[GitHub](https://github.com/) with:
+You can install the development version of drcHelper from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -78,21 +56,21 @@ dat_medium$Response[dat_medium$Response < 0] <- 0
 prelimPlot3(dat_medium)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%"/>
 
 ``` r
 prelimSummary(dat_medium) %>% knitr::kable(.,digits = 3)
 ```
 
-|  Dose |  Mean |    SD | % Inhibition |      CV |
-|------:|------:|------:|-------------:|--------:|
-|  0.00 | 7.736 | 0.635 |        0.000 |   8.203 |
-|  0.94 | 7.669 | 0.633 |        0.858 |   8.259 |
-|  1.88 | 6.563 | 0.275 |       15.161 |   4.197 |
-|  3.75 | 2.596 | 0.524 |       66.440 |  20.175 |
-|  7.50 | 0.429 | 0.128 |       94.456 |  29.865 |
-| 15.00 | 0.859 | 0.372 |       88.892 |  43.296 |
-| 30.00 | 0.465 | 0.485 |       93.984 | 104.162 |
+|  Dose |  Mean |    SD | \% Inhibition |      CV |
+|------:|------:|------:|--------------:|--------:|
+|  0.00 | 7.736 | 0.635 |         0.000 |   8.203 |
+|  0.94 | 7.669 | 0.633 |         0.858 |   8.259 |
+|  1.88 | 6.563 | 0.275 |        15.161 |   4.197 |
+|  3.75 | 2.596 | 0.524 |        66.440 |  20.175 |
+|  7.50 | 0.429 | 0.128 |        94.456 |  29.865 |
+| 15.00 | 0.859 | 0.372 |        88.892 |  43.296 |
+| 30.00 | 0.465 | 0.485 |        93.984 | 104.162 |
 
 ## Fitting multiple models and rank them.
 
@@ -154,7 +132,7 @@ p <- plot.modList(modList[1:3])
 p
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%"/>
 
 ## Adding ECx and ECx CI’s to the plots
 
@@ -164,7 +142,7 @@ addECxCI(p1,object=modList[[1]],EDres=NULL,trend="Decrease",endpoint="EC", respL
                      textAjust.x=0.01,textAjust.y=0.3,useObsCtr=FALSE,d0=NULL,textsize = 4,lineheight = 0.5,xmin=0.012)+ ylab("Response Variable [unit]") + xlab("Concentration [µg a.s./L]")
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%"/>
 
 ``` r
 ## addECxCI(p)
@@ -187,7 +165,7 @@ knitr::kable(resED,caption = "Response Variable at day N",digits = 3)
 
 Response Variable at day N
 
-**Calculate specific ECx: **
+**Calculate specific ECx:**
 
 ``` r
 mod <-modList[[1]]
@@ -220,49 +198,38 @@ knitr::kable(coef(modsum),digits = 3)
 
 1.  R-CMD-check.yaml: This triggers when:
 
-- A pull request is opened that targets any branch matching the pattern
-  releases/\*\*
-- This includes branches like releases/v1.0, releases/beta,
-  releases/hotfix, etc.
-- It will NOT trigger for PRs targeting main or master
-- workflow_dispatch: This allows manual triggering of the workflow from
-  the GitHub Actions tab.
+-   A pull request is opened that targets any branch matching the pattern releases/\*\*
+-   This includes branches like releases/v1.0, releases/beta, releases/hotfix, etc.
+-   It will NOT trigger for PRs targeting main or master
+-   workflow_dispatch: This allows manual triggering of the workflow from the GitHub Actions tab.
 
-This workflow will only run when working with release branches, not
-during normal development on main. If you want it to run on regular
-development, you’ll need to change the branch patterns.
+This workflow will only run when working with release branches, not during normal development on main. If you want it to run on regular development, you’ll need to change the branch patterns.
 
 2.  pkgdown.yaml: This triggers when
 
-- whenever a pull request event occurs.
-- when a GitHub release event occurs, but only for the specific type
-  published.
-- when pushed to dev.
+-   whenever a pull request event occurs.
+-   when a GitHub release event occurs, but only for the specific type published.
+-   when pushed to dev.
 
 ## ToDo
 
-- [ ] Develop all test cases for NOEC functions
-- [ ] Prepare the templates and standard outputs for all .
-- [ ] Update the documentation.
+-   [ ] Develop all test cases for NOEC functions
+-   [ ] Prepare the templates and standard outputs for all .
+-   [ ] Update the documentation.
 
 ## Contribution Notes
 
-- If a code space is used, Use ‘postCreateCommand’ to run commands after
-  the container is created. It is rather fast.
-  `"postCreateCommand": "R -q -e 'install.packages("tidyverse")'"`,
-- Please create a pull request to contribute to the development of
-  packages. Note that source branch is the branch you are currently
-  working on when you run the `gh pr create` command.
+-   If a code space is used, Use ‘postCreateCommand’ to run commands after the container is created. It is rather fast. `"postCreateCommand": "R -q -e 'install.packages("tidyverse")'"`,
+-   Please create a pull request to contribute to the development of packages. Note that source branch is the branch you are currently working on when you run the `gh pr create` command.
 
 <!-- -->
 
-    gh pr create --title "Title of the pull request" --body "Description of the pull request"
-    gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+```         
+gh pr create --title "Title of the pull request" --body "Description of the pull request"
+gh pr create --title "Title of the pull request" --body "Description of the pull request" --base develop
+```
 
-To use the pkgdown github workflow, some of the vignettes need to be
-pre-knit before pushing to the remote github repository if extra
-packages are needed and you don’s want to add those to the workflow. An
-example is given below.
+To use the pkgdown github workflow, some of the vignettes need to be pre-knit before pushing to the remote github repository if extra packages are needed and you don’s want to add those to the workflow. An example is given below.
 
 ``` r
 knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",fi)
@@ -270,10 +237,4 @@ knitr::knit("vignettes/drcHelper.Rmd.orig", output = "vignettes/drcHelper.Rmd",f
 
 ## Acknowledgements
 
-The work is supported by Bayer Environment Effects team members,
-especially by Andreas Solga and Daniela Jans. The Mesocosm colleagues
-Sarah Baumert and Harald Schulz have supported the verification and
-validation with extensive examples and scripts and SAS / VB validated
-calculations. Discussions with the Bayer RS-stats group, ecotox stats
-core group and members of the CLE stats group regarding current
-practices and statistical principles have been extremely helpful.
+The work is supported by Bayer Environment Effects team members, especially by Andreas Solga and Daniela Jans. The Mesocosm colleagues Sarah Baumert and Harald Schulz have supported the verification and validation with extensive examples and scripts and SAS / VB validated calculations. Discussions with the Bayer RS-stats group, ecotox stats core group and members of the CLE stats group regarding current practices and statistical principles have been extremely helpful.
