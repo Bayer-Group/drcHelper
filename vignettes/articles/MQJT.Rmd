@@ -14,8 +14,106 @@ library(drcHelper)
 source("../knitr-setup.R")
 ```
 
-MQJT(Multiquantal Jonckheere–Terpstra) is mentioned in OECD TG 231 for AMA life stage (integers ranging from 45 to 66 in general) analysis. It is identical to the standard JT test except that it is applied to several quantiles in addition to the median and decisions are made using the median p‐value.  
+/**
+ Need re-write this article!!
+ **/
 
+## Multiquantal Jonckheere-Terpstra (MQJT) Test
+
+The standard Jonckheere-Terpstra test compares groups using a single response variable. For ordinal endpoints such as NF developmental stage in AMA studies, the **Multiquantal JT (MQJT)** extends the standard approach by examining multiple quantiles of the stage distribution simultaneously.
+
+### Motivation
+
+A step-down JT test applied to replicate medians is the conventional approach for AMA developmental stage. However, median-only analysis may miss shifts that affect primarily the tails of the distribution. The MQJT addresses this by dichotomising the ordinal response at multiple cutpoints and applying a step-down JT at each "slice".
+
+**Key assumption**: If there is a true treatment effect on the population, a shift in the *entire* distribution is expected. Even if replicate medians appear similar across concentrations, effects at other quantiles should be detected.
+
+### Algorithm
+
+The MQJT procedure (Green, Springer & Holbech 2018, ch. 9.3) works as follows:
+
+1. **Dichotomise**: For each cutpoint $ from the set of observed control stages (excluding the minimum), create a binary indicator (\text{stage} \geq c)$ for each animal.
+
+2. **Aggregate to replicates**: Compute the proportion of animals in each replicate (tank) with $\text{stage} \geq c$.
+
+3. **Step-down JT**: Apply the step-down Jonckheere-Terpstra procedure to these proportions:
+   - Start with all dose groups. If the JT test is significant ( < \alpha$), the NOEC at this slice is below all tested doses.
+   - Remove the highest dose and re-test. Repeat until the test is no longer significant.
+   - The NOEC for this slice is the highest dose remaining at the point where significance is lost.
+
+4. **Overall NOEC**: The most conservative (lowest) NOEC across all slices is the final NOEC.
+
+### Implementation in drcHelper
+
+The mqjt_test() function implements this procedure using PMCMRplus::jonckheereTest() as the underlying JT engine.
+
+```{r mqjt-example}
+# Create example AMA-like data with a dose-dependent shift in stage distribution
+set.seed(42)
+ama_data <- data.frame(
+  stage = c(
+    sample(54:62, 30, replace = TRUE, prob = c(1, 1, 2, 3, 4, 5, 5, 4, 3)),
+    sample(54:62, 30, replace = TRUE, prob = c(1, 2, 3, 4, 5, 5, 4, 3, 1)),
+    sample(54:62, 30, replace = TRUE, prob = c(2, 3, 4, 5, 5, 4, 3, 1, 1)),
+    sample(54:62, 30, replace = TRUE, prob = c(4, 5, 5, 4, 3, 2, 1, 1, 1))
+  ),
+  dose = factor(rep(c("Control", "0.1", "1.0", "10"), each = 30),
+                levels = c("Control", "0.1", "1.0", "10")),
+  tank = rep(rep(paste0("T", 1:3), each = 10), 4)
+)
+
+# Run MQJT with one-sided test for decreasing trend
+res <- mqjt_test(
+  data = ama_data,
+  stage_col = "stage",
+  dose_col = "dose",
+  replicate_col = "tank",
+  alternative = "less"
+)
+```
+
+### Results
+
+```{r mqjt-print}
+res
+```
+
+The summary() method provides per-cutpoint detail:
+
+```{r mqjt-summary}
+summary(res)
+```
+
+### Interpretation
+
+```{r mqjt-interpret}
+# NOEC per slice
+res$noec_per_slice
+```
+
+```{r mqjt-overall}
+# Overall NOEC (most conservative across all slices)
+res$overall_NOEC
+```
+
+The overall NOEC is the **minimum** NOEC across all cutpoints, ensuring the most protective result. If any quantile of the stage distribution shows a significant treatment-related shift at a given dose, that dose is considered the LOEC.
+
+### Comparison: Standard JT vs. MQJT
+
+| Aspect | Standard step-down JT | MQJT |
+|--------|----------------------|------|
+| Input | Single response per replicate (e.g. median stage) | Multiple quantiles of stage distribution |
+| Sensitivity | May miss tail effects | Detects shifts across entire distribution |
+| NOEC determination | Based on single step-down | Most conservative across all slices |
+| Use case | General trend testing | Ordinal endpoints (AMA, LAGDA) |
+
+### References
+
+- Green JW, Springer TA, Holbech H (2018). *Statistical Analysis of Ecotoxicity Studies*. Wiley. Chapter 9, Sections 9.3.1--9.3.4.
+- OECD Test Guideline 231: Amphibian Metamorphosis Assay.
+
+
+MQJT(Multiquantal Jonckheere–Terpstra) is mentioned in OECD TG 231 for AMA life stage (integers ranging from 45 to 66 in general) analysis. It is identical to the standard JT test except that it is applied to several quantiles in addition to the median and decisions are made using the median p‐value.  
 
 ## The MQJT
 

@@ -294,3 +294,4 @@ JtTest(Response ~ Dose,data = dat1 %>% mutate(Dose = factor(Dose)) %>% mutate(Re
 |PMCMRplus  |jonckheereTest         |           72|      3.2796|   1e-03|two.sided   |JT is in 'estimate'; Z is in 'statistic'.        |
 |stats      |cor.test               |             |      3.2796|   1e-03|two.sided   |Z is in 'statistic'.  
 
+
