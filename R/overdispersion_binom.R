@@ -35,14 +35,14 @@ Tarone.trend.test <- function(successes, totals, doses,
   )
 
   # Summarize by dose for trend analysis
-  dose_summary <- raw_data %>%
-    dplyr::group_by(doses) %>%
+  dose_summary <- raw_data |>
+    dplyr::group_by(doses) |>
     dplyr::summarise(
       successes = sum(successes),
       totals = sum(totals),
       n_replicates = dplyr::n(),
       .groups = 'drop'
-    ) %>%
+    ) |>
     dplyr::arrange(doses)
 
   # Extract vectors for trend analysis
@@ -99,8 +99,8 @@ Tarone.trend.test <- function(successes, totals, doses,
 perform_groupwise_tarone <- function(data) {
 
   # Group by dose and perform Tarone test for each group with replicates
-  groupwise_results <- data %>%
-    dplyr::group_by(doses) %>%
+  groupwise_results <- data |>
+    dplyr::group_by(doses) |>
     dplyr::summarise(
       n_replicates = dplyr::n(),
       tarone_result = list({
@@ -268,7 +268,7 @@ print.TaroneTrendTest <- function(x, ...) {
   # Groupwise Tarone test results table
   if (!is.null(x$groupwise_tarone)) {
     cat("Groupwise Tarone Tests (Within-Dose Overdispersion):\n")
-    groupwise_df <- x$groupwise_tarone$summary %>%
+    groupwise_df <- x$groupwise_tarone$summary |>
       dplyr::mutate(
         Z_Statistic = ifelse(is.nan(z_statistic), "NaN (no variation)",
                              sprintf("%.3f", z_statistic)),
@@ -279,7 +279,7 @@ print.TaroneTrendTest <- function(x, ...) {
           !significant ~ "Not overdispersed",
           TRUE ~ "Unknown"
         )
-      ) %>%
+      ) |>
       dplyr::select(
         Dose = dose,
         N_Replicates = n_replicates,
@@ -415,7 +415,7 @@ rep_char <- function(char, n) paste(rep(char, n), collapse = "")
 create_summary_table <- function(comparison_results) {
 
   # Main results table
-  main_table <- comparison_results$comparison_table %>%
+  main_table <- comparison_results$comparison_table |>
     dplyr::mutate(
       `Scoring Method` = Scoring_Method,
       `Phi (Overdispersion)` = Phi_Estimate,
@@ -423,7 +423,7 @@ create_summary_table <- function(comparison_results) {
       `P-value` = Trend_P_Value,
       `Significant?` = Overdispersion,
       `Analysis Recommendation` = Recommendation
-    ) %>%
+    ) |>
     dplyr::select(-Scoring_Method, -Phi_Estimate, -Trend_Z_Stat,
                   -Trend_P_Value, -Overdispersion, -Recommendation)
 

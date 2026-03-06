@@ -228,18 +228,18 @@ report_dunnett_summary <- function(formula, data, dunnett_test_func, alternative
   }
   # --- END OF FIX ---
   # 4. Tidy and Join Results
-  test_output <- results_table %>%
-    dplyr::mutate(Dose = as.numeric(gsub(" - 0.*", "", comparison))) %>%
+  test_output <- results_table |>
+    dplyr::mutate(Dose = as.numeric(gsub(" - 0.*", "", comparison))) |>
     dplyr::select(Dose, statistic, p.value, significant)
   test_output$Dose <- factor(test_output$Dose)
   names(test_output)[1] <- dose_name
-  final_report <- prelim_stats %>%
-    dplyr::left_join(test_output, by = dose_name) %>%
-    dplyr::left_join(mdd_results, by = dose_name) %>%
+  final_report <- prelim_stats |>
+    dplyr::left_join(test_output, by = dose_name) |>
+    dplyr::left_join(mdd_results, by = dose_name) |>
     dplyr::rename(MDD_Dunnett_Percent = MDD_pct, t_statistic = statistic)
 
   # 5. Reorder and return
-  final_report %>%
+  final_report |>
     dplyr::select(
       Dose, Mean, SD, CV, `% Inhibition`,
       t_statistic, p.value, significant, MDD_Dunnett_Percent

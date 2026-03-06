@@ -57,7 +57,7 @@ Plot a list of models together.
 \examples{
 \dontrun{
 data("dat_medium")
-dat_medium <- dat_medium \%>\% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 dat_medium$Response[dat_medium$Response < 0] <- 0
 mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
 fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())

@@ -158,16 +158,16 @@ expand_to_individual_tidy <- function(data, treatment_col = "tmt", replicate_col
   }
 
   # Convert to long format and expand
-  result <- data %>%
+  result <- data |>
     tidyr::pivot_longer(
       cols = tidyselect::all_of(score_cols),
       names_to = "score",
       values_to = "count_weight"  # Use a specific name for the count column
-    ) %>%
-    dplyr::filter(.data$count_weight > 0) %>%
-    dplyr::select(tidyselect::all_of(c(treatment_col, replicate_col, "score", "count_weight"))) %>%
-    tidyr::uncount(weights = .data$count_weight) %>%  # Use the specific column name
-    dplyr::arrange(.data[[treatment_col]], .data[[replicate_col]]) %>%
+    ) |>
+    dplyr::filter(.data$count_weight > 0) |>
+    dplyr::select(tidyselect::all_of(c(treatment_col, replicate_col, "score", "count_weight"))) |>
+    tidyr::uncount(weights = .data$count_weight) |>  # Use the specific column name
+    dplyr::arrange(.data[[treatment_col]], .data[[replicate_col]]) |>
     dplyr::select(-tidyselect::all_of("count_weight")) ## remove the count-weight column
 
   return(result)
@@ -193,15 +193,15 @@ aggregate_from_individual_tidy <- function(data, treatment_col = "tmt", replicat
   }
 
   # Aggregate the data
-  result <- data %>%
-    dplyr::group_by(dplyr::across(tidyselect::all_of(c(treatment_col, replicate_col, score_col)))) %>%
-    dplyr::summarize(n = dplyr::n(), .groups = "drop") %>%
+  result <- data |>
+    dplyr::group_by(dplyr::across(tidyselect::all_of(c(treatment_col, replicate_col, score_col)))) |>
+    dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
     tidyr::pivot_wider(
       names_from = tidyselect::all_of(score_col),
       values_from = n,
       values_fill = 0
-    ) %>%
-    dplyr::mutate(!!total_col := rowSums(dplyr::across(where(is.numeric)))) %>%
+    ) |>
+    dplyr::mutate(!!total_col := rowSums(dplyr::across(where(is.numeric)))) |>
     dplyr::arrange(.data[[treatment_col]], .data[[replicate_col]])
 
   return(result)

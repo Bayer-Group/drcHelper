@@ -119,10 +119,10 @@ prelimPlot3 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
                    ylab = ylab, xlab = xlab, title = title)
 
   # Summarize the data
-  datsum <- testdata %>%
-    group_by(.data[[dose_col]]) %>%
+  datsum <- testdata |>
+    group_by(.data[[dose_col]]) |>
     summarise(mean = mean(.data[[response_col]]),
-              SE = sd(.data[[response_col]]) / sqrt(length(.data[[response_col]]))) %>%
+              SE = sd(.data[[response_col]]) / sqrt(length(.data[[response_col]]))) |>
     mutate(Lower = .data$mean - a * .data$SE, Upper = .data$mean + a * .data$SE)
 
   # Add points and error bars to the plot
@@ -162,14 +162,14 @@ prelimPlot3 <- function(testdata, ylab = "Response", xlab = "Test Concentration 
 #' print(summary_result)
 prelimSummary <- function(testdata, dose_col = "Dose", response_col = "Response") {
   # Filter control group (Dose == 0)
-  ctr <- testdata %>% filter(.data[[dose_col]] == 0)
+  ctr <- testdata |> filter(.data[[dose_col]] == 0)
   ctr0 <- mean(ctr[[response_col]], na.rm = TRUE)  # Calculate mean response for control group
 
   # Summarize the data
-  sres <- testdata %>%
-    group_by(.data[[dose_col]]) %>%
+  sres <- testdata |>
+    group_by(.data[[dose_col]]) |>
     summarise(Mean = mean(.data[[response_col]], na.rm = TRUE),
-              SD = sd(.data[[response_col]], na.rm = TRUE)) %>%
+              SD = sd(.data[[response_col]], na.rm = TRUE)) |>
     mutate(`% Inhibition` = -((.data$Mean - ctr0) / ctr0) * 100,
            CV = .data$SD / .data$Mean * 100)
 

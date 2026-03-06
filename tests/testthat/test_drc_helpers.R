@@ -126,7 +126,7 @@ describe("drcCompare", {
 
   it("ouput the expected results", {
     data("dat_medium")
-    dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+    dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
     dat_medium$Response[dat_medium$Response < 0] <- 0
 
     mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())

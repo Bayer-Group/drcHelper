@@ -70,8 +70,8 @@ cochranArmitageTrendTest <- function(successes, totals, doses,
 
   # Remove incomplete cases and summarize by dose
   OK <- complete.cases(successes, totals, doses)
-  dat <- data.frame(successes = successes[OK], totals = totals[OK], doses = doses[OK]) %>%
-    dplyr::group_by(doses) %>%
+  dat <- data.frame(successes = successes[OK], totals = totals[OK], doses = doses[OK]) |>
+    dplyr::group_by(doses) |>
     dplyr::summarise(successes = sum(successes), totals = sum(totals), .groups = 'drop')
 
   successes <- dat$successes
@@ -246,13 +246,13 @@ stepDownTrendTestBinom <- function(successes, totals, doses,
     successes = successes[OK],
     totals = totals[OK],
     doses = doses[OK]
-  ) %>%
-    dplyr::group_by(doses) %>%
+  ) |>
+    dplyr::group_by(doses) |>
     dplyr::summarise(
       successes = sum(successes),
       totals = sum(totals),
       .groups = 'drop'
-    ) %>%
+    ) |>
     dplyr::arrange(doses)
 
   # Extract vectors
@@ -466,13 +466,13 @@ estimate_phi_with_scoring <- function(successes, totals, doses, scoring,
     successes = successes[OK],
     totals = totals[OK],
     doses = doses[OK]
-  ) %>%
-    dplyr::group_by(doses) %>%
+  ) |>
+    dplyr::group_by(doses) |>
     dplyr::summarise(
       successes = sum(successes),
       totals = sum(totals),
       .groups = 'drop'
-    ) %>%
+    ) |>
     dplyr::arrange(doses)
 
   succ <- dat$successes

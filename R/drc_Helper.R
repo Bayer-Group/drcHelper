@@ -21,7 +21,7 @@
 #' @examples
 #' \dontrun{
 #' data("dat_medium")
-#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 #' dat_medium$Response[dat_medium$Response < 0] <- 0
 #' mod <- drm(Response~Dose,data=dat_medium,fct=LN.4())
 #' p1 <- plot.modList(list(mod))
@@ -114,7 +114,7 @@ addECxCI <- function(p = NULL, object, EDres = NULL, trend = "Decrease", endpoin
 #' @examples
 #' \dontrun{
 #' data("dat_medium")
-#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 #' dat_medium$Response[dat_medium$Response < 0] <- 0
 #' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
 #' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
@@ -331,7 +331,7 @@ ED.ZG <- function(...) {
 #' @examples
 #' \dontrun{
 #' data("dat_medium")
-#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 #' dat_medium$Response[dat_medium$Response < 0] <- 0
 #' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
 #' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
@@ -484,7 +484,7 @@ print.drcComp <- function(x, ...) {
 #' @examples
 #' \dontrun{
 #' data("dat_medium")
-#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 #' dat_medium$Response[dat_medium$Response < 0] <- 0
 #' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
 #' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())
@@ -862,7 +862,7 @@ ECx_rating <- function(x) {
 #' @examples
 #' \dontrun{
 #' data("dat_medium")
-#' dat_medium <- dat_medium %>% mutate(Treatment=factor(Dose,levels=unique(Dose)))
+#' dat_medium <- dat_medium |> mutate(Treatment=factor(Dose,levels=unique(Dose)))
 #' dat_medium$Response[dat_medium$Response < 0] <- 0
 #' mod <- drm(Response~Dose,data=dat_medium,fct=LL.3())
 #' fctList <- list(LN.4(),LL.4(),W1.3(),LL2.2())

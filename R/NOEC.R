@@ -1,8 +1,6 @@
 ## Function to calculate NOECs using multiple methods and broomed together
 ## Unit Testing in # FILE: tests/testthat/test_quantal_categorical.R
 
-
-
 #' Calculate NOEC Using Many-to-one Pairwise Tests
 #'
 #' This function calculates the No Observed Effect Concentration (NOEC) from dose response data
@@ -20,16 +18,20 @@
 #' @return A list containing the NOEC value and the full test results
 #' @export
 #'
-#' @importFrom dplyr mutate filter arrange %>%
+#' @importFrom dplyr mutate filter arrange
 #' @importFrom rlang enquo quo_name .data
 #' @importFrom rstatix t_test wilcox_test
 #' @importFrom stats as.formula setNames
-calculate_noec_rstatix <- function(data, response, dose, control = "0",
-                                   test = c("t.test", "wilcox.test"),
-                                   p_adjust_method = "holm",
-                                   alternative = "two.sided",
-                                   alpha = 0.05) {
-
+calculate_noec_rstatix <- function(
+  data,
+  response,
+  dose,
+  control = "0",
+  test = c("t.test", "wilcox.test"),
+  p_adjust_method = "holm",
+  alternative = "two.sided",
+  alpha = 0.05
+) {
   # Match test argument
   test <- match.arg(test)
 
@@ -76,7 +78,7 @@ calculate_noec_rstatix <- function(data, response, dose, control = "0",
     dose_mapping <- stats::setNames(numeric_doses, dose_levels)
 
     # Add numeric dose values to test results
-    test_results <- test_results %>%
+    test_results <- test_results |>
       dplyr::mutate(
         group1_numeric = dose_mapping[.data$group1],
         group2_numeric = dose_mapping[.data$group2]
@@ -84,28 +86,30 @@ calculate_noec_rstatix <- function(data, response, dose, control = "0",
 
     # Determine which column contains the non-control doses
     if (all(test_results$group1 == control)) {
-      test_results <- test_results %>%
+      test_results <- test_results |>
         dplyr::mutate(dose_numeric = .data$group2_numeric)
     } else if (all(test_results$group2 == control)) {
-      test_results <- test_results %>%
+      test_results <- test_results |>
         dplyr::mutate(dose_numeric = .data$group1_numeric)
     } else {
       # Mixed case - need to handle both possibilities
-      test_results <- test_results %>%
+      test_results <- test_results |>
         dplyr::mutate(
-          dose_numeric = ifelse(.data$group1 == control,
-                                .data$group2_numeric,
-                                .data$group1_numeric)
+          dose_numeric = ifelse(
+            .data$group1 == control,
+            .data$group2_numeric,
+            .data$group1_numeric
+          )
         )
     }
 
     # Sort by numeric dose
-    test_results <- test_results %>%
+    test_results <- test_results |>
       dplyr::arrange(.data$dose_numeric)
   }
 
   # Find the NOEC (highest dose with p > alpha)
-  significant_results <- test_results %>%
+  significant_results <- test_results |>
     dplyr::filter(.data$p.adj <= alpha)
 
   if (nrow(significant_results) == 0) {
@@ -137,7 +141,9 @@ calculate_noec_rstatix <- function(data, response, dose, control = "0",
     significant_doses <- suppressWarnings(as.numeric(significant_doses))
 
     # Get all tested doses
-    all_doses <- suppressWarnings(as.numeric(as.character(unique(data[[dose_name]]))))
+    all_doses <- suppressWarnings(as.numeric(as.character(unique(data[[
+      dose_name
+    ]]))))
     all_doses <- all_doses[!is.na(all_doses) & all_doses != as.numeric(control)]
     all_doses <- sort(all_doses)
 
@@ -161,16 +167,3 @@ calculate_noec_rstatix <- function(data, response, dose, control = "0",
     test_results = test_results
   ))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

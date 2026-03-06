@@ -489,7 +489,7 @@ describe("RSCABS",{
     Endpoint1 = c(rpois(10, 2), rpois(10, 3), rpois(10,5)),
     Endpoint2 = c(rpois(10, 1), rpois(10, 2), rpois(10, 3))
   )
-  #mock_data <- pvi_example %>% mutate(y0 = as.numeric(factor(y0)))
+  #mock_data <- pvi_example |> mutate(y0 = as.numeric(factor(y0)))
   # Unit tests
   it("runRSCABS calculates correctly", {
     result <- runRSCABS(as.data.frame(mock_data), "Treatment", "Replicate",Effects = "Endpoint1")

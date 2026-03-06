@@ -23,7 +23,7 @@ Config/testthat/edition: 3
 Depends: 
     drc,
     drcData,
-    R (>= 2.10)
+    R (>= 4.1.0)
 LazyData: true
 URL: https://bayer-group.github.io/drcHelper/index.html
 Imports: 
@@ -40,7 +40,6 @@ Imports:
     bmd,
     ggplot2,
     scales,
-    magrittr,
     metafor,
     purrr,
     rlang,

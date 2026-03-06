@@ -1,4 +1,4 @@
-# FILE: tests/testthat/test_data_Helper.R
+# FILE: tests/testthat/test_data_helper.R
 
 library(testthat)
 library(drcHelper)

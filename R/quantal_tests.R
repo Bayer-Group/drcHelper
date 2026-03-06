@@ -27,9 +27,14 @@
 #' # Create contingency table
 #' create_contingency_table(data, "dose", "alive", "dead")
 #'
-create_contingency_table <- function(data, group_col, success_col, failure_col,
-                                     prefix = NULL, col_names = NULL) {
-
+create_contingency_table <- function(
+  data,
+  group_col,
+  success_col,
+  failure_col,
+  prefix = NULL,
+  col_names = NULL
+) {
   # Validate inputs
   if (!all(c(group_col, success_col, failure_col) %in% colnames(data))) {
     stop("One or more specified columns not found in the data")
@@ -53,8 +58,8 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
   failure_sym <- sym(failure_col)
 
   # Aggregate counts by group using correct syntax for dynamic column names
-  summary_data <- data %>%
-    group_by(!!group_sym) %>%
+  summary_data <- data |>
+    group_by(!!group_sym) |>
     summarize(
       success_count = sum(!!success_sym),
       failure_count = sum(!!failure_sym),
@@ -62,7 +67,10 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
     )
 
   # Create matrix
-  result_matrix <- as.matrix(summary_data[, c("success_count", "failure_count")])
+  result_matrix <- as.matrix(summary_data[, c(
+    "success_count",
+    "failure_count"
+  )])
 
   # Set row and column names
   rownames(result_matrix) <- paste0(prefix, summary_data[[group_col]])
@@ -70,7 +78,6 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
 
   return(result_matrix)
 }
-
 
 
 #' Many-to-One Pairwise Fisher's Exact Test
@@ -84,7 +91,7 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
 #' @param ... Additional arguments passed to fisher.test()
 #'
 #' @return A data frame containing the results of the Fisher's exact tests
-#' @importFrom dplyr %>% mutate select add_row
+#' @importFrom dplyr mutate select add_row
 #' @importFrom purrr map
 #' @importFrom rstatix adjust_pvalue add_significance fisher_test
 #' @export
@@ -96,14 +103,21 @@ create_contingency_table <- function(data, group_col, success_col, failure_col,
 #' # Run many-to-one Fisher's test with dose_0 as reference
 #' many_to_one_fisher_test(ctable, ref.group = "dose_0")
 #' }
-many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "holm",
-                                    detailed = FALSE, ...) {
+many_to_one_fisher_test <- function(
+  xtab,
+  ref.group = NULL,
+  p.adjust.method = "holm",
+  detailed = FALSE,
+  ...
+) {
   ## requireNamespace("rstatix",quietly = FALSE)
-  if (is.data.frame(xtab))
+  if (is.data.frame(xtab)) {
     xtab <- as.matrix(xtab)
+  }
 
-  if (ncol(xtab) > 2 & nrow(xtab) == 2)
+  if (ncol(xtab) > 2 & nrow(xtab) == 2) {
     xtab <- t(xtab)
+  }
 
   if (is.null(colnames(xtab)) | any(0 %in% nchar(colnames(xtab)))) {
     colnames(xtab) <- paste0("col", 1:ncol(xtab))
@@ -129,8 +143,8 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
   # Function to compare a group with the reference group
   compare_to_ref <- function(group, ref, xtab, ...) {
     rows <- c(ref, group)
-    fisher_test(xtab[rows, ], detailed = detailed, ...) %>%
-      rstatix:::add_columns(group1 = ref, group2 = group, .before = 1) %>%
+    fisher_test(xtab[rows, ], detailed = detailed, ...) |>
+      rstatix:::add_columns(group1 = ref, group2 = group, .before = 1) |>
       rstatix:::keep_only_tbl_df_classes()
   }
 
@@ -138,19 +152,25 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
   other_groups <- setdiff(rownames(xtab), ref.group)
 
   # Perform comparisons
-  results <- lapply(other_groups, compare_to_ref, ref = ref.group, xtab = xtab, ...) %>%
-    bind_rows() %>%
-    adjust_pvalue("p", method = p.adjust.method) %>%
-    add_significance("p.adj") %>%
-    mutate(p.adj = signif(.data$p.adj, digits = 3)) %>%
+  results <- lapply(
+    other_groups,
+    compare_to_ref,
+    ref = ref.group,
+    xtab = xtab,
+    ...
+  ) |>
+    bind_rows() |>
+    adjust_pvalue("p", method = p.adjust.method) |>
+    add_significance("p.adj") |>
+    mutate(p.adj = signif(.data$p.adj, digits = 3)) |>
     dplyr::select(-.data$p.signif)
 
   # Add class and attributes
-  args <- c(as.list(environment()), list(...)) %>%
+  args <- c(as.list(environment()), list(...)) |>
     rstatix:::add_item(method = "fisher_test", ref.group = ref.group)
 
-  results %>%
-    rstatix:::set_attrs(args = args) %>%
+  results |>
+    rstatix:::set_attrs(args = args) |>
     rstatix:::add_class(c("rstatix_test", "fisher_test", "many_to_one_test"))
 }
 
@@ -189,12 +209,16 @@ many_to_one_fisher_test <- function(xtab, ref.group = NULL, p.adjust.method = "h
 #' # Run Fisher's exact test
 #' compare_to_control_fisher(data, "dose", "alive", "dead", control_level = 0)
 #'
-compare_to_control_fisher <- function(data, factor_col, success_col, failure_col,
-                                      control_level = NULL,
-                                      alternative = "two.sided",
-                                      conf.level = 0.95,
-                                      p.adjust.method = "holm") {
-
+compare_to_control_fisher <- function(
+  data,
+  factor_col,
+  success_col,
+  failure_col,
+  control_level = NULL,
+  alternative = "two.sided",
+  conf.level = 0.95,
+  p.adjust.method = "holm"
+) {
   # Validate inputs
   if (!all(c(factor_col, success_col, failure_col) %in% colnames(data))) {
     stop("One or more specified columns not found in the data")
@@ -261,14 +285,17 @@ compare_to_control_fisher <- function(data, factor_col, success_col, failure_col
   }
 
   # Add adjusted p-values
-  fisher_results$p_adjusted <- p.adjust(fisher_results$p_value, method = p.adjust.method)
+  fisher_results$p_adjusted <- p.adjust(
+    fisher_results$p_value,
+    method = p.adjust.method
+  )
 
   # Rename the level column to match the input factor column name
   names(fisher_results)[names(fisher_results) == "level"] <- factor_col
 
   # Round numeric columns for readability
-  fisher_results <- fisher_results %>%
-    mutate(across(where(is.numeric), ~round(., 4)))
+  fisher_results <- fisher_results |>
+    mutate(across(where(is.numeric), ~ round(., 4)))
 
   return(fisher_results)
 }
@@ -295,46 +322,62 @@ compare_to_control_fisher <- function(data, factor_col, success_col, failure_col
 #' M <- c( 9, 10, 22, 15,  8, 19, 16, 19, 15, 10)
 #' Tarone.test(N, M)
 Tarone.test <- function(N, M) {
-
   #Check validity of inputs
-  if(!(all(N == as.integer(N)))) { stop("Error: Number of trials should be integers"); }
-  if(min(N) < 1) { stop("Error: Number of trials should be positive"); }
-  if(!(all(M == as.integer(M)))) { stop("Error: Count values should be integers"); }
-  if(min(M) < 0) { stop("Error: Count values cannot be negative"); }
-  if(any(M > N)) { stop("Error: Observed count value exceeds number of trials"); }
+  if (!(all(N == as.integer(N)))) {
+    stop("Error: Number of trials should be integers")
+  }
+  if (min(N) < 1) {
+    stop("Error: Number of trials should be positive")
+  }
+  if (!(all(M == as.integer(M)))) {
+    stop("Error: Count values should be integers")
+  }
+  if (min(M) < 0) {
+    stop("Error: Count values cannot be negative")
+  }
+  if (any(M > N)) {
+    stop("Error: Observed count value exceeds number of trials")
+  }
 
   #Set description of test and data
-  method      <- "Tarone's Z test";
-  data.name   <- paste0(deparse(substitute(M)), " successes from ",
-                        deparse(substitute(N)), " trials");
+  method <- "Tarone's Z test"
+  data.name <- paste0(
+    deparse(substitute(M)),
+    " successes from ",
+    deparse(substitute(N)),
+    " trials"
+  )
 
   #Set null and alternative hypotheses
-  null.value  <- 0;
-  attr(null.value, "names") <- "dispersion parameter";
-  alternative <- "greater";
+  null.value <- 0
+  attr(null.value, "names") <- "dispersion parameter"
+  alternative <- "greater"
 
   #Calculate test statistics
-  estimate    <- sum(M)/sum(N);
-  attr(estimate, "names") <- "proportion parameter";
-  S           <- ifelse(estimate == 1, sum(N),
-                        sum((M - N*estimate)^2/(estimate*(1 - estimate))));
-  statistic   <- (S - sum(N))/sqrt(2*sum(N*(N-1)));
-  attr(statistic, "names") <- "z";
+  estimate <- sum(M) / sum(N)
+  attr(estimate, "names") <- "proportion parameter"
+  S <- ifelse(
+    estimate == 1,
+    sum(N),
+    sum((M - N * estimate)^2 / (estimate * (1 - estimate)))
+  )
+  statistic <- (S - sum(N)) / sqrt(2 * sum(N * (N - 1)))
+  attr(statistic, "names") <- "z"
 
   #Calculate p-value
-  p.value     <- 2*pnorm(-abs(statistic), 0, 1);
-  attr(p.value, "names") <- NULL;
+  p.value <- 2 * pnorm(-abs(statistic), 0, 1)
+  attr(p.value, "names") <- NULL
 
   #Create htest object
-  TEST        <- list(method = method, data.name = data.name,
-                      null.value = null.value, alternative = alternative,
-                      estimate = estimate, statistic = statistic, p.value = p.value);
-  class(TEST) <- "htest";
-  TEST;
+  TEST <- list(
+    method = method,
+    data.name = data.name,
+    null.value = null.value,
+    alternative = alternative,
+    estimate = estimate,
+    statistic = statistic,
+    p.value = p.value
+  )
+  class(TEST) <- "htest"
+  TEST
 }
-
-
-
-
-
-

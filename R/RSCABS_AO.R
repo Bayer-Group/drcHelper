@@ -33,30 +33,30 @@ get_RS_adj_val <- function(group, replicate, affected, total) {
   dat <- tibble(grp = group, rep = replicate, aff = affected, tot = total)
 
   # Create aggregates by dose levels
-  agg <- dat %>%
-    group_by(.data$grp) %>%
+  agg <- dat |>
+    group_by(.data$grp) |>
     summarize(x = sum(.data$aff),
               n = sum(.data$tot),
               m = n(),
-              .groups = "drop") %>%
+              .groups = "drop") |>
     mutate(p_hat = .data$x / .data$n,
            b = .data$p_hat * (1 - .data$p_hat) / .data$n)
 
   # Add aggregates to original data frame
-  dat <- dat %>%
-    left_join(agg, by = "grp") %>%
+  dat <- dat |>
+    left_join(agg, by = "grp") |>
     mutate(r2 = (.data$aff - .data$tot * .data$p_hat)^2) # square of residuals
 
   # Calculate subgroup variances
-  subgrp_var <- dat %>%
-    group_by(.data$grp, .data$m, .data$n) %>%
-    summarize(sum_r2 = sum(.data$r2), .groups = "drop") %>%
+  subgrp_var <- dat |>
+    group_by(.data$grp, .data$m, .data$n) |>
+    summarize(sum_r2 = sum(.data$r2), .groups = "drop") |>
     mutate(v = .data$m * .data$sum_r2 / .data$n^2 / (.data$m - 1))
 
   agg$v <- subgrp_var$v
 
   # Calculate adjusted n and x values
-  agg <- agg %>%
+  agg <- agg |>
     mutate(D = ifelse(.data$v / .data$b < 1, 1, .data$v / .data$b),
            n_tilde = .data$n / .data$D,
            x_tilde = .data$x / .data$D)
